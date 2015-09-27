@@ -40,6 +40,8 @@
 uintptr_t kernel_stack[KERNEL_STACK_SIZE/sizeof(uintptr_t)]
           __attribute__ ((aligned(8)));
 
+#define L1_BASE 0x8205dA00
+
 // You might want to use this or some other fancy/creative banner ;-)
 static const char banner[] =
 "   ___                   ______     __ \n"\
@@ -146,6 +148,33 @@ extern void paging_map_device_section(uintptr_t ttbase, lvaddr_t va, lpaddr_t pa
  */
 static void paging_init(void)
 {
+
+    volatile uint32_t* kernel_entry_1 = (uint32_t *) (L1_BASE + 0x0800);
+    volatile uint32_t* kernel_entry_2 = (uint32_t *) (L1_BASE + 0x0801); 
+    volatile uint32_t* kernel_entry_3 = (uint32_t *) (L1_BASE + 0x0802); 
+    volatile uint32_t* kernel_entry_4 = (uint32_t *) (L1_BASE + 0x0803); 
+    volatile uint32_t* kernel_entry_5 = (uint32_t *) (L1_BASE + 0x0804);   
+    volatile uint32_t* uart_entry = (uint32_t *)   (L1_BASE + 0x0480);
+  
+//    printf("%x   %x   %x\n",kernel_entry,kernel_entry_2, uart_entry);   
+//    printf("Hello 1");
+     
+    *kernel_entry_1 = (uint32_t) 0x80000c02;   
+    *kernel_entry_2 = (uint32_t) 0x80100c02;   
+    *kernel_entry_3 = (uint32_t) 0x80200c02;   
+    *kernel_entry_4 = (uint32_t) 0x80300c02;   
+    *kernel_entry_5 = (uint32_t) 0x80400c02;   
+    *uart_entry   =   (uint32_t) 0x48020c02;
+
+ 
+//     u_int32_t temp = *kernel_entry;
+//     u_int32_t temp2 = *uart_entry;;
+
+ 
+//    printf("%x   %x\n",temp,  temp2);
+
+    printf("End of paging_init\n");
+
 }
 
 /**
@@ -157,7 +186,8 @@ void arch_init(void *pointer)
 {
 
     serial_init(); 
-
+    
+    /*
     printf("Hello, World! Press any keys and then return to flash\n");
   
     char c = serial_getchar();
@@ -169,14 +199,26 @@ void arch_init(void *pointer)
    printf("Flashing LEDS\n");
    led_flash();
    for(;;); // Infinite loop to keep the system busy for milestone 0.
-
+   */
     // You will need this section of the code for milestone 1.
     struct multiboot_info *mb = (struct multiboot_info *)pointer;
     parse_multiboot_image_header(mb);
+    
+//    printf("Start free ram = %x", glbl_core_data->start_free_ram);
+   
+    //lpaddr_t ttbr1 = (lpaddr_t) 0x8205d4001;
+    cp15_write_ttbr0(L1_BASE);
+    
+    cp15_write_ttbcr( cp15_read_ttbcr() & 0xFFFFFFF8 ); 
 
+    printf("Before\n");
     paging_init();
-    cp15_enable_mmu();
-    printf("MMU enabled\n");
+    printf("After\n");
+    cp15_enable_mmu(); 
+   
+   // serial_map_registers(); 
+    serial_putchar('A');
+    // printf("MMU enabled\n");
 
     text_init();
 }
