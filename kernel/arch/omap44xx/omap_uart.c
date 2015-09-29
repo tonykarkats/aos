@@ -42,6 +42,30 @@ static bool uart_initialized = false;
  * \brief Reinitialize console UART after setting up the MMU
  * This function is needed in milestone 1.
  */
+/*
+void our_serial_map_registers(uintptr_t our_base)
+{
+    if (uart_initialized) {
+        printf("omap serial map registers: serial registers already mapped, skipping\n");
+        return;
+    }
+  
+    lpaddr_t paddr = UART_BASE;
+    lpaddr_t pend = paging_round_down( UART_BASE + UART_SIZE, BYTES_PER_SECTION); 
+
+    while (paddr < pend) {
+
+        paging_map_device_section((uintptr_t) our_base, paddr, paddr);
+	paddr += BYTES_PER_SECTION;    
+    }
+
+    printf("omap serial_map_registers: base = 0x%"PRIxLVADDR" 0x%"PRIxLVADDR"\n",
+	   base, base + offset);
+    uart_initialized = true;
+    printf("omap serial_map_registers: done.\n");
+    return;
+}
+*/
 void serial_map_registers(void)
 {
     if (uart_initialized) {

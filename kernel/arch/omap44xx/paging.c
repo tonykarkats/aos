@@ -84,7 +84,7 @@ void paging_map_kernel_section(uintptr_t ttbase, lvaddr_t va, lpaddr_t pa)
     l1.section.ap10         = 1;    // RW/NA
     l1.section.ap2          = 0;
     l1.section.base_address = pa >> 20u;
-
+    
     paging_write_l1_entry(ttbase, va, l1);
 }
 

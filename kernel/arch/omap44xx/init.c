@@ -31,16 +31,19 @@
 
 #include <omap44xx_map.h>
 #include <omap44xx_led.h>
-
+#
 /**
  * \brief Kernel stack.
  *
  * This is the one and only kernel stack for a kernel instance.
  */
 uintptr_t kernel_stack[KERNEL_STACK_SIZE/sizeof(uintptr_t)]
-          __attribute__ ((aligned(8)));
+       __attribute__ ((aligned(8)));
 
-#define L1_BASE 0x8205dA00
+// #define L1_BASE 0x8F000000
+static union arm_l1_entry kernel_l1_table[2*ARM_L1_MAX_ENTRIES]
+__attribute__((aligned(ARM_L1_ALIGN)));
+static union arm_l1_entry *aligned_kernel_l1_table;
 
 // You might want to use this or some other fancy/creative banner ;-)
 static const char banner[] =
@@ -58,13 +61,20 @@ static const char banner[] =
  * calls arm_kernel_startup(), which should not return (if it does, this function
  * halts the kernel).
  */
+
+inline static uintptr_t paging_round_down(uintptr_t address, uintptr_t size)
+{
+    return address & ~(size - 1);
+}
+
+
 static void  __attribute__ ((noinline,noreturn)) text_init(void)
 {
     // Map-out low memory
     struct arm_coredata_mmap *mmap = (struct arm_coredata_mmap *)
         local_phys_to_mem(glbl_core_data->mmap_addr);
 
-    printf("paging_arm_reset: base: 0x%"PRIx64", length: 0x%"PRIx64".\n",
+    printf("PAGING_arm_reset: base: 0x%"PRIx64", length: 0x%"PRIx64".\n",
            mmap->base_addr, mmap->length);
     paging_arm_reset(mmap->base_addr, mmap->length);
 
@@ -119,6 +129,7 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
     panic("arm_kernel_startup() returned\n");
 }
 
+
 /**
  * \brief extract global information from multiboot_info
  */
@@ -137,6 +148,7 @@ static void parse_multiboot_image_header(struct multiboot_info *mb)
     glbl_core_data->mmap_length = mb->mmap_length;
     glbl_core_data->mmap_addr = mb->mmap_addr;
     glbl_core_data->multiboot_flags = mb->flags;
+   
 }
 
 extern void paging_map_device_section(uintptr_t ttbase, lvaddr_t va, lpaddr_t pa);
@@ -148,33 +160,25 @@ extern void paging_map_device_section(uintptr_t ttbase, lvaddr_t va, lpaddr_t pa
  */
 static void paging_init(void)
 {
+    aligned_kernel_l1_table = (union arm_l1_entry *)ROUND_UP(
+            (uintptr_t)kernel_l1_table, ARM_L1_ALIGN);
 
-    volatile uint32_t* kernel_entry_1 = (uint32_t *) (L1_BASE + 0x0800);
-    volatile uint32_t* kernel_entry_2 = (uint32_t *) (L1_BASE + 0x0801); 
-    volatile uint32_t* kernel_entry_3 = (uint32_t *) (L1_BASE + 0x0802); 
-    volatile uint32_t* kernel_entry_4 = (uint32_t *) (L1_BASE + 0x0803); 
-    volatile uint32_t* kernel_entry_5 = (uint32_t *) (L1_BASE + 0x0804);   
-    volatile uint32_t* uart_entry = (uint32_t *)   (L1_BASE + 0x0480);
+    /* Mapping ALL memory with
+     * with identical mapping
+     */ 
   
-//    printf("%x   %x   %x\n",kernel_entry,kernel_entry_2, uart_entry);   
-//    printf("Hello 1");
+    lpaddr_t paddr = 0x00000000;
+    lpaddr_t pend = paging_round_down( 0xFFFFFFFF, BYTES_PER_SECTION); 
+
+    while (paddr < pend) {
+
+        paging_map_device_section((uintptr_t) aligned_kernel_l1_table, paddr, paddr);
+	paddr += BYTES_PER_SECTION;    
+    }
      
-    *kernel_entry_1 = (uint32_t) 0x80000c02;   
-    *kernel_entry_2 = (uint32_t) 0x80100c02;   
-    *kernel_entry_3 = (uint32_t) 0x80200c02;   
-    *kernel_entry_4 = (uint32_t) 0x80300c02;   
-    *kernel_entry_5 = (uint32_t) 0x80400c02;   
-    *uart_entry   =   (uint32_t) 0x48020c02;
-
- 
-//     u_int32_t temp = *kernel_entry;
-//     u_int32_t temp2 = *uart_entry;;
-
- 
-//    printf("%x   %x\n",temp,  temp2);
-
-    printf("End of paging_init\n");
-
+    cp15_write_ttbr0((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table)); 
+    cp15_write_ttbcr(0x000); 
+   
 }
 
 /**
@@ -186,7 +190,6 @@ void arch_init(void *pointer)
 {
 
     serial_init(); 
-    
     /*
     printf("Hello, World! Press any keys and then return to flash\n");
   
@@ -203,22 +206,12 @@ void arch_init(void *pointer)
     // You will need this section of the code for milestone 1.
     struct multiboot_info *mb = (struct multiboot_info *)pointer;
     parse_multiboot_image_header(mb);
-    
-//    printf("Start free ram = %x", glbl_core_data->start_free_ram);
-   
-    //lpaddr_t ttbr1 = (lpaddr_t) 0x8205d4001;
-    cp15_write_ttbr0(L1_BASE);
-    
-    cp15_write_ttbcr( cp15_read_ttbcr() & 0xFFFFFFF8 ); 
-
-    printf("Before\n");
+     
     paging_init();
-    printf("After\n");
+    
     cp15_enable_mmu(); 
-   
-   // serial_map_registers(); 
-    serial_putchar('A');
-    // printf("MMU enabled\n");
 
-    text_init();
+    printf("MMU enabled\n");
+    while(1);  
+//    text_init();
 }

@@ -12,7 +12,7 @@
  * ETH Zurich D-INFK, CAB F.78, Universitaestr. 6, CH-8092 Zurich. 
  * Attn: Systems Group.
  */
-
+#include <stdint.h>
 #ifndef __SERIAL_H
 #define __SERIAL_H
 
@@ -25,7 +25,9 @@ extern const unsigned serial_num_physical_ports;
  * Initialize a physical serial port
  */
 extern void serial_init(void);
-extern void serial_map_registers(void);
+extern void serial_map_registers(void); 
+extern void our_serial_map_registers(uintptr_t); 
+
 
 /*
  * Polled, blocking input/output.  No buffering.
