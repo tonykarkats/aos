@@ -58,10 +58,15 @@ struct dcb *spawn_init(const char *name)
     // TODO: setup page tables for Init, set the provided variables
     // init_l1 and init_l2 to the address of the L1 and L2 page table respectively.
     // NOTE: internal functionality expects l2 ptables back-to-back in memory
-    UNUSED(init_l1);
-    UNUSED(init_l2);
-
+    uint32_t l1_size = GEN_ADDR(14);
+    init_l1 = (union arm_l1_entry *) alloc_phys_aligned(l1_size, l1_size);
+    
+    uint32_t l2_size = ARM_L2_MAX_ENTRIES * ARM_L2_BYTES_PER_ENTRY;
+    init_l2 = (union arm_l2_entry *)  alloc_phys_aligned(l2_size * ARM_L1_MAX_ENTRIES, l2_size);
+    
     // TODO: save address of user L1 page table in init_dcb->vspace
+    // init_dcb->vspace = init_l1; 
+    init_dcb->vspace = (lpaddr_t ) init_l1;
 
     // Map & Load init structures and ELF image
     // returns the entry point address and the global offset table base address
@@ -82,6 +87,8 @@ struct dcb *spawn_init(const char *name)
     disp_arm->save_area.named.cpsr = ARM_MODE_USR | CPSR_F_MASK;
 
     // TODO: set pc and r10(got base) in register save area (disp_arm->save_area)
+    disp_arm->save_area.named.pc = init_ep;
+    disp_arm->save_area.named.r10 = got_base;
 
     return init_dcb;
 }
@@ -103,6 +110,7 @@ void arm_kernel_startup(void)
     // Should not return
     printf("Calling dispatch from arm_kernel_startup, start address is=%"PRIxLVADDR"\n",
            get_dispatcher_shared_arm(init_dcb->disp)->save_area.named.pc);
+    
     dispatch(init_dcb);
     panic("Error spawning init!");
 }

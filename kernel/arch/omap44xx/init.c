@@ -45,6 +45,10 @@ static union arm_l1_entry kernel_l1_table[2*ARM_L1_MAX_ENTRIES]
 __attribute__((aligned(ARM_L1_ALIGN)));
 static union arm_l1_entry *aligned_kernel_l1_table;
 
+// Allocate continuous memory for all L2 tables in kernel memory
+// static union arm_l2_entry kernel_l2_tables[2*ARM_L1_MAX_ENTRIES*ARM_L2_MAX_ENTRIES]
+// __attribute__((aligned(ARM_L2_ALIGN)));
+
 // You might want to use this or some other fancy/creative banner ;-)
 static const char banner[] =
 "   ___                   ______     __ \n"\
@@ -77,27 +81,31 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
     printf("PAGING_arm_reset: base: 0x%"PRIx64", length: 0x%"PRIx64".\n",
            mmap->base_addr, mmap->length);
     paging_arm_reset(mmap->base_addr, mmap->length);
-
+   
     exceptions_init();
-
+    
     printf("invalidate cache\n");
     cp15_invalidate_i_and_d_caches_fast();
 
     printf("invalidate TLB\n");
     cp15_invalidate_tlb_fn();
 
+
     // reinitialize serial driver in mapped address space
     serial_map_registers();
-
+ 
     // map led gpio reg
     led_map_register();
 
     // flash leds again
     led_flash();
 
+
     printf("The address of paging_map_kernel_section is %p\n",
            paging_map_kernel_section);
-
+    while(1)
+        printf("A");
+ 
     // Test MMU by remapping the device identifier and reading it using a
     // virtual address
     lpaddr_t id_code_section = OMAP44XX_MAP_L4_CFG_SYSCTRL_GENERAL_CORE & ~ARM_L1_SECTION_MASK;
@@ -107,10 +115,11 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
 
     printf("original addr: 0x%"PRIxLPADDR"\n", id_code_section);
     printf("remapped addr: 0x%"PRIxLVADDR"\n", id_code_remapped);
-
+    
     char buf[32] = {0};
     memcpy(buf,(const char *)(id+0x200),32);
     printf("Using MMU (addr 0x%"PRIxLVADDR"):\n", id);
+
     for (int i = 0; i < 32; i+=8) {
         printf("%03x: ", i);
         printf("%02x ", buf[i]);
@@ -122,6 +131,7 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
         printf("%02x ", buf[i+6]);
         printf("%02x\n", buf[i+7]);
     }
+
     gic_init();
     printf("gic_init done\n");
 
@@ -163,7 +173,7 @@ static void paging_init(void)
     aligned_kernel_l1_table = (union arm_l1_entry *)ROUND_UP(
             (uintptr_t)kernel_l1_table, ARM_L1_ALIGN);
 
-    /* Mapping ALL memory with
+    /* Mapping ALL 4GB memory with
      * with identical mapping
      */ 
   
@@ -190,19 +200,7 @@ void arch_init(void *pointer)
 {
 
     serial_init(); 
-    /*
-    printf("Hello, World! Press any keys and then return to flash\n");
-  
-    char c = serial_getchar();
-    while (c != '\r') {
-	printf("You typed %c\n", c);
-	c = serial_getchar();
-   }
-
-   printf("Flashing LEDS\n");
-   led_flash();
-   for(;;); // Infinite loop to keep the system busy for milestone 0.
-   */
+    
     // You will need this section of the code for milestone 1.
     struct multiboot_info *mb = (struct multiboot_info *)pointer;
     parse_multiboot_image_header(mb);
@@ -212,6 +210,5 @@ void arch_init(void *pointer)
     cp15_enable_mmu(); 
 
     printf("MMU enabled\n");
-    while(1);  
-//    text_init();
+    text_init();
 }
