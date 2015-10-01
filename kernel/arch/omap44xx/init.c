@@ -82,8 +82,7 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
            mmap->base_addr, mmap->length);
     paging_arm_reset(mmap->base_addr, mmap->length);
    
-//    exceptions_init();
-
+    exceptions_init();
     
     printf("invalidate cache\n");
     cp15_invalidate_i_and_d_caches_fast();
@@ -93,7 +92,7 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
 
 
     // reinitialize serial driver in mapped address space
-//    serial_map_registers();
+    serial_map_registers();
  
     // map led gpio reg
     led_map_register();
@@ -190,7 +189,8 @@ static void paging_init(void)
     }
 
     cp15_write_ttbr0((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table)); 
-    cp15_write_ttbcr(0x000); 
+    cp15_write_ttbr1((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table));
+    cp15_write_ttbcr(1); 
    
 }
 
