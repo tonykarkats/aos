@@ -245,7 +245,7 @@ void map_and_load_init(const char *name, struct dcb *init_dcb,
     printf("got %"PRIxGENVADDR" as init ep from load_init_image\n", *ret_init_ep);
 
     /* Fill bootinfo struct */
-    bootinfo->mem_spawn_core = KERNEL_IMAGE_SIZE; // Size of kernel
+//    bootinfo->mem_spawn_core = KERNEL_IMAGE_SIZE; // Size of kernel
 
     /* Initialize name field in generic part */
     printf("Before get_dispacher_shared_generic call\n");

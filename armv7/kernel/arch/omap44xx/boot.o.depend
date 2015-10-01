@@ -1,0 +1,4 @@
+armv7/kernel/arch/omap44xx/boot.o \
+ armv7/kernel/arch/omap44xx/boot.o.depend: kernel/arch/omap44xx/boot.S \
+ include/deputy/nodeputy.h include/arch/arm/barrelfish_kpi/flags_arch.h \
+ kernel/include/arch/armv7/offsets.h

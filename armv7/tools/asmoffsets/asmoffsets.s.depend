@@ -1,0 +1,43 @@
+armv7/tools/asmoffsets/asmoffsets.s \
+ armv7/tools/asmoffsets/asmoffsets.s.depend: \
+ tools/asmoffsets/asmoffsets.c include/deputy/nodeputy.h \
+ include/barrelfish/static_assert.h kernel/include/kernel.h \
+ lib/newlib/newlib/libc/include/assert.h \
+ lib/newlib/newlib/libc/include/_ansi.h \
+ lib/newlib/newlib/libc/include/newlib.h \
+ lib/newlib/newlib/libc/include/sys/config.h \
+ lib/newlib/newlib/libc/include/machine/ieeefp.h \
+ lib/newlib/newlib/libc/include/sys/features.h include/c/stddef.h \
+ lib/newlib/newlib/libc/include/stdio.h include/c/stdarg.h \
+ lib/newlib/newlib/libc/include/sys/reent.h \
+ lib/newlib/newlib/libc/include/_ansi.h include/sys/_types.h \
+ lib/newlib/newlib/libc/include/stdint.h \
+ lib/newlib/newlib/libc/include/sys/lock.h include/sys/types.h \
+ include/sys/cdefs.h include/barrelfish/types.h \
+ include/barrelfish_kpi/types.h lib/newlib/newlib/libc/include/inttypes.h \
+ lib/newlib/newlib/libc/include/stdlib.h \
+ lib/newlib/newlib/libc/include/machine/stdlib.h \
+ lib/newlib/newlib/libc/include/sys/stdio.h include/c/stdbool.h \
+ include/barrelfish_kpi/cpu.h \
+ include/arch/arm/barrelfish_kpi/generic_arch.h \
+ include/arch/arm/barrelfish_kpi/flags_arch.h \
+ include/arch/arm/barrelfish_kpi/spinlocks_arch.h \
+ include/arch/arm/barrelfish_kpi/asm_inlines_arch.h \
+ include/arch/arm/barrelfish_kpi/unknown_arch.h \
+ include/arch/arm/barrelfish_kpi/registers_arch.h \
+ include/arch/arm/barrelfish/curdispatcher_arch.h \
+ include/barrelfish_kpi/dispatcher_handle.h armv7/include/errors/errno.h \
+ kernel/include/arch/armv7/offsets.h kernel/include/schedule.h \
+ kernel/include/dispatch.h \
+ include/arch/arm/barrelfish_kpi/dispatcher_shared_arch.h \
+ include/target/arm/barrelfish_kpi/dispatcher_shared_target.h \
+ include/barrelfish_kpi/dispatcher_shared.h \
+ kernel/include/arch/armv7/misc.h include/barrelfish/barrelfish.h \
+ include/arch/arm/barrelfish_kpi/paging_arch.h \
+ include/target/arm/barrelfish_kpi/paging_arm_v7.h \
+ include/barrelfish_kpi/syscalls.h include/barrelfish_kpi/init.h \
+ include/arch/arm/barrelfish/dispatcher_arch.h \
+ include/target/arm/barrelfish/dispatcher_target.h \
+ include/barrelfish/dispatcher.h include/barrelfish/dispatch.h \
+ include/arch/arm/barrelfish/core_state_arch.h \
+ include/barrelfish/core_state.h include/k_r_malloc.h

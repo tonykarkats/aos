@@ -71,8 +71,7 @@ struct dcb *spawn_init(const char *name)
 	paging_map_user_pages_l1((lvaddr_t) init_l1, (lvaddr_t) i*(0x100000), (lpaddr_t) l2_offset);
 
 //        printf("init_l1[%d] = %0x  |   l2_offset = %0x\n", i, init_l1[i], l2_offset);
-        l2_offset += 1024;
-       
+        l2_offset += 1024;       
     }
 
     // TODO: save address of user L1 page table in init_dcb->vspace

@@ -1,0 +1,17 @@
+armv7/usr/init/_for_app_init/libc_glue/morecore.o \
+ armv7/usr/init/_for_app_init/libc_glue/morecore.o.depend: \
+ usr/init/libc_glue/morecore.c include/deputy/nodeputy.h \
+ lib/newlib/newlib/libc/include/stdint.h \
+ lib/newlib/newlib/libc/include/stdlib.h \
+ lib/newlib/newlib/libc/include/machine/ieeefp.h \
+ lib/newlib/newlib/libc/include/_ansi.h \
+ lib/newlib/newlib/libc/include/newlib.h \
+ lib/newlib/newlib/libc/include/sys/config.h \
+ lib/newlib/newlib/libc/include/sys/features.h include/c/stddef.h \
+ lib/newlib/newlib/libc/include/sys/reent.h \
+ lib/newlib/newlib/libc/include/_ansi.h include/sys/_types.h \
+ include/c/stdarg.h lib/newlib/newlib/libc/include/sys/lock.h \
+ lib/newlib/newlib/libc/include/machine/stdlib.h \
+ lib/newlib/newlib/libc/include/alloca.h usr/init/include/morecore.h \
+ include/k_r_malloc.h include/sys/cdefs.h usr/init/include/debug.h \
+ usr/init/include/helpers.h

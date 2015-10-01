@@ -1,0 +1,7 @@
+armv7/kernel/arch/armv7/exceptions.o \
+ armv7/kernel/arch/armv7/exceptions.o.depend: \
+ kernel/arch/armv7/exceptions.S include/deputy/nodeputy.h \
+ armv7/include/asmoffsets.h \
+ include/arch/arm/barrelfish_kpi/registers_arch.h \
+ include/arch/arm/barrelfish_kpi/flags_arch.h \
+ kernel/include/arch/armv7/exceptions.h

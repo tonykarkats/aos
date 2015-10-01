@@ -1,0 +1,2 @@
+armv7/kernel/arch/armv7/cp15.o armv7/kernel/arch/armv7/cp15.o.depend: \
+ kernel/arch/armv7/cp15.S include/deputy/nodeputy.h
