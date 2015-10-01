@@ -248,8 +248,11 @@ void map_and_load_init(const char *name, struct dcb *init_dcb,
     bootinfo->mem_spawn_core = KERNEL_IMAGE_SIZE; // Size of kernel
 
     /* Initialize name field in generic part */
+    printf("Before get_dispacher_shared_generic call\n");
     struct dispatcher_shared_generic *disp
         = get_dispatcher_shared_generic(init_dcb->disp);
+    
+    printf("Before strncpy \n");
     strncpy(disp->name, "init", DISP_NAME_LEN);
-
+    printf("At the end of map_and_load_init\n");
 }

@@ -58,20 +58,33 @@ struct dcb *spawn_init(const char *name)
     // TODO: setup page tables for Init, set the provided variables
     // init_l1 and init_l2 to the address of the L1 and L2 page table respectively.
     // NOTE: internal functionality expects l2 ptables back-to-back in memory
-    uint32_t l1_size = GEN_ADDR(14);
-    init_l1 = (union arm_l1_entry *) alloc_phys_aligned(l1_size, l1_size);
+    init_l1 = (union arm_l1_entry *) local_phys_to_mem(alloc_phys_aligned(16384, 16384));
     
-    uint32_t l2_size = ARM_L2_MAX_ENTRIES * ARM_L2_BYTES_PER_ENTRY;
-    init_l2 = (union arm_l2_entry *)  alloc_phys_aligned(l2_size * ARM_L1_MAX_ENTRIES, l2_size);
-    
+    init_l2 = (union arm_l2_entry *) local_phys_to_mem( alloc_phys_aligned(4194304, 1024));
+
+    memset(init_l1, 0, 16384);
+    memset(init_l2, 0, 4194304);
+
+    printf("Filling out l1 tables..\n");
+    lvaddr_t l2_offset = (lvaddr_t) init_l2;
+    for (int i = 0; i<4096; i++){
+	paging_map_user_pages_l1((lvaddr_t) init_l1, (lvaddr_t) i*(0x100000), (lpaddr_t) l2_offset);
+
+//        printf("init_l1[%d] = %0x  |   l2_offset = %0x\n", i, init_l1[i], l2_offset);
+        l2_offset += 1024;
+       
+    }
+
     // TODO: save address of user L1 page table in init_dcb->vspace
     // init_dcb->vspace = init_l1; 
-    init_dcb->vspace = (lpaddr_t ) init_l1;
+    init_dcb->vspace = (mem_to_local_phys((lvaddr_t ) init_l1));
 
     // Map & Load init structures and ELF image
     // returns the entry point address and the global offset table base address
     genvaddr_t init_ep, got_base;
     map_and_load_init(name, init_dcb, init_l2, &init_ep, &got_base);
+    
+    printf("After map_and_load_init \n");
 
     // get dispatcher structs from dispatcher handle
     struct dispatcher_shared_arm *disp_arm
@@ -89,7 +102,10 @@ struct dcb *spawn_init(const char *name)
     // TODO: set pc and r10(got base) in register save area (disp_arm->save_area)
     disp_arm->save_area.named.pc = init_ep;
     disp_arm->save_area.named.r10 = got_base;
+ 
 
+    
+    printf("Spawning init is ending.");
     return init_dcb;
 }
 

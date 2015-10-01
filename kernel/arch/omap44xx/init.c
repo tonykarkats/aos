@@ -31,7 +31,7 @@
 
 #include <omap44xx_map.h>
 #include <omap44xx_led.h>
-#
+
 /**
  * \brief Kernel stack.
  *
@@ -41,9 +41,14 @@ uintptr_t kernel_stack[KERNEL_STACK_SIZE/sizeof(uintptr_t)]
        __attribute__ ((aligned(8)));
 
 // #define L1_BASE 0x8F000000
-static union arm_l1_entry kernel_l1_table[2*ARM_L1_MAX_ENTRIES]
+static union arm_l1_entry kernel_l1_table_low_memory[2*ARM_L1_MAX_ENTRIES]
 __attribute__((aligned(ARM_L1_ALIGN)));
-static union arm_l1_entry *aligned_kernel_l1_table;
+static union arm_l1_entry *aligned_kernel_l1_table_low_memory;
+
+static union arm_l1_entry kernel_l1_table_high_memory[2*ARM_L1_MAX_ENTRIES]
+__attribute__((aligned(ARM_L1_ALIGN)));
+static union arm_l1_entry *aligned_kernel_l1_table_high_memory;
+
 
 // Allocate continuous memory for all L2 tables in kernel memory
 // static union arm_l2_entry kernel_l2_tables[2*ARM_L1_MAX_ENTRIES*ARM_L2_MAX_ENTRIES]
@@ -168,29 +173,35 @@ extern void paging_map_device_section(uintptr_t ttbase, lvaddr_t va, lpaddr_t pa
  */
 static void paging_init(void)
 {
-    aligned_kernel_l1_table = (union arm_l1_entry *)ROUND_UP(
-            (uintptr_t)kernel_l1_table, ARM_L1_ALIGN);
-  
-    lpaddr_t paddr = 0x80000000;
-    lpaddr_t pend = paging_round_down( 0xBFFFFFFF, BYTES_PER_SECTION); 
+    aligned_kernel_l1_table_high_memory = (union arm_l1_entry *)ROUND_UP(
+            (uintptr_t)kernel_l1_table_high_memory, ARM_L1_ALIGN);
+ 
+    aligned_kernel_l1_table_low_memory = (union arm_l1_entry *)ROUND_UP(
+	  (uintptr_t)kernel_l1_table_low_memory, ARM_L1_ALIGN);
+ 
+    lpaddr_t paddr = 0x00000000;
+    lpaddr_t pend = paging_round_down( 0x80000000, BYTES_PER_SECTION); 
 
     while (paddr < pend) {
 
-        paging_map_device_section((uintptr_t) aligned_kernel_l1_table, paddr, paddr);
+        paging_map_device_section((uintptr_t) aligned_kernel_l1_table_low_memory, paddr, paddr);
 	paddr += BYTES_PER_SECTION;    
     }
+
     
-    paddr = 0x48020000;
-    pend  = 0x48020FFF;
+    paddr = 0x80000000;
+    pend = paging_round_down( 0xFFFFFFFF, BYTES_PER_SECTION); 
+
     while (paddr < pend) {
 
-        paging_map_device_section((uintptr_t) aligned_kernel_l1_table, paddr, paddr);
+        paging_map_device_section((uintptr_t) aligned_kernel_l1_table_high_memory, paddr, paddr);
 	paddr += BYTES_PER_SECTION;    
     }
 
-    cp15_write_ttbr0((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table)); 
-    cp15_write_ttbr1((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table));
-    cp15_write_ttbcr(1); 
+    cp15_write_ttbr0((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table_low_memory)); 
+    cp15_write_ttbr1((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table_high_memory));
+    uint32_t ttbcr = cp15_read_ttbcr();
+    cp15_write_ttbcr( ttbcr | 1 ); 
    
 }
 
@@ -210,8 +221,8 @@ void arch_init(void *pointer)
          
     paging_init();
     
-    printf("Before MMU enable\n"); 
     cp15_enable_mmu(); 
+    
     printf("MMU enabled\n");
     text_init();
 }
