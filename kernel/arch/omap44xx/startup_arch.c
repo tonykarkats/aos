@@ -65,12 +65,22 @@ struct dcb *spawn_init(const char *name)
     memset(init_l1, 0, 16384);
     memset(init_l2, 0, 4194304);
 
+/*
+    for (lvaddr_t vaddr = INIT_VBASE;
+         vaddr < INIT_SPACE_LIMIT;
+         vaddr += ARM_L1_SECTION_BYTES) {
+        uintptr_t section = (vaddr - INIT_VBASE) / ARM_L1_SECTION_BYTES;
+        uintptr_t l2_off = section * ARM_L2_TABLE_BYTES;
+        lpaddr_t paddr = mem_to_local_phys((lvaddr_t)init_l2) + l2_off;
+        paging_map_user_pages_l1((lvaddr_t)init_l1, vaddr, paddr);
+    }
+*/
+ 
     printf("Filling out l1 tables..\n");
     lvaddr_t l2_offset = (lvaddr_t) init_l2;
     for (int i = 0; i<4096; i++){
-	paging_map_user_pages_l1((lvaddr_t) init_l1, (lvaddr_t) i*(0x100000), (lpaddr_t) l2_offset);
+	paging_map_user_pages_l1((lvaddr_t) init_l1, (lvaddr_t) i*(0x100000) + INIT_VBASE , (lpaddr_t) l2_offset);
 
-//        printf("init_l1[%d] = %0x  |   l2_offset = %0x\n", i, init_l1[i], l2_offset);
         l2_offset += 1024;       
     }
 
@@ -104,7 +114,6 @@ struct dcb *spawn_init(const char *name)
  
 
     
-    printf("Spawning init is ending.");
     return init_dcb;
 }
 

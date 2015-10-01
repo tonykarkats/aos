@@ -58,21 +58,24 @@ void sys_syscall_kernel(void)
 
 void sys_syscall(arch_registers_state_t* context)
 {
-    // TODO: remove this!
-    panic("Can't handle user mode syscalls yet");
+    //panic("Can't handle user mode syscalls yet");
 
-    // extract syscall number and number of syscall arguments from
+     // extract syscall number and number of syscall arguments from
     // registers
     struct registers_arm_syscall_args* sa = &context->syscall_args;
     uintptr_t   syscall = sa->arg0 & 0xf;
     uintptr_t   argc    = (sa->arg0 >> 4) & 0xf;
-
-    UNUSED(syscall);
+   
+    // printf("sa->arg0 = %s . argc = %p\n",sa->arg0, argc);
+    switch(syscall){ 
+	case (SYSCALL_PRINT) : 
+	    printf("%s", sa->arg1);
+            break;
+        case (SYSCALL_NOP) : 
+            printf("Nop call\n");
+	    break;
+    }
     UNUSED(argc);
-
-    // TODO: implement syscall handling here for milestone 1.
-
-    // resume user process
     resume(context);
 }
 

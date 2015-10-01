@@ -13,4 +13,11 @@ armv7/usr/init/_for_app_init/main.o \
  include/c/stdarg.h lib/newlib/newlib/libc/include/sys/lock.h \
  lib/newlib/newlib/libc/include/machine/stdlib.h \
  lib/newlib/newlib/libc/include/alloca.h \
- lib/newlib/newlib/libc/include/assert.h armv7/include/errors/errno.h
+ lib/newlib/newlib/libc/include/assert.h armv7/include/errors/errno.h \
+ lib/newlib/newlib/libc/include/string.h \
+ lib/newlib/newlib/libc/include/sys/string.h \
+ lib/newlib/newlib/libc/include/stdio.h include/sys/types.h \
+ include/sys/cdefs.h include/barrelfish/types.h \
+ include/barrelfish_kpi/types.h lib/newlib/newlib/libc/include/inttypes.h \
+ include/barrelfish/static_assert.h \
+ lib/newlib/newlib/libc/include/sys/stdio.h

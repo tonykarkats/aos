@@ -88,6 +88,7 @@ void sos_init(dispatcher_handle_t handle, bool init_dom_arg)
     sos_libc_glue_init();
     // initialize skeleton heap allocator to make C library compile
     morecore_init();
+    printf("In sos_init\n");
     main(1, args);
     while(1);
 }

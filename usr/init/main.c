@@ -13,9 +13,13 @@
  */
 
 #include <syscalls.h>
+#include <string.h>
+#include <stdio.h>
 
 int main(void)
 {
-    sys_nop();
+    sys_nop(); 
+    sys_print("Hello",6);
+    sys_print("Hello again",11);
     return 0;
 }

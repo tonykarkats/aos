@@ -59,7 +59,7 @@ LOAD /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4
                 0x00100000                . = 0x100000
                 0x00100000                kernel_first_byte = .
 
-.text           0x00100000     0x9728
+.text           0x00100000     0x9750
  *(.text)
  .text          0x00100000       0x34 ./armv7/kernel/arch/omap44xx/boot.o
                 0x00100000                start
@@ -74,156 +74,156 @@ LOAD /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4
  .text          0x00100250     0x2a00 ./armv7/kernel/arch/armv7/exceptions.o
                 0x001027c0                exceptions_init
                 0x001028c8                pabt_handler
- .text          0x00102c50       0xbc ./armv7/kernel/arch/arm/exn.o
+ .text          0x00102c50       0xf4 ./armv7/kernel/arch/arm/exn.o
                 0x00102c50                handle_user_page_fault
                 0x00102c74                handle_user_undef
                 0x00102c94                fatal_kernel_fault
                 0x00102cb8                handle_irq
                 0x00102cd4                sys_syscall_kernel
                 0x00102cf0                sys_syscall
- .text          0x00102d0c       0xfc ./armv7/kernel/arch/arm/misc.o
-                0x00102d0c                panic
-                0x00102d64                printk
-                0x00102ddc                __assert_func
- .text          0x00102e08       0x7c ./armv7/kernel/arch/armv7/kludges.o
-                0x00102e08                dbg_break
-                0x00102e10                arch_benchmarks
-                0x00102e18                arch_benchmarks_size
-                0x00102e20                conio_putchar
-                0x00102e24                gdb_arch_continue
-                0x00102e2c                gdb_arch_get_register
-                0x00102e34                gdb_arch_read_byte
-                0x00102e3c                gdb_arch_registers
-                0x00102e44                gdb_arch_set_register
-                0x00102e4c                gdb_arch_single_step
-                0x00102e54                gdb_arch_write_byte
-                0x00102e5c                reboot
-                0x00102e64                vmkit_vmenter
-                0x00102e6c                __aeabi_unwind_cpp_pr0
-                0x00102e74                raise
-                0x00102e7c                breakpoint
- .text          0x00102e84       0xc8 ./armv7/kernel/arch/armv7/kputchar.o
-                0x00102ee0                kprintf_begin
-                0x00102ef8                kputchar
-                0x00102f48                kprintf_end
- .text          0x00102f4c      0x574 ./armv7/kernel/arch/omap44xx/init.o
-                0x0010325c                arch_init
- .text          0x001034c0      0x5c8 ./armv7/kernel/arch/omap44xx/paging.o
-                0x001034c0                paging_map_kernel_section
-                0x00103534                paging_map_memory
-                0x001035d0                paging_map_device_section
-                0x00103650                paging_map_device
-                0x0010373c                paging_arm_reset
-                0x001037dc                paging_make_good
-                0x001038b0                paging_map_user_pages_l1
-                0x00103994                paging_set_l2_entry
-                0x00103a70                paging_context_switch
- .text          0x00103a88      0x218 ./armv7/kernel/arch/omap44xx/multiboot.o
-                0x00103a88                multiboot_find_module
-                0x00103b64                multiboot_end_addr
- .text          0x00103ca0      0x1f4 ./armv7/kernel/arch/omap44xx/omap_gic.o
-                0x00103ca0                gic_init
- .text          0x00103e94       0xc8 ./armv7/kernel/arch/omap44xx/omap_led.o
-                0x00103e94                led_map_register
-                0x00103e98                led_set_state
-                0x00103e9c                led_flash
- .text          0x00103f5c      0x194 ./armv7/kernel/arch/omap44xx/omap_uart.o
-                0x00103f5c                serial_map_registers
-                0x00104004                serial_init
-                0x00104068                serial_putchar
-                0x001040bc                serial_getchar
- .text          0x001040f0      0x208 ./armv7/kernel/arch/omap44xx/startup_arch.o
-                0x001040f0                spawn_init
-                0x00104274                arm_kernel_startup
- .text          0x001042f8      0x66c ./armv7/kernel/arch/omap44xx/startup_helpers.o
-                0x001044a8                alloc_phys
-                0x0010451c                alloc_phys_aligned
-                0x00104664                allocate_init_dcb
-                0x00104718                map_and_load_init
- .text          0x00104964      0x208 ./armv7/kernel/dispatch.o
-                0x00104964                resume
-                0x00104a1c                wait_for_interrupt
-                0x00104a48                dispatch
- .text          0x00104b6c      0x14c ./armv7/kernel/memset.o
-                0x00104b6c                memset
- .text          0x00104cb8      0x31c ./armv7/kernel/memmove.o
-                0x00104cb8                memmove
- .text          0x00104fd4     0x131c ./armv7/kernel/printf.o
-                0x00106148                putchar
-                0x00106170                printf_nolog
-                0x001061c0                printf
-                0x00106210                vprintf
-                0x0010625c                snprintf
-                0x001062b0                vsnprintf
- .text          0x001062f0      0x3c0 ./armv7/kernel/startup.o
-                0x001062f0                allocate_dcb
- .text          0x001066b0      0x1ac ./armv7/kernel/stdlib.o
-                0x001066b0                strtol
-                0x00106784                strtoul
- .text          0x0010685c      0x760 ./armv7/kernel/string.o
-                0x0010685c                memchr
-                0x001068dc                strlen
-                0x0010690c                strncpy
-                0x001069a0                strcpy
-                0x001069b8                memcpy
-                0x00106a84                strchr
-                0x00106b30                strrchr
-                0x00106c0c                strncmp
-                0x00106ccc                strcmp
-                0x00106d28                strspn
-                0x00106e30                strcspn
-                0x00106f34                strtok
- .text          0x00106fbc      0x360 ./armv7/lib/libelf.a(elf.o)
-                0x00106fbc                elf_load_tls
-                0x00107074                elf_load
-                0x001070b0                elf_virtual_size
-                0x001072b0                elf_virtual_base
- .text          0x0010731c      0xd50 ./armv7/lib/libelf.a(elf64.o)
-                0x0010731c                elf_virtual_base64
-                0x0010743c                elf64_find_section_header_type
-                0x001074ec                elf64_find_section_header_name
-                0x00107618                elf64_relocate
-                0x001079f0                elf64_load
- .text          0x0010806c      0xaa8 ./armv7/lib/libelf.a(elf32.o)
-                0x001080ac                elf_virtual_base32
-                0x001081e0                elf32_find_section_header_type
-                0x0010829c                elf32_find_section_header_name
-                0x001083c0                elf32_relocate
-                0x00108554                elf32_load
- .text          0x00108b14       0x3c /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_aeabi_uldivmod.o)
-                0x00108b14                __aeabi_uldivmod
- .text          0x00108b50       0x10 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_dvmd_lnx.o)
-                0x00108b50                __aeabi_ldiv0
-                0x00108b50                __aeabi_idiv0
- .text          0x00108b60       0x78 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
-                0x00108b60                __gnu_ldivmod_helper
-                0x00108b9c                __gnu_uldivmod_helper
- .text          0x00108bd8      0x4d0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
-                0x00108bd8                __divdi3
- .text          0x001090a8      0x474 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
-                0x001090a8                __udivdi3
- .text          0x0010951c      0x20c /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivsi3.o)
-                0x0010951c                __udivsi3
-                0x0010951c                __aeabi_uidiv
-                0x00109708                __aeabi_uidivmod
-                0x00109728                kernel_text_final_byte = .
+ .text          0x00102d44       0xfc ./armv7/kernel/arch/arm/misc.o
+                0x00102d44                panic
+                0x00102d9c                printk
+                0x00102e14                __assert_func
+ .text          0x00102e40       0x7c ./armv7/kernel/arch/armv7/kludges.o
+                0x00102e40                dbg_break
+                0x00102e48                arch_benchmarks
+                0x00102e50                arch_benchmarks_size
+                0x00102e58                conio_putchar
+                0x00102e5c                gdb_arch_continue
+                0x00102e64                gdb_arch_get_register
+                0x00102e6c                gdb_arch_read_byte
+                0x00102e74                gdb_arch_registers
+                0x00102e7c                gdb_arch_set_register
+                0x00102e84                gdb_arch_single_step
+                0x00102e8c                gdb_arch_write_byte
+                0x00102e94                reboot
+                0x00102e9c                vmkit_vmenter
+                0x00102ea4                __aeabi_unwind_cpp_pr0
+                0x00102eac                raise
+                0x00102eb4                breakpoint
+ .text          0x00102ebc       0xc8 ./armv7/kernel/arch/armv7/kputchar.o
+                0x00102f18                kprintf_begin
+                0x00102f30                kputchar
+                0x00102f80                kprintf_end
+ .text          0x00102f84      0x574 ./armv7/kernel/arch/omap44xx/init.o
+                0x00103294                arch_init
+ .text          0x001034f8      0x5c8 ./armv7/kernel/arch/omap44xx/paging.o
+                0x001034f8                paging_map_kernel_section
+                0x0010356c                paging_map_memory
+                0x00103608                paging_map_device_section
+                0x00103688                paging_map_device
+                0x00103774                paging_arm_reset
+                0x00103814                paging_make_good
+                0x001038e8                paging_map_user_pages_l1
+                0x001039cc                paging_set_l2_entry
+                0x00103aa8                paging_context_switch
+ .text          0x00103ac0      0x218 ./armv7/kernel/arch/omap44xx/multiboot.o
+                0x00103ac0                multiboot_find_module
+                0x00103b9c                multiboot_end_addr
+ .text          0x00103cd8      0x1f4 ./armv7/kernel/arch/omap44xx/omap_gic.o
+                0x00103cd8                gic_init
+ .text          0x00103ecc       0xc8 ./armv7/kernel/arch/omap44xx/omap_led.o
+                0x00103ecc                led_map_register
+                0x00103ed0                led_set_state
+                0x00103ed4                led_flash
+ .text          0x00103f94      0x194 ./armv7/kernel/arch/omap44xx/omap_uart.o
+                0x00103f94                serial_map_registers
+                0x0010403c                serial_init
+                0x001040a0                serial_putchar
+                0x001040f4                serial_getchar
+ .text          0x00104128      0x1f8 ./armv7/kernel/arch/omap44xx/startup_arch.o
+                0x00104128                spawn_init
+                0x0010429c                arm_kernel_startup
+ .text          0x00104320      0x66c ./armv7/kernel/arch/omap44xx/startup_helpers.o
+                0x001044d0                alloc_phys
+                0x00104544                alloc_phys_aligned
+                0x0010468c                allocate_init_dcb
+                0x00104740                map_and_load_init
+ .text          0x0010498c      0x208 ./armv7/kernel/dispatch.o
+                0x0010498c                resume
+                0x00104a44                wait_for_interrupt
+                0x00104a70                dispatch
+ .text          0x00104b94      0x14c ./armv7/kernel/memset.o
+                0x00104b94                memset
+ .text          0x00104ce0      0x31c ./armv7/kernel/memmove.o
+                0x00104ce0                memmove
+ .text          0x00104ffc     0x131c ./armv7/kernel/printf.o
+                0x00106170                putchar
+                0x00106198                printf_nolog
+                0x001061e8                printf
+                0x00106238                vprintf
+                0x00106284                snprintf
+                0x001062d8                vsnprintf
+ .text          0x00106318      0x3c0 ./armv7/kernel/startup.o
+                0x00106318                allocate_dcb
+ .text          0x001066d8      0x1ac ./armv7/kernel/stdlib.o
+                0x001066d8                strtol
+                0x001067ac                strtoul
+ .text          0x00106884      0x760 ./armv7/kernel/string.o
+                0x00106884                memchr
+                0x00106904                strlen
+                0x00106934                strncpy
+                0x001069c8                strcpy
+                0x001069e0                memcpy
+                0x00106aac                strchr
+                0x00106b58                strrchr
+                0x00106c34                strncmp
+                0x00106cf4                strcmp
+                0x00106d50                strspn
+                0x00106e58                strcspn
+                0x00106f5c                strtok
+ .text          0x00106fe4      0x360 ./armv7/lib/libelf.a(elf.o)
+                0x00106fe4                elf_load_tls
+                0x0010709c                elf_load
+                0x001070d8                elf_virtual_size
+                0x001072d8                elf_virtual_base
+ .text          0x00107344      0xd50 ./armv7/lib/libelf.a(elf64.o)
+                0x00107344                elf_virtual_base64
+                0x00107464                elf64_find_section_header_type
+                0x00107514                elf64_find_section_header_name
+                0x00107640                elf64_relocate
+                0x00107a18                elf64_load
+ .text          0x00108094      0xaa8 ./armv7/lib/libelf.a(elf32.o)
+                0x001080d4                elf_virtual_base32
+                0x00108208                elf32_find_section_header_type
+                0x001082c4                elf32_find_section_header_name
+                0x001083e8                elf32_relocate
+                0x0010857c                elf32_load
+ .text          0x00108b3c       0x3c /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_aeabi_uldivmod.o)
+                0x00108b3c                __aeabi_uldivmod
+ .text          0x00108b78       0x10 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_dvmd_lnx.o)
+                0x00108b78                __aeabi_ldiv0
+                0x00108b78                __aeabi_idiv0
+ .text          0x00108b88       0x78 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
+                0x00108b88                __gnu_ldivmod_helper
+                0x00108bc4                __gnu_uldivmod_helper
+ .text          0x00108c00      0x4d0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
+                0x00108c00                __divdi3
+ .text          0x001090d0      0x474 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
+                0x001090d0                __udivdi3
+ .text          0x00109544      0x20c /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivsi3.o)
+                0x00109544                __udivsi3
+                0x00109544                __aeabi_uidiv
+                0x00109730                __aeabi_uidivmod
+                0x00109750                kernel_text_final_byte = .
 
-.glue_7         0x00109728        0x0
+.glue_7         0x00109750        0x0
  .glue_7        0x00000000        0x0 linker stubs
 
-.glue_7t        0x00109728        0x0
+.glue_7t        0x00109750        0x0
  .glue_7t       0x00000000        0x0 linker stubs
 
-.vfp11_veneer   0x00109728        0x0
+.vfp11_veneer   0x00109750        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x00109728        0x0
+.v4_bx          0x00109750        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.plt            0x00109728        0x0
+.plt            0x00109750        0x0
  .plt           0x00000000        0x0 ./armv7/kernel/arch/omap44xx/boot.o
 
-.iplt           0x00109728        0x0
+.iplt           0x00109750        0x0
  .iplt          0x00000000        0x0 ./armv7/kernel/arch/omap44xx/boot.o
                 0x0010a000                . = ALIGN (0x1000)
 
@@ -262,140 +262,142 @@ LOAD /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4
 .hash           0x0010a330       0x48
  .hash          0x0010a330       0x48 ./armv7/kernel/arch/omap44xx/boot.o
 
-.rodata.str1.4  0x0010a378      0xbfc
+.rodata.str1.4  0x0010a378      0xbcc
  .rodata.str1.4
-                0x0010a378       0xd4 ./armv7/kernel/arch/arm/exn.o
+                0x0010a378       0xbe ./armv7/kernel/arch/arm/exn.o
+                                 0xc0 (size before relaxing)
+ *fill*         0x0010a436        0x2 00
  .rodata.str1.4
-                0x0010a44c       0x46 ./armv7/kernel/arch/arm/misc.o
+                0x0010a438       0x46 ./armv7/kernel/arch/arm/misc.o
                                  0x48 (size before relaxing)
- *fill*         0x0010a492        0x2 00
+ *fill*         0x0010a47e        0x2 00
  .rodata.str1.4
-                0x0010a494      0x149 ./armv7/kernel/arch/omap44xx/init.o
+                0x0010a480      0x149 ./armv7/kernel/arch/omap44xx/init.o
                                 0x14c (size before relaxing)
- *fill*         0x0010a5dd        0x3 00
+ *fill*         0x0010a5c9        0x3 00
  .rodata.str1.4
-                0x0010a5e0      0x16c ./armv7/kernel/arch/omap44xx/paging.o
+                0x0010a5cc      0x16c ./armv7/kernel/arch/omap44xx/paging.o
                                 0x1ac (size before relaxing)
  .rodata.str1.4
-                0x0010a74c      0x104 ./armv7/kernel/arch/omap44xx/omap_gic.o
+                0x0010a738      0x104 ./armv7/kernel/arch/omap44xx/omap_gic.o
  .rodata.str1.4
-                0x0010a850       0x9a ./armv7/kernel/arch/omap44xx/omap_uart.o
+                0x0010a83c       0x9a ./armv7/kernel/arch/omap44xx/omap_uart.o
                                  0x9c (size before relaxing)
- *fill*         0x0010a8ea        0x2 00
+ *fill*         0x0010a8d6        0x2 00
  .rodata.str1.4
-                0x0010a8ec       0xec ./armv7/kernel/arch/omap44xx/startup_arch.o
-                                0x12c (size before relaxing)
+                0x0010a8d8       0xd0 ./armv7/kernel/arch/omap44xx/startup_arch.o
+                                0x110 (size before relaxing)
  .rodata.str1.4
-                0x0010a9d8      0x255 ./armv7/kernel/arch/omap44xx/startup_helpers.o
+                0x0010a9a8      0x255 ./armv7/kernel/arch/omap44xx/startup_helpers.o
                                 0x298 (size before relaxing)
- *fill*         0x0010ac2d        0x3 00
+ *fill*         0x0010abfd        0x3 00
  .rodata.str1.4
-                0x0010ac30       0x9f ./armv7/kernel/dispatch.o
+                0x0010ac00       0x9f ./armv7/kernel/dispatch.o
                                  0xa0 (size before relaxing)
- *fill*         0x0010accf        0x1 00
+ *fill*         0x0010ac9f        0x1 00
  .rodata.str1.4
-                0x0010acd0        0x7 ./armv7/kernel/printf.o
+                0x0010aca0        0x7 ./armv7/kernel/printf.o
                                   0x8 (size before relaxing)
- *fill*         0x0010acd7        0x1 00
+ *fill*         0x0010aca7        0x1 00
  .rodata.str1.4
-                0x0010acd8       0x6d ./armv7/kernel/startup.o
+                0x0010aca8       0x6d ./armv7/kernel/startup.o
                                  0xb0 (size before relaxing)
+ *fill*         0x0010ad15        0x3 00
+ .rodata.str1.4
+                0x0010ad18       0x2d ./armv7/kernel/stdlib.o
+                                 0x30 (size before relaxing)
  *fill*         0x0010ad45        0x3 00
  .rodata.str1.4
-                0x0010ad48       0x2d ./armv7/kernel/stdlib.o
-                                 0x30 (size before relaxing)
- *fill*         0x0010ad75        0x3 00
- .rodata.str1.4
-                0x0010ad78       0x77 ./armv7/kernel/string.o
+                0x0010ad48       0x77 ./armv7/kernel/string.o
                                  0x78 (size before relaxing)
- *fill*         0x0010adef        0x1 00
+ *fill*         0x0010adbf        0x1 00
  .rodata.str1.4
-                0x0010adf0      0x10e ./armv7/lib/libelf.a(elf64.o)
+                0x0010adc0      0x10e ./armv7/lib/libelf.a(elf64.o)
                                 0x110 (size before relaxing)
- *fill*         0x0010aefe        0x2 00
+ *fill*         0x0010aece        0x2 00
  .rodata.str1.4
-                0x0010af00       0x74 ./armv7/lib/libelf.a(elf32.o)
+                0x0010aed0       0x74 ./armv7/lib/libelf.a(elf32.o)
                                 0x110 (size before relaxing)
 
-.ARM.extab      0x0010af74        0x0
- .ARM.extab     0x0010af74        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
- .ARM.extab     0x0010af74        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
- .ARM.extab     0x0010af74        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
+.ARM.extab      0x0010af44        0x0
+ .ARM.extab     0x0010af44        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
+ .ARM.extab     0x0010af44        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
+ .ARM.extab     0x0010af44        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
 
-.ARM.exidx      0x0010af74       0x28
- .ARM.exidx     0x0010af74       0x10 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
- .ARM.exidx     0x0010af84        0x8 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
- .ARM.exidx     0x0010af8c       0x10 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
+.ARM.exidx      0x0010af44       0x28
+ .ARM.exidx     0x0010af44       0x10 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
+ .ARM.exidx     0x0010af54        0x8 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
+ .ARM.exidx     0x0010af5c       0x10 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
                                   0x8 (size before relaxing)
 
-.rel.dyn        0x0010af9c       0x90
- .rel.got       0x0010af9c       0x38 ./armv7/kernel/arch/omap44xx/boot.o
+.rel.dyn        0x0010af6c       0x90
+ .rel.got       0x0010af6c       0x38 ./armv7/kernel/arch/omap44xx/boot.o
  .rel.plt       0x00000000        0x0 ./armv7/kernel/arch/omap44xx/boot.o
  .rel.iplt      0x00000000        0x0 ./armv7/kernel/arch/omap44xx/boot.o
- .rel.text      0x0010afd4       0x58 ./armv7/kernel/arch/omap44xx/boot.o
+ .rel.text      0x0010afa4       0x58 ./armv7/kernel/arch/omap44xx/boot.o
 
-.got            0x0010b02c       0x1c
-                0x0010b02c                got_base = .
+.got            0x0010affc       0x1c
+                0x0010affc                got_base = .
  *(.got)
- .got           0x0010b02c       0x1c ./armv7/kernel/arch/omap44xx/boot.o
+ .got           0x0010affc       0x1c ./armv7/kernel/arch/omap44xx/boot.o
 
-.data           0x0010b048       0x30
- .data          0x0010b048        0x0 ./armv7/kernel/arch/omap44xx/boot.o
- .data          0x0010b048        0x0 ./armv7/kernel/arch/armv7/cp15.o
- .data          0x0010b048        0x0 ./armv7/kernel/arch/armv7/exceptions.o
- .data          0x0010b048        0x0 ./armv7/kernel/arch/arm/exn.o
- .data          0x0010b048        0xc ./armv7/kernel/arch/arm/misc.o
-                0x0010b048                kernel_loglevel
-                0x0010b04c                kernel_ticks_enabled
-                0x0010b050                kernel_log_subsystem_mask
- .data          0x0010b054        0x0 ./armv7/kernel/arch/armv7/kludges.o
- .data          0x0010b054        0x0 ./armv7/kernel/arch/armv7/kputchar.o
- .data          0x0010b054        0x0 ./armv7/kernel/arch/omap44xx/init.o
- .data          0x0010b054        0x4 ./armv7/kernel/arch/omap44xx/paging.o
- .data          0x0010b058        0x4 ./armv7/kernel/arch/omap44xx/multiboot.o
-                0x0010b058                glbl_core_data
- .data          0x0010b05c        0x0 ./armv7/kernel/arch/omap44xx/omap_gic.o
- .data          0x0010b05c        0x0 ./armv7/kernel/arch/omap44xx/omap_led.o
- .data          0x0010b05c       0x14 ./armv7/kernel/arch/omap44xx/omap_uart.o
- .data          0x0010b070        0x0 ./armv7/kernel/arch/omap44xx/startup_arch.o
- .data          0x0010b070        0x8 ./armv7/kernel/arch/omap44xx/startup_helpers.o
-                0x0010b070                init_alloc_addr
-                0x0010b074                bootinfo
- .data          0x0010b078        0x0 ./armv7/kernel/dispatch.o
- .data          0x0010b078        0x0 ./armv7/kernel/memset.o
- .data          0x0010b078        0x0 ./armv7/kernel/memmove.o
- .data          0x0010b078        0x0 ./armv7/kernel/printf.o
- .data          0x0010b078        0x0 ./armv7/kernel/startup.o
- .data          0x0010b078        0x0 ./armv7/kernel/stdlib.o
- .data          0x0010b078        0x0 ./armv7/kernel/string.o
- .data          0x0010b078        0x0 ./armv7/lib/libelf.a(elf.o)
- .data          0x0010b078        0x0 ./armv7/lib/libelf.a(elf64.o)
- .data          0x0010b078        0x0 ./armv7/lib/libelf.a(elf32.o)
- .data          0x0010b078        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_aeabi_uldivmod.o)
- .data          0x0010b078        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_dvmd_lnx.o)
- .data          0x0010b078        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
- .data          0x0010b078        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
- .data          0x0010b078        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
- .data          0x0010b078        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivsi3.o)
+.data           0x0010b018       0x30
+ .data          0x0010b018        0x0 ./armv7/kernel/arch/omap44xx/boot.o
+ .data          0x0010b018        0x0 ./armv7/kernel/arch/armv7/cp15.o
+ .data          0x0010b018        0x0 ./armv7/kernel/arch/armv7/exceptions.o
+ .data          0x0010b018        0x0 ./armv7/kernel/arch/arm/exn.o
+ .data          0x0010b018        0xc ./armv7/kernel/arch/arm/misc.o
+                0x0010b018                kernel_loglevel
+                0x0010b01c                kernel_ticks_enabled
+                0x0010b020                kernel_log_subsystem_mask
+ .data          0x0010b024        0x0 ./armv7/kernel/arch/armv7/kludges.o
+ .data          0x0010b024        0x0 ./armv7/kernel/arch/armv7/kputchar.o
+ .data          0x0010b024        0x0 ./armv7/kernel/arch/omap44xx/init.o
+ .data          0x0010b024        0x4 ./armv7/kernel/arch/omap44xx/paging.o
+ .data          0x0010b028        0x4 ./armv7/kernel/arch/omap44xx/multiboot.o
+                0x0010b028                glbl_core_data
+ .data          0x0010b02c        0x0 ./armv7/kernel/arch/omap44xx/omap_gic.o
+ .data          0x0010b02c        0x0 ./armv7/kernel/arch/omap44xx/omap_led.o
+ .data          0x0010b02c       0x14 ./armv7/kernel/arch/omap44xx/omap_uart.o
+ .data          0x0010b040        0x0 ./armv7/kernel/arch/omap44xx/startup_arch.o
+ .data          0x0010b040        0x8 ./armv7/kernel/arch/omap44xx/startup_helpers.o
+                0x0010b040                init_alloc_addr
+                0x0010b044                bootinfo
+ .data          0x0010b048        0x0 ./armv7/kernel/dispatch.o
+ .data          0x0010b048        0x0 ./armv7/kernel/memset.o
+ .data          0x0010b048        0x0 ./armv7/kernel/memmove.o
+ .data          0x0010b048        0x0 ./armv7/kernel/printf.o
+ .data          0x0010b048        0x0 ./armv7/kernel/startup.o
+ .data          0x0010b048        0x0 ./armv7/kernel/stdlib.o
+ .data          0x0010b048        0x0 ./armv7/kernel/string.o
+ .data          0x0010b048        0x0 ./armv7/lib/libelf.a(elf.o)
+ .data          0x0010b048        0x0 ./armv7/lib/libelf.a(elf64.o)
+ .data          0x0010b048        0x0 ./armv7/lib/libelf.a(elf32.o)
+ .data          0x0010b048        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_aeabi_uldivmod.o)
+ .data          0x0010b048        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_dvmd_lnx.o)
+ .data          0x0010b048        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(bpabi.o)
+ .data          0x0010b048        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_divdi3.o)
+ .data          0x0010b048        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivdi3.o)
+ .data          0x0010b048        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivsi3.o)
 
-.got.plt        0x0010b078        0xc
- .got.plt       0x0010b078        0xc ./armv7/kernel/arch/omap44xx/boot.o
-                0x0010b078                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x0010b048        0xc
+ .got.plt       0x0010b048        0xc ./armv7/kernel/arch/omap44xx/boot.o
+                0x0010b048                _GLOBAL_OFFSET_TABLE_
 
-.igot.plt       0x0010b084        0x0
+.igot.plt       0x0010b054        0x0
  .igot.plt      0x00000000        0x0 ./armv7/kernel/arch/omap44xx/boot.o
 
-.bss            0x0010b084    0x28fc1
+.bss            0x0010b054    0x28ff1
  *(.bss)
- .bss           0x0010b084        0x0 ./armv7/kernel/arch/omap44xx/boot.o
- .bss           0x0010b084        0x0 ./armv7/kernel/arch/armv7/cp15.o
- .bss           0x0010b084        0x0 ./armv7/kernel/arch/armv7/exceptions.o
- .bss           0x0010b084        0x0 ./armv7/kernel/arch/arm/exn.o
- .bss           0x0010b084      0x204 ./armv7/kernel/arch/arm/misc.o
-                0x0010b284                kernel_now
- .bss           0x0010b288        0x0 ./armv7/kernel/arch/armv7/kludges.o
- .bss           0x0010b288      0x104 ./armv7/kernel/arch/armv7/kputchar.o
- *fill*         0x0010b38c      0xc74 00
+ .bss           0x0010b054        0x0 ./armv7/kernel/arch/omap44xx/boot.o
+ .bss           0x0010b054        0x0 ./armv7/kernel/arch/armv7/cp15.o
+ .bss           0x0010b054        0x0 ./armv7/kernel/arch/armv7/exceptions.o
+ .bss           0x0010b054        0x0 ./armv7/kernel/arch/arm/exn.o
+ .bss           0x0010b054      0x204 ./armv7/kernel/arch/arm/misc.o
+                0x0010b254                kernel_now
+ .bss           0x0010b258        0x0 ./armv7/kernel/arch/armv7/kludges.o
+ .bss           0x0010b258      0x104 ./armv7/kernel/arch/armv7/kputchar.o
+ *fill*         0x0010b35c      0xca4 00
  .bss           0x0010c000    0x18000 ./armv7/kernel/arch/omap44xx/init.o
  .bss           0x00124000     0xc000 ./armv7/kernel/arch/omap44xx/paging.o
  .bss           0x00130000        0x0 ./armv7/kernel/arch/omap44xx/multiboot.o
@@ -592,86 +594,86 @@ OUTPUT(./armv7/sbin/cpu_omap44xx elf32-littlearm)
  .note.GNU-stack
                 0x00000000        0x0 /home/panandr/AOS/tools/arm-2012.03/bin/../lib/gcc/arm-none-linux-gnueabi/4.6.3/libgcc.a(_udivsi3.o)
 
-.debug_line     0x00000000     0x2ae2
+.debug_line     0x00000000     0x2aed
  .debug_line    0x00000000       0x5b ./armv7/kernel/arch/omap44xx/boot.o
  .debug_line    0x0000005b       0xd9 ./armv7/kernel/arch/armv7/cp15.o
  .debug_line    0x00000134      0x10f ./armv7/kernel/arch/armv7/exceptions.o
- .debug_line    0x00000243      0x104 ./armv7/kernel/arch/arm/exn.o
- .debug_line    0x00000347       0x97 ./armv7/kernel/arch/arm/misc.o
- .debug_line    0x000003de       0xac ./armv7/kernel/arch/armv7/kludges.o
- .debug_line    0x0000048a       0x75 ./armv7/kernel/arch/armv7/kputchar.o
- .debug_line    0x000004ff      0x256 ./armv7/kernel/arch/omap44xx/init.o
- .debug_line    0x00000755      0x2d8 ./armv7/kernel/arch/omap44xx/paging.o
- .debug_line    0x00000a2d      0x162 ./armv7/kernel/arch/omap44xx/multiboot.o
- .debug_line    0x00000b8f      0x13c ./armv7/kernel/arch/omap44xx/omap_gic.o
- .debug_line    0x00000ccb       0xb5 ./armv7/kernel/arch/omap44xx/omap_led.o
- .debug_line    0x00000d80      0x118 ./armv7/kernel/arch/omap44xx/omap_uart.o
- .debug_line    0x00000e98      0x275 ./armv7/kernel/arch/omap44xx/startup_arch.o
- .debug_line    0x0000110d      0x312 ./armv7/kernel/arch/omap44xx/startup_helpers.o
- .debug_line    0x0000141f      0x206 ./armv7/kernel/dispatch.o
- .debug_line    0x00001625       0xd0 ./armv7/kernel/memset.o
- .debug_line    0x000016f5      0x138 ./armv7/kernel/memmove.o
- .debug_line    0x0000182d      0x61d ./armv7/kernel/printf.o
- .debug_line    0x00001e4a      0x243 ./armv7/kernel/startup.o
- .debug_line    0x0000208d       0xcc ./armv7/kernel/stdlib.o
- .debug_line    0x00002159      0x201 ./armv7/kernel/string.o
- .debug_line    0x0000235a      0x17e ./armv7/lib/libelf.a(elf.o)
- .debug_line    0x000024d8      0x337 ./armv7/lib/libelf.a(elf64.o)
- .debug_line    0x0000280f      0x2d3 ./armv7/lib/libelf.a(elf32.o)
+ .debug_line    0x00000243      0x10f ./armv7/kernel/arch/arm/exn.o
+ .debug_line    0x00000352       0x97 ./armv7/kernel/arch/arm/misc.o
+ .debug_line    0x000003e9       0xac ./armv7/kernel/arch/armv7/kludges.o
+ .debug_line    0x00000495       0x75 ./armv7/kernel/arch/armv7/kputchar.o
+ .debug_line    0x0000050a      0x256 ./armv7/kernel/arch/omap44xx/init.o
+ .debug_line    0x00000760      0x2d8 ./armv7/kernel/arch/omap44xx/paging.o
+ .debug_line    0x00000a38      0x162 ./armv7/kernel/arch/omap44xx/multiboot.o
+ .debug_line    0x00000b9a      0x13c ./armv7/kernel/arch/omap44xx/omap_gic.o
+ .debug_line    0x00000cd6       0xb5 ./armv7/kernel/arch/omap44xx/omap_led.o
+ .debug_line    0x00000d8b      0x118 ./armv7/kernel/arch/omap44xx/omap_uart.o
+ .debug_line    0x00000ea3      0x275 ./armv7/kernel/arch/omap44xx/startup_arch.o
+ .debug_line    0x00001118      0x312 ./armv7/kernel/arch/omap44xx/startup_helpers.o
+ .debug_line    0x0000142a      0x206 ./armv7/kernel/dispatch.o
+ .debug_line    0x00001630       0xd0 ./armv7/kernel/memset.o
+ .debug_line    0x00001700      0x138 ./armv7/kernel/memmove.o
+ .debug_line    0x00001838      0x61d ./armv7/kernel/printf.o
+ .debug_line    0x00001e55      0x243 ./armv7/kernel/startup.o
+ .debug_line    0x00002098       0xcc ./armv7/kernel/stdlib.o
+ .debug_line    0x00002164      0x201 ./armv7/kernel/string.o
+ .debug_line    0x00002365      0x17e ./armv7/lib/libelf.a(elf.o)
+ .debug_line    0x000024e3      0x337 ./armv7/lib/libelf.a(elf64.o)
+ .debug_line    0x0000281a      0x2d3 ./armv7/lib/libelf.a(elf32.o)
 
-.debug_info     0x00000000     0xd020
+.debug_info     0x00000000     0xd02c
  .debug_info    0x00000000       0x5d ./armv7/kernel/arch/omap44xx/boot.o
  .debug_info    0x0000005d       0x5a ./armv7/kernel/arch/armv7/cp15.o
  .debug_info    0x000000b7       0x60 ./armv7/kernel/arch/armv7/exceptions.o
- .debug_info    0x00000117      0x44f ./armv7/kernel/arch/arm/exn.o
- .debug_info    0x00000566      0x20c ./armv7/kernel/arch/arm/misc.o
- .debug_info    0x00000772      0x2e6 ./armv7/kernel/arch/armv7/kludges.o
- .debug_info    0x00000a58       0xf0 ./armv7/kernel/arch/armv7/kputchar.o
- .debug_info    0x00000b48      0xba5 ./armv7/kernel/arch/omap44xx/init.o
- .debug_info    0x000016ed      0xdc8 ./armv7/kernel/arch/omap44xx/paging.o
- .debug_info    0x000024b5      0x6a6 ./armv7/kernel/arch/omap44xx/multiboot.o
- .debug_info    0x00002b5b      0x230 ./armv7/kernel/arch/omap44xx/omap_gic.o
- .debug_info    0x00002d8b      0x157 ./armv7/kernel/arch/omap44xx/omap_led.o
- .debug_info    0x00002ee2      0x1e9 ./armv7/kernel/arch/omap44xx/omap_uart.o
- .debug_info    0x000030cb      0xd8b ./armv7/kernel/arch/omap44xx/startup_arch.o
- .debug_info    0x00003e56     0x1ff0 ./armv7/kernel/arch/omap44xx/startup_helpers.o
- .debug_info    0x00005e46      0x835 ./armv7/kernel/dispatch.o
- .debug_info    0x0000667b      0x12e ./armv7/kernel/memset.o
- .debug_info    0x000067a9       0xf7 ./armv7/kernel/memmove.o
- .debug_info    0x000068a0      0x50c ./armv7/kernel/printf.o
- .debug_info    0x00006dac      0x658 ./armv7/kernel/startup.o
- .debug_info    0x00007404      0x35e ./armv7/kernel/stdlib.o
- .debug_info    0x00007762      0x636 ./armv7/kernel/string.o
- .debug_info    0x00007d98     0x1813 ./armv7/lib/libelf.a(elf.o)
- .debug_info    0x000095ab     0x1d27 ./armv7/lib/libelf.a(elf64.o)
- .debug_info    0x0000b2d2     0x1d4e ./armv7/lib/libelf.a(elf32.o)
+ .debug_info    0x00000117      0x45b ./armv7/kernel/arch/arm/exn.o
+ .debug_info    0x00000572      0x20c ./armv7/kernel/arch/arm/misc.o
+ .debug_info    0x0000077e      0x2e6 ./armv7/kernel/arch/armv7/kludges.o
+ .debug_info    0x00000a64       0xf0 ./armv7/kernel/arch/armv7/kputchar.o
+ .debug_info    0x00000b54      0xba5 ./armv7/kernel/arch/omap44xx/init.o
+ .debug_info    0x000016f9      0xdc8 ./armv7/kernel/arch/omap44xx/paging.o
+ .debug_info    0x000024c1      0x6a6 ./armv7/kernel/arch/omap44xx/multiboot.o
+ .debug_info    0x00002b67      0x230 ./armv7/kernel/arch/omap44xx/omap_gic.o
+ .debug_info    0x00002d97      0x157 ./armv7/kernel/arch/omap44xx/omap_led.o
+ .debug_info    0x00002eee      0x1e9 ./armv7/kernel/arch/omap44xx/omap_uart.o
+ .debug_info    0x000030d7      0xd8b ./armv7/kernel/arch/omap44xx/startup_arch.o
+ .debug_info    0x00003e62     0x1ff0 ./armv7/kernel/arch/omap44xx/startup_helpers.o
+ .debug_info    0x00005e52      0x835 ./armv7/kernel/dispatch.o
+ .debug_info    0x00006687      0x12e ./armv7/kernel/memset.o
+ .debug_info    0x000067b5       0xf7 ./armv7/kernel/memmove.o
+ .debug_info    0x000068ac      0x50c ./armv7/kernel/printf.o
+ .debug_info    0x00006db8      0x658 ./armv7/kernel/startup.o
+ .debug_info    0x00007410      0x35e ./armv7/kernel/stdlib.o
+ .debug_info    0x0000776e      0x636 ./armv7/kernel/string.o
+ .debug_info    0x00007da4     0x1813 ./armv7/lib/libelf.a(elf.o)
+ .debug_info    0x000095b7     0x1d27 ./armv7/lib/libelf.a(elf64.o)
+ .debug_info    0x0000b2de     0x1d4e ./armv7/lib/libelf.a(elf32.o)
 
-.debug_abbrev   0x00000000     0x2429
+.debug_abbrev   0x00000000     0x241e
  .debug_abbrev  0x00000000       0x14 ./armv7/kernel/arch/omap44xx/boot.o
  .debug_abbrev  0x00000014       0x14 ./armv7/kernel/arch/armv7/cp15.o
  .debug_abbrev  0x00000028       0x14 ./armv7/kernel/arch/armv7/exceptions.o
- .debug_abbrev  0x0000003c      0x11d ./armv7/kernel/arch/arm/exn.o
- .debug_abbrev  0x00000159       0xee ./armv7/kernel/arch/arm/misc.o
- .debug_abbrev  0x00000247       0xb9 ./armv7/kernel/arch/armv7/kludges.o
- .debug_abbrev  0x00000300       0xb5 ./armv7/kernel/arch/armv7/kputchar.o
- .debug_abbrev  0x000003b5      0x289 ./armv7/kernel/arch/omap44xx/init.o
- .debug_abbrev  0x0000063e      0x2c5 ./armv7/kernel/arch/omap44xx/paging.o
- .debug_abbrev  0x00000903      0x19a ./armv7/kernel/arch/omap44xx/multiboot.o
- .debug_abbrev  0x00000a9d      0x126 ./armv7/kernel/arch/omap44xx/omap_gic.o
- .debug_abbrev  0x00000bc3       0xbe ./armv7/kernel/arch/omap44xx/omap_led.o
- .debug_abbrev  0x00000c81       0xee ./armv7/kernel/arch/omap44xx/omap_uart.o
- .debug_abbrev  0x00000d6f      0x213 ./armv7/kernel/arch/omap44xx/startup_arch.o
- .debug_abbrev  0x00000f82      0x37b ./armv7/kernel/arch/omap44xx/startup_helpers.o
- .debug_abbrev  0x000012fd      0x244 ./armv7/kernel/dispatch.o
- .debug_abbrev  0x00001541       0xb8 ./armv7/kernel/memset.o
- .debug_abbrev  0x000015f9       0x9f ./armv7/kernel/memmove.o
- .debug_abbrev  0x00001698      0x1a7 ./armv7/kernel/printf.o
- .debug_abbrev  0x0000183f      0x1d7 ./armv7/kernel/startup.o
- .debug_abbrev  0x00001a16      0x10f ./armv7/kernel/stdlib.o
- .debug_abbrev  0x00001b25      0x1db ./armv7/kernel/string.o
- .debug_abbrev  0x00001d00      0x183 ./armv7/lib/libelf.a(elf.o)
- .debug_abbrev  0x00001e83      0x2b2 ./armv7/lib/libelf.a(elf64.o)
- .debug_abbrev  0x00002135      0x2f4 ./armv7/lib/libelf.a(elf32.o)
+ .debug_abbrev  0x0000003c      0x112 ./armv7/kernel/arch/arm/exn.o
+ .debug_abbrev  0x0000014e       0xee ./armv7/kernel/arch/arm/misc.o
+ .debug_abbrev  0x0000023c       0xb9 ./armv7/kernel/arch/armv7/kludges.o
+ .debug_abbrev  0x000002f5       0xb5 ./armv7/kernel/arch/armv7/kputchar.o
+ .debug_abbrev  0x000003aa      0x289 ./armv7/kernel/arch/omap44xx/init.o
+ .debug_abbrev  0x00000633      0x2c5 ./armv7/kernel/arch/omap44xx/paging.o
+ .debug_abbrev  0x000008f8      0x19a ./armv7/kernel/arch/omap44xx/multiboot.o
+ .debug_abbrev  0x00000a92      0x126 ./armv7/kernel/arch/omap44xx/omap_gic.o
+ .debug_abbrev  0x00000bb8       0xbe ./armv7/kernel/arch/omap44xx/omap_led.o
+ .debug_abbrev  0x00000c76       0xee ./armv7/kernel/arch/omap44xx/omap_uart.o
+ .debug_abbrev  0x00000d64      0x213 ./armv7/kernel/arch/omap44xx/startup_arch.o
+ .debug_abbrev  0x00000f77      0x37b ./armv7/kernel/arch/omap44xx/startup_helpers.o
+ .debug_abbrev  0x000012f2      0x244 ./armv7/kernel/dispatch.o
+ .debug_abbrev  0x00001536       0xb8 ./armv7/kernel/memset.o
+ .debug_abbrev  0x000015ee       0x9f ./armv7/kernel/memmove.o
+ .debug_abbrev  0x0000168d      0x1a7 ./armv7/kernel/printf.o
+ .debug_abbrev  0x00001834      0x1d7 ./armv7/kernel/startup.o
+ .debug_abbrev  0x00001a0b      0x10f ./armv7/kernel/stdlib.o
+ .debug_abbrev  0x00001b1a      0x1db ./armv7/kernel/string.o
+ .debug_abbrev  0x00001cf5      0x183 ./armv7/lib/libelf.a(elf.o)
+ .debug_abbrev  0x00001e78      0x2b2 ./armv7/lib/libelf.a(elf64.o)
+ .debug_abbrev  0x0000212a      0x2f4 ./armv7/lib/libelf.a(elf32.o)
 
 .debug_aranges  0x00000000      0x320
  .debug_aranges
@@ -725,28 +727,28 @@ OUTPUT(./armv7/sbin/cpu_omap44xx elf32-littlearm)
  .debug_aranges
                 0x00000300       0x20 ./armv7/lib/libelf.a(elf32.o)
 
-.debug_loc      0x00000000     0x61ce
- .debug_loc     0x00000000      0x1fc ./armv7/kernel/arch/arm/exn.o
- .debug_loc     0x000001fc      0x104 ./armv7/kernel/arch/arm/misc.o
- .debug_loc     0x00000300       0x8a ./armv7/kernel/arch/armv7/kputchar.o
- .debug_loc     0x0000038a      0x206 ./armv7/kernel/arch/omap44xx/init.o
- .debug_loc     0x00000590      0x8c8 ./armv7/kernel/arch/omap44xx/paging.o
- .debug_loc     0x00000e58      0x228 ./armv7/kernel/arch/omap44xx/multiboot.o
- .debug_loc     0x00001080      0x298 ./armv7/kernel/arch/omap44xx/omap_gic.o
- .debug_loc     0x00001318       0x3c ./armv7/kernel/arch/omap44xx/omap_led.o
- .debug_loc     0x00001354       0xee ./armv7/kernel/arch/omap44xx/omap_uart.o
- .debug_loc     0x00001442      0x154 ./armv7/kernel/arch/omap44xx/startup_arch.o
- .debug_loc     0x00001596      0x729 ./armv7/kernel/arch/omap44xx/startup_helpers.o
- .debug_loc     0x00001cbf      0x18e ./armv7/kernel/dispatch.o
- .debug_loc     0x00001e4d      0x17b ./armv7/kernel/memset.o
- .debug_loc     0x00001fc8      0x2d3 ./armv7/kernel/memmove.o
- .debug_loc     0x0000229b     0x13f6 ./armv7/kernel/printf.o
- .debug_loc     0x00003691      0x1d2 ./armv7/kernel/startup.o
- .debug_loc     0x00003863      0x272 ./armv7/kernel/stdlib.o
- .debug_loc     0x00003ad5      0x84f ./armv7/kernel/string.o
- .debug_loc     0x00004324      0x448 ./armv7/lib/libelf.a(elf.o)
- .debug_loc     0x0000476c      0xe67 ./armv7/lib/libelf.a(elf64.o)
- .debug_loc     0x000055d3      0xbfb ./armv7/lib/libelf.a(elf32.o)
+.debug_loc      0x00000000     0x6268
+ .debug_loc     0x00000000      0x296 ./armv7/kernel/arch/arm/exn.o
+ .debug_loc     0x00000296      0x104 ./armv7/kernel/arch/arm/misc.o
+ .debug_loc     0x0000039a       0x8a ./armv7/kernel/arch/armv7/kputchar.o
+ .debug_loc     0x00000424      0x206 ./armv7/kernel/arch/omap44xx/init.o
+ .debug_loc     0x0000062a      0x8c8 ./armv7/kernel/arch/omap44xx/paging.o
+ .debug_loc     0x00000ef2      0x228 ./armv7/kernel/arch/omap44xx/multiboot.o
+ .debug_loc     0x0000111a      0x298 ./armv7/kernel/arch/omap44xx/omap_gic.o
+ .debug_loc     0x000013b2       0x3c ./armv7/kernel/arch/omap44xx/omap_led.o
+ .debug_loc     0x000013ee       0xee ./armv7/kernel/arch/omap44xx/omap_uart.o
+ .debug_loc     0x000014dc      0x154 ./armv7/kernel/arch/omap44xx/startup_arch.o
+ .debug_loc     0x00001630      0x729 ./armv7/kernel/arch/omap44xx/startup_helpers.o
+ .debug_loc     0x00001d59      0x18e ./armv7/kernel/dispatch.o
+ .debug_loc     0x00001ee7      0x17b ./armv7/kernel/memset.o
+ .debug_loc     0x00002062      0x2d3 ./armv7/kernel/memmove.o
+ .debug_loc     0x00002335     0x13f6 ./armv7/kernel/printf.o
+ .debug_loc     0x0000372b      0x1d2 ./armv7/kernel/startup.o
+ .debug_loc     0x000038fd      0x272 ./armv7/kernel/stdlib.o
+ .debug_loc     0x00003b6f      0x84f ./armv7/kernel/string.o
+ .debug_loc     0x000043be      0x448 ./armv7/lib/libelf.a(elf.o)
+ .debug_loc     0x00004806      0xe67 ./armv7/lib/libelf.a(elf64.o)
+ .debug_loc     0x0000566d      0xbfb ./armv7/lib/libelf.a(elf32.o)
 
 .debug_str      0x00000000     0x5400
  .debug_str     0x00000000      0x208 ./armv7/kernel/arch/arm/exn.o
