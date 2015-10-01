@@ -103,8 +103,6 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
 
     printf("The address of paging_map_kernel_section is %p\n",
            paging_map_kernel_section);
-    while(1)
-        printf("A");
  
     // Test MMU by remapping the device identifier and reading it using a
     // virtual address
