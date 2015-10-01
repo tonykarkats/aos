@@ -88,7 +88,7 @@ void serial_putchar(char c)
     if (c == '\n') serial_putchar('\r');
 
     // Wait until FIFO can hold more characters (i.e. TX_FIFO_E == 1)
-    while ( (*uart_lsr & 0x10) ==  0x10);    
+    while ( !(*uart_lsr & 0x20));    
     // Write character
     *uart_thr = c;
 }

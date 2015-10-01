@@ -82,7 +82,8 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
            mmap->base_addr, mmap->length);
     paging_arm_reset(mmap->base_addr, mmap->length);
    
-    exceptions_init();
+//    exceptions_init();
+
     
     printf("invalidate cache\n");
     cp15_invalidate_i_and_d_caches_fast();
@@ -92,13 +93,13 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
 
 
     // reinitialize serial driver in mapped address space
-    serial_map_registers();
+//    serial_map_registers();
  
     // map led gpio reg
     led_map_register();
 
     // flash leds again
-    led_flash();
+//    led_flash();
 
 
     printf("The address of paging_map_kernel_section is %p\n",
@@ -170,20 +171,24 @@ static void paging_init(void)
 {
     aligned_kernel_l1_table = (union arm_l1_entry *)ROUND_UP(
             (uintptr_t)kernel_l1_table, ARM_L1_ALIGN);
-
-    /* Mapping ALL 4GB memory with
-     * with identical mapping
-     */ 
   
-    lpaddr_t paddr = 0x00000000;
-    lpaddr_t pend = paging_round_down( 0xFFFFFFFF, BYTES_PER_SECTION); 
+    lpaddr_t paddr = 0x80000000;
+    lpaddr_t pend = paging_round_down( 0xBFFFFFFF, BYTES_PER_SECTION); 
 
     while (paddr < pend) {
 
         paging_map_device_section((uintptr_t) aligned_kernel_l1_table, paddr, paddr);
 	paddr += BYTES_PER_SECTION;    
     }
-     
+    
+    paddr = 0x48020000;
+    pend  = 0x48020FFF;
+    while (paddr < pend) {
+
+        paging_map_device_section((uintptr_t) aligned_kernel_l1_table, paddr, paddr);
+	paddr += BYTES_PER_SECTION;    
+    }
+
     cp15_write_ttbr0((mem_to_local_phys)((uintptr_t) aligned_kernel_l1_table)); 
     cp15_write_ttbcr(0x000); 
    
@@ -202,11 +207,11 @@ void arch_init(void *pointer)
     // You will need this section of the code for milestone 1.
     struct multiboot_info *mb = (struct multiboot_info *)pointer;
     parse_multiboot_image_header(mb);
-     
+         
     paging_init();
     
+    printf("Before MMU enable\n"); 
     cp15_enable_mmu(); 
-
     printf("MMU enabled\n");
     text_init();
 }
