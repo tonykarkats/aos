@@ -504,9 +504,8 @@ pandaboard_image: $(PANDABOARD_MODULES) \
 #######################################################################
 
 AOS_MODULES=\
-	armv7/sbin/cpu_omap44xx \
-  	armv7/sbin/init
-
+	armv7/sbin/cpu_omap44xx\
+        armv7/sbin/init
 menu.lst.aos: $(SRCDIR)/hake/menu.lst.aos
 	cp $< $@
 

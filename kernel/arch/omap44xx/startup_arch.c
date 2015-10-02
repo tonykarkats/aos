@@ -65,17 +65,6 @@ struct dcb *spawn_init(const char *name)
     memset(init_l1, 0, 16384);
     memset(init_l2, 0, 4194304);
 
-/*
-    for (lvaddr_t vaddr = INIT_VBASE;
-         vaddr < INIT_SPACE_LIMIT;
-         vaddr += ARM_L1_SECTION_BYTES) {
-        uintptr_t section = (vaddr - INIT_VBASE) / ARM_L1_SECTION_BYTES;
-        uintptr_t l2_off = section * ARM_L2_TABLE_BYTES;
-        lpaddr_t paddr = mem_to_local_phys((lvaddr_t)init_l2) + l2_off;
-        paging_map_user_pages_l1((lvaddr_t)init_l1, vaddr, paddr);
-    }
-*/
- 
     printf("Filling out l1 tables..\n");
     lvaddr_t l2_offset = (lvaddr_t) init_l2;
     for (int i = 0; i<4096; i++){
@@ -87,6 +76,8 @@ struct dcb *spawn_init(const char *name)
     // TODO: save address of user L1 page table in init_dcb->vspace
     // init_dcb->vspace = init_l1; 
     init_dcb->vspace = (mem_to_local_phys((lvaddr_t ) init_l1));
+ 
+    cp15_write_ttbr0(mem_to_local_phys((lvaddr_t) init_l1));
 
     // Map & Load init structures and ELF image
     // returns the entry point address and the global offset table base address

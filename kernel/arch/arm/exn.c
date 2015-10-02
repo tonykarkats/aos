@@ -65,16 +65,20 @@ void sys_syscall(arch_registers_state_t* context)
     struct registers_arm_syscall_args* sa = &context->syscall_args;
     uintptr_t   syscall = sa->arg0 & 0xf;
     uintptr_t   argc    = (sa->arg0 >> 4) & 0xf;
-   
-    // printf("sa->arg0 = %s . argc = %p\n",sa->arg0, argc);
+    //size_t length, counter = 0;    
+
     switch(syscall){ 
 	case (SYSCALL_PRINT) : 
-	    printf("%s", sa->arg1);
+  	    // length = *((uintptr_t *)sa->arg2);
+            
+            //if (((char *)sa->arg1)[length] == '\0')        
+    	    printf("%s", sa->arg1);
             break;
         case (SYSCALL_NOP) : 
             printf("Nop call\n");
 	    break;
     }
+    
     UNUSED(argc);
     resume(context);
 }

@@ -18,8 +18,8 @@
 
 int main(void)
 {
-    sys_nop(); 
-    sys_print("Hello",6);
-    sys_print("Hello again",11);
+    sys_nop();    
+    sys_print("Hello",10000);
+    sys_print("Hello again \n",11);
     return 0;
 }
