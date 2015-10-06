@@ -1,4 +1,0 @@
-armv7/kernel/arch/armv7/kputchar.o \
- armv7/kernel/arch/armv7/kputchar.o.depend: kernel/arch/armv7/kputchar.c \
- include/deputy/nodeputy.h kernel/include/serial.h \
- kernel/include/arch/armv7/kputchar.h

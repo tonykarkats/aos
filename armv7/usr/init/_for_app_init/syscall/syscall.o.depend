@@ -1,3 +1,0 @@
-armv7/usr/init/_for_app_init/syscall/syscall.o \
- armv7/usr/init/_for_app_init/syscall/syscall.o.depend: \
- usr/init/syscall/syscall.S include/deputy/nodeputy.h

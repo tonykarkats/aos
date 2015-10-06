@@ -1,3 +1,0 @@
-armv7/lib/crt/crtbegin.o armv7/lib/crt/crtbegin.o.depend: \
- lib/crt/crtbegin.c include/deputy/nodeputy.h \
- lib/newlib/newlib/libc/include/stdint.h

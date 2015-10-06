@@ -1,3 +1,0 @@
-armv7/lib/zlib/_for_lib_zlib/uncompr.o \
- armv7/lib/zlib/_for_lib_zlib/uncompr.o.depend: lib/zlib/uncompr.c \
- include/deputy/nodeputy.h include/zlib.h include/zconf.h

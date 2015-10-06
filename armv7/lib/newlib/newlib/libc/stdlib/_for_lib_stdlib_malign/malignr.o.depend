@@ -1,3 +1,0 @@
-armv7/lib/newlib/newlib/libc/stdlib/_for_lib_stdlib_malign/malignr.o \
- armv7/lib/newlib/newlib/libc/stdlib/_for_lib_stdlib_malign/malignr.o.depend: \
- lib/newlib/newlib/libc/stdlib/malignr.c include/deputy/nodeputy.h

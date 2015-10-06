@@ -1,3 +1,0 @@
-armv7/lib/newlib/newlib/libc/argz/_for_lib_argz/dummy.o \
- armv7/lib/newlib/newlib/libc/argz/_for_lib_argz/dummy.o.depend: \
- lib/newlib/newlib/libc/argz/dummy.c include/deputy/nodeputy.h
