@@ -1251,7 +1251,7 @@ errval_t thread_set_exception_handler(exception_handler_fn newhandler,
     if (old_stack_top != NULL) {
         *old_stack_top = me->exception_stack_top;
     }
-
+    
     me->exception_handler = newhandler;
 
     if (new_stack_base != NULL && new_stack_top != NULL) {
@@ -1259,6 +1259,11 @@ errval_t thread_set_exception_handler(exception_handler_fn newhandler,
         me->exception_stack_top = new_stack_top;
     }
 
+    if (me->exception_stack_top == NULL)
+	printf("Our exception stack top is NULL \n");
+    if (me->stack_top == NULL)
+	printf("Our stack top is NULL \n");
+    printf("Thread exception stack = %p and thread stack top= %p\n",me->exception_stack, me->stack_top);    
     return SYS_ERR_OK;
 }
 
@@ -1339,7 +1344,12 @@ void thread_deliver_exception_disabled(dispatcher_handle_t handle,
     struct thread *thread = disp_gen->current;
     assert_disabled(thread != NULL);
     assert_disabled(disp_gen->runq != NULL);
-
+   
+    printf("Before our own assert!!!!\n"); 
+    if (thread->exception_handler != NULL)
+	printf("Our handler is set\n");
+    if (thread->exception_stack_top != NULL)
+        printf("Our stack top is set\n");
     // can we deliver the exception?
     if (thread->exception_handler == NULL || thread->exception_stack_top == NULL
         || thread->in_exception) {
