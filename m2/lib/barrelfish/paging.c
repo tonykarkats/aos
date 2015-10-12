@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define S_SIZE 8192*2
+
 static struct paging_state current;
 
 /**
@@ -47,6 +49,18 @@ static errval_t arml2_alloc(struct capref *ret)
 // TODO: implement page fault handler that installs frames when a page fault
 // occurs and keeps track of the virtual address space.
 
+static void exception_handler(enum exception_type type,
+							   int subtype,
+							   void *addr,
+							   arch_registers_state_t *regs,
+							   arch_registers_fpu_state_t *fpuregs) {
+	if (type == EXCEPT_PAGEFAULT) {
+		printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
+		exit(0);
+	}
+}
+
+
 errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
         struct capref pdir)
 {
@@ -55,52 +69,29 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
     return SYS_ERR_OK;
 }
 
-static enum exception_type *exc_stack;
-
-static void page_fault_handler(enum exception_type type,
-                               int subtype,
-                               void *addr,
-                               arch_registers_state_t *regs,
-                               arch_registers_fpu_state_t *fpuregs) {
-
-    if (type == EXCEPT_PAGEFAULT)
-        printf("Pagefault exception!\n");
-
-}
+static char e_stack[S_SIZE];
+static char *e_stack_top = e_stack + S_SIZE;
 
 errval_t paging_init(void)
 {
-
     debug_printf("paging_init\n");
-    
     // TODO: initialize self-paging handler
     // TIP: use thread_set_exception_handler() to setup a page fault handler
-    exception_handler_fn newhandler = &page_fault_handler;
-    exception_handler_fn *oldhandler = NULL;
-    exc_stack = (enum exception_type *) malloc(sizeof(enum exception_type) * 10) ;  
-    if (newhandler == NULL) 
-	debug_printf("newhandler is NULL"); 
-    errval_t err;
-    
-    err = thread_set_exception_handler( newhandler, oldhandler, exc_stack + 128, exc_stack + 128, NULL, NULL);
-    if (err_is_fail(err)) {
-        DEBUG_ERR(err, "Failed to set exception handler");
-        abort();
-    }
-
- 
+    thread_set_exception_handler(exception_handler, NULL, e_stack, e_stack_top, NULL, NULL);
     // TIP: Think about the fact that later on, you'll have to make sure that
     // you can handle page faults in any thread of a domain.
     // TIP: it might be a good idea to call paging_init_state() from here to
     // avoid code duplication.
     set_current_paging_state(&current);
     return SYS_ERR_OK;
-
 }
+
+
 
 void paging_init_onthread(struct thread *t)
 {
     // TODO: setup exception handler for thread `t'.
+
 }
 
 /**
@@ -133,7 +124,7 @@ errval_t paging_region_map(struct paging_region *pr, size_t req_size,
 {
     lvaddr_t end_addr = pr->base_addr + pr->region_size;
     ssize_t rem = end_addr - pr->current_addr;
-    if (rem > req_size) {
+	if(rem > req_size) {
         // ok
         *retbuf = (void*)pr->current_addr;
         *ret_size = req_size;
