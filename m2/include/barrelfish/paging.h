@@ -18,6 +18,7 @@
 
 #include <errors/errno.h>
 #include <barrelfish/capabilities.h>
+#include <barrelfish/red_black_tree.h>
 
 typedef int paging_flags_t;
 
@@ -46,9 +47,15 @@ typedef int paging_flags_t;
 #define VREGION_FLAGS_READ_WRITE_MPB \
     (VREGION_FLAGS_READ | VREGION_FLAGS_WRITE | VREGION_FLAGS_MPB)
 
+void handle_fault(lvaddr_t vaddr);
+
 // struct to store the paging status of a process
 struct paging_state {
-    // TODO: add struct members to keep track of the page tables etc
+    
+    // A red-black tree that holds all the chunks of memory
+    // reserved or free.
+	rb_red_blk_tree* mem_tree;
+    
 };
 
 

@@ -1,0 +1,2 @@
+gcc -g -Wall -pedantic   -c -o test_red_black_tree.o test_red_black_tree.c
+<builtin>: recipe for target 'test_red_black_tree.o' failed

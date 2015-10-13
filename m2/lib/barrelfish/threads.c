@@ -1345,11 +1345,6 @@ void thread_deliver_exception_disabled(dispatcher_handle_t handle,
     assert_disabled(thread != NULL);
     assert_disabled(disp_gen->runq != NULL);
    
-    printf("Before our own assert!!!!\n"); 
-    if (thread->exception_handler != NULL)
-	printf("Our handler is set\n");
-    if (thread->exception_stack_top != NULL)
-        printf("Our stack top is set\n");
     // can we deliver the exception?
     if (thread->exception_handler == NULL || thread->exception_stack_top == NULL
         || thread->in_exception) {

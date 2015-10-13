@@ -16,13 +16,18 @@
 #include <barrelfish/paging.h>
 #include <barrelfish/except.h>
 #include <barrelfish/slab.h>
-#include "threads_priv.h"
 
+#ifndef HAVE_BARRELFISH_RED_BLACK
+#include <barrelfish/red_black_tree.h>
+#endif
+
+#include "threads_priv.h"
+// #include <barrelfish/red_black_tree.h>
 #include <stdio.h>
 #include <string.h>
 
 #define S_SIZE 8192*2
-
+#define START_VADDR (1UL<<25)
 static struct paging_state current;
 
 /**
@@ -46,6 +51,27 @@ static errval_t arml2_alloc(struct capref *ret)
     return SYS_ERR_OK;
 }
 
+
+#define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
+void handle_fault(lvaddr_t vaddr)
+{
+    int l1_index = ARM_L1_USER_OFFSET(vaddr);
+    int l2_index = ARM_L2_USER_OFFSET(vaddr);
+    struct capref l1_table = (struct capref) {
+        .cnode = cnode_page,
+        .slot = 0,
+    };
+ 
+    // would need checks if ptables exist already
+    struct capref l2_table;
+    arml2_alloc(&l2_table);
+    vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
+    struct capref frame;
+    size_t bytes = 4096u;
+    frame_alloc(&frame, bytes, &bytes);
+    vnode_map(l2_table, frame, l2_index, FLAGS, 0, 1);
+}
+
 // TODO: implement page fault handler that installs frames when a page fault
 // occurs and keeps track of the virtual address space.
 
@@ -56,7 +82,7 @@ static void exception_handler(enum exception_type type,
 							   arch_registers_fpu_state_t *fpuregs) {
 	if (type == EXCEPT_PAGEFAULT) {
 		printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
-		exit(0);
+		handle_fault((lvaddr_t) addr);
 	}
 }
 
@@ -65,7 +91,25 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
         struct capref pdir)
 {
     debug_printf("paging_init_state\n");
-    // TODO: implement state struct initialization
+    lvaddr_t* newAddr;
+	memory_chunk* newMemory;
+    rb_red_blk_tree* tree;
+
+	printf("Initialzing the red-black tree that holds the paging state\n");
+    printf("At start only one chunk with the whole available memory exists\n");
+
+    tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
+
+    newAddr = (lvaddr_t*) malloc(sizeof(lvaddr_t));
+    *newAddr = START_VADDR;
+    newMemory = (memory_chunk *) malloc(sizeof(memory_chunk));
+    newMemory->reserved = 0;
+    newMemory->size = 1UL*1024*1024*1024;
+    RBTreeInsert(tree, newAddr ,newMemory);
+
+    st->mem_tree = tree;
+
+    printf("Tree initialized\n");
     return SYS_ERR_OK;
 }
 
@@ -78,10 +122,13 @@ errval_t paging_init(void)
     // TODO: initialize self-paging handler
     // TIP: use thread_set_exception_handler() to setup a page fault handler
     thread_set_exception_handler(exception_handler, NULL, e_stack, e_stack_top, NULL, NULL);
+    
     // TIP: Think about the fact that later on, you'll have to make sure that
     // you can handle page faults in any thread of a domain.
     // TIP: it might be a good idea to call paging_init_state() from here to
     // avoid code duplication.
+    struct capref p;
+    paging_init_state(&current, START_VADDR, p);
     set_current_paging_state(&current);
     return SYS_ERR_OK;
 }

@@ -62,11 +62,11 @@ int main(int argc, char *argv[])
     // that are used here
     printf("testing page fault mechanism with static address %p.\n", (char*)SAFE_VADDR);
     char *cbuf = (char*)SAFE_VADDR;
-    for (int i = 0; i < 16*BASE_PAGE_SIZE; i++) {
+    for (int i = 0; i < BASE_PAGE_SIZE; i++) {
         cbuf[i] = i % 255;
     }
     sys_debug_flush_cache();
-    for (int i = 0; i < 16*BASE_PAGE_SIZE; i++) {
+    for (int i = 0; i < BASE_PAGE_SIZE; i++) {
         if (cbuf[i] != i % 255) {
             debug_printf("cbuf[%d] doesn't contain %d\n", i, i % 255);
             abort();
