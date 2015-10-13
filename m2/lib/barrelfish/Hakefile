@@ -20,7 +20,8 @@
                       "slot_alloc/single_slot_alloc.c", "slot_alloc/multi_slot_alloc.c",
                       "slot_alloc/slot_alloc.c", "slot_alloc/range_slot_alloc.c",
                       "trace.c", "resource_ctrl.c", "coreset.c",
-                      "inthandler.c", "deferred.c", "paging.c"
+                      "inthandler.c", "deferred.c", "paging.c", "red_black_tree.c", "stack.c",
+					  "misc.c"
                     ]
 
       idc_srcs = concat $ map getsrcs $ optInterconnectDrivers $ options arch

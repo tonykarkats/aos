@@ -40,4 +40,4 @@ stk_stack * StackCreate(void);
 void StackPush(stk_stack * theStack, DATA_TYPE newInfoPointer);
 void * StackPop(stk_stack * theStack);
 int StackNotEmpty(stk_stack *);
-
+void StackDestroy(stk_stack * theStack,void DestFunc(void * a));

@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     }
     printf("static malloc buf checked\n");
 
-#if 1
+#if 0
     // extra stage to test page fault handler when paging_alloc isn't
     // implemented yet. This will most likely break your self-paging
     // implementation as it doesn't tell paging_alloc() the range of addresses

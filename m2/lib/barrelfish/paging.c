@@ -16,11 +16,6 @@
 #include <barrelfish/paging.h>
 #include <barrelfish/except.h>
 #include <barrelfish/slab.h>
-
-#ifndef HAVE_BARRELFISH_RED_BLACK
-#include <barrelfish/red_black_tree.h>
-#endif
-
 #include "threads_priv.h"
 // #include <barrelfish/red_black_tree.h>
 #include <stdio.h>
@@ -100,13 +95,22 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
-    newAddr = (lvaddr_t*) malloc(sizeof(lvaddr_t));
+    printf("Before first SafeMalloc\n");
+    newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
+    //newAddr = &vaddr_start;
+
+    printf("After first SafeMalloc\n");
     *newAddr = START_VADDR;
-    newMemory = (memory_chunk *) malloc(sizeof(memory_chunk));
+    
+    newMemory = (memory_chunk *) SafeMalloc(sizeof(memory_chunk));
+    //newMemory = &first_chunk;  
+
     newMemory->reserved = 0;
     newMemory->size = 1UL*1024*1024*1024;
+    
+    printf("Before first tree insert\n");
     RBTreeInsert(tree, newAddr ,newMemory);
-
+    printf("After first tree insert\n");
     st->mem_tree = tree;
 
     printf("Tree initialized\n");
@@ -128,7 +132,11 @@ errval_t paging_init(void)
     // TIP: it might be a good idea to call paging_init_state() from here to
     // avoid code duplication.
     struct capref p;
+    
+    printf("Before initializing our memory tree\n");
     paging_init_state(&current, START_VADDR, p);
+    printf("Printing our tree!\n");
+    RBTreePrint(current.mem_tree);
     set_current_paging_state(&current);
     return SYS_ERR_OK;
 }

@@ -22,7 +22,8 @@
 
 void Assert(int assertion, char* error);
 void * SafeMalloc(size_t size);
-
+void SafeFree(void*);
+void NullFunction(void * junk);
 #endif
 
 

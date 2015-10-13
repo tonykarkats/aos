@@ -51,7 +51,7 @@ typedef struct rb_red_blk_tree {
   void (*DestroyKey)(void* a);
   void (*DestroyInfo)(void* a);
   void (*PrintKey)(const void* a);
-  void (*PrintInfo)(void* a);
+  void (*PrintInfo)(const void* a);
   /*  A sentinel is used for root and for nil.  These sentinels are */
   /*  created when RBTreeCreate is caled.  root->left should always */
   /*  point to the node which is the root of the tree.  nil points to a */
@@ -75,16 +75,20 @@ rb_red_blk_node* TreePredecessor(rb_red_blk_tree*,rb_red_blk_node*);
 rb_red_blk_node* TreeSuccessor(rb_red_blk_tree*,rb_red_blk_node*);
 rb_red_blk_node* RBExactQuery(rb_red_blk_tree*, void*);
 stk_stack * RBEnumerate(rb_red_blk_tree* tree,void* low, void* high);
-void NullFunction(void*);
 
 void VirtaddrDest(void* a);
 int VirtaddrComp(const void* a,const void* b);
 void VirtaddrInfoDest(void *);
 void VirtaddrPrint(const void*);
 void VirtaddrInfo(const void*);
-
+void LeftRotate(rb_red_blk_tree* tree, rb_red_blk_node* x);
 int is_virtual_address_mapped(rb_red_blk_tree*, lvaddr_t);
+void RightRotate(rb_red_blk_tree* tree, rb_red_blk_node* y);
 
+void RBDeleteFixUp(rb_red_blk_tree* tree, rb_red_blk_node* x);
+void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x);
+void TreeInsertHelp(rb_red_blk_tree* tree, rb_red_blk_node* z);
+void TreeDestHelper(rb_red_blk_tree* tree, rb_red_blk_node* x);
 lvaddr_t allocate_memory(rb_red_blk_tree*, size_t);
 
 rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t bytes, rb_red_blk_node* guard);

@@ -24,7 +24,7 @@ rb_red_blk_tree* RBTreeCreate( int (*CompFunc) (const void*,const void*),
 			      void (*DestFunc) (void*),
 			      void (*InfoDestFunc) (void*),
 			      void (*PrintFunc) (const void*),
-			      void (*PrintInfo)(void*)) {
+			      void (*PrintInfo)(const void*)) {
   rb_red_blk_tree* newTree;
   rb_red_blk_node* temp;
 
@@ -405,7 +405,7 @@ void TreeDestHelper(rb_red_blk_tree* tree, rb_red_blk_node* x) {
     TreeDestHelper(tree,x->right);
     tree->DestroyKey(x->key);
     tree->DestroyInfo(x->info);
-    free(x);
+    SafeFree(x);
   }
 }
 
@@ -417,7 +417,7 @@ void TreeDestHelper(rb_red_blk_tree* tree, rb_red_blk_node* x) {
 /**/
 /*    OUTPUT:  none */
 /**/
-/*    EFFECT:  Destroys the key and frees memory */
+/*    EFFECT:  Destroys the key and SafeFrees memory */
 /**/
 /*    Modifies Input: tree */
 /**/
@@ -425,9 +425,9 @@ void TreeDestHelper(rb_red_blk_tree* tree, rb_red_blk_node* x) {
 
 void RBTreeDestroy(rb_red_blk_tree* tree) {
   TreeDestHelper(tree,tree->root->left);
-  free(tree->root);
-  free(tree->nil);
-  free(tree);
+  SafeFree(tree->root);
+  SafeFree(tree->nil);
+  SafeFree(tree);
 }
 
 
@@ -475,9 +475,8 @@ rb_red_blk_node* RBExactQuery(rb_red_blk_tree* tree, void* q) {
   while(0 != compVal) {/*assignemnt*/
     if (1 == compVal) { /* x->key > q */
        temp = x->parent;
-b/barrelfish/include/arch/arm -o ./armv7/lib/barrelfish/_for_lib_barrelfish/deferred.o -c ../m2/lib/barrelfish/deferred.c 
-arm-linux-gnueabi-gcc -std=c99 -U__STRICT_ANSI__ -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -fno-omit-frame-pointer -fno-builtin -nostdinc -U__linux__ -Ulinux -Wall -Wshadow -Wmissing-declarations -Wmissing-field-initializers -Wredundant-decls -Werror -imacros ../m2/include/deputy/nodeputy.h -fno-unwind-tables -Wno-packed-bitfield-compat -marm -fno-stack-protector -mcpu=cortex-a9 -march=armv7-a -mapcs -mabi=aapcs-linux -msingle-pic-base -mpic-register=r10 -DPIC_REGISTER=R10 -fPIE -ffixed-r9 -DTHREAD_REGISTER=R9 -D__ARM_CORTEX__ -D__ARM_ARCH_7A__ -Wno-unused-but-set-variable -Wno-format -D__pandaboard__ -DBARRELFISH -DCONFIG_NEWLIB -DUSE_KALUGA_DVM -DMILESTONE=2 -DCONFIG_INTERCONNECT_DRIVER_LMP -DCONFIG_FLOUNDER_BACKEND_LMP -g -O2 -I../m2/include -I../m2/include/arch/arm -I../m2/lib/newlib/newlib/libc/include -I../m2/include/c -I../m2/include/target/arm -I../m2/include/ipv4 -I./armv7/include -I./armv7/include/dev -I../m2/lib/barrelfish -I./armv7/lib/barrelfish -I../m2/lib/barrelfish/include -I../m2/lib/barrelfish/include/arch/arm -o ./armv7/lib/barrelfish/_for_lib_barrelfish/paging.o -c ../m2/lib/barrelfish/paging.c        x=x->left;
-    } else {
+  	   x=x->left;
+   } else {
       temp = x;
       x=x->right;
     }
@@ -573,7 +572,7 @@ void RBDeleteFixUp(rb_red_blk_tree* tree, rb_red_blk_node* x) {
 /**/
 /*    OUTPUT:  none */
 /**/
-/*    EFFECT:  Deletes z from tree and frees the key and info of z */
+/*    EFFECT:  Deletes z from tree and SafeFrees the key and info of z */
 /*             using DestoryKey and DestoryInfo.  Then calls */
 /*             RBDeleteFixUp to restore red-black properties */
 /**/
@@ -620,12 +619,12 @@ void RBDelete(rb_red_blk_tree* tree, rb_red_blk_node* z){
     } else {
       z->parent->right=y;
     }
-    free(z); 
+    SafeFree(z); 
   } else {
     tree->DestroyKey(y->key);
     tree->DestroyInfo(y->info);
     if (!(y->red)) RBDeleteFixUp(tree,x);
-    free(y);
+    SafeFree(y);
   }
   
 #ifdef DEBUG_ASSERT
@@ -668,7 +667,7 @@ stk_stack* RBEnumerate(rb_red_blk_tree* tree, void* low, void* high) {
 }
      
 void VirtaddrDest(void* a) {
-  free((int*)a);
+  SafeFree((int*)a);
 }
 
 int VirtaddrComp(const void* a,const void* b) {
@@ -701,8 +700,8 @@ int is_virtual_address_mapped(rb_red_blk_tree* tree, lvaddr_t q) {
 
 rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t bytes, rb_red_blk_node* guard)
 {
-    rb_red_blk_node* nil=tree->nil;
-    rb_red_blk_node* root=tree->root;
+    //rb_red_blk_node* nil=tree->nil;
+    //rb_red_blk_node* root=tree->root;
     memory_chunk *chunk;
     rb_red_blk_node* init_guard = guard;
 
@@ -755,7 +754,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
     new_chunk_1 = (memory_chunk*) malloc(sizeof(memory_chunk));
     new_chunk_2 = (memory_chunk*) malloc(sizeof(memory_chunk));
 
-    new_chunk_1->size = bytes;
+    new_chunk_1->size = size1;
     new_chunk_2->size = size2;
 
     new_chunk_1->reserved = 1;
