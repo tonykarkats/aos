@@ -80,17 +80,20 @@ int main(int argc, char *argv[])
         printf("error in paging_alloc: %s\n", err_getstring(err));
         abort();
     }
-
+    
     if (!vbuf) {
         printf("did not get a buffer\n");
         abort();
     }
-
+    
     char *buf = vbuf;
-
+    buf[50000000] = 1; 
+	abort(); 
+    
     for (int i = 0; i < BUFSIZE; i++){
         buf[i] = i%255;
     }
+    
     printf("buf filled\n");
     sys_debug_flush_cache();
     for (int i = 0; i < BUFSIZE; i++){

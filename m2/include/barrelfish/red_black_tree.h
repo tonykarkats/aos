@@ -3,7 +3,7 @@
 #endif
 #include<stdint.h>
 #include<barrelfish/stack.h>
-
+#include<barrelfish/caddr.h>
 #ifndef HAVE_BARELLFISH_RED_BLACK 
 #define HAVE_BARELLFISH_RED_BLACK
 #endif
@@ -31,6 +31,7 @@ typedef uintptr_t lvaddr_t;
 typedef struct memory_chunk {
 	size_t size;
 	int reserved;
+	struct capref frame_cap;
 } memory_chunk;
 
 typedef struct rb_red_blk_node {

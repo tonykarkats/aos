@@ -678,11 +678,11 @@ int VirtaddrComp(const void* a,const void* b) {
 
 void VirtaddrInfoDest(void *a) {
 
-  printf("VirtAddr= %p",*(lvaddr_t*)a);
+  // printf("VirtAddr= %p\n",*(lvaddr_t*)a);
 }
 
 void VirtaddrPrint(const void* a) {
-  printf("VirtAddr= %p",*(lvaddr_t*)a);
+  printf("VirtAddr= %p\n",*(lvaddr_t*)a);
 }
 
 void VirtaddrInfo(const void* a) {
@@ -707,7 +707,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
 
     if (x != tree->nil) {
             init_guard = find_memory_chunk(tree, x->left, bytes, init_guard);
-            printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
+            //printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
             if (init_guard == NULL) {
 
                 chunk =  ((memory_chunk*) x->info);
@@ -745,14 +745,14 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
 
     size_t size1 = bytes;
     size_t size2 = chunk->size - bytes;
-    addr1 = (lvaddr_t*) malloc(sizeof(lvaddr_t));
-    addr2 = (lvaddr_t*) malloc(sizeof(lvaddr_t));
+    addr1 = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
+    addr2 = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
 
-    *addr1 = *((lvaddr_t*) node->key);
+    *addr1 = *((lvaddr_t*)node->key);
     *addr2 = *addr1 + bytes;
 
-    new_chunk_1 = (memory_chunk*) malloc(sizeof(memory_chunk));
-    new_chunk_2 = (memory_chunk*) malloc(sizeof(memory_chunk));
+    new_chunk_1 = (memory_chunk*) SafeMalloc(sizeof(memory_chunk));
+    new_chunk_2 = (memory_chunk*) SafeMalloc(sizeof(memory_chunk));
 
     new_chunk_1->size = size1;
     new_chunk_2->size = size2;
@@ -763,7 +763,8 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
     RBDelete(tree, node);
     RBTreeInsert(tree, addr1, new_chunk_1);
     RBTreeInsert(tree, addr2, new_chunk_2);
-
+    
+    printf("Will return %p\n",*addr1);
     return *addr1;
 }
 
