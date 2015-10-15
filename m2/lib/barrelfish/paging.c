@@ -20,7 +20,7 @@
 // #include <barrelfish/red_black_tree.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <stdbool.h>
 #define S_SIZE 8192*2
 #define START_VADDR (1UL<<25)
 
@@ -80,28 +80,35 @@ errval_t map_page(lvaddr_t vaddr) {
     };
     rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
 	memory_chunk* chunk = (memory_chunk*) node->info; 
-    lvaddr_t start_of_memory = *((lvaddr_t*)node->key);  
 	
-	if (chunk->l2_mapped[l2_index]) 
-		return SYS_ERR_OK;   
-
-    printf("Mapping l2 table at l1...\n");
+    if (!chunk->has_frame) {
+		err = get_frame(chunk->size , &chunk->frame_cap);
+		chunk->has_frame = true;
+	}
+    
     struct capref l2_table;
-    arml2_alloc(&l2_table);
-    vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
-
-	chunk->l2_mapped[l2_index] = true;    
-
-    int frame_cap_index = (vaddr -  start_of_memory) / BASE_PAGE_SIZE;
-	struct capref large_frame = chunk->frame_cap;
-
-	printf("Mapping frame with index = %d at l2 table...\n",frame_cap_index);
-    err = vnode_map(l2_table, large_frame, l2_index, FLAGS, frame_cap_index*BASE_PAGE_SIZE , 1);
 	
-	if (err_is_fail(err)) {
-		return err_push(err, LIB_ERR_VNODE_MAP);
+    if (!chunk->l2_mapped[l1_index]) {
+	    //printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
+		arml2_alloc(&l2_table);
+    	vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
+		
+		chunk->l2_mapped[l1_index] = true;    
+		chunk->l2_table_cap[l1_index] = l2_table; 
+	}
+	else {
+		l2_table = chunk->l2_table_cap[l1_index];
 	}
 
+	struct capref large_frame = chunk->frame_cap;
+	chunk->frame_cap.slot++;
+
+	//printf("Mapping frame with index = %d at l2 table...\n",l2_index);
+	err = vnode_map(l2_table, large_frame, l2_index, FLAGS, 0 , 1);	
+	if (err_is_fail(err)) {
+		printf("Error in mapping !\n");
+		return err_push(err, LIB_ERR_VNODE_MAP);
+	}
 	return SYS_ERR_OK;
 }
 // TODO: implement page fault handler that installs frames when a page fault
@@ -113,8 +120,8 @@ static void exception_handler(enum exception_type type,
 							   arch_registers_state_t *regs,
 							   arch_registers_fpu_state_t *fpuregs) {
 	if (type == EXCEPT_PAGEFAULT) {
-		printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
-        printf("Checking to see if we have it in paging tree\n");
+		//printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
+        //printf("Checking to see if we have it in paging tree\n");
 
 		if (addr == NULL){
 			printf("NULL pointer!");
@@ -131,7 +138,7 @@ static void exception_handler(enum exception_type type,
 			abort();			
 		} 
 		else { 
-			printf("Address is mapped!\n");
+			//printf("Address is mapped!\n");
 			errval_t err = map_page((lvaddr_t) addr);
  			if (err_is_fail(err)) {
 				printf("Error in map_page!");
@@ -289,7 +296,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
-    printf("get_frame: Need %d slots\n", slots_needed);
+    //printf("get_frame: Need %d slots\n", slots_needed);
 	
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
@@ -326,32 +333,24 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 
 	bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
     
-    printf("Trying to allocate memory. Rounded up to %d\n",bytes);
+    //printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
 		debug_printf("Run out of virtual memory!");
 		return LIB_ERR_OUT_OF_VIRTUAL_ADDR;
 	}
 
-	printf("Memory allocated at %p\n",vaddr);
+	//printf("Memory allocated at %p\n",vaddr);
 	
-    if (vaddr != START_VADDR) {
-   		printf("Trying to find node that was just created to update its memory frame\n");
-    	node = RBExactQuery(st->mem_tree, &vaddr);
-    	struct memory_chunk* chunk = (struct memory_chunk*) node->info;
-		struct capref* memory_cap_frame = &(chunk->frame_cap);
-		
-		for (int i = 0; i<4096; i++)
-			chunk->l2_mapped[i] = false;
+   	//printf("Trying to find node that was just created to update its memory frame\n");
+    node = RBExactQuery(st->mem_tree, &vaddr);
+    struct memory_chunk* chunk = (struct memory_chunk*) node->info;
 
-		//errval_t err = get_frame(bytes, memory_cap_frame);
-	   	errval_t err = frame_alloc(memory_cap_frame, bytes, &bytes);
+	for (int i = 0; i<4096; i++)
+		chunk->l2_mapped[i] = false;
+
+	chunk->has_frame = false;
 		
-		if (err_is_fail(err)) {
-			return err;
-		}
- 	}
-    
 	*buf = (void *)vaddr;
 
     return SYS_ERR_OK;

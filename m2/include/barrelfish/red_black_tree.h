@@ -34,6 +34,8 @@ typedef struct memory_chunk {
 	int reserved;
 	struct capref frame_cap;
 	bool l2_mapped[4096]; 
+	struct capref l2_table_cap[4096];
+	bool has_frame;
 } memory_chunk;
 
 typedef struct rb_red_blk_node {

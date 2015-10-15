@@ -67,7 +67,12 @@ static int pointer = 0;
 
 void * SafeMalloc(size_t size) {
 
+	if ((pointer + size)>BUFFER_SIZE) {
+		printf("OUT OF STATIC MEMORY!");
+		abort();
+	}
 	char* return_address = memory_buffer+pointer;
+    
     pointer += size;
     
     return (void *) return_address;  
