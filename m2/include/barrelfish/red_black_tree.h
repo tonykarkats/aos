@@ -8,6 +8,7 @@
 #define HAVE_BARELLFISH_RED_BLACK
 #endif
 
+#include <stdbool.h>
 typedef uintptr_t lvaddr_t;
 /*  CONVENTIONS:  All data structures for red-black trees have the prefix */
 /*                "rb_" to prevent name conflicts. */
@@ -32,6 +33,7 @@ typedef struct memory_chunk {
 	size_t size;
 	int reserved;
 	struct capref frame_cap;
+	bool l2_mapped[4096]; 
 } memory_chunk;
 
 typedef struct rb_red_blk_node {

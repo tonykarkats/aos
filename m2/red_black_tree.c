@@ -1,5 +1,5 @@
 #include <barrelfish/red_black_tree.h>
-
+#include <barrelfish/paging.h>
 /***********************************************************************/
 /*  FUNCTION:  RBTreeCreate */
 /**/

@@ -23,6 +23,8 @@
 
 #define S_SIZE 8192*2
 #define START_VADDR (1UL<<25)
+
+
 static struct paging_state current;
 
 /**
@@ -76,24 +78,28 @@ errval_t map_page(lvaddr_t vaddr) {
         .cnode = cnode_page,
         .slot = 0,
     };
- 
+    rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
+	memory_chunk* chunk = (memory_chunk*) node->info; 
+    lvaddr_t start_of_memory = *((lvaddr_t*)node->key);  
+	
+	if (chunk->l2_mapped[l2_index]) 
+		return SYS_ERR_OK;   
+
     printf("Mapping l2 table at l1...\n");
     struct capref l2_table;
     arml2_alloc(&l2_table);
     vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
 
-    rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
-	memory_chunk* chunk = (memory_chunk*) node->info; 
-    lvaddr_t start_of_memory = *((lvaddr_t*)node->key);
+	chunk->l2_mapped[l2_index] = true;    
 
     int frame_cap_index = (vaddr -  start_of_memory) / BASE_PAGE_SIZE;
 	struct capref large_frame = chunk->frame_cap;
-    
-    printf("Mapping frame with index = %d at l2 table...\n",frame_cap_index);
+
+	printf("Mapping frame with index = %d at l2 table...\n",frame_cap_index);
     err = vnode_map(l2_table, large_frame, l2_index, FLAGS, frame_cap_index*BASE_PAGE_SIZE , 1);
+	
 	if (err_is_fail(err)) {
-		printf("Error in maping frame to l2 table!\n");
-		return err;
+		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
 
 	return SYS_ERR_OK;
@@ -268,6 +274,8 @@ errval_t paging_region_unmap(struct paging_region *pr, lvaddr_t base, size_t byt
  * TODO: you need to implement this function using the knowledge of your
  * self-paging implementation about where you have already mapped frames.
  */
+
+
 errval_t get_frame(size_t bytes, struct capref* current_frame)
 {
 	struct capref ram;
@@ -281,6 +289,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
+    printf("get_frame: Need %d slots\n", slots_needed);
 	
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
@@ -309,12 +318,13 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
     return SYS_ERR_OK;
 }
 
+
 errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 {
     rb_red_blk_node* node;
 	lvaddr_t vaddr;
 
-	bytes = ROUND_UP(bytes, BASE_PAGE_SIZE); 
+	bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
     
     printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
@@ -324,17 +334,25 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	}
 
 	printf("Memory allocated at %p\n",vaddr);
-	printf("Trying to find node that was just created to update its memory frame\n");
-    node = RBExactQuery(st->mem_tree, &vaddr);
-    struct memory_chunk* chunk = (struct memory_chunk*) node->info;
-	struct capref* memory_cap_frame = &(chunk->frame_cap);
+	
+    if (vaddr != START_VADDR) {
+   		printf("Trying to find node that was just created to update its memory frame\n");
+    	node = RBExactQuery(st->mem_tree, &vaddr);
+    	struct memory_chunk* chunk = (struct memory_chunk*) node->info;
+		struct capref* memory_cap_frame = &(chunk->frame_cap);
+		
+		for (int i = 0; i<4096; i++)
+			chunk->l2_mapped[i] = false;
 
-	errval_t err = get_frame(bytes, memory_cap_frame);
-    if (err_is_fail(err)) {
-		return err;
-	}
- 
-    *buf = (void *)vaddr;
+		//errval_t err = get_frame(bytes, memory_cap_frame);
+	   	errval_t err = frame_alloc(memory_cap_frame, bytes, &bytes);
+		
+		if (err_is_fail(err)) {
+			return err;
+		}
+ 	}
+    
+	*buf = (void *)vaddr;
 
     return SYS_ERR_OK;
 }

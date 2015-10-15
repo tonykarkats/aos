@@ -41,23 +41,6 @@ void Assert(int assertion, char* error) {
 /**/
 /***********************************************************************/
 
-
-#define BUFFER_SIZE 2UL*1024*1024
-
-static char memory_buffer[BUFFER_SIZE];
-static int pointer = 0;
-
-void * SafeMalloc(size_t size) {
-
-	char* return_address = memory_buffer+pointer;
-    pointer += size;
-    
-    return (void *) return_address;  
-}
-
-void SafeFree(void* addr) {
-}
-
 /*
 void * SafeMalloc(size_t size) {
   void * result;
@@ -77,5 +60,22 @@ void * SafeMalloc(size_t size) {
 /*  NullFunction does nothing it is included so that it can be passed */
 /*  as a function to RBTreeCreate when no other suitable function has */
 /*  been defined */
+
+#define BUFFER_SIZE 2UL*1024*1024
+static char memory_buffer[BUFFER_SIZE];
+static int pointer = 0;
+
+void * SafeMalloc(size_t size) {
+
+	char* return_address = memory_buffer+pointer;
+    pointer += size;
+    
+    return (void *) return_address;  
+}
+
+void SafeFree(void* addr) {
+}
+
+
 
 void NullFunction(void * junk) { ; }

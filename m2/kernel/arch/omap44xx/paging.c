@@ -1,4 +1,5 @@
 /*
+ * 
  * Copyright (c) 2009 - 2012 ETH Zurich.
  * All rights reserved.
  *
@@ -410,6 +411,7 @@ caps_map_l2(struct capability* dest,
     }
 
     // check offset within frame
+
     if ((offset + BYTES_PER_PAGE > get_size(src)) ||
         ((offset % BYTES_PER_PAGE) != 0)) {
         panic("oops: frame offset invalid");

@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
 
     void *vbuf;
     err = paging_alloc(get_current_paging_state(), &vbuf, BUFSIZE);
+    
+    //err = paging_alloc(get_current_paging_state(), &vbuf, 4096*50);
     if (err_is_fail(err)) {
         printf("error in paging_alloc: %s\n", err_getstring(err));
         abort();
@@ -85,10 +87,11 @@ int main(int argc, char *argv[])
         printf("did not get a buffer\n");
         abort();
     }
-    
+     
     char *buf = vbuf;
-    buf[50000000] = 1; 
-	abort(); 
+    //buf[50000000] = 1; 
+	//buf[5] = 1;
+    //abort(); 
     
     for (int i = 0; i < BUFSIZE; i++){
         buf[i] = i%255;

@@ -19,10 +19,11 @@
 /*                name.  For example, int newLongInt.  Global variables have */
 /*                names beginning with "g".  An example of a global */
 /*                variable name is gNewtonsConstant. */
-
-void Assert(int assertion, char* error);
 void * SafeMalloc(size_t size);
 void SafeFree(void*);
+
+
+void Assert(int assertion, char* error);
 void NullFunction(void * junk);
 #endif
 

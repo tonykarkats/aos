@@ -1,4 +1,5 @@
 #include <barrelfish/stack.h>
+#include <barrelfish/misc.h>
 
 int StackNotEmpty(stk_stack * theStack) {
   return( theStack ? (int) theStack->top : 0);

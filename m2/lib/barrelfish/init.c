@@ -137,7 +137,9 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     waitset_init(default_ws);
 
     // Initialize ram_alloc state
-    ram_alloc_init();
+
+	ram_alloc_init();
+
     /* All domains use smallcn to initialize */
     err = ram_alloc_set(ram_alloc_fixed);
     if (err_is_fail(err)) {
