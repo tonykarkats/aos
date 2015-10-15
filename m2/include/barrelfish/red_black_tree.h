@@ -10,24 +10,20 @@
 
 #include <stdbool.h>
 typedef uintptr_t lvaddr_t;
-/*  CONVENTIONS:  All data structures for red-black trees have the prefix */
-/*                "rb_" to prevent name conflicts. */
-/*                                                                      */
-/*                Function names: Each word in a function name begins with */
-/*                a capital letter.  An example funcntion name is  */
-/*                CreateRedTree(a,b,c). Furthermore, each function name */
-/*                should begin with a capital letter to easily distinguish */
-/*                them from variables. */
-/*                                                                     */
-/*                Variable names: Each word in a variable name begins with */
-/*                a capital letter EXCEPT the first letter of the variable */
-/*                name.  For example, int newLongInt.  Global variables have */
-/*                names beginning with "g".  An example of a global */
-/*                variable name is gNewtonsConstant. */
 
 /* comment out the line below to remove all the debugging assertion */
 /* checks from the compiled code.  */
 #define DEBUG_ASSERT 1
+
+/*  This is the chunk that the info pointer of the tree points to.
+ *  It holds information about the memory chunks that are allocated.
+ *  size        : the size of the chunk
+ *  reserved    : set when the memory is reserved
+ *  frame cap   : the physical frame capability corresponding to the chunk
+ *  l2_mapped   : boolean array that shows which l2 pages have been mapped
+ *  l2_table_cap: the capabilities for the l2 pages
+*/
+  
 
 typedef struct memory_chunk {
 	size_t size;
@@ -37,6 +33,17 @@ typedef struct memory_chunk {
 	struct capref l2_table_cap[4096];
 	bool has_frame;
 } memory_chunk;
+
+/* Our paging state struct is a Red-Black tree whose nodes represent the
+ * memory chunks allocated fot the demand paging. The key for each node is the 
+ * virtual address of the start of the chunk and the 'info' field is a pointer
+ * to a memory_chunk struct described above. The rest are needed for the actual
+ * implementation of the red-black tree.
+ * Note: Our implementation is based on the following implementation from
+ * Emin Martinian at MIT
+ * URL : http://web.mit.edu/~emin/Desktop/ref_to_emin/www.old/source_code/red_black_tree/index.html
+*/
+
 
 typedef struct rb_red_blk_node {
   void* key;
@@ -67,11 +74,13 @@ typedef struct rb_red_blk_tree {
   rb_red_blk_node* nil;              
 } rb_red_blk_tree;
 
+/* The functions below are described in the .c file */ 
 rb_red_blk_tree* RBTreeCreate(int  (*CompFunc)(const void*, const void*),
 			     void (*DestFunc)(void*), 
 			     void (*InfoDestFunc)(void*), 
 			     void (*PrintFunc)(const void*),
 			     void (*PrintInfo)(const void*));
+
 rb_red_blk_node * RBTreeInsert(rb_red_blk_tree*, void* key, void* info);
 void RBTreePrint(rb_red_blk_tree*);
 void RBDelete(rb_red_blk_tree* , rb_red_blk_node* );

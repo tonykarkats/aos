@@ -69,16 +69,6 @@ void LeftRotate(rb_red_blk_tree* tree, rb_red_blk_node* x) {
   rb_red_blk_node* y;
   rb_red_blk_node* nil=tree->nil;
 
-  /*  I originally wrote this function to use the sentinel for */
-  /*  nil to avoid checking for nil.  However this introduces a */
-  /*  very subtle bug because sometimes this function modifies */
-  /*  the parent pointer of nil.  This can be a problem if a */
-  /*  function which calls LeftRotate also uses the nil sentinel */
-  /*  and expects the nil sentinel's parent pointer to be unchanged */
-  /*  after calling this function.  For example, when RBDeleteFixUP */
-  /*  calls LeftRotate it expects the parent pointer of nil to be */
-  /*  unchanged. */
-
   y=x->right;
   x->right=y->left;
 
@@ -698,6 +688,10 @@ int is_virtual_address_mapped(rb_red_blk_tree* tree, lvaddr_t q) {
     return (( (memory_chunk*)is_in_memory_chunk->info)->reserved);
 }
 
+
+/* Recursively searches the tree and returns a memory chunk which can hold
+ * 'bytes' bytes in size */
+
 rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t bytes, rb_red_blk_node* guard)
 {
     //rb_red_blk_node* nil=tree->nil;
@@ -728,6 +722,10 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
    return init_guard;
 
 }
+
+/* This function finds a memory chunk that can hold 'bytes' bytes
+ * and splits up the chunk into to new chunk, reserving the first
+ * for the allocated memory and marking the second as free. */
 
 lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
 
@@ -760,6 +758,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
     new_chunk_1->reserved = 1;
     new_chunk_2->reserved = 0;
 
+    // Delete the old chunk and insert the new ones
     RBDelete(tree, node);
     RBTreeInsert(tree, addr1, new_chunk_1);
     RBTreeInsert(tree, addr2, new_chunk_2);

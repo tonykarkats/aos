@@ -21,9 +21,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+
 #define S_SIZE 8192*2
 #define START_VADDR (1UL<<25)
-
+#define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 
 static struct paging_state current;
 
@@ -49,7 +50,6 @@ static errval_t arml2_alloc(struct capref *ret)
 }
 
 
-#define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 void handle_fault(lvaddr_t vaddr)
 {
     int l1_index = ARM_L1_USER_OFFSET(vaddr);
@@ -111,17 +111,19 @@ errval_t map_page(lvaddr_t vaddr) {
 	}
 	return SYS_ERR_OK;
 }
-// TODO: implement page fault handler that installs frames when a page fault
+
+// Page fault handler that installs frames when a page fault
 // occurs and keeps track of the virtual address space.
 
 static void exception_handler(enum exception_type type,
-							   int subtype,
-							   void *addr,
-							   arch_registers_state_t *regs,
-							   arch_registers_fpu_state_t *fpuregs) {
+			      int subtype,
+			      void *addr,
+			      arch_registers_state_t *regs,
+			      arch_registers_fpu_state_t *fpuregs) 
+{
 	if (type == EXCEPT_PAGEFAULT) {
 		//printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
-        //printf("Checking to see if we have it in paging tree\n");
+        	//printf("Checking to see if we have it in paging tree\n");
 
 		if (addr == NULL){
 			printf("NULL pointer!");
@@ -148,6 +150,11 @@ static void exception_handler(enum exception_type type,
 	}
 }
 
+
+/* This function initializes our paging state tree. In order to initialize the 
+ * tree we use SafeMalloc which is essentially an allocation from a static 
+ * array. We initialize the first chunk to [0-1GB] */
+
 errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
         struct capref pdir)
 {
@@ -156,16 +163,16 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 	memory_chunk* newMemory;
     rb_red_blk_tree* tree;
 
-	printf("Initialzing the red-black tree that holds the paging state\n");
-    printf("At start only one chunk with the whole available memory exists\n");
+    printf("Initialzing the red-black tree that holds the paging state\n");
+    //printf("At start only one chunk with the whole available memory exists\n");
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
-    printf("Before first SafeMalloc\n");
+    //printf("Before first SafeMalloc\n");
     newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
     //newAddr = &vaddr_start;
 
-    printf("After first SafeMalloc\n");
+    //printf("After first SafeMalloc\n");
     *newAddr = START_VADDR;
     
     newMemory = (memory_chunk *) SafeMalloc(sizeof(memory_chunk));
@@ -174,12 +181,12 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
     newMemory->reserved = 0;
     newMemory->size = 1UL*1024*1024*1024;
     
-    printf("Before first tree insert\n");
+    //printf("Before first tree insert\n");
     RBTreeInsert(tree, newAddr ,newMemory);
-    printf("After first tree insert\n");
+    //printf("After first tree insert\n");
     st->mem_tree = tree;
 
-    printf("Tree initialized\n");
+    printf("Paging Struct initialized.\n");
     return SYS_ERR_OK;
 }
 
@@ -189,19 +196,14 @@ static char *e_stack_top = e_stack + S_SIZE;
 errval_t paging_init(void)
 {
     debug_printf("paging_init\n");
-    // TODO: initialize self-paging handler
-    // TIP: use thread_set_exception_handler() to setup a page fault handler
+    // Initialize self-paging handler
     thread_set_exception_handler(exception_handler, NULL, e_stack, e_stack_top, NULL, NULL);
     
-    // TIP: Think about the fact that later on, you'll have to make sure that
-    // you can handle page faults in any thread of a domain.
-    // TIP: it might be a good idea to call paging_init_state() from here to
-    // avoid code duplication.
     struct capref p;
     
-    printf("Before initializing our memory tree\n");
+    //printf("Before initializing our memory tree\n");
     paging_init_state(&current, START_VADDR, p);
-    printf("Printing our tree!\n");
+    printf("Initial Memory State Tree\n");
     RBTreePrint(current.mem_tree);
     set_current_paging_state(&current);
     return SYS_ERR_OK;
@@ -278,8 +280,6 @@ errval_t paging_region_unmap(struct paging_region *pr, lvaddr_t base, size_t byt
 /**
  * \brief Find a bit of free virtual address space that is large enough to
  *        accomodate a buffer of size `bytes`.
- * TODO: you need to implement this function using the knowledge of your
- * self-paging implementation about where you have already mapped frames.
  */
 
 
@@ -324,6 +324,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
  
     return SYS_ERR_OK;
 }
+
 
 
 errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
