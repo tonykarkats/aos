@@ -696,17 +696,42 @@ void arm_kernel_startup(void)
         //    for minting.
         // 3) copy init's receive ep into all other domains'
         //    TASKCN_SLOT_INITEP.
-/*
-	struct capref selfep = {
+
+	//Selfep for memeater
+	struct capref selfep_memeater = {
 		.cnode = memeater_rootcn,
 		.slot = TASKCN_SLOT_SELFEP,
 	};
-*//*
-	err = cap_retype(selfep,  , ObjType_EndPont,0);
+
+	err = cap_retype(selfep_memeater, memeater_dcb->disp_cte , ObjType_EndPoint,0);
 	if (err_is_fail(err)){
 		return err_push(err, SPAWN_ERR_CREATE_SELFEP);
 	}
-*/
+	
+	//Selfep for init
+	struct capref selfep_init = {
+		.cnode = init_rootcn,
+		.slot = TASKCN_SLOT_SELFEP,
+	};
+
+	err = cap_retype(selfep_init, init_dcb->disp_cte , ObjType_EndPoint,0);
+	if (err_is_fail(err)){
+		return err_push(err, SPAWN_ERR_CREATE_SELFEP);
+	}
+
+	//Mint init's self ep to contain the endpoint buffer
+	struct capref temp;
+	temp.cnode = init_rootcn;
+	temp.slot = TASKCN_SLOT_INITEP;
+	err = cap_mint(temp, selfep_init, FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
+	if (err_is_fail(err)){
+		return err_push(err, SPAWN_ERR_MINT_ROOTCN);
+	}
+
+	//Copy
+
+
+
 
 #endif
     } else {
