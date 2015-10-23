@@ -162,7 +162,9 @@ errval_t ram_alloc(struct capref *ret, uint8_t size_bits)
         ram_alloc_func(ret, size_bits, ram_alloc_state->default_minbase,
                        ram_alloc_state->default_maxlimit);
     if(err_is_fail(err)) {
-      /*
+      printf("ram_alloc: Error in ram_alloc_func!\n");
+
+   /*
       DEBUG_ERR(err, "ram_alloc");
       printf("callstack: %p %p %p %p\n",
 	     __builtin_return_address(0),

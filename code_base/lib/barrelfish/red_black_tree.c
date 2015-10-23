@@ -357,7 +357,7 @@ void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x) {
   rb_red_blk_node* root=tree->root;
   if (x != tree->nil) {
     InorderTreePrint(tree,x->left);
-    printf("info=");
+    printf("red_black_tree: info=");
     tree->PrintInfo(x->info);
     printf("  key="); 
     tree->PrintKey(x->key);
@@ -709,7 +709,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
                     init_guard = NULL;
                 else {
                     if (chunk->size > bytes) {
-                        printf("----- Memory area can fit into memory chunk that starts at %p\n", *((lvaddr_t*)x->key));
+                        printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
                         init_guard = x;
                     }
                     else
@@ -738,7 +738,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
     if (node == NULL)
         return -1;
 
-    printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
+    //printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
     chunk = (memory_chunk*) node->info;
 
     size_t size1 = bytes;

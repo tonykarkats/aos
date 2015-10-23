@@ -28,10 +28,18 @@ typedef uintptr_t lvaddr_t;
 typedef struct memory_chunk {
 	size_t size;
 	int reserved;
-	struct capref frame_cap;
-	bool l2_mapped[4096]; 
+
+    int current_frame_used;
+    int total_frames_needed;
+    int size_of_last_frame;
+    struct capref* frame_caps_for_region;
+
+    bool l2_mapped[4096]; 
 	struct capref l2_table_cap[4096];
-	bool has_frame;
+	
+    
+
+
 } memory_chunk;
 
 /* Our paging state struct is a Red-Black tree whose nodes represent the

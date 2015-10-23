@@ -254,10 +254,13 @@ errval_t multi_slot_alloc_init(struct multi_slot_allocator *ret,
     nslots = ROUND_UP(nslots, DEFAULT_CNODE_SLOTS);
     size_t bufsize = SINGLE_SLOT_ALLOC_BUFLEN(nslots); // XXX?
 
+	printf("multi_sloc_alloc_init: Before first malloc!\n");
     ret->top = malloc(sizeof(struct single_slot_allocator));
     if (!ret->top) {
         return LIB_ERR_MALLOC_FAIL;
     }
+
+	printf("multi_sloc_alloc_init: Before second malloc!\n");
     void *top_buf = malloc(bufsize);
     if (!top_buf) {
         return LIB_ERR_MALLOC_FAIL;

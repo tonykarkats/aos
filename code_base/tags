@@ -781,7 +781,7 @@ BUF	lib/oldc/src/vfscanf.c	49;"	d	file:
 BUF	lib/oldc/src/xprintf_float.c	60;"	d	file:
 BUF	lib/oldc/src/xprintf_int.c	78;"	d	file:
 BUFFER_CACHE_BLOCK_SIZE	include/vfs/vfs.h	34;"	d
-BUFFER_SIZE	lib/barrelfish/misc.c	45;"	d	file:
+BUFFER_SIZE	lib/barrelfish/misc.c	64;"	d	file:
 BUFFER_SIZE	lib/skb/skb_functions.c	21;"	d	file:
 BUFHEAD	lib/newlib/newlib/libc/search/hash.h	/^typedef struct _bufhead BUFHEAD;$/;"	t	typeref:struct:_bufhead
 BUFMAX	kernel/gdb_stub.c	71;"	d	file:
@@ -1612,7 +1612,7 @@ DEBUGPRINTF	lib/thc/thcstubs.c	19;"	d	file:
 DEBUGPRINTF	lib/thc/thcsync.c	21;"	d	file:
 DEBUGPRINTPS	lib/lwip/src/core/init.c	73;"	d	file:
 DEBUGPRINTPS	lib/lwip/src/core/init.c	75;"	d	file:
-DEBUG_ASSERT	include/barrelfish/red_black_tree.h	29;"	d
+DEBUG_ASSERT	include/barrelfish/red_black_tree.h	16;"	d
 DEBUG_ASSERT	include/red_black_tree.h	24;"	d
 DEBUG_ASSERT	lib/barrelfish/red_black_tree.h	26;"	d
 DEBUG_ASSERT	red_black_tree.h	18;"	d
@@ -4047,7 +4047,7 @@ FLAG	lib/newlib/newlib/libc/stdio/local.h	/^  FLAG,   \/* format flag *\/$/;"	e	
 FLAG4_BIT	lib/dmalloc/dmalloc.c	2242;"	d	file:
 FLAG4_BIT	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2247;"	d	file:
 FLAGBITS	lib/mm/mm.c	50;"	d	file:
-FLAGS	lib/barrelfish/paging.c	50;"	d	file:
+FLAGS	lib/barrelfish/paging.c	27;"	d	file:
 FLAG_BITS	lib/dmalloc/dmalloc.c	2244;"	d	file:
 FLAG_BITS	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2249;"	d	file:
 FLOATING_POINT	lib/newlib/newlib/libc/machine/powerpc/vfprintf.c	154;"	d	file:
@@ -4801,7 +4801,7 @@ HAVE_MREMAP	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	620;"	d	file:
 HAVE_MREMAP	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	622;"	d	file:
 HDRPAGES	lib/newlib/newlib/libc/search/hash.h	306;"	d
 HDRS	lib/barrelfish/Makefile	/^HDRS = red_black_tree.h stack.h misc.h$/;"	m
-HEAP_SIZE	lib/barrelfish/morecore.c	36;"	d	file:
+HEAP_SIZE	lib/barrelfish/morecore.c	32;"	d	file:
 HERE	include/barrelfish/debug.h	52;"	d
 HERE	include/barrelfish/debug.h	56;"	d
 HERE	lib/newlib/newlib/libc/posix/regcomp.c	161;"	d	file:
@@ -12587,7 +12587,7 @@ START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(strtoul_hex)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(strtoul_upper_hex)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(ungetc_multiple_test)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(ungetc_test)$/;"	f
-START_VADDR	lib/barrelfish/paging.c	25;"	d	file:
+START_VADDR	lib/barrelfish/paging.c	26;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	120;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	73;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	99;"	d	file:
@@ -13077,7 +13077,7 @@ S_IXOTH	include/sys/stat.h	54;"	d
 S_IXOTH	lib/newlib/newlib/libc/include/sys/stat.h	123;"	d
 S_IXUSR	include/sys/stat.h	48;"	d
 S_IXUSR	lib/newlib/newlib/libc/include/sys/stat.h	115;"	d
-S_SIZE	lib/barrelfish/paging.c	24;"	d	file:
+S_SIZE	lib/barrelfish/paging.c	25;"	d	file:
 SafeFree	lib/barrelfish/misc.c	/^void SafeFree(void* addr) {$/;"	f
 SafeMalloc	lib/barrelfish/misc.c	/^void * SafeMalloc(size_t size) {$/;"	f
 SaveThese	tools/demo/Aquarium/Dialogs.cs	/^        public static bool SaveThese(string extension, string filter,$/;"	m	class:Aquarium.Dialogs
@@ -14433,7 +14433,6 @@ USE_SPIN_LOCKS	lib/dmalloc/dmalloc.c	604;"	d	file:
 USE_SPIN_LOCKS	lib/dmalloc/dmalloc.c	606;"	d	file:
 USE_SPIN_LOCKS	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	604;"	d	file:
 USE_SPIN_LOCKS	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	606;"	d	file:
-USE_STATIC_HEAP	lib/barrelfish/morecore.c	29;"	d	file:
 USHRT_MAX	include/limits.h	53;"	d
 USHRT_MAX	lib/newlib/newlib/libc/include/limits.h	61;"	d
 USHRT_MAX	lib/newlib/newlib/libc/include/limits.h	62;"	d
@@ -25047,6 +25046,7 @@ endbus	lib/pci/confspace/pcie_confspace.c	/^static uint8_t startbus, endbus;$/;"
 endfil	lib/newlib/newlib/libc/machine/hppa/memset.S	/^endfil:$/;"	l
 endorder	lib/newlib/newlib/libc/include/search.h	/^	endorder,$/;"	e	enum:__anon176
 endp	lib/barrelfish/morecore.c	/^static char *endp = mymem + HEAP_SIZE;$/;"	v	file:
+endp	lib/barrelfish/morecore.c	/^static char *endp;$/;"	v	file:
 endp	lib/newlib/newlib/libc/posix/engine.c	/^	char *endp;		\/* end of string -- virtual NUL here *\/$/;"	m	struct:match	file:
 endpoint	include/barrelfish/lmp_chan.h	/^    struct lmp_endpoint *endpoint;         \/\/\/< Incoming LMP endpoint (in dispatcher)$/;"	m	struct:lmp_chan	typeref:struct:lmp_chan::lmp_endpoint
 endpoint_create	lib/barrelfish/capabilities.c	/^errval_t endpoint_create(size_t buflen, struct capref *retcap,$/;"	f
@@ -26727,7 +26727,7 @@ get_finish_string	tools/harness/tests/vmkit.py	/^    def get_finish_string(self)
 get_first	include/hashtable/multimap.h	/^    int (*get_first)(struct multimap*, char*, void**);$/;"	m	struct:multimap
 get_foot	lib/dmalloc/dmalloc.c	2271;"	d	file:
 get_foot	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2276;"	d	file:
-get_frame	lib/barrelfish/paging.c	/^struct capref get_frame(size_t bytes)$/;"	f
+get_frame	lib/barrelfish/paging.c	/^errval_t get_frame(size_t bytes, struct capref* current_frame)$/;"	f
 get_hostname	tools/harness/machines/eth.py	/^    def get_hostname(self):$/;"	m	class:ETHMachine
 get_hostname	tools/harness/machines/msrc.py	/^    def get_hostname(self):$/;"	m	class:MSRCMachine
 get_init_chan	lib/barrelfish/domain.c	/^struct aos_chan *get_init_chan(void)$/;"	f
@@ -27229,6 +27229,7 @@ has_ancestors	lib/mdb/mdb.c	/^bool has_ancestors(struct cte *cte)$/;"	f
 has_arg	lib/newlib/newlib/libc/include/getopt.h	/^    int has_arg;		\/* one of the above macros *\/$/;"	m	struct:option
 has_copies	lib/mdb/mdb.c	/^bool has_copies(struct cte *cte)$/;"	f
 has_descendants	lib/mdb/mdb.c	/^bool has_descendants(struct cte *cte)$/;"	f
+has_frame	include/barrelfish/red_black_tree.h	/^	bool has_frame;$/;"	m	struct:memory_chunk
 has_headers	lib/net_queue_manager/frag.c	/^static bool has_headers(void *packet, size_t len)$/;"	f	file:
 has_segment_link	lib/dmalloc/dmalloc.c	/^static int has_segment_link(mstate m, msegmentptr ss) {$/;"	f	file:
 has_segment_link	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^static int has_segment_link(mstate m, msegmentptr ss) {$/;"	f	file:
@@ -28958,7 +28959,9 @@ l	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  volatile unsigned int l;$
 l	lib/newlib/newlib/libm/mathfp/zmath.h	/^  long l;$/;"	m	union:__anon275
 l	lib/newlib/newlib/libm/mathfp/zmath.h	/^  long l[2];$/;"	m	union:__anon274
 l2_base	kernel/arch/omap44xx/startup_arch.c	/^    lvaddr_t   l2_base;$/;"	m	struct:startup_l2_info	file:
+l2_mapped	include/barrelfish/red_black_tree.h	/^	bool l2_mapped[4096]; $/;"	m	struct:memory_chunk
 l2_table	kernel/arch/omap44xx/startup_arch.c	/^    union arm_l2_entry* l2_table;$/;"	m	struct:startup_l2_info	typeref:union:startup_l2_info::arm_l2_entry	file:
+l2_table_cap	include/barrelfish/red_black_tree.h	/^	struct capref l2_table_cap[4096];$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0x2C100000, pio_size=0xfff)$/;"	v	class:VExpress_EMM
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0xE0202000, pio_size=0xfff)$/;"	v	class:VExpress_ELT
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake     = IsaFake(pio_addr=0x1f002000, pio_size=0xfff)$/;"	v	class:RealViewPBX
@@ -30617,6 +30620,7 @@ map	lib/oldc/src/locale/runefile.h	/^	int32_t		map;$/;"	m	struct:__anon300
 map_bars	lib/pci/mem.c	/^errval_t map_bars(struct device_mem *bars, int nr_mapped_bars)$/;"	f
 map_device	lib/pci/mem.c	/^errval_t map_device(struct device_mem *mem)$/;"	f
 map_device_register	lib/driverkit/map_devices.c	/^errval_t map_device_register(lpaddr_t address, size_t size, lvaddr_t *return_address)$/;"	f
+map_page	lib/barrelfish/paging.c	/^errval_t map_page(lvaddr_t vaddr) {$/;"	f
 map_page	lib/pci/confspace/pcie_confspace.c	/^static lvaddr_t map_page(uint64_t page)$/;"	f	file:
 map_private_memory_region	kernel/arch/omap44xx/omap.c	/^void map_private_memory_region(void)$/;"	f
 map_region	include/barrelfish/memobj.h	/^    errval_t (*map_region)(struct memobj *memobj, struct vregion *vregion);$/;"	m	struct:memobj_funcs

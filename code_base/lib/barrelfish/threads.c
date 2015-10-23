@@ -1260,10 +1260,10 @@ errval_t thread_set_exception_handler(exception_handler_fn newhandler,
     }
 
     if (me->exception_stack_top == NULL)
-	printf("Our exception stack top is NULL \n");
+	printf("thread_set_exception_handler: Our exception stack top is NULL \n");
     if (me->stack_top == NULL)
-	printf("Our stack top is NULL \n");
-    printf("Thread exception stack = %p and thread stack top= %p\n",me->exception_stack, me->stack_top);    
+	printf("thread_set_exception_handler: Our stack top is NULL \n");
+    printf("thread_set_exception_handler: Thread exception stack = %p and thread stack top= %p\n",me->exception_stack, me->stack_top);    
     return SYS_ERR_OK;
 }
 

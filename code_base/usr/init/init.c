@@ -19,6 +19,14 @@
 #include <barrelfish/dispatcher_arch.h>
 #include <barrelfish/debug.h>
 #include <barrelfish/lmp_chan.h>
+#include <barrelfish/sys_debug.h>
+
+#define UNUSED(x) (x) = (x)
+
+#define MALLOC_BUFSIZE (1UL<<20)
+#define BUFSIZE 32L * 1024 * 1024
+#define SAFE_VADDR (1UL<<25)
+
 
 struct bootinfo *bi;
 static coreid_t my_core_id;
@@ -51,7 +59,12 @@ int main(int argc, char *argv[])
         abort();
     }
     debug_printf("initialized local ram alloc\n");
+   	
+	printf("Before dynamic malloc\n");
+    char *static_malloc_buf = malloc(1);
+    UNUSED(static_malloc_buf);	
 
+    while(1); 
     // setup memory serving
     err = initialize_mem_serv();
     if (err_is_fail(err)) {

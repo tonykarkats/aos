@@ -17,7 +17,7 @@
 #include <barrelfish/morecore.h>
 #include <barrelfish/domain.h>
 #include <barrelfish/sys_debug.h>
-
+#define UNUSED(x) (x) = (x)
 struct bootinfo *bi;
 
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -60,30 +60,26 @@ int main(int argc, char *argv[])
     printf("dynamic malloc buf checked\n");
 
     void *vbuf;
-    err = paging_alloc(get_current_paging_state(), &vbuf, BUFSIZE);
+    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*2) + 256*1024);
     if (err_is_fail(err)) {
         printf("error in paging_alloc: %s\n", err_getstring(err));
         abort();
     }
     
-    if (!vbuf) {
-        printf("did not get a buffer\n");
-        abort();
-    }
-     
-    char *buf = vbuf;
-    
-    for (int i = 0; i < BUFSIZE ; i++){
+    char* buf = vbuf;	
+	 
+    for (int i = 0; i < (1024*1024*2) + 256*1024 ; i++){
         buf[i] = i%255;
     }
     
     printf("buf filled\n");
     sys_debug_flush_cache();
-    for (int i = 0; i < BUFSIZE; i++){
+    for (int i = 0; i < (1024*1024*2) + 256*1024 ; i++){
         assert(buf[i] == i%255);
-    }
-    printf("check passed\n");
-    
+    } 	
+
+	printf("After paging_alloc!\n");
+	err = err;	
 
     while(1);
 
