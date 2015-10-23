@@ -58,27 +58,21 @@ int main(int argc, char *argv[])
         DEBUG_ERR(err, "Failed to init local ram allocator");
         abort();
     }
-    debug_printf("initialized local ram alloc\n");
-   	
-	printf("Before dynamic malloc\n");
-    char *static_malloc_buf = malloc(1);
-    UNUSED(static_malloc_buf);	
 
-    while(1); 
-    // setup memory serving
-    err = initialize_mem_serv();
+	debug_printf("initialized local ram alloc\n");
+
+
+	err = initialize_mem_serv();
     if (err_is_fail(err)) {
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
-
+	UNUSED(err);
     // TODO (milestone 4): Implement a system to manage the device memory
     // that's referenced by the capability in TASKCN_SLOT_IO in the task
     // cnode. Additionally, export the functionality of that system to other
     // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
     debug_printf("initialized dev memory management\n");
-
-
 
     // TODO (milestone 3) STEP 2:
     // get waitset

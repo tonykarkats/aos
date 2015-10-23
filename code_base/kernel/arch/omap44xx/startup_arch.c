@@ -416,7 +416,7 @@ static void create_phys_caps(lpaddr_t unused_start_addr,
         if (last_end_addr > phys_region_limit) {
             size = 0; // end of RAM is already too high!
         } else if (last_end_addr + size > phys_region_limit) {
-            size = phys_region_limit - last_end_addr;
+             size = phys_region_limit - last_end_addr;
         }
         err = create_caps_to_cnode(last_end_addr, size,
                 RegionType_PhyAddr, spawn_state, bootinfo);
@@ -696,6 +696,18 @@ void arm_kernel_startup(void)
         //    for minting.
         // 3) copy init's receive ep into all other domains'
         //    TASKCN_SLOT_INITEP.
+/*
+	struct capref selfep = {
+		.cnode = memeater_rootcn,
+		.slot = TASKCN_SLOT_SELFEP,
+	};
+*//*
+	err = cap_retype(selfep,  , ObjType_EndPont,0);
+	if (err_is_fail(err)){
+		return err_push(err, SPAWN_ERR_CREATE_SELFEP);
+	}
+*/
+
 #endif
     } else {
         debug(SUBSYS_STARTUP, "Doing non-BSP related bootup \n");

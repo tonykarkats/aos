@@ -788,8 +788,10 @@ BUFMAX	kernel/gdb_stub.c	71;"	d	file:
 BUFSIZ	include/oldc/stdio.h	98;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	106;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	108;"	d
+BUFSIZE	usr/init/init.c	27;"	d	file:
 BUFSIZE	usr/init_memtest/init.c	24;"	d	file:
-BUFSIZE	usr/memeater/memeater.c	6;"	d	file:
+BUFSIZE	usr/memeater/memeater.c	14;"	d	file:
+BUFSIZE_2	usr/memeater/memeater.c	12;"	d	file:
 BUF_BUCKET	lib/newlib/newlib/libc/search/hash.h	75;"	d
 BUF_DISK	lib/newlib/newlib/libc/search/hash.h	74;"	d
 BUF_INSERT	lib/newlib/newlib/libc/search/hash_buf.c	83;"	d	file:
@@ -7072,7 +7074,9 @@ MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/msizer.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/pvallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/reallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/vallocr.c	1405;"	d	file:
+MALLOC_BUFSIZE	usr/init/init.c	26;"	d	file:
 MALLOC_BUFSIZE	usr/init_memtest/init.c	23;"	d	file:
+MALLOC_BUFSIZE	usr/memeater/memeater.c	13;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/machine/powerpc/vec_mallocr.c	150;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/stdlib/callocr.c	546;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/stdlib/callocr.c	585;"	d	file:
@@ -11119,7 +11123,9 @@ S9	lib/oldc/msun/ld128/k_sinl.c	/^S9  = -0.8220635245834894781251212216344620249
 SAFE	include/deputy/nodeputy.h	21;"	d
 SAFE_LEFT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	368;"	d
 SAFE_RIGHT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	371;"	d
+SAFE_VADDR	usr/init/init.c	28;"	d	file:
 SAFE_VADDR	usr/init_memtest/init.c	25;"	d	file:
+SAFE_VADDR	usr/memeater/memeater.c	15;"	d	file:
 SAMPLE_INTERVAL	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	76;"	d	file:
 SARG	kernel/printf.c	228;"	d	file:
 SARG	lib/newlib/newlib/libc/machine/powerpc/vfprintf.c	480;"	d	file:
@@ -14318,6 +14324,8 @@ UNROLL_FACTOR	lib/newlib/newlib/libc/machine/mips/strncpy.c	39;"	d	file:
 UNSIGNED	lib/oldc/src/vfscanf.c	65;"	d	file:
 UNSTABLE	include/nfs/nfs_rpc.h	/^    UNSTABLE = 0,$/;"	e	enum:stable_how
 UNUSED	kernel/arch/omap44xx/startup_arch.c	34;"	d	file:
+UNUSED	usr/init/init.c	24;"	d	file:
+UNUSED	usr/init_memtest/init.c	20;"	d	file:
 UPAP_DEFREQTIME	include/lwip/opt.h	1467;"	d
 UPAP_DEFTIMEOUT	include/lwip/opt.h	1463;"	d
 UQUAD_MAX	include/limits.h	86;"	d
@@ -23779,6 +23787,7 @@ current_categories	lib/newlib/newlib/libc/locale/locale.c	/^static char current_
 current_categories	lib/oldc/src/locale/setlocale.c	/^static char current_categories[_LC_LAST][ENCODING_LEN + 1] = {$/;"	v	file:
 current_fb	include/thc/thcinternal.h	/^  finish_t *current_fb;$/;"	m	struct:awe_t
 current_fb	include/thc/thcinternal.h	/^  finish_t *current_fb;$/;"	m	struct:ptstate_t
+current_frame_used	include/barrelfish/red_black_tree.h	/^    int current_frame_used;$/;"	m	struct:memory_chunk
 current_header	lib/lwip/src/core/ipv4/ip.c	/^static const struct ip_hdr *current_header;$/;"	v	typeref:struct:ip_hdr	file:
 current_level	tools/harness/debug.py	/^current_level = NORMAL$/;"	v
 current_locale	lib/oldc/src/locale.c	/^struct lconv current_locale = {$/;"	v	typeref:struct:lconv
@@ -25045,7 +25054,6 @@ end_root	include/mdb/types.h	/^    mdb_root_t end_root;$/;"	m	struct:mdbnode
 endbus	lib/pci/confspace/pcie_confspace.c	/^static uint8_t startbus, endbus;$/;"	v	file:
 endfil	lib/newlib/newlib/libc/machine/hppa/memset.S	/^endfil:$/;"	l
 endorder	lib/newlib/newlib/libc/include/search.h	/^	endorder,$/;"	e	enum:__anon176
-endp	lib/barrelfish/morecore.c	/^static char *endp = mymem + HEAP_SIZE;$/;"	v	file:
 endp	lib/barrelfish/morecore.c	/^static char *endp;$/;"	v	file:
 endp	lib/newlib/newlib/libc/posix/engine.c	/^	char *endp;		\/* end of string -- virtual NUL here *\/$/;"	m	struct:match	file:
 endpoint	include/barrelfish/lmp_chan.h	/^    struct lmp_endpoint *endpoint;         \/\/\/< Incoming LMP endpoint (in dispatcher)$/;"	m	struct:lmp_chan	typeref:struct:lmp_chan::lmp_endpoint
@@ -26293,8 +26301,8 @@ frame	include/target/x86/barrelfish/pmap_target.h	/^        } frame; \/\/ for le
 frame	include/usb/mem/usb_mem.h	/^    struct capref frame;$/;"	m	struct:usb_page	typeref:struct:usb_page::capref
 frame	lib/barrelfish/domain.c	/^    struct capref frame;                \/\/\/< Dispatcher frame$/;"	m	struct:span_domain_state	typeref:struct:span_domain_state::capref	file:
 frame_alloc	lib/barrelfish/capabilities.c	/^errval_t frame_alloc(struct capref *dest, size_t bytes, size_t *retbytes)$/;"	f
-frame_cap	include/barrelfish/red_black_tree.h	/^	struct capref frame_cap;$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 frame_cap	include/pci/mem.h	/^    struct capref *frame_cap; \/\/ array of frame caps$/;"	m	struct:device_mem	typeref:struct:device_mem::capref
+frame_caps_for_region	include/barrelfish/red_black_tree.h	/^    struct capref* frame_caps_for_region;$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 frame_cmd	include/barrelfish_kpi/capabilities.h	/^enum frame_cmd {$/;"	g
 frame_create	lib/barrelfish/capabilities.c	/^errval_t frame_create(struct capref dest, size_t bytes, size_t *retbytes)$/;"	f
 frame_id	include/usb/mem/usb_mem.h	/^    struct frame_identity frame_id;$/;"	m	struct:usb_page	typeref:struct:usb_page::frame_identity
@@ -27184,7 +27192,6 @@ handle_delete	kernel/arch/armv7/syscall.c	/^handle_delete($/;"	f	file:
 handle_dispatcher_perfmon	kernel/arch/armv7/syscall.c	/^handle_dispatcher_perfmon($/;"	f	file:
 handle_dispatcher_properties	kernel/arch/armv7/syscall.c	/^handle_dispatcher_properties($/;"	f	file:
 handle_dispatcher_setup	kernel/arch/armv7/syscall.c	/^handle_dispatcher_setup($/;"	f	file:
-handle_fault	lib/barrelfish/paging.c	/^void handle_fault(lvaddr_t vaddr)$/;"	f
 handle_filter_response	lib/net_device_manager/port_service_impl.c	/^void handle_filter_response(uint64_t id, errval_t err, uint64_t filter_id,$/;"	f
 handle_follows	include/nfs/nfs_rpc.h	/^    bool_t handle_follows;$/;"	m	struct:post_op_fh3
 handle_fpu_unavailable	lib/barrelfish/dispatch.c	/^handle_fpu_unavailable(dispatcher_handle_t handle,$/;"	f	file:
@@ -27229,7 +27236,6 @@ has_ancestors	lib/mdb/mdb.c	/^bool has_ancestors(struct cte *cte)$/;"	f
 has_arg	lib/newlib/newlib/libc/include/getopt.h	/^    int has_arg;		\/* one of the above macros *\/$/;"	m	struct:option
 has_copies	lib/mdb/mdb.c	/^bool has_copies(struct cte *cte)$/;"	f
 has_descendants	lib/mdb/mdb.c	/^bool has_descendants(struct cte *cte)$/;"	f
-has_frame	include/barrelfish/red_black_tree.h	/^	bool has_frame;$/;"	m	struct:memory_chunk
 has_headers	lib/net_queue_manager/frag.c	/^static bool has_headers(void *packet, size_t len)$/;"	f	file:
 has_segment_link	lib/dmalloc/dmalloc.c	/^static int has_segment_link(mstate m, msegmentptr ss) {$/;"	f	file:
 has_segment_link	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^static int has_segment_link(mstate m, msegmentptr ss) {$/;"	f	file:
@@ -28959,7 +28965,7 @@ l	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  volatile unsigned int l;$
 l	lib/newlib/newlib/libm/mathfp/zmath.h	/^  long l;$/;"	m	union:__anon275
 l	lib/newlib/newlib/libm/mathfp/zmath.h	/^  long l[2];$/;"	m	union:__anon274
 l2_base	kernel/arch/omap44xx/startup_arch.c	/^    lvaddr_t   l2_base;$/;"	m	struct:startup_l2_info	file:
-l2_mapped	include/barrelfish/red_black_tree.h	/^	bool l2_mapped[4096]; $/;"	m	struct:memory_chunk
+l2_mapped	include/barrelfish/red_black_tree.h	/^    bool l2_mapped[4096]; $/;"	m	struct:memory_chunk
 l2_table	kernel/arch/omap44xx/startup_arch.c	/^    union arm_l2_entry* l2_table;$/;"	m	struct:startup_l2_info	typeref:union:startup_l2_info::arm_l2_entry	file:
 l2_table_cap	include/barrelfish/red_black_tree.h	/^	struct capref l2_table_cap[4096];$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0x2C100000, pio_size=0xfff)$/;"	v	class:VExpress_EMM
@@ -37164,6 +37170,7 @@ size3	include/nfs/nfs_rpc.h	/^typedef uint64_t size3;$/;"	t
 size_bits	include/barrelfish/caddr.h	/^    uint8_t size_bits;      \/\/\/< Number of slots in the CNode as a power of 2$/;"	m	struct:cnoderef
 size_ea_t	lib/newlib/newlib/libc/machine/spu/include/ea.h	/^typedef uint32_t size_ea_t;$/;"	t
 size_ea_t	lib/newlib/newlib/libc/machine/spu/include/ea.h	/^typedef uint64_t size_ea_t;$/;"	t
+size_of_last_frame	include/barrelfish/red_black_tree.h	/^    int size_of_last_frame;$/;"	m	struct:memory_chunk
 size_ram	kernel/arch/omap44xx/init.c	/^static void size_ram(void)$/;"	f	file:
 size_reg	include/procon/procon.h	/^    union vreg size_reg;$/;"	m	struct:shared_pool	typeref:union:shared_pool::vreg
 size_t	include/c/stddef.h	/^typedef __SIZE_TYPE__ size_t;$/;"	t
@@ -39676,6 +39683,7 @@ total	lib/newlib/newlib/libc/stdio/svfscanf.c	/^  size_t total;$/;"	m	struct:fp	
 total	lib/newlib/newlib/libc/stdio/vfiscanf.c	/^  size_t total;$/;"	m	struct:fp	file:
 total	lib/newlib/newlib/libc/stdio/vfscanf.c	/^  size_t total;$/;"	m	struct:fp	file:
 total_events	include/contmng/netbench.h	/^    uint32_t total_events;$/;"	m	struct:netbench_details
+total_frames_needed	include/barrelfish/red_black_tree.h	/^    int total_frames_needed;$/;"	m	struct:memory_chunk
 total_interrupt_time	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_interrupt_time = 0;$/;"	v
 total_processing_time	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_processing_time = 0;$/;"	v
 total_queues	lib/net_device_manager/port_management_support.h	/^qid_t total_queues; \/\/ Total no. of valid queues (0, ..., total_queues-1)$/;"	v

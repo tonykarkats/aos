@@ -26,16 +26,16 @@ extern morecore_free_func_t sys_morecore_free;
 
 // this define makes morecore use an implementation that just has a static
 // 16MB heap.
-// #define USE_STATIC_HEAP
+//#define USE_STATIC_HEAP
 
 
-#define HEAP_SIZE (64*1024*1024)
+#define HEAP_SIZE (128*1024*1024)
 
 #ifdef USE_STATIC_HEAP
 
 // dummy mini heap (16M)
 static char mymem[HEAP_SIZE] = { 0 };
-// static char *endp = mymem + HEAP_SIZE;
+//static char *endp = mymem + HEAP_SIZE;
 
 /**
  * \brief Allocate some memory for malloc to use
@@ -94,35 +94,28 @@ errval_t morecore_init(void)
  * region than requested for.
  */
 #endif
+
 static char *endp;
 
-/**
- * \brief Allocate some memory for malloc to use
- *
- * This function will keep trying with smaller and smaller frames till
- * it finds a set of frames that satisfy the requirement. retbytes can
- * be smaller than bytes if we were able to allocate a smaller memory
- * region than requested for.
- */
 
 static void *morecore_alloc(size_t bytes, size_t *retbytes)
 {
     struct morecore_state *state = get_morecore_state();
 
-	printf("morecore_alloc: Trying to allocate %d bytes!\n", bytes);
     char *freep = state->freep;
-    size_t aligned_bytes = ROUND_UP(bytes, sizeof(Header));
+
+	size_t aligned_bytes = ROUND_UP(bytes, sizeof(Header));
+
     void *ret = NULL;
     if (freep + aligned_bytes < endp) {
         ret = freep;
-        freep += aligned_bytes;
+        state->freep += aligned_bytes;
     }
     else {
         aligned_bytes = 0;
     }
     *retbytes = aligned_bytes;
 
-    printf("morecore_alloc: Returning the address!\n");
     return ret;
 }
 
@@ -138,7 +131,6 @@ errval_t morecore_init(void)
     thread_mutex_init(&state->mutex);
 
     char* new_heap; 
-    printf("morecore_init: Getting memory for our heap!\n");
     errval_t err = paging_alloc(get_current_paging_state(),(void **) &new_heap, HEAP_SIZE);
     if (err_is_fail(err)) {
 		return err_push(err, LIB_ERR_MALLOC_FAIL);

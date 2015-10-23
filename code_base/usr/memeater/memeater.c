@@ -22,14 +22,5 @@ int main(int argc, char *argv[])
     // TODO STEP 1: connect & send msg to init using syscall
     // TODO STEP 5: test memory allocation using memserv
 
-    /*	
-    // setup memory serving
-    err = initialize_ram_alloc();
-    if (err_is_fail(err)) {
-        DEBUG_ERR(err, "Failed to init local ram allocator");
-        abort();
-    }
-    debug_printf("initialized local ram alloc\n");
-	*/
-      return 0;
+    return 0;
 }

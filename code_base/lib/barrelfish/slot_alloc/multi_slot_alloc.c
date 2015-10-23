@@ -205,12 +205,12 @@ errval_t multi_slot_alloc_init_raw(struct multi_slot_allocator *ret,
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_SINGLE_SLOT_ALLOC_INIT);
     }
-
     /* Head */
     err = ret->top->alloc(ret->top, &cap);
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_SLOT_ALLOC);
     }
+
     err = cnode_create_raw(cap, &cnode, nslots, NULL);
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_CNODE_CREATE);
@@ -220,7 +220,6 @@ errval_t multi_slot_alloc_init_raw(struct multi_slot_allocator *ret,
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_SINGLE_SLOT_ALLOC_INIT);
     }
-
     /* Reserve */
     err = ret->top->alloc(ret->top, &cap);
     if (err_is_fail(err)) {
@@ -254,13 +253,11 @@ errval_t multi_slot_alloc_init(struct multi_slot_allocator *ret,
     nslots = ROUND_UP(nslots, DEFAULT_CNODE_SLOTS);
     size_t bufsize = SINGLE_SLOT_ALLOC_BUFLEN(nslots); // XXX?
 
-	printf("multi_sloc_alloc_init: Before first malloc!\n");
     ret->top = malloc(sizeof(struct single_slot_allocator));
     if (!ret->top) {
         return LIB_ERR_MALLOC_FAIL;
     }
 
-	printf("multi_sloc_alloc_init: Before second malloc!\n");
     void *top_buf = malloc(bufsize);
     if (!top_buf) {
         return LIB_ERR_MALLOC_FAIL;
@@ -300,7 +297,6 @@ errval_t multi_slot_alloc_init(struct multi_slot_allocator *ret,
     }
     err = multi_slot_alloc_init_raw(ret, nslots, cap, cnode, top_buf,
                                     head_buf, reserve_buf, bufsize);
-
     if (retslots) {
         *retslots = nslots;
     }
