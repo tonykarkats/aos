@@ -753,7 +753,7 @@ errval_t caps_retype(enum objtype type, size_t objbits,
     /* Check retypability */
     err = is_retypeable(src_cte, src_cap->type, type, from_monitor);
     if (err_is_fail(err)) {
-        debug(SUBSYS_CAPS, "caps_retype: is_retypeable failed\n");
+		debug(SUBSYS_CAPS, "caps_retype: is_retypeable failed\n");
         return err;
     }
 
@@ -791,6 +791,7 @@ errval_t caps_retype(enum objtype type, size_t objbits,
     numobjs = caps_numobjs(type, bits, objbits);
 
     if (numobjs == 0) {
+		printf("Bits = 0 ! \n");
         debug(SUBSYS_CAPS, "caps_retype: numobjs == 0\n");
         return SYS_ERR_INVALID_SIZE_BITS;
     }
@@ -826,6 +827,7 @@ errval_t caps_retype(enum objtype type, size_t objbits,
 
     /* special initialisation for endpoint caps */
     if (type == ObjType_EndPoint) {
+		printf("Retyping endpoint...\n");
         assert(src_cap->type == ObjType_Dispatcher);
         assert(numobjs == 1);
         struct capability *dest_cap = &dest_cte->cap;
@@ -845,12 +847,14 @@ errval_t is_retypeable(struct cte *src_cte, enum objtype src_type,
                        enum objtype dest_type, bool from_monitor)
 {
     if (!is_well_founded(src_type, dest_type)) {
+		printf("is_Retypbale: not well_founded!\n");
         return SYS_ERR_INVALID_RETYPE;
     } else if (!is_revoked_first(src_cte, src_type)){
         printf("err_revoke_first: (%p, %d, %d)\n", src_cte, src_type, dest_type);
         return SYS_ERR_REVOKE_FIRST;
 #ifndef RCAPDB_NULL
     } else if (!from_monitor && is_cap_remote(src_cte)) {
+		printf("is_retypable: retry through monitor");
         return SYS_ERR_RETRY_THROUGH_MONITOR;
 #endif
     } else {
@@ -886,8 +890,10 @@ errval_t caps_copy_to_cte(struct cte *dest_cte, struct cte *src_cte, bool mint,
     struct capability *dest_cap = &dest_cte->cap;
     // NULL caps cannot be copied/minted
     if (src_cap->type == ObjType_Null) {
-        return SYS_ERR_CAP_NOT_FOUND;
+    	printf("Cap not found!\n");
+	    return SYS_ERR_CAP_NOT_FOUND;
     }
+	
     // Parameters should be 0 if not minting
     if (!mint) {
         assert(param1 == 0);

@@ -38,6 +38,10 @@
 #define TASKCN_SLOT_INITEP      (TASKCN_SLOTS_USER + 1)   ///< End Point to init
 #define TASKCN_SLOT_REMEP       (TASKCN_SLOTS_USER + 2)   ///< End Point to init
 
+
+
+
+
 // first EP starts in dispatcher frame after dispatcher (33472 bytes)
 // and the value we use for the mint operation is the offset of the kernel
 // struct in the lmp_endpoint struct (+56 bytes)
@@ -654,6 +658,7 @@ struct dcb *spawn_bsp_init(const char *name, alloc_phys_func alloc_phys_fn,
 void arm_kernel_startup(void)
 {
     printk(LOG_NOTE, "arm_kernel_startup entered \n");
+	errval_t err;
 
     /* Initialize the core_data */
     /* Used when bringing up other cores, must be at consistent global address
@@ -682,7 +687,7 @@ void arm_kernel_startup(void)
 #endif
 
         // Bring up init
-        struct spawn_state init_st;
+		struct spawn_state init_st;
         memset(&init_st, 0, sizeof(struct spawn_state));
         static struct cte init_rootcn; // gets put into mdb
         init_dcb = spawn_bsp_init(BSP_INIT_MODULE_NAME, bsp_alloc_phys,
@@ -697,40 +702,50 @@ void arm_kernel_startup(void)
         // 3) copy init's receive ep into all other domains'
         //    TASKCN_SLOT_INITEP.
 
-	//Selfep for memeater
-	struct capref selfep_memeater = {
-		.cnode = memeater_rootcn,
-		.slot = TASKCN_SLOT_SELFEP,
-	};
 
-	err = cap_retype(selfep_memeater, memeater_dcb->disp_cte , ObjType_EndPoint,0);
-	if (err_is_fail(err)){
-		return err_push(err, SPAWN_ERR_CREATE_SELFEP);
-	}
+    struct cte *memeater_dcb_cte = caps_locate_slot(CNODE(memeater_st.taskcn),
+												TASKCN_SLOT_DISPATCHER);
 	
-	//Selfep for init
-	struct capref selfep_init = {
-		.cnode = init_rootcn,
-		.slot = TASKCN_SLOT_SELFEP,
-	};
-
-	err = cap_retype(selfep_init, init_dcb->disp_cte , ObjType_EndPoint,0);
+	err = caps_retype(ObjType_EndPoint,0, &memeater_st.taskcn->cap, TASKCN_SLOT_SELFEP, memeater_dcb_cte,false);
 	if (err_is_fail(err)){
-		return err_push(err, SPAWN_ERR_CREATE_SELFEP);
+		panic("startup_arch: Error in retyping for memeater!\n");
 	}
 
-	//Mint init's self ep to contain the endpoint buffer
-	struct capref temp;
-	temp.cnode = init_rootcn;
-	temp.slot = TASKCN_SLOT_INITEP;
-	err = cap_mint(temp, selfep_init, FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
+	struct cte *init_dcb_cte = caps_locate_slot(CNODE(init_st.taskcn),
+												TASKCN_SLOT_DISPATCHER);
+	
+	err = caps_retype(ObjType_EndPoint,0, &init_st.taskcn->cap, TASKCN_SLOT_SELFEP, init_dcb_cte,false);
 	if (err_is_fail(err)){
-		return err_push(err, SPAWN_ERR_MINT_ROOTCN);
+		panic("startup_arch: Error in retyping for init!\n");
 	}
 
-	//Copy
+	struct cte *memeater_selfep = caps_locate_slot(CNODE(memeater_st.taskcn),
+												   TASKCN_SLOT_SELFEP);
+	
+	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_INITEP, memeater_selfep, true,
+							 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
+	if (err_is_fail(err)) { 
+		panic("startup_arch: Can not mint for memeater!\n");
+	}
 
 
+	struct cte *init_selfep = caps_locate_slot(CNODE(init_st.taskcn),
+											   TASKCN_SLOT_SELFEP);
+
+	err = caps_copy_to_cnode(init_st.taskcn  , TASKCN_SLOT_INITEP, init_selfep, true,
+						 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
+	if (err_is_fail(err)) { 
+		panic("startup_arch: Can not mint for init!\n");
+	}
+
+	
+	struct cte *init_ep = caps_locate_slot(CNODE(init_st.taskcn),
+											TASKCN_SLOT_INITEP);
+	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_REMEP, init_ep, false,
+						 0, 0);
+	if (err_is_fail(err)) { 
+		panic("startup_arch: Can not copy init's endpoint into remote endpoint!\n");
+	}
 
 
 #endif
