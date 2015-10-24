@@ -8,6 +8,7 @@
 #include <barrelfish/debug.h>
 #include <barrelfish/lmp_chan.h>
 #include <barrelfish/sys_debug.h>
+#include <barrelfish/cspace.h>
 
 #define BUFSIZE_2 (128UL*1024*1024)
 #define MALLOC_BUFSIZE 1   //(1UL<<20)
@@ -18,9 +19,21 @@
 int main(int argc, char *argv[])
 {
 	//errval_t err;
-    debug_printf("memeater started\n");
-    // TODO STEP 1: connect & send msg to init using syscall
-    // TODO STEP 5: test memory allocation using memserv
+    struct sysret ret;
+
+	debug_printf("memeater started\n");
+    
+	// TODO STEP 1: connect & send msg to init using syscall
+   
+	struct capref remote_endpoint = {
+		.cnode = cnode_task,	
+		.slot = TASKCN_SLOT_REMEP
+	};
+
+	
+	ret = cap_invoke1(remote_endpoint, 2);
+
+	// TODO STEP 5: test memory allocation using memserv
 
     return 0;
 }
