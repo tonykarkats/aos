@@ -719,32 +719,20 @@ void arm_kernel_startup(void)
 		panic("startup_arch: Error in retyping for init!\n");
 	}
 
-	struct cte *memeater_selfep = caps_locate_slot(CNODE(memeater_st.taskcn),
-												   TASKCN_SLOT_SELFEP);
-	
-	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_INITEP, memeater_selfep, true,
+	struct cte *init_selfep = caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_SELFEP);
+
+	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_INITEP, init_selfep, true,
 							 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
 	if (err_is_fail(err)) { 
 		panic("startup_arch: Can not mint for memeater!\n");
 	}
 
 
-	struct cte *init_selfep = caps_locate_slot(CNODE(init_st.taskcn),
-											   TASKCN_SLOT_SELFEP);
 
 	err = caps_copy_to_cnode(init_st.taskcn  , TASKCN_SLOT_INITEP, init_selfep, true,
 						 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
 	if (err_is_fail(err)) { 
 		panic("startup_arch: Can not mint for init!\n");
-	}
-
-	
-	struct cte *init_ep = caps_locate_slot(CNODE(init_st.taskcn),
-											TASKCN_SLOT_INITEP);
-	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_REMEP, init_ep, false,
-						 0, 0);
-	if (err_is_fail(err)) { 
-		panic("startup_arch: Can not copy init's endpoint into remote endpoint!\n");
 	}
 
 
@@ -769,4 +757,5 @@ void arm_kernel_startup(void)
     panic("Error spawning init!");
 
 }
+oATH=/home/akarkats/aos/ghc/bin:/home/akarkats/.cabal/bin/:$PATH
 

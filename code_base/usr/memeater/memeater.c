@@ -18,20 +18,15 @@
 
 int main(int argc, char *argv[])
 {
-	//errval_t err;
+	errval_t err;
     struct sysret ret;
 
 	debug_printf("memeater started\n");
     
 	// TODO STEP 1: connect & send msg to init using syscall
    
-	struct capref remote_endpoint = {
-		.cnode = cnode_task,	
-		.slot = TASKCN_SLOT_REMEP
-	};
-
+	err = lmp_ep_send2(cap_initep, 0, NULL_CAP,0, 0);
 	
-	ret = cap_invoke1(remote_endpoint, 2);
 
 	// TODO STEP 5: test memory allocation using memserv
 
