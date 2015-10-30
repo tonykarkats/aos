@@ -56,6 +56,14 @@ static void recv_handler(void *arg)
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));
 
+	if (capref_is_null(cap)) 
+		debug_printf("cap received = NULL_CAP\n");
+	else {
+		debug_printf("cap received, slot = %u \n", cap.slot);
+		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'a');
+		if (err_is_fail(err))
+			debug_printf("Could not send a message!\n");
+	}
 }
 
 int main(int argc, char *argv[])
@@ -149,5 +157,6 @@ int main(int argc, char *argv[])
 		}		
 	}
 
-    return EXIT_SUCCESS;
+
+   return EXIT_SUCCESS;
 }
