@@ -20,7 +20,7 @@
 #include <barrelfish/debug.h>
 #include <barrelfish/lmp_chan.h>
 #include <barrelfish/sys_debug.h>
-
+#include <math.h>
 #define UNUSED(x) (x) = (x)
 
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -29,9 +29,11 @@
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
+#define CLIENT_LIMIT 			1<<26			
+
 
 static uint32_t next_client = 0;
-static struct capref client_endpoints[2048];
+static struct lmp_chan client_channels[2048];
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
@@ -45,7 +47,7 @@ static void recv_handler(void *arg)
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
-
+	
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
 		lmp_chan_register_recv(lc,get_default_waitset(),
@@ -72,25 +74,47 @@ static void recv_handler(void *arg)
 		if (capref_is_null(cap)) 
 			debug_printf("recv_handler: Client did not provided us a valid endpoint!\n");
 		else {
-			debug_printf("recv_handler: Will register client with client id = %d\n", next_client);
-			client_endpoints[next_client] = cap;
+			debug_printf("recv_handler: Will register client with client id = %d and slot in cap = %d\n", next_client, cap.slot);
+			lmp_chan_init(client_channels + next_client);
+			client_channels[next_client].remote_cap = cap;
 			client_limits[next_client] = 0;
-			lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, next_client);
+			lmp_chan_send1(client_channels + next_client , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, next_client);
 			next_client++;
 		}
 	}
-	else {		// Requesting memory
-		client_id = msg.words[0];
-		uint32_t size_requested = msg.words[1];	
-		if 	
-
-
+	else {	
+		// Requesting memory
+		uint32_t client_id = msg.words[0];
+		struct lmp_chan client_channel = client_channels[client_id];
+		size_t size_requested = msg.words[1];	
+		struct capref returned_cap;
+		
+		
+		if (pow(2,size_requested) + client_limits[client_id] > CLIENT_LIMIT) {
+			debug_printf("recv_handle: Client with id =%d exceeded its available limit!\n", client_id);		
+			returned_cap = NULL_CAP;			
+		}
+		else {
+			err = ram_alloc(&returned_cap, size_requested); 
+			if (err_is_fail(err)) {
+				returned_cap = NULL_CAP;	
+			}
+		}
+		
+		err = lmp_chan_send0(&client_channel, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
+	    if (err_is_fail(err))
+			DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 	}
-	
 
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));
+	
+	err = lmp_chan_alloc_recv_slot(lc);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
+	}	
 }
+
 
 int main(int argc, char *argv[])
 {

@@ -18,14 +18,14 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-//static struct capref ram_cap;
+static struct capref ram_cap;
 static uint32_t returned_string[9];
 static int received_length;
 static uint32_t client_id = -1;
 
 static void recv_handler(void *arg) 
 {
-	debug_printf("recv_handler: Got a message!");
+	debug_printf("recv_handler: Got a message or a cap!");
 	errval_t err;
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
@@ -46,8 +46,7 @@ static void recv_handler(void *arg)
 		returned_string[i] = msg.words[i];	
 	}
 	
-	assert(received_length > 0);
-
+	ram_cap = cap;	
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));
 
@@ -114,9 +113,34 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
                              struct capref *retcap, size_t *ret_bits)
 {
-    // TODO: implement functionality to request a RAM capability over the
-    // given channel and wait until it is delivered.
-    return SYS_ERR_OK;
+	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
+	errval_t err;
+	
+	size_t alloc_bits = log2ceil(request_bits);
+	
+	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, chan->client_id, alloc_bits);	
+ 	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");
+		return AOS_ERR_LMP_SEND_FAILURE;
+	}
+
+	event_dispatch(get_default_waitset());
+	debug_printf("aos_rpc_get_ram_cap: Server responded!\n");	
+
+	if (capref_is_null(ram_cap))  {
+		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
+   		*ret_bits = 0;
+	 	return LIB_ERR_RAM_ALLOC;
+	}
+	else 
+		debug_printf("aos_rpc_get_ram_cap: Server responded with a memory region!\n");
+	
+	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
+
+	*retcap = ram_cap;
+	*ret_bits = pow(2,alloc_bits);	
+	return SYS_ERR_OK;
+
 }
 
 errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
@@ -213,7 +237,7 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
 errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 {
 	errval_t err;
-
+	
 	struct waitset * ws = get_default_waitset();
 
 	lmp_chan_init(&rpc->init_channel);
@@ -226,11 +250,20 @@ errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 
 	struct lmp_endpoint* ep;
 	
-	err = lmp_endpoint_create_in_slot(FIRSTEP_BUFLEN, rem_ep,
+	err = endpoint_create(FIRSTEP_BUFLEN, &rem_ep,
 									  &ep);		  
-	
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Failure in creating client endpoint!\n");
+		abort();
+	}	
 	rpc->rpc_channel.endpoint = ep;
 	rpc->rpc_channel.local_cap = rem_ep;
+
+	err = lmp_chan_alloc_recv_slot(&rpc->rpc_channel);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Error in allocating capability slot in the channel!\n");
+		return LIB_ERR_LMP_ALLOC_RECV_SLOT;
+	}
 	
 	struct event_closure rpc_handler_init = {
         .handler = bootstrap_handler,
@@ -239,7 +272,7 @@ errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 
 	err = lmp_chan_register_recv(&rpc->rpc_channel, ws, rpc_handler_init);
 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Error in registering the channel..\n");	
+		DEBUG_ERR(err, "Error in registering the channel for bootstrap handler!\n");	
 		return LIB_ERR_CHAN_REGISTER_RECV;
 	}
 	
@@ -251,10 +284,18 @@ errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 	else 
 		debug_printf("Sent our endpoint to init!\n");
  
-		
 	event_dispatch(ws);	
 	
 	debug_printf("Memory server accepted us! Our id = %d\n", client_id);
 	rpc->client_id = client_id;	
+
+	rpc_handler_init.handler = recv_handler;
+	
+	err = lmp_chan_register_recv(&rpc->rpc_channel, ws, rpc_handler_init);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Error in registering the channel for recv_handler!\n");	
+		return LIB_ERR_CHAN_REGISTER_RECV;
+	}
+
   	return SYS_ERR_OK;
 }

@@ -18,6 +18,7 @@
 #include <k_r_malloc.h>
 #include <barrelfish/paging.h>
 #include <barrelfish/waitset.h>
+#include <barrelfish/aos_rpc.h>
 
 struct morecore_state {
     struct thread_mutex mutex;
@@ -27,6 +28,7 @@ struct morecore_state {
     struct paging_region region;
     // for "static" morecore (see lib/barrelfish/static_morecore.c)
     char *freep;
+
 };
 
 struct ram_alloc_state {

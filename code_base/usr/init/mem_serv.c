@@ -47,7 +47,8 @@ static errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minba
                               genpaddr_t maxlimit)
 {
     errval_t err;
-
+	
+	debug_printf("memerv_alloc: Bits requested are %d\n", bits);
     assert(bits >= MINSIZEBITS);
 
     /* refill slot allocator if needed */

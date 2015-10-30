@@ -22,33 +22,44 @@
 
 int main(int argc, char *argv[])
 {
+	/*
 	errval_t err;
-	struct aos_rpc test_rpc; //, test_rpc_2;
+	struct aos_rpc test_rpc;
 
 	err = aos_rpc_init(&test_rpc, TASKCN_SLOT_REMEP);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Rpc init fail!\n");
 		abort();
 	}
-	/*
-	debug_printf("Registered the first channel...\n");
-	err = aos_rpc_init(&test_rpc_2, TASKCN_SLOTS_USER + 10);
+	
+	struct capref returned_cap;
+	size_t ret_bits;
+
+	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Rpc init fail!\n");
+		DEBUG_ERR(err, "Failure in memory allocation!\n");
+		abort();
+	}
+	
+	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Failure in memory allocation!\n");
+		abort();
+	}
+
+	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024*3, &returned_cap, &ret_bits); 	
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Failure in memory allocation!\n");
+		abort();
+	}
+
+	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024*1/2, &returned_cap, &ret_bits); 	
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Failure in memory allocation!\n");
 		abort();
 	}
 	*/
-
-	err = aos_rpc_send_string(&test_rpc, "Hello init!COCK!!!!!!!!!!!!!!!!!!!!");
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err,"Rpc send strign failed!\n");
-		abort();
-	}
 	while(1);
-	// This call will re-enable init dispatcher 
-	// in the schedule 
-	// We could marshal the arguments by hand but lmp_ep_send2 does 
-	// just that.:wq
 
 
     return 0;

@@ -29,6 +29,7 @@
 #include <octopus/init.h>
 #include "threads_priv.h"
 #include "init.h"
+#include <barrelfish/aos_rpc.h>
 
 /// Are we the init domain (and thus need to take some special paths)?
 static bool init_domain;
@@ -122,6 +123,10 @@ static void init_recv_handler(struct aos_chan *ac, struct lmp_recv_msg *msg, str
  * This runs on a thread in every domain, after the dispatcher is setup but
  * before main() runs.
  */
+
+//static struct aos_rpc domain_memory_channel;
+	
+
 errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 {
     errval_t err;
@@ -175,6 +180,12 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     /* send local ep to init */
     /* wait for init to acknowledge receiving the endpoint */
 
+	//err = aos_rpc_init( disp->init_chan, TASKCN_SLOT_REMEP);
+	//if (err_is_fail(err)) {
+	//	DEBUG_ERR(err, "Failure in initialising channel for memory requests!\n");
+	//	return err_push(err, LIB_ERR_LMP_CHAN_INIT);
+	//}
+	
     /* TODO STEP 5: now we should have a channel with init set up and can
      * use it for the ram allocator */
 

@@ -14,10 +14,12 @@
 
 #include <barrelfish/barrelfish.h>
 #include <barrelfish/core_state.h>
-
 #include <if/monitor_defs.h>
 #include <if/mem_rpcclient_defs.h>
 #include <stdio.h>
+#include <barrelfish/aos_rpc.h>
+
+
 #if 0
 static bool aos_got_ram_reply = false;
 static void aos_ram_alloc_recv(struct aos_chan *ac,struct lmp_recv_msg *msg, struct capref cap)
@@ -144,9 +146,27 @@ errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
     }
 }
 
+
+/*
+errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
+                         uint64_t minbase, uint64_t maxlimit)
+{
+    // struct ram_alloc_state *state = get_ram_alloc_state();
+	size_t ret_bits;
+	
+	errval_t err = aos_rpc_get_ram_cap( &channel, size_bits, ret, &ret_bits);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"CAN NOT REQUEST MEMORY FROM MEM SERVER!\n");
+		abort();
+	}
+
+	return SYS_ERR_OK;
+
+}
+*/
+
 #include <stdio.h>
 #include <string.h>
-
 /**
  * \brief Allocates memory in the form of a RAM capability
  *
@@ -195,6 +215,8 @@ errval_t ram_available(genpaddr_t *available, genpaddr_t *total)
 /**
  * \brief Initialize the dispatcher specific state of ram_alloc
  */
+
+
 void ram_alloc_init(void)
 {
     /* Initialize the ram_alloc_state */
@@ -206,6 +228,7 @@ void ram_alloc_init(void)
     ram_alloc_state->default_minbase  = 0;
     ram_alloc_state->default_maxlimit = 0;
     ram_alloc_state->base_capnum      = 0;
+	
 }
 
 /**
