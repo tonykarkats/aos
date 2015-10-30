@@ -18,9 +18,10 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-static struct capref ram_cap;
+//static struct capref ram_cap;
 static uint32_t returned_string[9];
 static int received_length;
+static uint32_t client_id = -1;
 
 static void recv_handler(void *arg) 
 {
@@ -44,24 +45,56 @@ static void recv_handler(void *arg)
 		debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
 		returned_string[i] = msg.words[i];	
 	}
-
-	if (capref_is_null(cap)) 
-		debug_printf("NULL_CAP receiver\n");
-	else {
-		debug_printf("cap received\n", cap.slot);
-		ram_cap = cap;	
-	}
 	
+	assert(received_length > 0);
+
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));
+
+	
 }
 
+static void bootstrap_handler(void *arg) 
+{
+	debug_printf("recv_handler: Got my client_id!\n");
+	errval_t err;
+	struct lmp_chan *lc = arg;
+	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
+	struct capref cap;
+
+	err = lmp_chan_recv(lc, &msg, &cap);
+	if (err_is_fail(err) && lmp_err_is_transient(err)) {
+		lmp_chan_register_recv(lc,get_default_waitset(),
+							MKCLOSURE(recv_handler, arg));
+	}
+	
+	debug_printf("msg buflen %zu\n", msg.buf.msglen);
+	
+	received_length = msg.buf.msglen;
+	
+	assert(received_length == 1);
+	
+	debug_printf("My client_id = %d!\n", msg.words[0]);
+
+	client_id = msg.words[0];
+
+}
 
 errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 {
 	errval_t err;
 
 	uint32_t buffer[9];
+
+	// Check length of user string in a safe manner
+	int i;
+	for (i=0; i < 38; i++)
+		if (string[i] == '\0')
+			break;
+
+	if (i == 38) 
+		return AOS_ERR_LMP_SEND_FAILURE;
+		
 	memcpy(buffer, string, strlen(string)+1);
 	
 	err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
@@ -177,7 +210,7 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
     return SYS_ERR_OK;
 }
 
-errval_t aos_rpc_init(struct aos_rpc *rpc)
+errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 {
 	errval_t err;
 
@@ -188,7 +221,7 @@ errval_t aos_rpc_init(struct aos_rpc *rpc)
 	
 	struct capref rem_ep = {
 		.cnode = cnode_task,
-		.slot = TASKCN_SLOT_REMEP
+		.slot = slot_number
 	};
 
 	struct lmp_endpoint* ep;
@@ -200,7 +233,7 @@ errval_t aos_rpc_init(struct aos_rpc *rpc)
 	rpc->rpc_channel.local_cap = rem_ep;
 	
 	struct event_closure rpc_handler_init = {
-        .handler = recv_handler,
+        .handler = bootstrap_handler,
         .arg = &rpc->rpc_channel,
     };
 
@@ -210,7 +243,6 @@ errval_t aos_rpc_init(struct aos_rpc *rpc)
 		return LIB_ERR_CHAN_REGISTER_RECV;
 	}
 	
-
 	lmp_chan_send0(&rpc->init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in sending our own endpoint to init\n!");
@@ -218,6 +250,11 @@ errval_t aos_rpc_init(struct aos_rpc *rpc)
 	} 
 	else 
 		debug_printf("Sent our endpoint to init!\n");
+ 
+		
+	event_dispatch(ws);	
 	
+	debug_printf("Memory server accepted us! Our id = %d\n", client_id);
+	rpc->client_id = client_id;	
   	return SYS_ERR_OK;
 }

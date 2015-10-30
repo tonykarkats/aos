@@ -30,11 +30,12 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
+static uint32_t next_client = 0;
+static struct capref client_endpoints[2048];
 struct bootinfo *bi;
 static coreid_t my_core_id;
-
-
 static struct lmp_chan channel ;
+static size_t client_limits[2048];
 
 static void recv_handler(void *arg) 
 {
@@ -52,7 +53,7 @@ static void recv_handler(void *arg)
 	}
 
 	int message_length = msg.buf.msglen;
-	debug_printf("Received length = %d\n", message_length);	
+	debug_printf("recv_handler: Received length = %d\n", message_length);	
 	
 	//for (int i=0 ; i<message_length; i++) 
 	//	debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
@@ -64,21 +65,31 @@ static void recv_handler(void *arg)
 	}	
 	
 	if (message_length != 0) 
-		debug_printf("String received : %s\n", message_string);
+		debug_printf("recv_handler: String received : %s\n", message_string);
 	
-	lmp_chan_register_recv(lc, get_default_waitset(),
-			MKCLOSURE(recv_handler, arg));
-	
-	if (capref_is_null(cap)) 
-		debug_printf("cap received = NULL_CAP\n");
-	else {
-		debug_printf("cap received!\n");
+	// Bootstraping ...
+	if (message_length == 0) {
+		if (capref_is_null(cap)) 
+			debug_printf("recv_handler: Client did not provided us a valid endpoint!\n");
+		else {
+			debug_printf("recv_handler: Will register client with client id = %d\n", next_client);
+			client_endpoints[next_client] = cap;
+			client_limits[next_client] = 0;
+			lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, next_client);
+			next_client++;
+		}
+	}
+	else {		// Requesting memory
+		client_id = msg.words[0];
+		uint32_t size_requested = msg.words[1];	
+		if 	
 
-		if (err_is_fail(err))
-			debug_printf("Could not send a message!\n");
+
 	}
 	
-	debug_printf("All ok...\n");
+
+	lmp_chan_register_recv(lc, get_default_waitset(),
+			MKCLOSURE(recv_handler, arg));
 }
 
 int main(int argc, char *argv[])
