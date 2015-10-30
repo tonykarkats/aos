@@ -51,7 +51,8 @@ static void recv_handler(void *arg)
 	}
 
 	debug_printf("msg buflen %zu\n", msg.buf.msglen);
-	debug_printf("msg->words[0] = 0x%lx\n", msg.words[0]);
+	debug_printf("msg->words[0] = 0x%lx\n", msg.words[0]);	
+	debug_printf("msg->words[1] = 0x%lx\n", msg.words[1]);
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));
 
