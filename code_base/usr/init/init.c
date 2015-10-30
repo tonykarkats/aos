@@ -61,6 +61,10 @@ static void recv_handler(void *arg)
 	else {
 		debug_printf("cap received, slot = %u \n", cap.slot);
 		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'a');
+		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'b');
+		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'c');
+		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'd');
+
 		if (err_is_fail(err))
 			debug_printf("Could not send a message!\n");
 	}
