@@ -27,9 +27,35 @@
 #define BUFSIZE 32L * 1024 * 1024
 #define SAFE_VADDR (1UL<<25)
 
+#define FIRSTEP_BUFLEN          21u
+#define FIRSTEP_OFFSET          (33472u + 56u)
 
 struct bootinfo *bi;
 static coreid_t my_core_id;
+
+
+static struct lmp_chan channel ;
+
+static void recv_handler(void *arg) 
+{
+	debug_printf("recv_handler: Got a message!");
+	errval_t err;
+	struct lmp_chan *lc = arg;
+	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
+	struct capref cap;
+
+	err = lmp_chan_recv(lc, &msg, &cap);
+	if (err_is_fail(err) && lmp_err_is_transient(err)) {
+		lmp_chan_register_recv(lc,get_default_waitset(),
+							MKCLOSURE(recv_handler, arg));
+	}
+
+	debug_printf("msg buflen %zu\n", msg.buf.msglen);
+	debug_printf("msg->words[0] = 0x%lx\n", msg.words[0]);
+	lmp_chan_register_recv(lc, get_default_waitset(),
+		MKCLOSURE(recv_handler, arg));
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -60,32 +86,67 @@ int main(int argc, char *argv[])
     }
 
 	debug_printf("initialized local ram alloc\n");
-
-
 	err = initialize_mem_serv();
     if (err_is_fail(err)) {
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
-	UNUSED(err);
-    // TODO (milestone 4): Implement a system to manage the device memory
+    
+	// TODO (milestone 4): Implement a system to manage the device memory
     // that's referenced by the capability in TASKCN_SLOT_IO in the task
     // cnode. Additionally, export the functionality of that system to other
     // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
     debug_printf("initialized dev memory management\n");
 
     // TODO (milestone 3) STEP 2:
-    // get waitset
-    // allocate lmp chan
-    // init lmp chan
+    // get waitseti --> get_default_waitset()
+    // allocate lmp chan --> 
+    // init lmp chan --> lmp_chan_init
     /* make local endpoint available -- this was minted in the kernel in a way
      * such that the buffer is directly after the dispatcher struct and the
      * buffer length corresponds DEFAULT_LMP_BUF_WORDS (excluding the kernel 
      * sentinel word).
      */
-    // allocate slot for incoming capabilites
+	struct waitset* ws = get_default_waitset();  	
+	
+	lmp_chan_init(&channel);
+	
+	channel.local_cap =  cap_initep;
+	
+	err = lmp_endpoint_setup(0, DEFAULT_LMP_BUF_WORDS,  &channel.endpoint);
+	if (err_is_fail(err)) {
+		debug_printf("Error in seting up the endpoint..\n");	
+		abort();
+	}
+
+	err = lmp_chan_alloc_recv_slot(&channel);
+	if (err_is_fail(err)) {
+		debug_printf("Error in allocating receiver slot!\n");
+		abort();
+	}
+
+	struct event_closure recv_handler_init = {
+        .handler = recv_handler,
+        .arg = &channel,
+    };
+
+	err = lmp_chan_register_recv(&channel,ws, recv_handler_init);
+	if (err_is_fail(err)) {
+		debug_printf("Error in registering the channel..\n");	
+		abort();
+	}
+	
+	// allocate slot for incoming capabilites
     // register receive handler 
     // go into messaging main loop
+ 	debug_printf("Entering main messaging loop...\n");	
+	while(true) {
+		err = event_dispatch(get_default_waitset());
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err, "in main event_dispatch loop");
+			return EXIT_FAILURE;
+		}		
+	}
 
     return EXIT_SUCCESS;
 }

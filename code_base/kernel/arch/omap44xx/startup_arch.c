@@ -28,7 +28,7 @@
 #include <offsets.h>
 #include <startup_arch.h>
 #include <global.h>
-
+#include <barrelfish/capabilities.h>
 #define CNODE(cte)              (cte)->cap.u.cnode.cnode
 #define C(cte)                  (&(cte)->cap)
 #define UNUSED(x)               (x) = (x)
@@ -702,39 +702,36 @@ void arm_kernel_startup(void)
         // 3) copy init's receive ep into all other domains'
         //    TASKCN_SLOT_INITEP.
 
-
-    struct cte *memeater_dcb_cte = caps_locate_slot(CNODE(memeater_st.taskcn),
-												TASKCN_SLOT_DISPATCHER);
+	printf("startup_arch: Init dispatcher handle = %u\n", init_dcb->disp);	
+	printf("startup_arch: Memeater dispatcher handle = %u\n", memeater_dcb->disp);	
 	
-	err = caps_retype(ObjType_EndPoint,0, &memeater_st.taskcn->cap, TASKCN_SLOT_SELFEP, memeater_dcb_cte,false);
-	if (err_is_fail(err)){
-		panic("startup_arch: Error in retyping for memeater!\n");
-	}
-
-	struct cte *init_dcb_cte = caps_locate_slot(CNODE(init_st.taskcn),
-												TASKCN_SLOT_DISPATCHER);
-	
-	err = caps_retype(ObjType_EndPoint,0, &init_st.taskcn->cap, TASKCN_SLOT_SELFEP, init_dcb_cte,false);
+	err = caps_retype(ObjType_EndPoint,0, &init_st.taskcn->cap, TASKCN_SLOT_SELFEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_DISPATCHER),0);
 	if (err_is_fail(err)){
 		panic("startup_arch: Error in retyping for init!\n");
 	}
 
-	struct cte *init_selfep = caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_SELFEP);
 
-	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_INITEP, init_selfep, true,
-							 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
-	if (err_is_fail(err)) { 
-		panic("startup_arch: Can not mint for memeater!\n");
+	err = caps_retype(ObjType_EndPoint,0, &memeater_st.taskcn->cap, TASKCN_SLOT_SELFEP, caps_locate_slot(CNODE(memeater_st.taskcn), TASKCN_SLOT_DISPATCHER),0);
+	if (err_is_fail(err)){
+		panic("startup_arch: Error in retyping for memeater!\n");
 	}
-
-
-
-	err = caps_copy_to_cnode(init_st.taskcn  , TASKCN_SLOT_INITEP, init_selfep, true,
+	
+		
+	err = caps_copy_to_cnode(init_st.taskcn  , TASKCN_SLOT_INITEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_SELFEP), 1,
 						 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
 	if (err_is_fail(err)) { 
 		panic("startup_arch: Can not mint for init!\n");
 	}
 
+	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_INITEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_SELFEP), 1,
+							 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
+	if (err_is_fail(err)) { 
+		panic("startup_arch: Can not mint for memeater!\n");
+	}
+	
+	struct cte *rem_selfep = caps_locate_slot(CNODE(memeater_st.taskcn),
+											   TASKCN_SLOT_INITEP);
+	printf("Our type = %d\n!",rem_selfep->cap.type);
 
 #endif
     } else {
@@ -757,5 +754,3 @@ void arm_kernel_startup(void)
     panic("Error spawning init!");
 
 }
-oATH=/home/akarkats/aos/ghc/bin:/home/akarkats/.cabal/bin/:$PATH
-
