@@ -16,9 +16,22 @@
 #define _LIB_BARRELFISH_AOS_MESSAGES_H
 
 #include <barrelfish/barrelfish.h>
+#include <barrelfish/lmp_chan.h>
+#include <barrelfish/barrelfish.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <barrelfish/sys_debug.h>
+#include <barrelfish/morecore.h>
+#include <barrelfish/dispatcher_arch.h>
+#include <barrelfish/debug.h>
+#include <barrelfish/lmp_chan.h>
+#include <barrelfish/sys_debug.h>
+#include <barrelfish/cspace.h>
 
 struct aos_rpc {
-	struct lmp_chan channel;    
+	struct lmp_chan init_channel;    
+	struct lmp_chan rpc_channel;
 };
 
 /**

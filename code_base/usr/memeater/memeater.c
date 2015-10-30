@@ -9,6 +9,7 @@
 #include <barrelfish/lmp_chan.h>
 #include <barrelfish/sys_debug.h>
 #include <barrelfish/cspace.h>
+#include <barrelfish/aos_rpc.h>
 
 #define BUFSIZE_2 (128UL*1024*1024)
 #define MALLOC_BUFSIZE 1   //(1UL<<20)
@@ -18,7 +19,7 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-
+/*
 static struct lmp_chan init_channel;
 static struct lmp_chan memeater_channel;
 
@@ -65,69 +66,78 @@ static void recv_handler(void *arg)
 			debug_printf("Could not send a message!\n");
 	}
 }
+*/
 
 int main(int argc, char *argv[])
 {
 	errval_t err;
-	uintptr_t msg_buf[2] = { 'A', 'B' };
-	debug_printf("memeater started\n");
-    
-	// TODO STEP 1: connect & send msg to init using syscall
+//	uintptr_t msg_buf[2] = { 'A', 'B' };
+//	debug_printf("memeater started\n");
+//    
+//	// TODO STEP 1: connect & send msg to init using syscall
+//
+//	lmp_chan_init(&init_channel);
+//	lmp_chan_init(&memeater_channel);
+//	struct waitset* ws = get_default_waitset();
+//
+//	size_t words_sent;
+//	
+//	init_channel.remote_cap = cap_initep;	
+//
+//	struct lmp_endpoint* remep;
+//
+//	struct capref mem_ep = {
+//		.cnode = cnode_task,
+//		.slot = TASKCN_SLOT_REMEP
+//	};		
+//
+//	err = lmp_endpoint_create_in_slot(FIRSTEP_BUFLEN, mem_ep, &remep);
+//	if (err_is_fail(err)) {
+//		DEBUG_ERR(err, "Error in lmp endpoint create!\n");
+//		abort();
+//	}			
+//
+//	memeater_channel.endpoint = remep;
+//	memeater_channel.local_cap = mem_ep;
+//
+//	struct event_closure memeater_handler_init = {
+//        .handler = recv_handler,
+//        .arg = &memeater_channel,
+//    };
+//
+//	err = lmp_chan_register_recv(&memeater_channel,ws, memeater_handler_init);
+//	if (err_is_fail(err)) {
+//		debug_printf("Error in registering the channel..\n");	
+//		abort();
+//	}
+//	
+//	err = send_message(&init_channel, msg_buf, 2, &words_sent, mem_ep);
+//	if (err_is_fail(err)) {
+//		printf("Error in sending the message\n!");
+//	} 
+//	else 
+//		printf("Sent words!\n");
 
-	lmp_chan_init(&init_channel);
-	lmp_chan_init(&memeater_channel);
-	struct waitset* ws = get_default_waitset();
 
-	size_t words_sent;
-	
-	init_channel.remote_cap = cap_initep;	
+	struct aos_rpc test_rpc;
 
-	struct lmp_endpoint* remep;
-
-	struct capref mem_ep = {
-		.cnode = cnode_task,
-		.slot = TASKCN_SLOT_REMEP
-	};		
-
-	err = lmp_endpoint_create_in_slot(FIRSTEP_BUFLEN, mem_ep, &remep);
+	err = aos_rpc_init(&test_rpc);
 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Error in lmp endpoint create!\n");
-		abort();
-	}			
-
-	memeater_channel.endpoint = remep;
-	memeater_channel.local_cap = mem_ep;
-
-	struct event_closure memeater_handler_init = {
-        .handler = recv_handler,
-        .arg = &memeater_channel,
-    };
-
-	err = lmp_chan_register_recv(&memeater_channel,ws, memeater_handler_init);
-	if (err_is_fail(err)) {
-		debug_printf("Error in registering the channel..\n");	
+		DEBUG_ERR(err, "Rpc init fail!\n");
 		abort();
 	}
-	
-	err = send_message(&init_channel, msg_buf, 2, &words_sent, mem_ep);
-	if (err_is_fail(err)) {
-		printf("Error in sending the message\n!");
-	} 
-	else 
-		printf("Sent words!\n");
 
+	err = aos_rpc_send_string(&test_rpc, "Hello init!COCK!!!!!");
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Rpc send strign failed!\n");
+		abort();
+	}
+	while(1);
 	// This call will re-enable init dispatcher 
 	// in the schedule 
 	// We could marshal the arguments by hand but lmp_ep_send2 does 
 	// just that.:wq
-	debug_printf("Entering main messaging loop...\n");	
-	while(true) {
-		err = event_dispatch(get_default_waitset());
-		if (err_is_fail(err)) {
-			DEBUG_ERR(err, "in main event_dispatch loop");
-			return EXIT_FAILURE;
-		}		
-	}
+
 
     return 0;
 }

@@ -38,7 +38,8 @@ static struct lmp_chan channel ;
 
 static void recv_handler(void *arg) 
 {
-	debug_printf("recv_handler: Got a message!");
+	debug_printf("recv_handler: Got a message!\n");
+		
 	errval_t err;
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
@@ -50,24 +51,34 @@ static void recv_handler(void *arg)
 							MKCLOSURE(recv_handler, arg));
 	}
 
-	debug_printf("msg buflen %zu\n", msg.buf.msglen);
-	debug_printf("msg->words[0] = 0x%lx\n", msg.words[0]);	
-	debug_printf("msg->words[1] = 0x%lx\n", msg.words[1]);
+	int message_length = msg.buf.msglen;
+	debug_printf("Received length = %d\n", message_length);	
+	
+	//for (int i=0 ; i<message_length; i++) 
+	//	debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
+	
+	char message_string[msg.buf.msglen * 4];
+	for (int i = 0; i<message_length; i++){
+		uint32_t * word = (uint32_t *) (message_string + i*4);
+		*word = msg.words[i];   
+	}	
+	
+	if (message_length != 0) 
+		debug_printf("String received : %s\n", message_string);
+	
 	lmp_chan_register_recv(lc, get_default_waitset(),
-		MKCLOSURE(recv_handler, arg));
-
+			MKCLOSURE(recv_handler, arg));
+	
 	if (capref_is_null(cap)) 
 		debug_printf("cap received = NULL_CAP\n");
 	else {
-		debug_printf("cap received, slot = %u \n", cap.slot);
-		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'a');
-		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'b');
-		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'c');
-		err = lmp_ep_send1(cap, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 'd');
+		debug_printf("cap received!\n");
 
 		if (err_is_fail(err))
 			debug_printf("Could not send a message!\n");
 	}
+	
+	debug_printf("All ok...\n");
 }
 
 int main(int argc, char *argv[])

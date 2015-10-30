@@ -13,13 +13,70 @@
  */
 
 #include <barrelfish/aos_rpc.h>
+#include <string.h>
+#include <math.h>
+#define FIRSTEP_BUFLEN          21u
+#define FIRSTEP_OFFSET          (33472u + 56u)
+
+static struct capref ram_cap;
+static uint32_t returned_string[9];
+static int received_length;
+
+static void recv_handler(void *arg) 
+{
+	debug_printf("recv_handler: Got a message!");
+	errval_t err;
+	struct lmp_chan *lc = arg;
+	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
+	struct capref cap;
+
+	err = lmp_chan_recv(lc, &msg, &cap);
+	if (err_is_fail(err) && lmp_err_is_transient(err)) {
+		lmp_chan_register_recv(lc,get_default_waitset(),
+							MKCLOSURE(recv_handler, arg));
+	}
+	
+	debug_printf("msg buflen %zu\n", msg.buf.msglen);
+	
+	received_length = msg.buf.msglen;
+
+	for (int i=0 ; i<msg.buf.msglen; i++) {
+		debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
+		returned_string[i] = msg.words[i];	
+	}
+
+	if (capref_is_null(cap)) 
+		debug_printf("NULL_CAP receiver\n");
+	else {
+		debug_printf("cap received\n", cap.slot);
+		ram_cap = cap;	
+	}
+	
+	lmp_chan_register_recv(lc, get_default_waitset(),
+		MKCLOSURE(recv_handler, arg));
+}
+
 
 errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 {
-    // TODO: implement functionality to send a string over the given channel
-    // and wait for a response.
-    return SYS_ERR_OK;
+	errval_t err;
+
+	uint32_t buffer[9];
+	memcpy(buffer, string, strlen(string)+1);
+	
+	err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
+				  buffer[0], buffer[1],buffer[2],
+				  buffer[3], buffer[4],buffer[5],
+				  buffer[6], buffer[7],buffer[8]);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Error in sending the string!\n");
+		return AOS_ERR_LMP_SEND_FAILURE;
+	}
+	
+	return SYS_ERR_OK;
 }
+
+
 
 errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
                              struct capref *retcap, size_t *ret_bits)
@@ -122,6 +179,45 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
 
 errval_t aos_rpc_init(struct aos_rpc *rpc)
 {
-    // TODO: Initialize given rpc channel
-    return SYS_ERR_OK;
+	errval_t err;
+
+	struct waitset * ws = get_default_waitset();
+
+	lmp_chan_init(&rpc->init_channel);
+	rpc->init_channel.remote_cap = cap_initep;
+	
+	struct capref rem_ep = {
+		.cnode = cnode_task,
+		.slot = TASKCN_SLOT_REMEP
+	};
+
+	struct lmp_endpoint* ep;
+	
+	err = lmp_endpoint_create_in_slot(FIRSTEP_BUFLEN, rem_ep,
+									  &ep);		  
+	
+	rpc->rpc_channel.endpoint = ep;
+	rpc->rpc_channel.local_cap = rem_ep;
+	
+	struct event_closure rpc_handler_init = {
+        .handler = recv_handler,
+        .arg = &rpc->rpc_channel,
+    };
+
+	err = lmp_chan_register_recv(&rpc->rpc_channel, ws, rpc_handler_init);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Error in registering the channel..\n");	
+		return LIB_ERR_CHAN_REGISTER_RECV;
+	}
+	
+
+	lmp_chan_send0(&rpc->init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Error in sending our own endpoint to init\n!");
+		return LIB_ERR_LMP_CHAN_SEND;
+	} 
+	else 
+		debug_printf("Sent our endpoint to init!\n");
+	
+  	return SYS_ERR_OK;
 }
