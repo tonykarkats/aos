@@ -29,7 +29,7 @@
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
-#define CLIENT_LIMIT 			1<<26			
+#define CLIENT_LIMIT 			(1<<26)*10			
 
 
 static uint32_t next_client = 0;
@@ -88,7 +88,6 @@ static void recv_handler(void *arg)
 		struct lmp_chan client_channel = client_channels[client_id];
 		size_t size_requested = msg.words[1];	
 		struct capref returned_cap;
-		
 		
 		if (pow(2,size_requested) + client_limits[client_id] > CLIENT_LIMIT) {
 			debug_printf("recv_handle: Client with id =%d exceeded its available limit!\n", client_id);		

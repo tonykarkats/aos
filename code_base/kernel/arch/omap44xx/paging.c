@@ -17,7 +17,6 @@
 #include <arm_hal.h>
 #include <cap_predicates.h>
 #include <dispatch.h>
-
 /**
  * Kernel L1 page table
  */
@@ -355,7 +354,8 @@ caps_map_l1(struct capability* dest,
 
     for (int i = 0; i < 4; i++) {
         if (entry[i].page_table.type != L1_TYPE_INVALID_ENTRY) {
-            panic("Remapping valid page table.");
+            printf("PANIC: Remapping valid page table.\n");
+			panic("Remapping valid page table.");
         }
     }
 

@@ -126,7 +126,6 @@ static void init_recv_handler(struct aos_chan *ac, struct lmp_recv_msg *msg, str
 
 //static struct aos_rpc domain_memory_channel;
 	
-
 errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 {
     errval_t err;
@@ -172,6 +171,20 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
         return SYS_ERR_OK;
     }
 
+	debug_printf("Initializing our endpoint with init!\n");
+	err = aos_rpc_init(TASKCN_SLOT_REMEP);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Error in aos_rpc_init!\n");
+		return err_push(err, SYS_ERR_LRPC_SLOT_INVALID);
+	}
+
+	debug_printf("Setting our local ram allocator to talk with server!\n");
+    err = ram_alloc_set(NULL);
+    if (err_is_fail(err)) {
+    	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
+	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
+    }
+
     // TODO STEP 3: register ourselves with init
     /* allocate lmp channel structure */
     /* create local endpoint */
@@ -180,12 +193,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     /* send local ep to init */
     /* wait for init to acknowledge receiving the endpoint */
 
-	//err = aos_rpc_init( disp->init_chan, TASKCN_SLOT_REMEP);
-	//if (err_is_fail(err)) {
-	//	DEBUG_ERR(err, "Failure in initialising channel for memory requests!\n");
-	//	return err_push(err, LIB_ERR_LMP_CHAN_INIT);
-	//}
-	
     /* TODO STEP 5: now we should have a channel with init set up and can
      * use it for the ram allocator */
 

@@ -48,7 +48,7 @@ static errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minba
 {
     errval_t err;
 	
-	debug_printf("memerv_alloc: Bits requested are %d\n", bits);
+	debug_printf("memserv_alloc: Bits requested are %d\n", bits);
     assert(bits >= MINSIZEBITS);
 
     /* refill slot allocator if needed */
@@ -58,6 +58,7 @@ static errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minba
     /* refill slab allocator if needed */
     size_t freecount = slab_freecount(&mm_ram.slabs);
     while (!refilling && (freecount <= MINSPARENODES)) {
+		debug_printf("memeserv_alloc: Need to refill..\n");
         refilling = true;
         struct capref frame;
         err = msa.a.alloc(&msa.a, &frame);

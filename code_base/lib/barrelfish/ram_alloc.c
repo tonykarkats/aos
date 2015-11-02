@@ -18,7 +18,7 @@
 #include <if/mem_rpcclient_defs.h>
 #include <stdio.h>
 #include <barrelfish/aos_rpc.h>
-
+#include <math.h>
 
 #if 0
 static bool aos_got_ram_reply = false;
@@ -36,6 +36,7 @@ static void aos_ram_alloc_recv(struct aos_chan *ac,struct lmp_recv_msg *msg, str
 #endif
 
 /* remote (indirect through a channel) version of ram_alloc, for most domains */
+/*
 static errval_t ram_alloc_remote(struct capref *ret, uint8_t size_bits,
                                  uint64_t minbase, uint64_t maxlimit)
 {
@@ -113,7 +114,7 @@ static errval_t ram_alloc_remote(struct capref *ret, uint8_t size_bits,
 #endif
     return SYS_ERR_OK;
 }
-
+*/
 void ram_set_affinity(uint64_t minbase, uint64_t maxlimit)
 {
     struct ram_alloc_state *ram_alloc_state = get_ram_alloc_state();
@@ -147,14 +148,14 @@ errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
 }
 
 
-/*
+
 errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
                          uint64_t minbase, uint64_t maxlimit)
 {
-    // struct ram_alloc_state *state = get_ram_alloc_state();
 	size_t ret_bits;
-	
-	errval_t err = aos_rpc_get_ram_cap( &channel, size_bits, ret, &ret_bits);
+	size_t bits = pow(2,size_bits);
+		
+	errval_t err = aos_rpc_get_ram_cap( get_init_chan() , bits, ret, &ret_bits);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"CAN NOT REQUEST MEMORY FROM MEM SERVER!\n");
 		abort();
@@ -163,10 +164,11 @@ errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
 	return SYS_ERR_OK;
 
 }
-*/
+
 
 #include <stdio.h>
 #include <string.h>
+
 /**
  * \brief Allocates memory in the form of a RAM capability
  *
@@ -247,8 +249,9 @@ errval_t ram_alloc_set(ram_alloc_func_t local_allocator)
         return SYS_ERR_OK;
     }
 
-    struct aos_chan *ic = get_init_chan();
+    struct aos_rpc *ic = get_init_chan();
     assert(ic);
-    ram_alloc_state->ram_alloc_func = ram_alloc_remote;
+	debug_printf("ram_alloc_set: Setting our ram alloc to talk with server!\n");
+    ram_alloc_state->ram_alloc_func = server_ram_alloc;
     return SYS_ERR_OK;
 }

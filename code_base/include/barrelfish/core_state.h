@@ -18,7 +18,6 @@
 #include <k_r_malloc.h>
 #include <barrelfish/paging.h>
 #include <barrelfish/waitset.h>
-#include <barrelfish/aos_rpc.h>
 
 struct morecore_state {
     struct thread_mutex mutex;
@@ -66,7 +65,7 @@ struct octopus_rpc_client;
 struct domain_state;
 struct spawn_state;
 struct monitor_binding;
-struct aos_chan;
+struct aos_rpc;
 struct mem_rpc_client;
 struct spawn_rpc_client;
 struct paging_state;
@@ -74,7 +73,7 @@ struct paging_state;
 struct core_state_generic {
     struct waitset default_waitset;
     struct monitor_binding *monitor_binding;
-    struct aos_chan *init_chan;
+    struct aos_rpc *init_chan;
     struct monitor_blocking_rpc_client *monitor_blocking_rpc_client;
     struct mem_rpc_client *mem_st;
     struct morecore_state morecore_state;

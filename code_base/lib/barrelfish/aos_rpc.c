@@ -22,6 +22,7 @@ static struct capref ram_cap;
 static uint32_t returned_string[9];
 static int received_length;
 static uint32_t client_id = -1;
+ static struct aos_rpc memory_channel;
 
 static void recv_handler(void *arg) 
 {
@@ -234,14 +235,14 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
     return SYS_ERR_OK;
 }
 
-errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
+errval_t aos_rpc_init(int slot_number)
 {
 	errval_t err;
 	
 	struct waitset * ws = get_default_waitset();
 
-	lmp_chan_init(&rpc->init_channel);
-	rpc->init_channel.remote_cap = cap_initep;
+	lmp_chan_init(&memory_channel.init_channel);
+	memory_channel.init_channel.remote_cap = cap_initep;
 	
 	struct capref rem_ep = {
 		.cnode = cnode_task,
@@ -256,10 +257,10 @@ errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 		DEBUG_ERR(err,"Failure in creating client endpoint!\n");
 		abort();
 	}	
-	rpc->rpc_channel.endpoint = ep;
-	rpc->rpc_channel.local_cap = rem_ep;
+	memory_channel.rpc_channel.endpoint = ep;
+	memory_channel.rpc_channel.local_cap = rem_ep;
 
-	err = lmp_chan_alloc_recv_slot(&rpc->rpc_channel);
+	err = lmp_chan_alloc_recv_slot(&memory_channel.rpc_channel);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Error in allocating capability slot in the channel!\n");
 		return LIB_ERR_LMP_ALLOC_RECV_SLOT;
@@ -267,16 +268,16 @@ errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 	
 	struct event_closure rpc_handler_init = {
         .handler = bootstrap_handler,
-        .arg = &rpc->rpc_channel,
+        .arg = &memory_channel.rpc_channel,
     };
 
-	err = lmp_chan_register_recv(&rpc->rpc_channel, ws, rpc_handler_init);
+	err = lmp_chan_register_recv(&memory_channel.rpc_channel, ws, rpc_handler_init);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in registering the channel for bootstrap handler!\n");	
 		return LIB_ERR_CHAN_REGISTER_RECV;
 	}
 	
-	lmp_chan_send0(&rpc->init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep);
+	lmp_chan_send0(&memory_channel.init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in sending our own endpoint to init\n!");
 		return LIB_ERR_LMP_CHAN_SEND;
@@ -287,15 +288,18 @@ errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number)
 	event_dispatch(ws);	
 	
 	debug_printf("Memory server accepted us! Our id = %d\n", client_id);
-	rpc->client_id = client_id;	
+	memory_channel.client_id = client_id;	
 
 	rpc_handler_init.handler = recv_handler;
 	
-	err = lmp_chan_register_recv(&rpc->rpc_channel, ws, rpc_handler_init);
+	err = lmp_chan_register_recv(&memory_channel.rpc_channel, ws, rpc_handler_init);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in registering the channel for recv_handler!\n");	
 		return LIB_ERR_CHAN_REGISTER_RECV;
 	}
+
+
+	set_init_chan(&memory_channel);
 
   	return SYS_ERR_OK;
 }

@@ -174,6 +174,6 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path);
  * \brief Initialize given rpc channel.
  * TODO: you may want to change the inteface of your init function
  */
-errval_t aos_rpc_init(struct aos_rpc *rpc, int slot_number);
+errval_t aos_rpc_init(int slot_number);
 
 #endif // _LIB_BARRELFISH_AOS_MESSAGES_H

@@ -1,5 +1,5 @@
 #include <barrelfish/red_black_tree.h>
-
+#include <barrelfish/debug.h>
 /***********************************************************************/
 /*  FUNCTION:  RBTreeCreate */
 /**/
@@ -709,7 +709,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
                     init_guard = NULL;
                 else {
                     if (chunk->size > bytes) {
-                        printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
+                        debug_printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
                         init_guard = x;
                     }
                     else

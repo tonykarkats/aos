@@ -981,7 +981,7 @@ struct monitor_binding *get_monitor_binding(void)
 /**
  * \brief set the init client binding on the dispatcher priv
  */
-void set_init_chan(struct aos_chan *initchan)
+void set_init_chan(struct aos_rpc *initchan)
 {
     dispatcher_handle_t handle = curdispatcher();
     struct dispatcher_generic* disp = get_dispatcher_generic(handle);
@@ -991,7 +991,7 @@ void set_init_chan(struct aos_chan *initchan)
 /**
  * \brief Returns the monitor client binding on the dispatcher priv
  */
-struct aos_chan *get_init_chan(void)
+struct aos_rpc *get_init_chan(void)
 {
     dispatcher_handle_t handle = curdispatcher();
     struct dispatcher_generic* disp = get_dispatcher_generic(handle);

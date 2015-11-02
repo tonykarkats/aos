@@ -22,9 +22,10 @@
 
 int main(int argc, char *argv[])
 {
-	/*
+	
 	errval_t err;
-	struct aos_rpc test_rpc;
+	
+	/*struct aos_rpc test_rpc;
 
 	err = aos_rpc_init(&test_rpc, TASKCN_SLOT_REMEP);
 	if (err_is_fail(err)) {
@@ -59,8 +60,26 @@ int main(int argc, char *argv[])
 		abort();
 	}
 	*/
+	
+	
+	
+	void *vbuf;
+    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*10));
+    if (err_is_fail(err)) {
+        printf("error in paging_alloc: %s\n", err_getstring(err));
+        abort();
+    }
+
+	char* buf = (char *) vbuf;
+	for (int i = 0 ; i < 10*1024*1024; i++)
+		buf[i] = i;
+
+    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*32));
+	debug_printf("Before while(1)\n");	
+	for (int i = 0 ; i < 5*1024*1024; i++)
+		buf[i] = i;
+
 	while(1);
 
-
-    return 0;
+   return 0;
 }

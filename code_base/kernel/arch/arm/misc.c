@@ -20,7 +20,7 @@
 #include <exec.h>
 #include <misc.h>
 #include <arm_hal.h> // for core_id
-
+#include <barrelfish/debug.h>
 #define DEFAULT_LOGLEVEL        LOG_DEBUG
 #define DEFAULT_SUBSYSTEM_MASK  (~0L)
 

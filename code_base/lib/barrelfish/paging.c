@@ -27,6 +27,10 @@
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 
 static struct paging_state current;
+//static int temp1;
+//static int temp2;
+
+
 
 /**
  * \brief Helper function that allocates a slot and
@@ -64,7 +68,7 @@ errval_t map_page(lvaddr_t vaddr) {
     struct capref l2_table;
 	
     if (!chunk->l2_mapped[l1_index]) {
-	    //printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
+	    debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
 		err = arml2_alloc(&l2_table);
 		if (err_is_fail(err)) {
 			printf("map_page: Error in allocating cab for l2 table!\n");
@@ -72,7 +76,9 @@ errval_t map_page(lvaddr_t vaddr) {
 		
 		}
 
+		debug_printf("map_page: Before VNODE map!\n");
     	err = vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
+		debug_printf("map_page: After VNODE map!\n");
 		if (err_is_fail(err)) {
 			printf("map_page: Error in maping l2 table!\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -85,7 +91,7 @@ errval_t map_page(lvaddr_t vaddr) {
 	}
 
 	if (chunk->current_frame_used == -1) {
-		// printf("Allocating our first large frame!\n");		
+		printf("map_page: Allocating our first large frame!\n");		
         chunk->current_frame_used = 0;
 		if (chunk->total_frames_needed == 1)
 			err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
@@ -119,7 +125,7 @@ errval_t map_page(lvaddr_t vaddr) {
 	   //	printf("Total fr needed = %d . Current frame = %d . Size of last frame = %d\n",chunk->total_frames_needed,chunk->current_frame_used,chunk->size_of_last_frame);
 			used_frame++;
 			if (used_frame == (chunk->total_frames_needed -1)) {
-		//		printf("Allocating the LAST frame!\n");		
+				debug_printf("map_page: Allocating the LAST frame!\n");		
 		//		printf("Allocating huge frame with %d bytes\n", chunk->size_of_last_frame);
 				err = get_frame(chunk->size_of_last_frame, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
@@ -432,6 +438,7 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
                                size_t bytes, struct capref frame,
                                int flags, void *arg1, void *arg2)
 {
+	debug_printf("paging_map_frame_attr: Initiating...\n");
     errval_t err = paging_alloc(st, buf, bytes);
     if (err_is_fail(err)) {
         return err;
@@ -446,8 +453,19 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
 errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
         struct capref frame, size_t bytes, int flags)
 {
-    // TODO: you will need this functionality in later assignments. Try to
+	debug_printf("paging_map_fixed_attr: Initiating...\n");
+    //int l1_index = ARM_L1_USER_OFFSET(vaddr);
+    //int l2_index = ARM_L2_USER_OFFSET(vaddr);
+
+ 	//rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
+	
+
+
+	// TODO: you will need this functionality in later assignments. Try to
     // keep this in mind when designing your self-paging system.
+
+		
+
     return SYS_ERR_OK;
 }
 

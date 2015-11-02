@@ -20,7 +20,7 @@ import Data.List
 -- update this variable to change behaviour of the provided code depending on
 -- which milestone you're working on.
 milestone :: Integer
-milestone = 2
+milestone = 3
 
 -- path to source and install directories; these are automatically set by hake.sh at setup time 
 source_dir :: String
