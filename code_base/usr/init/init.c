@@ -57,54 +57,58 @@ static void recv_handler(void *arg)
 	int message_length = msg.buf.msglen;
 	debug_printf("recv_handler: Received length = %d\n", message_length);	
 	
-	//for (int i=0 ; i<message_length; i++) 
-	//	debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
-	
-	char message_string[msg.buf.msglen * 4];
-	for (int i = 0; i<message_length; i++){
-		uint32_t * word = (uint32_t *) (message_string + i*4);
-		*word = msg.words[i];   
-	}	
-	
-	if (message_length != 0) 
-		debug_printf("recv_handler: String received : %s\n", message_string);
-	
-	// Bootstraping ...
-	if (message_length == 0) {
-		if (capref_is_null(cap)) 
-			debug_printf("recv_handler: Client did not provided us a valid endpoint!\n");
-		else {
-			debug_printf("recv_handler: Will register client with client id = %d and slot in cap = %d\n", next_client, cap.slot);
-			lmp_chan_init(client_channels + next_client);
-			client_channels[next_client].remote_cap = cap;
-			client_limits[next_client] = 0;
-			lmp_chan_send1(client_channels + next_client , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, next_client);
-			next_client++;
-		}
-	}
-	else {	
-		// Requesting memory
-		uint32_t client_id = msg.words[0];
-		struct lmp_chan client_channel = client_channels[client_id];
-		size_t size_requested = msg.words[1];	
-		struct capref returned_cap;
-		
-		if (pow(2,size_requested) + client_limits[client_id] > CLIENT_LIMIT) {
-			debug_printf("recv_handle: Client with id =%d exceeded its available limit!\n", client_id);		
-			returned_cap = NULL_CAP;			
-		}
-		else {
-			err = ram_alloc(&returned_cap, size_requested); 
-			if (err_is_fail(err)) {
-				returned_cap = NULL_CAP;	
-			}
-		}
-		
-		err = lmp_chan_send0(&client_channel, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
-	    if (err_is_fail(err))
-			DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
-	}
+//	for (int i=0 ; i<message_length; i++) 
+//		debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
 
+	//Make Sure that a valid operation was requested
+	assert(message_length != 0);
+	
+	int string_length = message_length - 1;
+	char message_string[string_length * 4];
+
+	switch (msg.words[0]) {
+		case 0: // Connect
+			if (capref_is_null(cap)) 
+				debug_printf("recv_handler: Client did not provided us a valid endpoint!\n");
+			else {
+				debug_printf("recv_handler: Will register client with client id = %d and slot in cap = %d\n", next_client, cap.slot);
+				lmp_chan_init(client_channels + next_client);
+				client_channels[next_client].remote_cap = cap;
+				client_limits[next_client] = 0;
+				lmp_chan_send1(client_channels + next_client , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, next_client);
+				next_client++;
+				}
+			break;
+		case 1: ; // Send String
+			for (int i = 0; i<string_length; i++){
+				uint32_t * word = (uint32_t *) (message_string + i*4);
+				*word = msg.words[i+1];   
+			}	
+			debug_printf("recv_handler: String received : %s\n", message_string);
+			break;
+		case 2: ;// Request Ram Capability
+			uint32_t client_id = msg.words[1];
+			struct lmp_chan client_channel = client_channels[client_id];
+			size_t size_requested = msg.words[2];	
+			struct capref returned_cap;
+		
+			if (pow(2,size_requested) + client_limits[client_id] > CLIENT_LIMIT) {
+				debug_printf("recv_handle: Client with id =%d exceeded its available limit!\n", client_id);		
+				returned_cap = NULL_CAP;			
+			}
+			else {
+				err = ram_alloc(&returned_cap, size_requested); 
+				if (err_is_fail(err)) {
+					returned_cap = NULL_CAP;	
+				}
+			}
+			
+			err = lmp_chan_send0(&client_channel, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
+		    if (err_is_fail(err))
+				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
+			break;
+	}
+	
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));
 	

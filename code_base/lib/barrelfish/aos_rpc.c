@@ -88,17 +88,21 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 
 	// Check length of user string in a safe manner
 	int i;
-	for (i=0; i < 38; i++)
+	for (i=0; i < 34; i++)
 		if (string[i] == '\0')
 			break;
 
-	if (i == 38) 
+	if (i == 34) 
 		return AOS_ERR_LMP_SEND_FAILURE;
-		
-	memcpy(buffer, string, strlen(string)+1);
+	
+	buffer[0] = AOS_RPC_SEND_STRING;	
+	memcpy(buffer + 1, string, strlen(string)+1);
+
+//	for (int t=0; t<9; t++)
+//		debug_printf("buf[%d] = 0x%lx\n",  t, buffer[t]);
 	
 	err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
-				  buffer[0], buffer[1],buffer[2],
+				  buffer[0] , buffer[1],buffer[2],
 				  buffer[3], buffer[4],buffer[5],
 				  buffer[6], buffer[7],buffer[8]);
 	if (err_is_fail(err)) {
@@ -119,7 +123,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 	
 	size_t alloc_bits = log2ceil(request_bits);
 	
-	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, chan->client_id, alloc_bits);	
+	err = lmp_chan_send3(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_RAM_CAP, chan->client_id, alloc_bits);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
@@ -244,6 +248,8 @@ errval_t aos_rpc_init(int slot_number)
 	lmp_chan_init(&memory_channel.init_channel);
 	memory_channel.init_channel.remote_cap = cap_initep;
 	
+	
+
 	struct capref rem_ep = {
 		.cnode = cnode_task,
 		.slot = slot_number
@@ -277,7 +283,7 @@ errval_t aos_rpc_init(int slot_number)
 		return LIB_ERR_CHAN_REGISTER_RECV;
 	}
 	
-	lmp_chan_send0(&memory_channel.init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep);
+	lmp_chan_send1(&memory_channel.init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep, (uint32_t)AOS_RPC_CONNECT);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in sending our own endpoint to init\n!");
 		return LIB_ERR_LMP_CHAN_SEND;

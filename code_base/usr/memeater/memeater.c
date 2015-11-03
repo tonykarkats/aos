@@ -24,24 +24,25 @@ int main(int argc, char *argv[])
 {
 	
 	errval_t err;
-	
-	/*struct aos_rpc test_rpc;
-
-	err = aos_rpc_init(&test_rpc, TASKCN_SLOT_REMEP);
+//	
+	struct aos_rpc *test_rpc = get_init_chan();
+	err = aos_rpc_send_string(test_rpc, "Hello"); 	
 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Rpc init fail!\n");
+		DEBUG_ERR(err, "Failure in sending string!!\n");
 		abort();
 	}
-	
+
+
 	struct capref returned_cap;
 	size_t ret_bits;
 
-	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
+	err = aos_rpc_get_ram_cap(test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failure in memory allocation!\n");
 		abort();
 	}
 	
+/*	
 	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failure in memory allocation!\n");
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
 		DEBUG_ERR(err, "Failure in memory allocation!\n");
 		abort();
 	}
-	*/
+	
 	
 	
 	
@@ -75,9 +76,10 @@ int main(int argc, char *argv[])
 		buf[i] = i;
 
     err = paging_alloc(get_current_paging_state(), &vbuf, (1024*32));
+*/
 	debug_printf("Before while(1)\n");	
-	for (int i = 0 ; i < 5*1024*1024; i++)
-		buf[i] = i;
+//	for (int i = 0 ; i < 5*1024*1024; i++)
+//		buf[i] = i;
 
 	while(1);
 
