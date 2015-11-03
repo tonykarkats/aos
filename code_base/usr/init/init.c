@@ -33,21 +33,22 @@
 
 
 static uint32_t next_client = 0;
-static struct lmp_chan client_channels[2048];
+//static struct lmp_chan client_channels[2048];
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
-static size_t client_limits[2048];
+static size_t client_limit;
 
 static void recv_handler(void *arg) 
 {
-	debug_printf("recv_handler: Got a message!\n");
 		
 	errval_t err;
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
 	
+	debug_printf("recv_handler: Got a message!!\n");
+
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
 		lmp_chan_register_recv(lc,get_default_waitset(),
@@ -72,10 +73,11 @@ static void recv_handler(void *arg)
 				debug_printf("recv_handler: Client did not provided us a valid endpoint!\n");
 			else {
 				debug_printf("recv_handler: Will register client with client id = %d and slot in cap = %d\n", next_client, cap.slot);
-				lmp_chan_init(client_channels + next_client);
-				client_channels[next_client].remote_cap = cap;
-				client_limits[next_client] = 0;
-				lmp_chan_send1(client_channels + next_client , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, next_client);
+				//lmp_chan_init(client_channels + next_client);
+				//client_channels[next_client].remote_cap = cap;
+				lc->remote_cap = cap;
+				client_limit = 0;
+				lmp_chan_send0(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
 				next_client++;
 				}
 			break;
@@ -87,13 +89,13 @@ static void recv_handler(void *arg)
 			debug_printf("recv_handler: String received : %s\n", message_string);
 			break;
 		case 2: ;// Request Ram Capability
-			uint32_t client_id = msg.words[1];
-			struct lmp_chan client_channel = client_channels[client_id];
-			size_t size_requested = msg.words[2];	
+			//uint32_t client_id = msg.words[1];
+			//struct lmp_chan client_channel = client_channels[client_id];
+			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 		
-			if (pow(2,size_requested) + client_limits[client_id] > CLIENT_LIMIT) {
-				debug_printf("recv_handle: Client with id =%d exceeded its available limit!\n", client_id);		
+			if (pow(2,size_requested) + client_limit > CLIENT_LIMIT) {
+				debug_printf("recv_handle: Client with exceeded its available limit!\n");		
 				returned_cap = NULL_CAP;			
 			}
 			else {
@@ -101,9 +103,10 @@ static void recv_handler(void *arg)
 				if (err_is_fail(err)) {
 					returned_cap = NULL_CAP;	
 				}
+				client_limit += size_requested;
 			}
 			
-			err = lmp_chan_send0(&client_channel, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 			break;

@@ -21,8 +21,8 @@
 static struct capref ram_cap;
 static uint32_t returned_string[9];
 static int received_length;
-static uint32_t client_id = -1;
- static struct aos_rpc memory_channel;
+//static uint32_t client_id = -1;
+static struct aos_rpc memory_channel;
 
 static void recv_handler(void *arg) 
 {
@@ -56,7 +56,7 @@ static void recv_handler(void *arg)
 
 static void bootstrap_handler(void *arg) 
 {
-	debug_printf("recv_handler: Got my client_id!\n");
+	debug_printf("recv_handler: I initialized the connection to the server!\n");
 	errval_t err;
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
@@ -68,15 +68,15 @@ static void bootstrap_handler(void *arg)
 							MKCLOSURE(recv_handler, arg));
 	}
 	
-	debug_printf("msg buflen %zu\n", msg.buf.msglen);
+	//debug_printf("msg buflen %zu\n", msg.buf.msglen);
 	
-	received_length = msg.buf.msglen;
+	//received_length = msg.buf.msglen;
 	
-	assert(received_length == 1);
+	//assert(received_length == 1);
 	
-	debug_printf("My client_id = %d!\n", msg.words[0]);
+	//debug_printf("My client_id = %d!\n", msg.words[0]);
 
-	client_id = msg.words[0];
+	//client_id = msg.words[0];
 
 }
 
@@ -123,7 +123,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 	
 	size_t alloc_bits = log2ceil(request_bits);
 	
-	err = lmp_chan_send3(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_RAM_CAP, chan->client_id, alloc_bits);	
+	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_RAM_CAP, alloc_bits);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
@@ -293,8 +293,8 @@ errval_t aos_rpc_init(int slot_number)
  
 	event_dispatch(ws);	
 	
-	debug_printf("Memory server accepted us! Our id = %d\n", client_id);
-	memory_channel.client_id = client_id;	
+	debug_printf("Memory server accepted us!\n");
+//	memory_channel.client_id = client_id;	
 
 	rpc_handler_init.handler = recv_handler;
 	
