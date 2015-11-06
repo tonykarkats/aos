@@ -227,6 +227,9 @@ ANSI	lib/oldc/src/gdtoa/gdtoa.h	50;"	d
 ANSI	lib/oldc/src/gdtoa/gdtoa.h	53;"	d
 ANSIC	lib/newlib/newlib/libc/machine/powerpc/simdldtoa.c	371;"	d	file:
 ANSIC	lib/newlib/newlib/libc/stdlib/ldtoa.c	377;"	d	file:
+AOS_RPC_CONNECT	include/barrelfish/aos_rpc.h	35;"	d
+AOS_RPC_GET_RAM_CAP	include/barrelfish/aos_rpc.h	37;"	d
+AOS_RPC_SEND_STRING	include/barrelfish/aos_rpc.h	36;"	d
 API_EVENT	include/lwip/api.h	163;"	d
 API_LIB_DEBUG	include/lwip/opt.h	1614;"	d
 API_MSG_DEBUG	include/lwip/opt.h	1621;"	d
@@ -7288,7 +7291,7 @@ MAXINT	kernel/printf.c	218;"	d	file:
 MAXINTERP	include/sys/param.h	50;"	d
 MAXLINELEN	lib/newlib/newlib/libc/posix/wordexp.c	24;"	d	file:
 MAXLOGNAME	include/sys/param.h	51;"	d
-MAXNAMELEN	include/barrelfish/aos_rpc.h	105;"	d
+MAXNAMELEN	include/barrelfish/aos_rpc.h	112;"	d
 MAXNAMELEN	include/lwip/opt.h	1515;"	d
 MAXNAMLEN	include/oldc/dirent.h	9;"	d
 MAXNAMLEN	lib/newlib/newlib/libc/include/dirent.h	9;"	d
@@ -8627,7 +8630,7 @@ OBACK_	lib/newlib/newlib/libc/posix/regex2.h	95;"	d
 OBJBITS_CTE	include/barrelfish_kpi/capabilities.h	21;"	d
 OBJBITS_DISPATCHER	include/barrelfish_kpi/capabilities.h	24;"	d
 OBJS	lib/barrelfish/Makefile	/^OBJS = red_black_tree.o stack.o test_red_black_tree.o misc.o$/;"	m
-OBJSPERPAGE_CTE	lib/barrelfish/ram_alloc.c	131;"	d	file:
+OBJSPERPAGE_CTE	lib/barrelfish/ram_alloc.c	132;"	d	file:
 OBOL	lib/newlib/newlib/libc/posix/regex2.h	91;"	d
 OBOW	lib/newlib/newlib/libc/posix/regex2.h	107;"	d
 OCHAR	lib/newlib/newlib/libc/posix/regex2.h	90;"	d
@@ -22571,7 +22574,6 @@ clearerr	lib/newlib/newlib/libc/include/stdio.h	653;"	d
 clearerr	lib/newlib/newlib/libc/stdio/clearerr.c	61;"	d	file:
 clearerr	lib/oldc/src/clearerr.c	/^clearerr(FILE *stream)$/;"	f
 clflush	include/arch/x86/barrelfish_kpi/asm_inlines_arch.h	/^static inline void clflush(void *line)$/;"	f
-client_channels	usr/init/init.c	/^static struct lmp_chan client_channels[2048];$/;"	v	typeref:struct:lmp_chan	file:
 client_closure	include/net_queue_manager/net_queue_manager.h	/^struct client_closure {$/;"	s
 client_closure_FM	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^struct client_closure_FM {$/;"	s	file:
 client_closure_NC	lib/lwip/src/barrelfish/idc_barrelfish.h	/^struct client_closure_NC {$/;"	s
@@ -22580,8 +22582,7 @@ client_connected	lib/barrelfish/domain.c	/^static void client_connected(void *st
 client_data	include/procon/procon.h	/^    volatile uint64_t client_data;$/;"	m	struct:slot_data
 client_handler	include/octopus_server/service.h	/^    uint64_t client_handler;$/;"	m	struct:oct_reply_state
 client_id	include/barrelfish/aos_rpc.h	/^	uint32_t client_id;$/;"	m	struct:aos_rpc
-client_id	lib/barrelfish/aos_rpc.c	/^static uint32_t client_id = -1;$/;"	v	file:
-client_limits	usr/init/init.c	/^static size_t client_limits[2048];$/;"	v	file:
+client_limit	usr/init/init.c	/^static size_t client_limit;$/;"	v	file:
 client_no	lib/net_queue_manager/queue_manager.c	/^static int client_no = 0;  \/\/ number of clients(apps) connected$/;"	v	file:
 client_state	include/octopus_server/service.h	/^    uint64_t client_state;$/;"	m	struct:oct_reply_state
 clkgen_cm2	usr/mmchs_driver/cm2.c	/^static omap44xx_ckgen_cm2_t clkgen_cm2;$/;"	v	file:
@@ -30496,7 +30497,7 @@ memory_bits	include/target/arm/barrelfish_kpi/arm_core_data.h	/^    uint8_t memo
 memory_bits	include/target/x86/barrelfish_kpi/coredata_target.h	/^    uint8_t memory_bits;$/;"	m	struct:x86_core_data
 memory_bits	kernel/include/arch/armv7/arm_core_data.h	/^    uint8_t memory_bits;$/;"	m	struct:arm_core_data
 memory_buffer	lib/barrelfish/misc.c	/^static char memory_buffer[BUFFER_SIZE];$/;"	v	file:
-memory_channel	lib/barrelfish/aos_rpc.c	/^ static struct aos_rpc memory_channel;$/;"	v	typeref:struct:aos_rpc	file:
+memory_channel	lib/barrelfish/aos_rpc.c	/^static struct aos_rpc memory_channel;$/;"	v	typeref:struct:aos_rpc	file:
 memory_chunk	include/barrelfish/red_black_tree.h	/^typedef struct memory_chunk {$/;"	s
 memory_chunk	include/barrelfish/red_black_tree.h	/^} memory_chunk;$/;"	t	typeref:struct:memory_chunk
 memory_chunk	lib/barrelfish/red_black_tree.h	/^typedef struct memory_chunk {$/;"	s
@@ -34567,7 +34568,6 @@ ram_alloc_func	include/barrelfish/core_state.h	/^    ram_alloc_func_t ram_alloc_
 ram_alloc_func_t	include/barrelfish/ram_alloc.h	/^typedef errval_t (* ram_alloc_func_t)(struct capref *ret, uint8_t size_bits,$/;"	t
 ram_alloc_init	lib/barrelfish/ram_alloc.c	/^void ram_alloc_init(void)$/;"	f
 ram_alloc_lock	include/barrelfish/core_state.h	/^    struct thread_mutex ram_alloc_lock;$/;"	m	struct:ram_alloc_state	typeref:struct:ram_alloc_state::thread_mutex
-ram_alloc_remote	lib/barrelfish/ram_alloc.c	/^static errval_t ram_alloc_remote(struct capref *ret, uint8_t size_bits,$/;"	f	file:
 ram_alloc_set	lib/barrelfish/ram_alloc.c	/^errval_t ram_alloc_set(ram_alloc_func_t local_allocator)$/;"	f
 ram_alloc_state	include/barrelfish/core_state.h	/^    struct ram_alloc_state ram_alloc_state;$/;"	m	struct:core_state_generic	typeref:struct:core_state_generic::ram_alloc_state
 ram_alloc_state	include/barrelfish/core_state.h	/^struct ram_alloc_state {$/;"	s

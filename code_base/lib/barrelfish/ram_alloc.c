@@ -153,9 +153,8 @@ errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
                          uint64_t minbase, uint64_t maxlimit)
 {
 	size_t ret_bits;
-	size_t bits = pow(2,size_bits);
 		
-	errval_t err = aos_rpc_get_ram_cap( get_init_chan() , bits, ret, &ret_bits);
+	errval_t err = aos_rpc_get_ram_cap( get_init_chan() , size_bits, ret, &ret_bits);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"CAN NOT REQUEST MEMORY FROM MEM SERVER!\n");
 		abort();

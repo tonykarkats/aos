@@ -47,7 +47,7 @@ typedef int paging_flags_t;
 #define VREGION_FLAGS_READ_WRITE_MPB \
     (VREGION_FLAGS_READ | VREGION_FLAGS_WRITE | VREGION_FLAGS_MPB)
 
-errval_t map_page(lvaddr_t vaddr); 
+errval_t map_page(lvaddr_t vaddr, struct capref); 
 void handle_fault(lvaddr_t vaddr);
 errval_t get_frame(size_t, struct capref*);
 // struct to store the paging status of a process

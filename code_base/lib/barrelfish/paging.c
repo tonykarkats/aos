@@ -53,7 +53,7 @@ static errval_t arml2_alloc(struct capref *ret)
     return SYS_ERR_OK;
 }
 
-errval_t map_page(lvaddr_t vaddr) {
+errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 	
 	errval_t err;
     int l1_index = ARM_L1_USER_OFFSET(vaddr);
@@ -66,7 +66,8 @@ errval_t map_page(lvaddr_t vaddr) {
 	memory_chunk* chunk = (memory_chunk*) node->info; 
  
     struct capref l2_table;
-	
+
+	debug_printf("map_page: Mapping address %p\n", vaddr);	
     if (!chunk->l2_mapped[l1_index]) {
 	    debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
 		err = arml2_alloc(&l2_table);
@@ -185,7 +186,7 @@ static void exception_handler(enum exception_type type,
 		} 
 		else { 
 			//printf("Address is mapped!\n");
-			errval_t err = map_page((lvaddr_t) addr);
+			errval_t err = map_page((lvaddr_t) addr, NULL_CAP);
  			if (err_is_fail(err)) {
 				printf("exception_handler: Error in map_page!\n");
 				abort();

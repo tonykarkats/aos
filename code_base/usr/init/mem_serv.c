@@ -32,7 +32,7 @@ size_t mem_total = 0, mem_avail = 0;
 #define NCNODES         (1UL << CNODE_BITS)     ///< Maximum number of CNodes
 
 /// Watermark at which we must refill the slab allocator used for nodes
-#define MINSPARENODES   (MAXDEPTH * 9) // XXX: FIXME: experimentally determined!
+#define MINSPARENODES   (MAXDEPTH * 13) // XXX: FIXME: experimentally determined!
 
 /// General-purpose slot allocator
 static struct multi_slot_allocator msa;

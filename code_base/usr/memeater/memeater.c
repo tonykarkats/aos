@@ -24,60 +24,25 @@ int main(int argc, char *argv[])
 {
 	
 	errval_t err;
-//	
+	
 	struct aos_rpc *test_rpc = get_init_chan();
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failure in sending string!!\n");
 		abort();
 	}
-
-
-	struct capref returned_cap;
-	size_t ret_bits;
-
-	err = aos_rpc_get_ram_cap(test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failure in memory allocation!\n");
-		abort();
-	}
-	
-/*	
-	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024, &returned_cap, &ret_bits); 	
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failure in memory allocation!\n");
-		abort();
-	}
-
-	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024*3, &returned_cap, &ret_bits); 	
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failure in memory allocation!\n");
-		abort();
-	}
-
-	err = aos_rpc_get_ram_cap( &test_rpc, 1024*1024*1/2, &returned_cap, &ret_bits); 	
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failure in memory allocation!\n");
-		abort();
-	}
-	
-	
-	
 	
 	void *vbuf;
-    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*10));
+    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*5));
     if (err_is_fail(err)) {
         printf("error in paging_alloc: %s\n", err_getstring(err));
         abort();
     }
 
 	char* buf = (char *) vbuf;
-	for (int i = 0 ; i < 10*1024*1024; i++)
+	for (int i = 0 ; i < 1024*1024*10; i++)
 		buf[i] = i;
 
-    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*32));
-*/
-	debug_printf("Before while(1)\n");	
 //	for (int i = 0 ; i < 5*1024*1024; i++)
 //		buf[i] = i;
 

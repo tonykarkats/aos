@@ -32,15 +32,12 @@
 
 /* Defined here are the operation ids for the different RPC calls */
 
-#define AOS_RPC_CONNECT      0
 #define AOS_RPC_SEND_STRING  1
 #define AOS_RPC_GET_RAM_CAP  2
 
 struct aos_rpc {
 	struct lmp_chan init_channel;    
 	struct lmp_chan rpc_channel;
-
-	uint32_t client_id;
 };
 
 /**

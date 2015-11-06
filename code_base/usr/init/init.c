@@ -21,6 +21,7 @@
 #include <barrelfish/lmp_chan.h>
 #include <barrelfish/sys_debug.h>
 #include <math.h>
+#include <barrelfish/aos_rpc.h>
 #define UNUSED(x) (x) = (x)
 
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -31,13 +32,9 @@
 #define FIRSTEP_OFFSET          (33472u + 56u)
 #define CLIENT_LIMIT 			(1<<26)*10			
 
-
-static uint32_t next_client = 0;
-//static struct lmp_chan client_channels[2048];
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
-static size_t client_limit;
 
 static void recv_handler(void *arg) 
 {
@@ -46,8 +43,8 @@ static void recv_handler(void *arg)
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
-	
-	debug_printf("recv_handler: Got a message!!\n");
+
+	debug_printf("recv_handler: Got a message from channel with local_ep = %d , remote_ep = %d\n", lc->local_cap.slot, lc->remote_cap.slot);
 
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
@@ -60,65 +57,48 @@ static void recv_handler(void *arg)
 	
 //	for (int i=0 ; i<message_length; i++) 
 //		debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
-
-	//Make Sure that a valid operation was requested
-	assert(message_length != 0);
 	
 	int string_length = message_length - 1;
 	char message_string[string_length * 4];
+		
+	uint32_t rpc_operation = msg.words[0];
+	assert(message_length != 0);
+	
+	if (!capref_is_null(cap))
+		lc->remote_cap = cap;  
 
-	switch (msg.words[0]) {
-		case 0: // Connect
-			if (capref_is_null(cap)) 
-				debug_printf("recv_handler: Client did not provided us a valid endpoint!\n");
-			else {
-				debug_printf("recv_handler: Will register client with client id = %d and slot in cap = %d\n", next_client, cap.slot);
-				//lmp_chan_init(client_channels + next_client);
-				//client_channels[next_client].remote_cap = cap;
-				lc->remote_cap = cap;
-				client_limit = 0;
-				lmp_chan_send0(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
-				next_client++;
-				}
-			break;
-		case 1: ; // Send String
+	switch (rpc_operation) {
+		case AOS_RPC_SEND_STRING: ; // Send String
 			for (int i = 0; i<string_length; i++){
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
 			debug_printf("recv_handler: String received : %s\n", message_string);
 			break;
-		case 2: ;// Request Ram Capability
-			//uint32_t client_id = msg.words[1];
-			//struct lmp_chan client_channel = client_channels[client_id];
+		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
+			
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
-		
-			if (pow(2,size_requested) + client_limit > CLIENT_LIMIT) {
-				debug_printf("recv_handle: Client with exceeded its available limit!\n");		
-				returned_cap = NULL_CAP;			
-			}
-			else {
-				err = ram_alloc(&returned_cap, size_requested); 
-				if (err_is_fail(err)) {
-					returned_cap = NULL_CAP;	
-				}
-				client_limit += size_requested;
-			}
 			
+			err = ram_alloc(&returned_cap, size_requested); 
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
+				returned_cap = NULL_CAP;	
+			}
+				
 			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 			break;
 	}
 	
-	lmp_chan_register_recv(lc, get_default_waitset(),
-			MKCLOSURE(recv_handler, arg));
-	
 	err = lmp_chan_alloc_recv_slot(lc);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
 	}	
+
+	lmp_chan_register_recv(lc, get_default_waitset(),
+			MKCLOSURE(recv_handler, arg));
 }
 
 
