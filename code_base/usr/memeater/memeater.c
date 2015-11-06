@@ -33,14 +33,14 @@ int main(int argc, char *argv[])
 	}
 	
 	void *vbuf;
-    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*5));
+    err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*800));
     if (err_is_fail(err)) {
         printf("error in paging_alloc: %s\n", err_getstring(err));
         abort();
     }
 
 	char* buf = (char *) vbuf;
-	for (int i = 0 ; i < 1024*1024*10; i++)
+	for (int i = 0 ; i < 1024*1024*512; i++)
 		buf[i] = i;
 
 //	for (int i = 0 ; i < 5*1024*1024; i++)

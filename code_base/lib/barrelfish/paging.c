@@ -27,10 +27,6 @@
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 
 static struct paging_state current;
-//static int temp1;
-//static int temp2;
-
-
 
 /**
  * \brief Helper function that allocates a slot and
@@ -40,6 +36,7 @@ __attribute__((unused))
 static errval_t arml2_alloc(struct capref *ret)
 {
     errval_t err;
+
     err = slot_alloc(ret);
     if (err_is_fail(err)) {
         debug_printf("slot_alloc failed: %s\n", err_getstring(err));
@@ -53,45 +50,79 @@ static errval_t arml2_alloc(struct capref *ret)
     return SYS_ERR_OK;
 }
 
-errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
+struct capref get_l2_table(lvaddr_t vaddr){
+
+	int l1_index = ARM_L1_USER_OFFSET(vaddr);
+	return current.mem_tree->l2_tables[l1_index];
+}
+
+bool is_l2_mapped(lvaddr_t vaddr) {
 	
+	int l1_index = ARM_L1_USER_OFFSET(vaddr);
+	return current.mem_tree->l2_maps[l1_index];	
+}
+
+errval_t map_l2 (lvaddr_t vaddr){
+
 	errval_t err;
     int l1_index = ARM_L1_USER_OFFSET(vaddr);
-    int l2_index = ARM_L2_USER_OFFSET(vaddr);
+	struct capref l2_table;
     struct capref l1_table = (struct capref) {
         .cnode = cnode_page,
         .slot = 0,
     };
-    rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
+   
+	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
+
+	err = arml2_alloc(&l2_table);
+	if (err_is_fail(err)) {
+		printf("map_l2: Error in allocating cab for l2 table!\n");
+		return err_push(err, LIB_ERR_VNODE_MAP);
+	}
+
+   	err = vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
+	if (err_is_fail(err)) {
+		printf("map_page: Error in maping l2 table!\n");
+		return err_push(err, LIB_ERR_VNODE_MAP);
+	}
+	
+	current.mem_tree->l2_maps[l1_index] = true;
+ 	current.mem_tree->l2_tables[l1_index] = l2_table;	 
+
+	return SYS_ERR_OK;
+}
+
+errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
+	
+	errval_t err;
+	int l2_index = ARM_L2_USER_OFFSET(vaddr);
+    
+	rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
 	memory_chunk* chunk = (memory_chunk*) node->info; 
  
-    struct capref l2_table;
-
-	debug_printf("map_page: Mapping address %p\n", vaddr);	
-    if (!chunk->l2_mapped[l1_index]) {
-	    debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
-		err = arml2_alloc(&l2_table);
+    if (!is_l2_mapped(vaddr)) {
+		debug_printf("MAPPING L2!\n");
+		err = map_l2(vaddr);
 		if (err_is_fail(err)) {
-			printf("map_page: Error in allocating cab for l2 table!\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
+		}
+	}
+
+	struct capref l2_table = get_l2_table(vaddr);
+
+	if (!capref_is_null(usercap)) {
+		debug_printf("User provided us with a frame!\n");
+		chunk->current_frame_used = 0;
+		//if (chunk->total_frames_needed == 1)
+		err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
 		
-		}
-
-		debug_printf("map_page: Before VNODE map!\n");
-    	err = vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
-		debug_printf("map_page: After VNODE map!\n");
 		if (err_is_fail(err)) {
-			printf("map_page: Error in maping l2 table!\n");
-			return err_push(err, LIB_ERR_VNODE_MAP);
+			printf("map_page: Error in getting the very first frame of the region!\n");
+			return err_push(err, LIB_ERR_FRAME_ALLOC);
 		}
-		chunk->l2_mapped[l1_index] = true;    
-		chunk->l2_table_cap[l1_index] = l2_table; 
+		//abort();
 	}
-	else {
-		l2_table = chunk->l2_table_cap[l1_index];
-	}
-
-	if (chunk->current_frame_used == -1) {
+	else if (chunk->current_frame_used == -1) {
 		printf("map_page: Allocating our first large frame!\n");		
         chunk->current_frame_used = 0;
 		if (chunk->total_frames_needed == 1)
@@ -209,10 +240,13 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
     rb_red_blk_tree* tree;
 
     printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
-    //printf("At start only one chunk with the whole available memory exists\n");
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
+	for (int i = 0 ; i < 4096; i++) {
+		tree->l2_maps[i] = false;
+		tree->l2_tables[i] = NULL_CAP;
+	}
     //printf("Before first SafeMalloc\n");
     newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
     //newAddr = &vaddr_start;
@@ -422,8 +456,8 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * frames_needed);	
 	}
 
-	for (int i = 0; i<4096; i++)
-		chunk->l2_mapped[i] = false;
+	//for (int i = 0; i<4096; i++)
+	//	chunk->l2_mapped[i] = false;
 
 		
 	*buf = (void *)vaddr;
@@ -454,18 +488,10 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
 errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
         struct capref frame, size_t bytes, int flags)
 {
+	errval_t err;
 	debug_printf("paging_map_fixed_attr: Initiating...\n");
-    //int l1_index = ARM_L1_USER_OFFSET(vaddr);
-    //int l2_index = ARM_L2_USER_OFFSET(vaddr);
 
- 	//rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
-	
-
-
-	// TODO: you will need this functionality in later assignments. Try to
-    // keep this in mind when designing your self-paging system.
-
-		
+	err = map_page(vaddr, frame);
 
     return SYS_ERR_OK;
 }

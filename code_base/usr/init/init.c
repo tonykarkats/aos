@@ -92,10 +92,13 @@ static void recv_handler(void *arg)
 			break;
 	}
 	
-	err = lmp_chan_alloc_recv_slot(lc);
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
-	}	
+	
+	if (!capref_is_null(cap)) {
+		err = lmp_chan_alloc_recv_slot(lc);
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
+		}	
+	}
 
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));

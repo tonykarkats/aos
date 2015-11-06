@@ -34,12 +34,6 @@ typedef struct memory_chunk {
     int size_of_last_frame;
     struct capref* frame_caps_for_region;
 
-    bool l2_mapped[4096]; 
-	struct capref l2_table_cap[4096];
-	
-    
-
-
 } memory_chunk;
 
 /* Our paging state struct is a Red-Black tree whose nodes represent the
@@ -80,6 +74,9 @@ typedef struct rb_red_blk_tree {
   /*  that the root and nil nodes do not require special cases in the code */
   rb_red_blk_node* root;             
   rb_red_blk_node* nil;              
+
+  struct capref l2_tables[4096];
+  bool l2_maps[4096];
 } rb_red_blk_tree;
 
 /* The functions below are described in the .c file */ 

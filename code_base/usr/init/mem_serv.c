@@ -58,8 +58,11 @@ static errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minba
     /* refill slab allocator if needed */
     size_t freecount = slab_freecount(&mm_ram.slabs);
     while (!refilling && (freecount <= MINSPARENODES)) {
+	
 		debug_printf("memeserv_alloc: Need to refill..\n");
-        refilling = true;
+    
+		//abort();
+	    refilling = true;
         struct capref frame;
         err = msa.a.alloc(&msa.a, &frame);
         assert(err_is_ok(err));

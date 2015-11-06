@@ -56,7 +56,9 @@ typedef struct rb_red_blk_tree {
   /*  parent and no key or info.  The point of using these sentinels is so */
   /*  that the root and nil nodes do not require special cases in the code */
   rb_red_blk_node* root;             
-  rb_red_blk_node* nil;              
+  rb_red_blk_node* nil;      
+  int l2_mapped[4096];
+        
 } rb_red_blk_tree;
 
 rb_red_blk_tree* RBTreeCreate(int  (*CompFunc)(const void*, const void*),
