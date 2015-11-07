@@ -702,8 +702,8 @@ void arm_kernel_startup(void)
         // 3) copy init's receive ep into all other domains'
         //    TASKCN_SLOT_INITEP.
 
-	printf("startup_arch: Init dispatcher handle = %u\n", init_dcb->disp);	
-	printf("startup_arch: Memeater dispatcher handle = %u\n", memeater_dcb->disp);	
+//	printf("startup_arch: Init dispatcher handle = %u\n", init_dcb->disp);	
+//	printf("startup_arch: Memeater dispatcher handle = %u\n", memeater_dcb->disp);	
 	
 	err = caps_retype(ObjType_EndPoint,0, &init_st.taskcn->cap, TASKCN_SLOT_SELFEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_DISPATCHER),0);
 	if (err_is_fail(err)){
@@ -728,10 +728,6 @@ void arm_kernel_startup(void)
 	if (err_is_fail(err)) { 
 		panic("startup_arch: Can not mint for memeater!\n");
 	}
-	
-	struct cte *rem_selfep = caps_locate_slot(CNODE(memeater_st.taskcn),
-											   TASKCN_SLOT_INITEP);
-	printf("Our type = %d\n!",rem_selfep->cap.type);
 
 #endif
     } else {

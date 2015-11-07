@@ -97,7 +97,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
 	RBTreeInsert(tree, addr1, new_chunk_1);
 	RBTreeInsert(tree, addr2, new_chunk_2);	
 
-    printf("!! Will return %p\n",*addr1);		
+    //printf("!! Will return %p\n",*addr1);		
 	return *addr1;	
 }
 

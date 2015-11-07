@@ -44,7 +44,7 @@ static void recv_handler(void *arg)
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
 
-	debug_printf("recv_handler: Got a message from channel with local_ep = %d , remote_ep = %d\n", lc->local_cap.slot, lc->remote_cap.slot);
+//	debug_printf("recv_handler: Got a message from channel with local_ep = %d , remote_ep = %d\n", lc->local_cap.slot, lc->remote_cap.slot);
 
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
@@ -53,7 +53,7 @@ static void recv_handler(void *arg)
 	}
 
 	int message_length = msg.buf.msglen;
-	debug_printf("recv_handler: Received length = %d\n", message_length);	
+//	debug_printf("recv_handler: Received length = %d\n", message_length);	
 	
 //	for (int i=0 ; i<message_length; i++) 
 //		debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
@@ -73,7 +73,7 @@ static void recv_handler(void *arg)
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
-			debug_printf("recv_handler: String received : %s\n", message_string);
+//			debug_printf("recv_handler: String received : %s\n", message_string);
 			break;
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			
@@ -82,7 +82,7 @@ static void recv_handler(void *arg)
 			
 			err = ram_alloc(&returned_cap, size_requested); 
 			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
+//				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
 				returned_cap = NULL_CAP;	
 			}
 				
@@ -183,6 +183,10 @@ int main(int argc, char *argv[])
 		debug_printf("Error in registering the channel..\n");	
 		abort();
 	}
+
+		
+
+	
 	
 	// allocate slot for incoming capabilites
     // register receive handler 

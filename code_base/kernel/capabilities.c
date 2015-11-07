@@ -827,7 +827,7 @@ errval_t caps_retype(enum objtype type, size_t objbits,
 
     /* special initialisation for endpoint caps */
     if (type == ObjType_EndPoint) {
-		printf("Retyping endpoint...\n");
+		//printf("Retyping endpoint...\n");
         assert(src_cap->type == ObjType_Dispatcher);
         assert(numobjs == 1);
         struct capability *dest_cap = &dest_cte->cap;

@@ -24,6 +24,7 @@
 
 #define S_SIZE 8192*2
 #define START_VADDR (1UL<<25)
+#define MAX_MEMORY (1024*1024*3*512)
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 
 static struct paging_state current;
@@ -72,7 +73,7 @@ errval_t map_l2 (lvaddr_t vaddr){
         .slot = 0,
     };
    
-	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
+//	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
 
 	err = arml2_alloc(&l2_table);
 	if (err_is_fail(err)) {
@@ -101,7 +102,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 	memory_chunk* chunk = (memory_chunk*) node->info; 
  
     if (!is_l2_mapped(vaddr)) {
-		debug_printf("MAPPING L2!\n");
+		//debug_printf("MAPPING L2!\n");
 		err = map_l2(vaddr);
 		if (err_is_fail(err)) {
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -111,7 +112,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 	struct capref l2_table = get_l2_table(vaddr);
 
 	if (!capref_is_null(usercap)) {
-		debug_printf("User provided us with a frame!\n");
+//		debug_printf("User provided us with a frame!\n");
 		chunk->current_frame_used = 0;
 		//if (chunk->total_frames_needed == 1)
 		err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
@@ -123,7 +124,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 		//abort();
 	}
 	else if (chunk->current_frame_used == -1) {
-		printf("map_page: Allocating our first large frame!\n");		
+//		printf("map_page: Allocating our first large frame!\n");		
         chunk->current_frame_used = 0;
 		if (chunk->total_frames_needed == 1)
 			err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
@@ -178,7 +179,9 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 		} 
 
 		//printf("Mapping for frame = %d and for slot = %d \n",used_frame,current_frame.slot);
-		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);	
+		//debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
+		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);
+		//chunk->frame_offset += 4096;	
 		if (err_is_fail(err)) {
 			printf("map_page: Error in mapping frame to l2 table !\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -199,7 +202,6 @@ static void exception_handler(enum exception_type type,
 {
 	if (type == EXCEPT_PAGEFAULT) {
 		//printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
-        	//printf("Checking to see if we have it in paging tree\n");
 
 		if (addr == NULL){
 			printf("exception_handler: NULL pointer!\n");
@@ -234,12 +236,12 @@ static void exception_handler(enum exception_type type,
 errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
         struct capref pdir)
 {
-    debug_printf("paging_init_state\n");
+//    debug_printf("paging_init_state\n");
     lvaddr_t* newAddr;
 	memory_chunk* newMemory;
     rb_red_blk_tree* tree;
 
-    printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
+//    printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
@@ -258,14 +260,14 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
     //newMemory = &first_chunk;  
 
     newMemory->reserved = 0;
-    newMemory->size = 1UL*1024*1024*1024;
+    newMemory->size = MAX_MEMORY;
     
     //printf("Before first tree insert\n");
     RBTreeInsert(tree, newAddr ,newMemory);
     //printf("After first tree insert\n");
     st->mem_tree = tree;
 
-    printf("paging_init: Paging Struct initialized.\n");
+//    printf("paging_init: Paging Struct initialized.\n");
     return SYS_ERR_OK;
 }
 
@@ -293,6 +295,10 @@ errval_t paging_init(void)
 void paging_init_onthread(struct thread *t)
 {
     // TODO: setup exception handler for thread `t'.
+    t->exception_handler = exception_handler;
+
+    t->exception_stack = e_stack;
+    t->exception_stack_top = e_stack_top;
 
 }
 
@@ -438,6 +444,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		chunk->size_of_last_frame = bytes;
 		chunk->frame_caps_for_region = (struct capref *)  SafeMalloc(sizeof(struct capref));
 		chunk->current_frame_used = -1;
+		chunk->frame_offset = 0;
     }  
 	else {
 
@@ -453,6 +460,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		chunk->current_frame_used = -1;
 		chunk->total_frames_needed = frames_needed;
 		chunk->size_of_last_frame  = size_of_last_frame;
+		chunk->frame_offset = 0;
 		chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * frames_needed);	
 	}
 
@@ -488,12 +496,9 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
 errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
         struct capref frame, size_t bytes, int flags)
 {
-	errval_t err;
 	debug_printf("paging_map_fixed_attr: Initiating...\n");
 
-	err = map_page(vaddr, frame);
-
-    return SYS_ERR_OK;
+	return map_page(vaddr, frame);
 }
 
 /**

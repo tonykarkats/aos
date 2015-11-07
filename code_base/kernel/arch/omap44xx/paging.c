@@ -412,9 +412,10 @@ caps_map_l2(struct capability* dest,
 
     // check offset within frame
 
+	printf("Size of frame = %" PRIu64 "\n", get_size(src));
     if ((offset + BYTES_PER_PAGE > get_size(src)) ||
         ((offset % BYTES_PER_PAGE) != 0)) {
-        panic("oops: frame offset invalid");
+        panic("oops: frame offset invalid. Size of frame\n");
         return SYS_ERR_FRAME_OFFSET_INVALID;
     }
 

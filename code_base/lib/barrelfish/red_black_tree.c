@@ -357,17 +357,17 @@ void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x) {
   rb_red_blk_node* root=tree->root;
   if (x != tree->nil) {
     InorderTreePrint(tree,x->left);
-    printf("red_black_tree: info=");
+    //printf("red_black_tree: info=");
     tree->PrintInfo(x->info);
-    printf("  key="); 
+    //printf("  key="); 
     tree->PrintKey(x->key);
-    printf("  l->key=");
+    //printf("  l->key=");
     if( x->left == nil) printf("NULL"); else tree->PrintKey(x->left->key);
-    printf("  r->key=");
+    //printf("  r->key=");
     if( x->right == nil) printf("NULL"); else tree->PrintKey(x->right->key);
-    printf("  p->key=");
+    //printf("  p->key=");
     if( x->parent == root) printf("NULL"); else tree->PrintKey(x->parent->key);
-    printf("  red=%i\n\n\n",x->red);
+    //printf("  red=%i\n\n\n",x->red);
     InorderTreePrint(tree,x->right);
   }
 }
@@ -709,7 +709,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
                     init_guard = NULL;
                 else {
                     if (chunk->size > bytes) {
-                        debug_printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
+                        //debug_printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
                         init_guard = x;
                     }
                     else

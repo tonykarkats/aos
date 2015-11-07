@@ -23,7 +23,7 @@ static struct aos_rpc memory_channel;
 
 static void recv_handler(void *arg) 
 {
-	debug_printf("recv_handler: Got a message or a cap!");
+//	debug_printf("recv_handler: Got a message or a cap!");
 	errval_t err;
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
@@ -35,7 +35,7 @@ static void recv_handler(void *arg)
 							MKCLOSURE(recv_handler, arg));
 	}
 	
-	debug_printf("msg buflen %zu\n", msg.buf.msglen);
+//	debug_printf("msg buflen %zu\n", msg.buf.msglen);
 		
 	ram_cap = cap;	
 	
@@ -81,7 +81,7 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
                              struct capref *retcap, size_t *ret_bits)
 {
-	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
+//	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
 	errval_t err;
 		
 	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_RAM_CAP, request_bits);	
@@ -91,15 +91,15 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 	}
 
 	event_dispatch(get_default_waitset());
-	debug_printf("aos_rpc_get_ram_cap: Server responded!\n");	
+//	debug_printf("aos_rpc_get_ram_cap: Server responded!\n");	
 
 	if (capref_is_null(ram_cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
    		*ret_bits = 0;
 	 	return LIB_ERR_RAM_ALLOC;
 	}
-	else 
-		debug_printf("aos_rpc_get_ram_cap: Server responded with a memory region!\n");
+//	else 
+//		debug_printf("aos_rpc_get_ram_cap: Server responded with a memory region!\n");
 	
 	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
 

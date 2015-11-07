@@ -32,6 +32,8 @@ typedef struct memory_chunk {
     int current_frame_used;
     int total_frames_needed;
     int size_of_last_frame;
+	size_t frame_offset;
+	
     struct capref* frame_caps_for_region;
 
 } memory_chunk;

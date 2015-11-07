@@ -124,12 +124,11 @@ static void init_recv_handler(struct aos_chan *ac, struct lmp_recv_msg *msg, str
  * before main() runs.
  */
 
-//static struct aos_rpc domain_memory_channel;
-	
 errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 {
     errval_t err;
-
+	
+	debug_printf("barrelfish_init_onthread: Initializing...\n");
     // do we have an environment?
     if (params != NULL && params->envp[0] != NULL) {
         extern char **environ;
