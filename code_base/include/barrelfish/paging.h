@@ -50,7 +50,7 @@ typedef int paging_flags_t;
 errval_t map_l2 (lvaddr_t vaddr);
 struct capref get_l2_table(lvaddr_t vaddr);
 bool is_l2_mapped(lvaddr_t vaddr);
-errval_t map_page(lvaddr_t vaddr, struct capref); 
+errval_t map_page(lvaddr_t vaddr, struct capref, uint64_t off, uint64_t pte_count); 
 void handle_fault(lvaddr_t vaddr);
 errval_t get_frame(size_t, struct capref*);
 // struct to store the paging status of a process
@@ -113,6 +113,9 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
 errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
                 struct capref frame, size_t bytes, int flags);
 
+errval_t paging_map_fixed_attr_args(struct paging_state *st, lvaddr_t vaddr,
+                struct capref frame, size_t bytes, int flags
+								   , void * arg1, void * arg2);
 /**
  * \brief unmap a user provided frame
  * NOTE: this function is currently here to make libbarrelfish compile. As

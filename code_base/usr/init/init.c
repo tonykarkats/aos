@@ -35,6 +35,8 @@
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
+static volatile char * uart_fifo ;
+static volatile char * uart_thres ;  
 
 static void recv_handler(void *arg) 
 {
@@ -146,12 +148,14 @@ int main(int argc, char *argv[])
     // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
     debug_printf("initialized dev memory management\n");
 
-/*	
+	uint64_t size   = 0x1000;
+	uint64_t offset = 0x8020000;
 	void * vbuf;	
-	err = paging_map_frame(get_current_paging_state(),&vbuf, 1024*1024*2, cap_io, NULL, NULL) ;
-	if (err_is_fail(err))
+	err = paging_map_frame(get_current_paging_state(),&vbuf, 0x1000, cap_io, &offset, &size);
+	if (err_is_fail(err)) {
 		debug_printf("CAN not map dev frame");
-*/
+		abort();
+	}
 	//char* buf = (char *) vbuf;	
 	//for (int i=0; i < 8*BASE_PAGE_SIZE; i++)
 	//	buf[i] = i / 4096;	
@@ -194,10 +198,29 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-		
+	char * uart_3_buf = (char *) vbuf;
+	uart_fifo  = uart_3_buf + 0x14;
+	uart_thres = uart_3_buf;
 
+	debug_printf("thres = %p , fifo = %p \n", uart_thres, uart_fifo);
+
+	while(!(*(uart_fifo) & 0x20))
 	
+	*uart_thres = 'C';	
+
+	while(!(*(uart_fifo) & 0x20)) 
 	
+	*uart_thres = 'O';
+
+	while(!(*(uart_fifo) & 0x20))
+	
+	*uart_thres = 'C';	
+
+	while(!(*(uart_fifo) & 0x20)) 
+
+	*uart_thres = 'K';	
+
+	abort();
 	// allocate slot for incoming capabilites
     // register receive handler 
     // go into messaging main loop

@@ -483,7 +483,7 @@ errval_t caps_copy_to_vnode(struct cte *dest_vnode_cte, cslot_t dest_slot,
                           );
     }
     else if (ObjType_VNode_ARM_l2 == dest_cap->type) {
-        printf("caps_map_l2: %zu\n", (size_t)pte_count);
+        //printf("caps_map_l2: %zu\n", (size_t)pte_count);
         return caps_map_l2(dest_cap, dest_slot, src_cap,
                            flags,
                            offset,

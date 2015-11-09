@@ -96,7 +96,7 @@ errval_t map_l2 (lvaddr_t vaddr){
 	return SYS_ERR_OK;
 }
 
-errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
+errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size) {
 	
 	errval_t err;
 	int l2_index = ARM_L2_USER_OFFSET(vaddr);
@@ -105,7 +105,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 	memory_chunk* chunk = (memory_chunk*) node->info; 
  
     if (!is_l2_mapped(vaddr)) {
-		debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
+		//debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
 		err = map_l2(vaddr);
 		if (err_is_fail(err)) {
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -116,25 +116,26 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 
 	// Maping frame provided by user
 	if (!capref_is_null(usercap)) {
+		
 		debug_printf("User provided us with a frame!\n");
-		size_t pages_needed = chunk->size / 4096;
+		size_t pages_needed = size / 4096;
 		debug_printf("Will map %d pages ! l2_index = %d \n", pages_needed,l2_index);
 		chunk->current_frame_used = 0;
 		chunk->size_of_last_frame = -1;
 		
-		debug_printf("Mapping page with index = %d at l2 table...\n",l2_index);
-		err = vnode_map(l2_table, usercap, l2_index, FLAGS, 0, pages_needed);
+		err = vnode_map(l2_table, usercap, l2_index, FLAGS, off, pages_needed);
 		if (err_is_fail(err)) {
 			debug_printf("map_page: Can not map user provided frame!\n");
 			return err_push(err, LIB_ERR_FRAME_ALLOC);
-		}	
+		}		
+		
 		return SYS_ERR_OK;
 	}
 
 
 	// Logic for mapping frames created on the fly (on pagefaults)
 	if (chunk->current_frame_used == -1) {
-		debug_printf("map_page: Allocating our first large frame!\n");		
+		//debug_printf("map_page: Allocating our first large frame!\n");		
         chunk->current_frame_used = 0;
 		if (chunk->total_frames_needed == 1)
 			err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
@@ -150,7 +151,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
  	if (chunk->total_frames_needed == 1) {
     	struct capref current_frame = chunk->frame_caps_for_region[0];
 
-		debug_printf("Mapping frame with index = %d at l2 table...\n",l2_index);
+		//debug_printf("Mapping frame with index = %d at l2 table...\n",l2_index);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);	
 		if (err_is_fail(err)) {
 			printf("map_page: Error in mapping frame to l2 table !\n");
@@ -168,7 +169,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 	   //	printf("Total fr needed = %d . Current frame = %d . Size of last frame = %d\n",chunk->total_frames_needed,chunk->current_frame_used,chunk->size_of_last_frame);
 			used_frame++;
 			if (used_frame == (chunk->total_frames_needed -1)) {
-				debug_printf("map_page: Allocating the LAST frame!\n");		
+		//		debug_printf("map_page: Allocating the LAST frame!\n");		
 		//		printf("Allocating huge frame with %d bytes\n", chunk->size_of_last_frame);
 				err = get_frame(chunk->size_of_last_frame, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
@@ -189,7 +190,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 		} 
 
 		//printf("Mapping for frame = %d and for slot = %d \n",used_frame,current_frame.slot);
-		debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
+		//debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);
 		if (err_is_fail(err)) {
 			printf("map_page: Error in mapping frame to l2 table !\n");
@@ -228,7 +229,7 @@ static void exception_handler(enum exception_type type,
 		} 
 		else { 
 			//printf("Address is mapped!\n");
-			errval_t err = map_page((lvaddr_t) addr, NULL_CAP);
+			errval_t err = map_page((lvaddr_t) addr, NULL_CAP, 0, 0);
  			if (err_is_fail(err)) {
 				printf("exception_handler: Error in map_page!\n");
 				abort();
@@ -495,9 +496,29 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
     if (err_is_fail(err)) {
         return err;
     }
-    return paging_map_fixed_attr(st, (lvaddr_t)(*buf), frame, bytes, flags);
+
+    if ((arg1 != NULL)&&(arg2 != NULL) )
+    	return paging_map_fixed_attr_args(st, (lvaddr_t)(*buf), frame, bytes, flags, arg1, arg2);
+	else 
+		return paging_map_fixed_attr(st, (lvaddr_t)(*buf), frame, bytes, flags);
 }
 
+
+/**
+ * \brief map a user provided frame at user provided VA.
+ * Starting from the absolute offset in the frame and 
+ * for length in bytes
+ */
+errval_t paging_map_fixed_attr_args(struct paging_state *st, lvaddr_t vaddr,
+        struct capref frame, size_t bytes, int flags, void *arg1, void *arg2)
+{
+	debug_printf("paging_map_fixed_attr: Initiating...\n");
+	
+	uint64_t offset = *(uint64_t *) arg1;
+	uint64_t size   = *(uint64_t *) arg2;
+	
+	return map_page(vaddr, frame, offset, size);
+}
 
 /**
  * \brief map a user provided frame at user provided VA.
@@ -507,7 +528,8 @@ errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
 {
 	debug_printf("paging_map_fixed_attr: Initiating...\n");
 
-	return map_page(vaddr, frame);
+	
+	return map_page(vaddr, frame, 0, bytes);
 }
 
 /**
