@@ -202,29 +202,28 @@ int main(int argc, char *argv[])
 	uart_fifo  = uart_3_buf + 0x14;
 	uart_thres = uart_3_buf;
 
-	debug_printf("thres = %p , fifo = %p \n", uart_thres, uart_fifo);
-
-	while(!(*(uart_fifo) & 0x20))
+	//debug_printf("thres = %p , fifo = %p \n", uart_thres, uart_fifo);
 	
+	while(!(*(uart_fifo) & 0x20));
 	*uart_thres = 'C';	
-
-	while(!(*(uart_fifo) & 0x20)) 
 	
+	while(!(*(uart_fifo) & 0x20)) 
 	*uart_thres = 'O';
-
-	while(!(*(uart_fifo) & 0x20))
 	
+	while(!(*(uart_fifo) & 0x20)) 
 	*uart_thres = 'C';	
 
 	while(!(*(uart_fifo) & 0x20)) 
-
 	*uart_thres = 'K';	
+	
 
-	abort();
+	while(1);
 	// allocate slot for incoming capabilites
     // register receive handler 
     // go into messaging main loop
- 	debug_printf("Entering main messaging loop...\n");	
+ 	debug_printf("Entering main messaging loop...AAAAAAAAAAAAAA\n");	
+
+
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {
