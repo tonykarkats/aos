@@ -73,6 +73,17 @@ char serial_getchar(void) {
 	return (char) *(char *) uart3_thr;
 }
 
+static char serial_input_buffer[4096];
+static int buffer_head = 0;
+static int buffer_tail = 0;
+
+static int poll_serial(void) {
+
+	while(1) {
+		// TODO
+	}	
+}
+
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
@@ -130,6 +141,12 @@ static void recv_handler(void *arg)
 			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
+			break;
+		case AOS_RPC_PUT_CHAR:
+			// TODO
+			break;
+		case 
+			// TODO
 			break;
 	}
 	

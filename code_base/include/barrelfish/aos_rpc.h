@@ -34,7 +34,8 @@
 
 #define AOS_RPC_SEND_STRING  1
 #define AOS_RPC_GET_RAM_CAP  2
-
+#define AOS_RPC_PUT_CHAR	 3
+#define AOS_RPC_GET_CHAR	 4
 struct aos_rpc {
 	struct lmp_chan init_channel;    
 	struct lmp_chan rpc_channel;
