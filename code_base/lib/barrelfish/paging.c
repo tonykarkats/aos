@@ -26,7 +26,7 @@
 #define START_VADDR (1UL<<25)
 #define MAX_MEMORY (1024*1024*3*512)
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
-
+#define DEVICE_FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE | KPI_PAGING_FLAGS_NOCACHE)
 static struct paging_state current;
 
 /**
@@ -122,8 +122,12 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		debug_printf("Will map %d pages ! l2_index = %d \n", pages_needed,l2_index);
 		chunk->current_frame_used = 0;
 		chunk->size_of_last_frame = -1;
+	
+		if (usercap.slot == TASKCN_SLOT_IO) 	
+			err = vnode_map(l2_table, usercap, l2_index, DEVICE_FLAGS, off, pages_needed);
+		else
+			err = vnode_map(l2_table, usercap, l2_index, FLAGS, off, pages_needed);
 		
-		err = vnode_map(l2_table, usercap, l2_index, FLAGS, off, pages_needed);
 		if (err_is_fail(err)) {
 			debug_printf("map_page: Can not map user provided frame!\n");
 			return err_push(err, LIB_ERR_FRAME_ALLOC);

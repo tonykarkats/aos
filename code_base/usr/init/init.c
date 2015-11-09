@@ -22,6 +22,9 @@
 #include <barrelfish/sys_debug.h>
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
+#include <dev/omap/omap_uart_dev.h>
+#include "omap_uart.h"
+
 #define UNUSED(x) (x) = (x)
 
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -32,11 +35,47 @@
 #define FIRSTEP_OFFSET          (33472u + 56u)
 #define CLIENT_LIMIT 			(1<<26)*10			
 
+static volatile lvaddr_t uart3_base;
+static volatile lvaddr_t uart3_lsr;
+static volatile lvaddr_t uart3_thr;
+static volatile lvaddr_t uart3_fcr;
+static volatile lvaddr_t uart3_ier;
+static volatile lvaddr_t uart3_lcr;
+
+void uart_initialize(lvaddr_t mapped_address){
+
+	uart3_base = mapped_address;
+	uart3_thr = mapped_address + 0x00;
+	uart3_ier = mapped_address + 0x04;
+	uart3_lsr = mapped_address + 0x14;
+	uart3_fcr = mapped_address + 0x08;
+	uart3_lcr = mapped_address + 0x0C;
+
+	*(char *) uart3_ier = 0;
+	*(char *) uart3_fcr = 0xf1;
+	*(char *) uart3_lcr = 0x03;
+}
+
+void serial_putchar(char c) {
+
+	if (c == '\n')
+		serial_putchar('\r');
+
+	while ((!(* (char * ) uart3_lsr )) & 0x20);
+
+	*(char *)uart3_thr = c;
+}
+
+char serial_getchar(void) {
+
+	while (!(* (char *) uart3_lsr & 0x01));
+
+	return (char) *(char *) uart3_thr;
+}
+
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
-static volatile char * uart_fifo ;
-static volatile char * uart_thres ;  
 
 static void recv_handler(void *arg) 
 {
@@ -156,10 +195,7 @@ int main(int argc, char *argv[])
 		debug_printf("CAN not map dev frame");
 		abort();
 	}
-	//char* buf = (char *) vbuf;	
-	//for (int i=0; i < 8*BASE_PAGE_SIZE; i++)
-	//	buf[i] = i / 4096;	
-
+	
     // TODO (milestone 3) STEP 2:
     // get waitseti --> get_default_waitset()
     // allocate lmp chan --> 
@@ -198,30 +234,25 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-	char * uart_3_buf = (char *) vbuf;
-	uart_fifo  = uart_3_buf + 0x14;
-	uart_thres = uart_3_buf;
+//	char * uart_3_buf = (char *) vbuf;
+//	uart_fifo  = uart_3_buf + 0x14;
+//	uart_thres = uart_3_buf;
+	
+	uart_initialize((lvaddr_t)vbuf);
 
 	//debug_printf("thres = %p , fifo = %p \n", uart_thres, uart_fifo);
-	
-	while(!(*(uart_fifo) & 0x20));
-	*uart_thres = 'C';	
-	
-	while(!(*(uart_fifo) & 0x20)) 
-	*uart_thres = 'O';
-	
-	while(!(*(uart_fifo) & 0x20)) 
-	*uart_thres = 'C';	
 
-	while(!(*(uart_fifo) & 0x20)) 
-	*uart_thres = 'K';	
-	
-
+	serial_putchar('C');
+	serial_putchar('O');
+	serial_putchar('C');
+	serial_putchar('K');
+	//serial_putchar('\r');	
+	serial_putchar('\n');	
 	while(1);
+
 	// allocate slot for incoming capabilites
     // register receive handler 
     // go into messaging main loop
- 	debug_printf("Entering main messaging loop...AAAAAAAAAAAAAA\n");	
 
 
 	while(true) {
