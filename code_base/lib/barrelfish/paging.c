@@ -54,12 +54,15 @@ static errval_t arml2_alloc(struct capref *ret)
 struct capref get_l2_table(lvaddr_t vaddr){
 
 	int l1_index = ARM_L1_USER_OFFSET(vaddr);
+	
 	return current.mem_tree->l2_tables[l1_index];
 }
 
 bool is_l2_mapped(lvaddr_t vaddr) {
 	
 	int l1_index = ARM_L1_USER_OFFSET(vaddr);
+	
+	debug_printf("is_l2_mapped: Searcing for l1 index = %d\n", l1_index);
 	return current.mem_tree->l2_maps[l1_index];	
 }
 
@@ -102,7 +105,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 	memory_chunk* chunk = (memory_chunk*) node->info; 
  
     if (!is_l2_mapped(vaddr)) {
-		//debug_printf("MAPPING L2!\n");
+		debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
 		err = map_l2(vaddr);
 		if (err_is_fail(err)) {
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -111,20 +114,27 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 
 	struct capref l2_table = get_l2_table(vaddr);
 
+	// Maping frame provided by user
 	if (!capref_is_null(usercap)) {
-//		debug_printf("User provided us with a frame!\n");
+		debug_printf("User provided us with a frame!\n");
+		size_t pages_needed = chunk->size / 4096;
+		debug_printf("Will map %d pages ! l2_index = %d \n", pages_needed,l2_index);
 		chunk->current_frame_used = 0;
-		//if (chunk->total_frames_needed == 1)
-		err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
+		chunk->size_of_last_frame = -1;
 		
+		debug_printf("Mapping page with index = %d at l2 table...\n",l2_index);
+		err = vnode_map(l2_table, usercap, l2_index, FLAGS, 0, pages_needed);
 		if (err_is_fail(err)) {
-			printf("map_page: Error in getting the very first frame of the region!\n");
+			debug_printf("map_page: Can not map user provided frame!\n");
 			return err_push(err, LIB_ERR_FRAME_ALLOC);
-		}
-		//abort();
+		}	
+		return SYS_ERR_OK;
 	}
-	else if (chunk->current_frame_used == -1) {
-//		printf("map_page: Allocating our first large frame!\n");		
+
+
+	// Logic for mapping frames created on the fly (on pagefaults)
+	if (chunk->current_frame_used == -1) {
+		debug_printf("map_page: Allocating our first large frame!\n");		
         chunk->current_frame_used = 0;
 		if (chunk->total_frames_needed == 1)
 			err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
@@ -132,7 +142,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 			err = get_frame(1024*1024, chunk->frame_caps_for_region);
 	   	
 		if (err_is_fail(err)) {
-			printf("map_page: Error in getting the very first frame of the region!\n");
+			debug_printf("map_page: Error in getting the very first frame of the region!\n");
 			return err_push(err, LIB_ERR_FRAME_ALLOC);
 		}
 	}
@@ -140,7 +150,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
  	if (chunk->total_frames_needed == 1) {
     	struct capref current_frame = chunk->frame_caps_for_region[0];
 
-		//printf("Mapping frame with index = %d at l2 table...\n",l2_index);
+		debug_printf("Mapping frame with index = %d at l2 table...\n",l2_index);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);	
 		if (err_is_fail(err)) {
 			printf("map_page: Error in mapping frame to l2 table !\n");
@@ -179,9 +189,8 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap) {
 		} 
 
 		//printf("Mapping for frame = %d and for slot = %d \n",used_frame,current_frame.slot);
-		//debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
+		debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);
-		//chunk->frame_offset += 4096;	
 		if (err_is_fail(err)) {
 			printf("map_page: Error in mapping frame to l2 table !\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);

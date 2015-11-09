@@ -35,14 +35,18 @@ static int test_thread(void){
     }
 
 	char* buf = (char *) vbuf;
-	for (int i = 0 ; i <  2*4096; i++)
-		buf[i] = i/4096;
+//	for (int i = 0 ; i <  2*4096; i++)
+//		buf[i] = i/4096;
 
+
+	buf[0] = 66;
+	buf[4096] = 77;
+
+	debug_printf("%d %d\n", buf[0], buf[4096]);
 //	for (int i = 0 ; i< 2*4096; i++)
 //		assert(buf[i] == i);
-	for (int i = 0 ; i< 2*4096; i++)
-		debug_printf("%d\n",buf[i]);
-
+//	for (int i = 0 ; i< 2*4096; i++)
+//		assert(buf[i] == (i/4096));
 
 	thread_id++;
 	return 0;

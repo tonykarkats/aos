@@ -412,7 +412,7 @@ caps_map_l2(struct capability* dest,
 
     // check offset within frame
 
-	printf("Size of frame = %" PRIu64 "\n", get_size(src));
+	//printf("Size of frame = %" PRIu64 "\n", get_size(src));
     if ((offset + BYTES_PER_PAGE > get_size(src)) ||
         ((offset % BYTES_PER_PAGE) != 0)) {
         panic("oops: frame offset invalid. Size of frame\n");
@@ -452,8 +452,8 @@ caps_map_l2(struct capability* dest,
 
         entry++;
 
-        debug(SUBSYS_PAGING, "L2 mapping %08"PRIxLVADDR"[%"PRIuCSLOT"] @%p = %08"PRIx32"\n",
-               dest_lvaddr, slot, entry, entry->raw);
+        //printf("L2 mapping %08"PRIxLVADDR"[%"PRIuCSLOT"] @%p = %08"PRIx32"\n",
+        //       dest_lvaddr, slot, entry, entry->raw);
     }
 
     // Flush TLB if remapping.
@@ -483,7 +483,7 @@ errval_t caps_copy_to_vnode(struct cte *dest_vnode_cte, cslot_t dest_slot,
                           );
     }
     else if (ObjType_VNode_ARM_l2 == dest_cap->type) {
-        //printf("caps_map_l2: %zu\n", (size_t)pte_count);
+        printf("caps_map_l2: %zu\n", (size_t)pte_count);
         return caps_map_l2(dest_cap, dest_slot, src_cap,
                            flags,
                            offset,

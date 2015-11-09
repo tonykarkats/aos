@@ -146,6 +146,16 @@ int main(int argc, char *argv[])
     // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
     debug_printf("initialized dev memory management\n");
 
+/*	
+	void * vbuf;	
+	err = paging_map_frame(get_current_paging_state(),&vbuf, 1024*1024*2, cap_io, NULL, NULL) ;
+	if (err_is_fail(err))
+		debug_printf("CAN not map dev frame");
+*/
+	//char* buf = (char *) vbuf;	
+	//for (int i=0; i < 8*BASE_PAGE_SIZE; i++)
+	//	buf[i] = i / 4096;	
+
     // TODO (milestone 3) STEP 2:
     // get waitseti --> get_default_waitset()
     // allocate lmp chan --> 

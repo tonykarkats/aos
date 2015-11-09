@@ -4058,7 +4058,7 @@ FLAG	lib/newlib/newlib/libc/stdio/local.h	/^  FLAG,   \/* format flag *\/$/;"	e	
 FLAG4_BIT	lib/dmalloc/dmalloc.c	2242;"	d	file:
 FLAG4_BIT	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2247;"	d	file:
 FLAGBITS	lib/mm/mm.c	50;"	d	file:
-FLAGS	lib/barrelfish/paging.c	27;"	d	file:
+FLAGS	lib/barrelfish/paging.c	28;"	d	file:
 FLAG_BITS	lib/dmalloc/dmalloc.c	2244;"	d	file:
 FLAG_BITS	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2249;"	d	file:
 FLOATING_POINT	lib/newlib/newlib/libc/machine/powerpc/vfprintf.c	154;"	d	file:
@@ -7340,6 +7340,7 @@ MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfiscanf.c	183;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfiwscanf.c	180;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfscanf.c	183;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfwscanf.c	180;"	d	file:
+MAX_MEMORY	lib/barrelfish/paging.c	27;"	d	file:
 MAX_MEM_LEVEL	include/zconf.h	136;"	d
 MAX_MEM_LEVEL	include/zconf.h	138;"	d
 MAX_MEM_REGIONS	include/barrelfish_kpi/init.h	58;"	d
@@ -25741,6 +25742,7 @@ frame_identity	include/barrelfish_kpi/capabilities.h	/^struct frame_identity {$/
 frame_list	include/barrelfish/memobj.h	/^    struct memobj_frame_list *frame_list; \/\/\/< List of frames tracked by the obj$/;"	m	struct:memobj_anon	typeref:struct:memobj_anon::memobj_frame_list
 frame_list_slab	include/arch/arm/barrelfish/core_state_arch.h	/^    struct slab_alloc frame_list_slab;$/;"	m	struct:pinned_state	typeref:struct:pinned_state::slab_alloc
 frame_list_slab	include/arch/x86/barrelfish/core_state_arch.h	/^    struct slab_alloc frame_list_slab;$/;"	m	struct:pinned_state	typeref:struct:pinned_state::slab_alloc
+frame_offset	include/barrelfish/red_black_tree.h	/^	size_t frame_offset;$/;"	m	struct:memory_chunk
 frame_slab	include/barrelfish/memobj.h	/^    struct slab_alloc frame_slab;         \/\/\/< Slab to back the frame list$/;"	m	struct:memobj_anon	typeref:struct:memobj_anon::slab_alloc
 fread	lib/oldc/src/fread.c	/^fread(void *ptr, size_t size, size_t nmemb, FILE *stream)$/;"	f
 free	include/barrelfish/slab.h	/^    uint32_t total, free;   \/\/\/< Count of total and free blocks in this slab$/;"	m	struct:slab_head
