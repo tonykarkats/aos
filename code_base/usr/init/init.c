@@ -21,7 +21,6 @@
 #include <barrelfish/sys_debug.h>
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
-#include <dev/omap/omap_uart_dev.h>
 #include "omap_uart.h"
 #include <barrelfish/thread_sync.h>
 
@@ -98,13 +97,24 @@ static void recv_handler(void *arg)
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 			break;
 
-		case AOS_RPC_PUT_CHAR:
-			// TODO
-			debug_printf("nyi\n");
+		case AOS_RPC_PUT_CHAR: ;
+			char out_c = (char) msg.words[1];
+			serial_putchar(out_c);
+			
 			break;
-		case AOS_RPC_GET_CHAR: 
-			// TODO
-			debug_printf("nyi\n");
+		case AOS_RPC_GET_CHAR: ;
+			
+			char in_c;
+			while(1) {
+				char * ret_char = read_from_ring(&ring, &in_c);
+				if (ret_char != NULL)
+					break;
+			}
+			
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");
+			}	 
 			break;
 	}
 	

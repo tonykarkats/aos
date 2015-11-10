@@ -18,6 +18,7 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
+static char rpc_char;
 static struct capref ram_cap;
 static struct aos_rpc memory_channel;
 
@@ -36,9 +37,10 @@ static void recv_handler(void *arg)
 	}
 	
 //	debug_printf("msg buflen %zu\n", msg.buf.msglen);
-		
-	ram_cap = cap;	
 	
+	ram_cap = cap;	
+	rpc_char = (char) msg.words[0];
+
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));	
 }
@@ -119,17 +121,39 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
 
 errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 {
-    // TODO (milestone 4): implement functionality to request a character from
-    // the serial driver.
-    return SYS_ERR_OK;
+   	errval_t err;
+		
+	err = lmp_chan_send1(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_CHAR);	
+ 	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
+		return AOS_ERR_LMP_SEND_FAILURE;
+	}
+
+	debug_printf("BEFORE WAITSET!\n");	
+
+	event_dispatch(get_default_waitset());
+
+	debug_printf("SERVER RESPONDED WITH CHAR!\n");	
+
+
+	*retc = rpc_char;	
+		
+	return SYS_ERR_OK;
 }
 
 
 errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 {
-    // TODO (milestone 4): implement functionality to send a character to the
-    // serial port.
-    return SYS_ERR_OK;
+	errval_t err;
+		
+	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
+ 	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
+		return AOS_ERR_LMP_SEND_FAILURE;
+	}
+	
+	return SYS_ERR_OK;
+
 }
 
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,

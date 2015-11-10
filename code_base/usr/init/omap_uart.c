@@ -32,14 +32,14 @@ void serial_putchar(char c) {
 	if (c == '\n')
 		serial_putchar('\r');
 
-	while ((!(* (char * ) uart3_lsr )) & 0x20);
+	while (! (((* (char * ) uart3_lsr )) & 0x20));
 
 	*(char *)uart3_thr = c;
 }
 
 char serial_getchar(void) {
 
-	while (!(* (char *) uart3_lsr & 0x01));
+	while (! ((* (char *) uart3_lsr & 0x01)));
 
 	return (char) *(char *) uart3_thr;
 }
