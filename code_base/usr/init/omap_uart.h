@@ -20,7 +20,7 @@ struct serial_ring_buffer {
 	size_t head;
 	size_t tail;
 
-	struct thread_mutex ring_lock;
+//	struct thread_mutex ring_lock;
 };
 
 void initialize_ring(struct serial_ring_buffer * ring);

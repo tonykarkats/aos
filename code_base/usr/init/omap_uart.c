@@ -65,39 +65,39 @@ void initialize_ring(struct serial_ring_buffer* ring) {
 	ring->head = 0;
 	ring->tail = 0;
 
-	thread_mutex_init(&ring->ring_lock);
+	//thread_mutex_init(&ring->ring_lock);
 }
 
 char * read_from_ring(struct serial_ring_buffer * ring, char * c) {
 
 	
-	while (!thread_mutex_trylock(&ring->ring_lock)) ;
+	//while (!thread_mutex_trylock(&ring->ring_lock)) ;
 	
 	size_t head = ring->head;
 	size_t tail = ring->tail;
 
 	if (head == tail) {
-		thread_mutex_unlock(&ring->ring_lock);
+		//thread_mutex_unlock(&ring->ring_lock);
 		return NULL;
 	}
 		
 	*c = ring->buffer[head];
 	ring->head = (head+1) % INPUT_BUF_SIZE;
 	
-	thread_mutex_unlock(&ring->ring_lock);
+	//thread_mutex_unlock(&ring->ring_lock);
 
 	return c;
 }
 
 bool write_to_ring (struct serial_ring_buffer * ring, char * c) {
 
-	thread_mutex_lock(&ring->ring_lock);
+	//thread_mutex_lock(&ring->ring_lock);
 
 	size_t head = ring->head;
 	size_t tail = ring->tail;
 
 	if ( (tail + 1)%INPUT_BUF_SIZE == head) {
-		thread_mutex_unlock(&ring->ring_lock);
+		//thread_mutex_unlock(&ring->ring_lock);
 		return false;
 	}
 
@@ -105,7 +105,7 @@ bool write_to_ring (struct serial_ring_buffer * ring, char * c) {
 	ring->tail = (tail+1) % INPUT_BUF_SIZE;
 
 
-	thread_mutex_unlock(&ring->ring_lock);
+	//thread_mutex_unlock(&ring->ring_lock);
 
 	return true	;
 }
