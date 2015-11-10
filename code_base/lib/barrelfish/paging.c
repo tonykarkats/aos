@@ -305,14 +305,22 @@ errval_t paging_init(void)
 }
 
 
-
+/*
+ * Mallos a new stack for each new thread
+ * and initializes the thread exception stack.
+ * Ask the TAs about this.
+ */
 void paging_init_onthread(struct thread *t)
 {
     // TODO: setup exception handler for thread `t'.
-    t->exception_handler = exception_handler;
+    
+	t->exception_handler = exception_handler;
 
-    t->exception_stack = e_stack;
-    t->exception_stack_top = e_stack_top;
+	t->exception_stack = (char *) malloc(S_SIZE);
+	t->exception_stack_top = t->exception_stack + S_SIZE;
+  
+	//t->exception_stack = e_stack;
+    //t->exception_stack_top = e_stack_top;
 
 }
 

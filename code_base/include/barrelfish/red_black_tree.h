@@ -79,6 +79,8 @@ typedef struct rb_red_blk_tree {
 
   struct capref l2_tables[4096];
   bool l2_maps[4096];
+
+  th
 } rb_red_blk_tree;
 
 /* The functions below are described in the .c file */ 

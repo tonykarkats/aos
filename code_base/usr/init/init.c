@@ -23,7 +23,6 @@
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
 #include <dev/omap/omap_uart_dev.h>
-#include "omap_uart.h"
 
 #define UNUSED(x) (x) = (x)
 
