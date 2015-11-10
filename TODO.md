@@ -15,3 +15,5 @@
 - Move device driver and memory server to other domains with the use of an init server
 
 - Ask if it is safe to perform channel and all other initialization on main 
+
+- Separate exception stack for each thread
