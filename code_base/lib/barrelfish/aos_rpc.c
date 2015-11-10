@@ -133,7 +133,7 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 
 	event_dispatch(get_default_waitset());
 
-	debug_printf("SERVER RESPONDED WITH CHAR!\n");	
+	debug_printf("SERVER RESPONDED WITH CHAR = %c!\n", rpc_char);	
 
 
 	*retc = rpc_char;	

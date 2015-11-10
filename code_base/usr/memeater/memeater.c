@@ -77,8 +77,6 @@ int main(int argc, char *argv[])
 	err = aos_rpc_serial_putchar(test_rpc, c3); 	
 	err = aos_rpc_serial_putchar(test_rpc, c4); 	
 
-
-
 	struct thread* t = thread_create((thread_func_t)  test_thread, NULL);
 	//struct thread* t2= thread_create((thread_func_t)  test_thread, NULL);
 	

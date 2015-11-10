@@ -110,7 +110,6 @@ static void recv_handler(void *arg)
 				if (ret_char != NULL)
 					break;
 			}
-			
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");

@@ -70,7 +70,8 @@ void initialize_ring(struct serial_ring_buffer* ring) {
 
 char * read_from_ring(struct serial_ring_buffer * ring, char * c) {
 
-	thread_mutex_lock(&ring->ring_lock);
+	
+	while (!thread_mutex_trylock(&ring->ring_lock)) ;
 	
 	size_t head = ring->head;
 	size_t tail = ring->tail;
