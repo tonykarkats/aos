@@ -24,7 +24,8 @@
 #include <stdbool.h>
 #include <barrelfish/thread_sync.h>
 
-#define S_SIZE 8192*2
+#define S_SIZE_PER_THREAD 2*8192
+#define S_SIZE 1024*100
 #define START_VADDR (1UL<<25)
 #define MAX_MEMORY (1024*1024*3*512)
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
@@ -232,7 +233,7 @@ static void exception_handler(enum exception_type type,
 		}		
 	
 		// Get lock 
-		//thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
+		thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 		
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
 			printf("exception_handler: Address not mapped!\n");
@@ -247,7 +248,7 @@ static void exception_handler(enum exception_type type,
 			}
 		}
 		
-		//thread_mutex_unlock(&get_current_paging_state()->paging_tree_lock);
+		thread_mutex_unlock(&get_current_paging_state()->paging_tree_lock);
 	}
 }
 
@@ -283,20 +284,22 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
     RBTreeInsert(tree, newAddr ,newMemory);
     st->mem_tree = tree;
 
-	//thread_mutex_init(&st->paging_tree_lock);
+	thread_mutex_init(&st->paging_tree_lock);
 
     return SYS_ERR_OK;
 }
 
 static char e_stack[S_SIZE];
-static char *e_stack_top = e_stack + S_SIZE;
+static int e_stack_head = 0;
 
 errval_t paging_init(void)
 {
     debug_printf("paging_init\n");
+
     // Initialize self-paging handler
-    thread_set_exception_handler(exception_handler, NULL, e_stack, e_stack_top, NULL, NULL);
-    
+    thread_set_exception_handler(exception_handler, NULL, e_stack, e_stack + e_stack_head + S_SIZE_PER_THREAD, NULL, NULL);
+    e_stack_head += S_SIZE_PER_THREAD;
+
     struct capref p;
     
     //printf("Before initializing our memory tree\n");
@@ -319,12 +322,10 @@ void paging_init_onthread(struct thread *t)
     
 	t->exception_handler = exception_handler;
 
-	t->exception_stack = (char *) malloc(S_SIZE);
-	t->exception_stack_top = t->exception_stack + S_SIZE;
-  
-	//t->exception_stack = e_stack;
-    //t->exception_stack_top = e_stack_top;
+	t->exception_stack = e_stack + e_stack_head;
+	t->exception_stack_top = e_stack + e_stack_head + S_SIZE_PER_THREAD;
 
+	e_stack_head += S_SIZE_PER_THREAD;
 }
 
 /**
@@ -451,7 +452,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	int frames_needed, size_of_last_frame;
 	bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
    
-	//thread_mutex_lock(&st->paging_tree_lock);
+	thread_mutex_lock(&st->paging_tree_lock);
  
     //printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
@@ -491,7 +492,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * frames_needed);	
 	}
 
-	//thread_mutex_unlock(&st->paging_tree_lock);
+	thread_mutex_unlock(&st->paging_tree_lock);
 		
 	*buf = (void *)vaddr;
 

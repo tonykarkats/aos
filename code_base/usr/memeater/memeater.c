@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 	
 	int ret_val;
 	thread_join(t, &ret_val);
-	//thread_join(t2, &ret_val);
+	
 	debug_printf("main: Thread finished!\n");
 	
 	while(1);
