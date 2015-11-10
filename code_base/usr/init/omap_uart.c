@@ -1,12 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-#include <barrelfish/morecore.h>
-#include <barrelfish/dispatcher_arch.h>
 #include <barrelfish/debug.h>
-#include <barrelfish/lmp_chan.h>
 #include <barrelfish/sys_debug.h>
-#include <math.h>
-#include <barrelfish/aos_rpc.h>
+#include "omap_uart.h"
 
 static volatile lvaddr_t uart3_base;
 static volatile lvaddr_t uart3_lsr;
@@ -24,24 +20,34 @@ void uart_initialize(lvaddr_t mapped_address){
 	uart3_fcr = mapped_address + 0x08;
 	uart3_lcr = mapped_address + 0x0C;
 
-	*uart3_ier = 0;
-	*uart3_fcr = 0xf1;
-	*uart3_lcr = 0x03;
+	*(char *) uart3_ier = 0;
+	*(char *) uart3_fcr = 0xf1;
+	*(char *) uart3_lcr = 0x03;
 }
 
 void serial_putchar(char c) {
 
 	if (c == '\n')
-		c = '\r';
+		serial_putchar('\r');
 
-	while (!(*uart_lsr ) & 0x20);
+	while ((!(* (char * ) uart3_lsr )) & 0x20);
 
-	*uart_thr = c;
+	*(char *)uart3_thr = c;
 }
 
 char serial_getchar(void) {
 
-	while (!(*uart_lsr & 0x01));
+	while (!(* (char *) uart3_lsr & 0x01));
 
-	return (char) *uart_thr;
+	return (char) *(char *) uart3_thr;
 }
+
+static int poll_serial_thread(void) {
+
+	while(1) {
+		// TODO
+	}
+	return 1;	
+}
+
+
