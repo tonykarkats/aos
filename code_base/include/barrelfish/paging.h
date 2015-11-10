@@ -59,6 +59,7 @@ struct paging_state {
     // A red-black tree that holds all the chunks of memory
     // reserved or free.
 	rb_red_blk_tree* mem_tree;
+	struct thread_mutex paging_tree_lock;
     
 };
 

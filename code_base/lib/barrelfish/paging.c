@@ -1,4 +1,6 @@
 /**
+
+
  * \file
  * \brief Barrelfish paging helpers.
  */
@@ -17,10 +19,10 @@
 #include <barrelfish/except.h>
 #include <barrelfish/slab.h>
 #include "threads_priv.h"
-// #include <barrelfish/red_black_tree.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <barrelfish/thread_sync.h>
 
 #define S_SIZE 8192*2
 #define START_VADDR (1UL<<25)
@@ -132,6 +134,8 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 			debug_printf("map_page: Can not map user provided frame!\n");
 			return err_push(err, LIB_ERR_FRAME_ALLOC);
 		}		
+
+
 		
 		return SYS_ERR_OK;
 	}
@@ -226,7 +230,10 @@ static void exception_handler(enum exception_type type,
 			printf("exception_handler: Address outside of valid boundaries!\n");		
 			abort();
 		}		
-
+	
+		// Get lock 
+		//thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
+		
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
 			printf("exception_handler: Address not mapped!\n");
 			abort();			
@@ -239,6 +246,8 @@ static void exception_handler(enum exception_type type,
 				abort();
 			}
 		}
+		
+		//thread_mutex_unlock(&get_current_paging_state()->paging_tree_lock);
 	}
 }
 
@@ -263,25 +272,19 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 		tree->l2_maps[i] = false;
 		tree->l2_tables[i] = NULL_CAP;
 	}
-    //printf("Before first SafeMalloc\n");
     newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
-    //newAddr = &vaddr_start;
 
-    //printf("After first SafeMalloc\n");
     *newAddr = START_VADDR;
-    
     newMemory = (memory_chunk *) SafeMalloc(sizeof(memory_chunk));
-    //newMemory = &first_chunk;  
 
     newMemory->reserved = 0;
     newMemory->size = MAX_MEMORY;
     
-    //printf("Before first tree insert\n");
     RBTreeInsert(tree, newAddr ,newMemory);
-    //printf("After first tree insert\n");
     st->mem_tree = tree;
 
-//    printf("paging_init: Paging Struct initialized.\n");
+	//thread_mutex_init(&st->paging_tree_lock);
+
     return SYS_ERR_OK;
 }
 
@@ -447,7 +450,9 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	lvaddr_t vaddr;
 	int frames_needed, size_of_last_frame;
 	bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
-    
+   
+	//thread_mutex_lock(&st->paging_tree_lock);
+ 
     //printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
@@ -486,9 +491,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * frames_needed);	
 	}
 
-	//for (int i = 0; i<4096; i++)
-	//	chunk->l2_mapped[i] = false;
-
+	//thread_mutex_unlock(&st->paging_tree_lock);
 		
 	*buf = (void *)vaddr;
 

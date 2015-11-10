@@ -23,7 +23,7 @@
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
 #include <dev/omap/omap_uart_dev.h>
-
+#include "omap_uart.h"
 #define UNUSED(x) (x) = (x)
 
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -72,17 +72,18 @@ char serial_getchar(void) {
 	return (char) *(char *) uart3_thr;
 }
 
-static char serial_input_buffer[4096];
-static int buffer_head = 0;
-static int buffer_tail = 0;
-
+//static char serial_input_buffer[4096];
+//static int buffer_head = 0;
+//static int buffer_tail = 0;
+/*
 static int poll_serial(void) {
 
 	while(1) {
 		// TODO
-	}	
+	}
+	return 1;	
 }
-
+*/
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
@@ -124,7 +125,7 @@ static void recv_handler(void *arg)
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
-//			debug_printf("recv_handler: String received : %s\n", message_string);
+			debug_printf("recv_handler: String received : %s\n", message_string);
 			break;
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			
@@ -143,9 +144,11 @@ static void recv_handler(void *arg)
 			break;
 		case AOS_RPC_PUT_CHAR:
 			// TODO
+			debug_printf("nyi\n");
 			break;
-		case 
+		case AOS_RPC_GET_CHAR: 
 			// TODO
+			debug_printf("nyi\n");
 			break;
 	}
 	
@@ -264,7 +267,6 @@ int main(int argc, char *argv[])
 	serial_putchar('K');
 	//serial_putchar('\r');	
 	serial_putchar('\n');	
-	while(1);
 
 	// allocate slot for incoming capabilites
     // register receive handler 

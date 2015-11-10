@@ -35,18 +35,12 @@ static int test_thread(void){
     }
 
 	char* buf = (char *) vbuf;
-//	for (int i = 0 ; i <  2*4096; i++)
-//		buf[i] = i/4096;
 
 
 	buf[0] = 66;
 	buf[4096] = 77;
 
 	debug_printf("%d %d\n", buf[0], buf[4096]);
-//	for (int i = 0 ; i< 2*4096; i++)
-//		assert(buf[i] == i);
-//	for (int i = 0 ; i< 2*4096; i++)
-//		assert(buf[i] == (i/4096));
 
 	thread_id++;
 	return 0;
@@ -71,19 +65,7 @@ int main(int argc, char *argv[])
 	thread_join(t, &ret_val);
 	//thread_join(t2, &ret_val);
 	debug_printf("main: Thread finished!\n");
-/*	
-
-	 err = paging_alloc(get_current_paging_state(), &vbuf, (1024*1024*800));
-    if (err_is_fail(err)) {
-        printf("error in paging_alloc: %s\n", err_getstring(err));
-        abort();
-    }
-
-	char* buf = (char *) vbuf;
-	for (int i = 0 ; i < 1024*1024*512; i++)
-		buf[i] = i;
-*/
-
+	
 	while(1);
 
    return 0;

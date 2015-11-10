@@ -8,6 +8,7 @@
 #define HAVE_BARELLFISH_RED_BLACK
 #endif
 
+#include <barrelfish/thread_sync.h>
 #include <stdbool.h>
 typedef uintptr_t lvaddr_t;
 
@@ -80,7 +81,7 @@ typedef struct rb_red_blk_tree {
   struct capref l2_tables[4096];
   bool l2_maps[4096];
 
-  th
+  struct thread_mutex paging_tree_lock;
 } rb_red_blk_tree;
 
 /* The functions below are described in the .c file */ 

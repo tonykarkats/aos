@@ -792,7 +792,7 @@ BUFMAX	kernel/gdb_stub.c	71;"	d	file:
 BUFSIZ	include/oldc/stdio.h	98;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	106;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	108;"	d
-BUFSIZE	usr/init/init.c	31;"	d	file:
+BUFSIZE	usr/init/init.c	30;"	d	file:
 BUFSIZE	usr/init_memtest/init.c	24;"	d	file:
 BUFSIZE	usr/memeater/memeater.c	16;"	d	file:
 BUFSIZE_2	usr/memeater/memeater.c	14;"	d	file:
@@ -1204,7 +1204,7 @@ CLEAN_OPTIONS_FLAGS	lib/net_queue_manager/frag.c	99;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	113;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	66;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	92;"	d	file:
-CLIENT_LIMIT	usr/init/init.c	36;"	d	file:
+CLIENT_LIMIT	usr/init/init.c	35;"	d	file:
 CLK_TCK	lib/newlib/newlib/libc/include/time.h	25;"	d
 CLOCAL	include/sys/_termios.h	143;"	d
 CLOCKDRIFT_TIMEOUT	tools/harness/tests/clockdrift.py	/^CLOCKDRIFT_TIMEOUT = datetime.timedelta(hours=13)$/;"	v
@@ -1618,7 +1618,7 @@ DEBUGPRINTF	lib/thc/thcstubs.c	19;"	d	file:
 DEBUGPRINTF	lib/thc/thcsync.c	21;"	d	file:
 DEBUGPRINTPS	lib/lwip/src/core/init.c	73;"	d	file:
 DEBUGPRINTPS	lib/lwip/src/core/init.c	75;"	d	file:
-DEBUG_ASSERT	include/barrelfish/red_black_tree.h	16;"	d
+DEBUG_ASSERT	include/barrelfish/red_black_tree.h	17;"	d
 DEBUG_ASSERT	include/red_black_tree.h	24;"	d
 DEBUG_ASSERT	lib/barrelfish/red_black_tree.h	26;"	d
 DEBUG_AWE	lib/thc/thc.c	59;"	d	file:
@@ -4042,11 +4042,11 @@ FIONREAD	include/lwip/sockets.h	251;"	d
 FIRSTEP_BUFLEN	kernel/arch/omap44xx/startup_arch.c	53;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/aos_rpc.c	18;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/lmp_endpoints.c	507;"	d	file:
-FIRSTEP_BUFLEN	usr/init/init.c	34;"	d	file:
+FIRSTEP_BUFLEN	usr/init/init.c	33;"	d	file:
 FIRSTEP_BUFLEN	usr/memeater/memeater.c	19;"	d	file:
 FIRSTEP_OFFSET	kernel/arch/omap44xx/startup_arch.c	49;"	d	file:
 FIRSTEP_OFFSET	lib/barrelfish/aos_rpc.c	19;"	d	file:
-FIRSTEP_OFFSET	usr/init/init.c	35;"	d	file:
+FIRSTEP_OFFSET	usr/init/init.c	34;"	d	file:
 FIRSTEP_OFFSET	usr/memeater/memeater.c	20;"	d	file:
 FIRST_RANGE_INDEX	lib/newlib/newlib/libc/iconv/ccs/ccs.h	125;"	d
 FIRST_UNRANGED_INDEX_INDEX	lib/newlib/newlib/libc/iconv/ccs/ccs.h	123;"	d
@@ -7075,7 +7075,7 @@ MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/msizer.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/pvallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/reallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/vallocr.c	1405;"	d	file:
-MALLOC_BUFSIZE	usr/init/init.c	30;"	d	file:
+MALLOC_BUFSIZE	usr/init/init.c	29;"	d	file:
 MALLOC_BUFSIZE	usr/init_memtest/init.c	23;"	d	file:
 MALLOC_BUFSIZE	usr/memeater/memeater.c	15;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/machine/powerpc/vec_mallocr.c	150;"	d	file:
@@ -11114,7 +11114,7 @@ S9	lib/oldc/msun/ld128/k_sinl.c	/^S9  = -0.8220635245834894781251212216344620249
 SAFE	include/deputy/nodeputy.h	21;"	d
 SAFE_LEFT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	368;"	d
 SAFE_RIGHT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	371;"	d
-SAFE_VADDR	usr/init/init.c	32;"	d	file:
+SAFE_VADDR	usr/init/init.c	31;"	d	file:
 SAFE_VADDR	usr/init_memtest/init.c	25;"	d	file:
 SAFE_VADDR	usr/memeater/memeater.c	17;"	d	file:
 SAMPLE_INTERVAL	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	76;"	d	file:
@@ -14311,7 +14311,7 @@ UNROLL_FACTOR	lib/newlib/newlib/libc/machine/mips/strncpy.c	39;"	d	file:
 UNSIGNED	lib/oldc/src/vfscanf.c	65;"	d	file:
 UNSTABLE	include/nfs/nfs_rpc.h	/^    UNSTABLE = 0,$/;"	e	enum:stable_how
 UNUSED	kernel/arch/omap44xx/startup_arch.c	34;"	d	file:
-UNUSED	usr/init/init.c	28;"	d	file:
+UNUSED	usr/init/init.c	27;"	d	file:
 UNUSED	usr/init_memtest/init.c	20;"	d	file:
 UPAP_DEFREQTIME	include/lwip/opt.h	1467;"	d
 UPAP_DEFTIMEOUT	include/lwip/opt.h	1463;"	d
@@ -33287,6 +33287,7 @@ paging_set_flags	kernel/arch/omap44xx/paging.c	/^paging_set_flags(union arm_l2_e
 paging_set_l2_entry	kernel/arch/omap44xx/paging.c	/^void paging_set_l2_entry(uintptr_t* l2e, lpaddr_t addr, uintptr_t flags)$/;"	f
 paging_state	include/barrelfish/core_state.h	/^    struct paging_state *paging_state;$/;"	m	struct:core_state_generic	typeref:struct:core_state_generic::paging_state
 paging_state	include/barrelfish/paging.h	/^struct paging_state {$/;"	s
+paging_tree_lock	include/barrelfish/red_black_tree.h	/^  struct thread_mutex paging_tree_lock;$/;"	m	struct:rb_red_blk_tree	typeref:struct:rb_red_blk_tree::thread_mutex
 paging_unmap	kernel/include/target/x86_64/paging_kernel_target.h	/^static inline void paging_unmap(union x86_64_ptable_entry * NONNULL entry)$/;"	f
 paging_unmap	lib/barrelfish/paging.c	/^errval_t paging_unmap(struct paging_state *st, const void *region)$/;"	f
 paging_write_l1_entry	kernel/arch/omap44xx/paging.c	/^paging_write_l1_entry(uintptr_t ttbase, lvaddr_t va, union arm_l1_entry l1)$/;"	f	file:
@@ -36575,6 +36576,7 @@ serial_debug_putchar	kernel/include/serial.h	/^static inline void serial_debug_p
 serial_early_init	kernel/arch/omap44xx/omap_uart.c	/^errval_t serial_early_init(unsigned port)$/;"	f
 serial_getchar	kernel/arch/omap44xx/omap_uart.c	/^char serial_getchar(unsigned port)$/;"	f
 serial_getchar	usr/init/init.c	/^char serial_getchar(void) {$/;"	f
+serial_getchar	usr/init/omap_uart.c	/^char serial_getchar(void) {$/;"	f
 serial_init	kernel/arch/omap44xx/omap_uart.c	/^errval_t serial_init(unsigned port)$/;"	f
 serial_input_buffer	usr/init/init.c	/^static char serial_input_buffer[4096];$/;"	v	file:
 serial_num_physical_ports	kernel/arch/omap44xx/omap_uart.c	/^unsigned const int serial_num_physical_ports = NUM_PORTS;$/;"	v
@@ -36583,6 +36585,7 @@ serial_portbase	tools/molly/molly_init.c	/^static int serial_portbase = 0x3f8; \
 serial_putchar	kernel/arch/omap44xx/omap_uart.c	/^void serial_putchar(unsigned port, char c)$/;"	f
 serial_putchar	tools/molly/molly_init.c	/^static void serial_putchar(char c)$/;"	f	file:
 serial_putchar	usr/init/init.c	/^void serial_putchar(char c) {$/;"	f
+serial_putchar	usr/init/omap_uart.c	/^void serial_putchar(char c) {$/;"	f
 served	include/thc/thcsync.h	/^  int                served;$/;"	m	struct:thc_queue_entry
 server	lib/nfs/rpc.h	/^    struct ip_addr server;  \/\/\/< Server IP$/;"	m	struct:rpc_client	typeref:struct:rpc_client::ip_addr
 server_connected	lib/barrelfish/domain.c	/^static errval_t server_connected(void *st, struct interdisp_binding *b)$/;"	f	file:
@@ -40357,17 +40360,24 @@ uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake     = AmbaFake(pio_addr=0
 uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake    = AmbaFake(pio_addr=0x1000b000)$/;"	v	class:RealViewEB
 uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake    = AmbaFake(pio_addr=0x1000b000)$/;"	v	class:RealViewPBX
 uart3_base	usr/init/init.c	/^static volatile lvaddr_t uart3_base;$/;"	v	file:
+uart3_base	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_base;$/;"	v	file:
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake     = AmbaFake(pio_addr=0x1C0C0000)$/;"	v	class:VExpress_EMM
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake     = AmbaFake(pio_addr=0xE000C000)$/;"	v	class:VExpress_ELT
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake    = AmbaFake(pio_addr=0x1000c000)$/;"	v	class:RealViewEB
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake    = AmbaFake(pio_addr=0x1000c000)$/;"	v	class:RealViewPBX
 uart3_fcr	usr/init/init.c	/^static volatile lvaddr_t uart3_fcr;$/;"	v	file:
+uart3_fcr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_fcr;$/;"	v	file:
 uart3_ier	usr/init/init.c	/^static volatile lvaddr_t uart3_ier;$/;"	v	file:
+uart3_ier	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_ier;$/;"	v	file:
 uart3_lcr	usr/init/init.c	/^static volatile lvaddr_t uart3_lcr;$/;"	v	file:
+uart3_lcr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_lcr;$/;"	v	file:
 uart3_lsr	usr/init/init.c	/^static volatile lvaddr_t uart3_lsr;$/;"	v	file:
+uart3_lsr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_lsr;$/;"	v	file:
 uart3_thr	usr/init/init.c	/^static volatile lvaddr_t uart3_thr;$/;"	v	file:
+uart3_thr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_thr;$/;"	v	file:
 uart_base	kernel/arch/omap44xx/omap_uart.c	/^lpaddr_t uart_base[NUM_PORTS] = {$/;"	v
 uart_initialize	usr/init/init.c	/^void uart_initialize(lvaddr_t mapped_address){$/;"	f
+uart_initialize	usr/init/omap_uart.c	/^void uart_initialize(lvaddr_t mapped_address){$/;"	f
 uart_initialized	kernel/arch/omap44xx/omap_uart.c	/^static bool uart_initialized[NUM_PORTS];$/;"	v	file:
 uart_size	kernel/arch/omap44xx/omap_uart.c	/^size_t uart_size[NUM_PORTS] = {$/;"	v
 uart_slot	include/barrelfish_kpi/init.h	/^    cslot_t             uart_slot; \/\/ slot no. for UART device$/;"	m	struct:bootinfo
