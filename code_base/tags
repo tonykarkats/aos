@@ -792,7 +792,7 @@ BUFMAX	kernel/gdb_stub.c	71;"	d	file:
 BUFSIZ	include/oldc/stdio.h	98;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	106;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	108;"	d
-BUFSIZE	usr/init/init.c	30;"	d	file:
+BUFSIZE	usr/init/init.c	32;"	d	file:
 BUFSIZE	usr/init_memtest/init.c	24;"	d	file:
 BUFSIZE	usr/memeater/memeater.c	16;"	d	file:
 BUFSIZE_2	usr/memeater/memeater.c	14;"	d	file:
@@ -1204,7 +1204,7 @@ CLEAN_OPTIONS_FLAGS	lib/net_queue_manager/frag.c	99;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	113;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	66;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	92;"	d	file:
-CLIENT_LIMIT	usr/init/init.c	35;"	d	file:
+CLIENT_LIMIT	usr/init/init.c	37;"	d	file:
 CLK_TCK	lib/newlib/newlib/libc/include/time.h	25;"	d
 CLOCAL	include/sys/_termios.h	143;"	d
 CLOCKDRIFT_TIMEOUT	tools/harness/tests/clockdrift.py	/^CLOCKDRIFT_TIMEOUT = datetime.timedelta(hours=13)$/;"	v
@@ -1976,7 +1976,7 @@ DETECTNULL	lib/newlib/newlib/libc/string/strncmp.c	51;"	d	file:
 DETECTNULL	lib/newlib/newlib/libc/string/strncpy.c	51;"	d	file:
 DETECTNULL	lib/newlib/newlib/libc/string/strncpy.c	55;"	d	file:
 DEVICE_COMMANDS_H	include/usb/device_commands.h	18;"	d
-DEVICE_FLAGS	lib/barrelfish/paging.c	29;"	d	file:
+DEVICE_FLAGS	lib/barrelfish/paging.c	32;"	d	file:
 DEVICE_MANAGER_DEBUG_H_	lib/net_device_manager/device_manager_debug.h	11;"	d
 DEVICE_OFFSET	kernel/include/arch/armv7/offsets.h	137;"	d
 DEVICE_REGISTERS_H_	include/arch/arm/omap44xx/device_registers.h	14;"	d
@@ -4042,11 +4042,11 @@ FIONREAD	include/lwip/sockets.h	251;"	d
 FIRSTEP_BUFLEN	kernel/arch/omap44xx/startup_arch.c	53;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/aos_rpc.c	18;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/lmp_endpoints.c	507;"	d	file:
-FIRSTEP_BUFLEN	usr/init/init.c	33;"	d	file:
+FIRSTEP_BUFLEN	usr/init/init.c	35;"	d	file:
 FIRSTEP_BUFLEN	usr/memeater/memeater.c	19;"	d	file:
 FIRSTEP_OFFSET	kernel/arch/omap44xx/startup_arch.c	49;"	d	file:
 FIRSTEP_OFFSET	lib/barrelfish/aos_rpc.c	19;"	d	file:
-FIRSTEP_OFFSET	usr/init/init.c	34;"	d	file:
+FIRSTEP_OFFSET	usr/init/init.c	36;"	d	file:
 FIRSTEP_OFFSET	usr/memeater/memeater.c	20;"	d	file:
 FIRST_RANGE_INDEX	lib/newlib/newlib/libc/iconv/ccs/ccs.h	125;"	d
 FIRST_UNRANGED_INDEX_INDEX	lib/newlib/newlib/libc/iconv/ccs/ccs.h	123;"	d
@@ -4057,7 +4057,7 @@ FLAG	lib/newlib/newlib/libc/stdio/local.h	/^  FLAG,   \/* format flag *\/$/;"	e	
 FLAG4_BIT	lib/dmalloc/dmalloc.c	2242;"	d	file:
 FLAG4_BIT	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2247;"	d	file:
 FLAGBITS	lib/mm/mm.c	50;"	d	file:
-FLAGS	lib/barrelfish/paging.c	28;"	d	file:
+FLAGS	lib/barrelfish/paging.c	31;"	d	file:
 FLAG_BITS	lib/dmalloc/dmalloc.c	2244;"	d	file:
 FLAG_BITS	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2249;"	d	file:
 FLOATING_POINT	lib/newlib/newlib/libc/machine/powerpc/vfprintf.c	154;"	d	file:
@@ -5403,6 +5403,8 @@ INIT_VBASE	kernel/include/arch/armv7/offsets.h	102;"	d
 INLCR	include/sys/_termios.h	102;"	d
 INLINE	include/arch/cc.h	57;"	d
 INPCK	include/sys/_termios.h	100;"	d
+INPUT_BUF_SIZE	usr/init/init.c	30;"	d	file:
+INPUT_BUF_SIZE	usr/init/omap_uart.h	7;"	d
 INRANGE	lib/oldc/msun/src/s_lround.c	52;"	d	file:
 INSECURE	lib/dmalloc/dmalloc.c	610;"	d	file:
 INSECURE	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	610;"	d	file:
@@ -7075,7 +7077,7 @@ MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/msizer.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/pvallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/reallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/vallocr.c	1405;"	d	file:
-MALLOC_BUFSIZE	usr/init/init.c	29;"	d	file:
+MALLOC_BUFSIZE	usr/init/init.c	31;"	d	file:
 MALLOC_BUFSIZE	usr/init_memtest/init.c	23;"	d	file:
 MALLOC_BUFSIZE	usr/memeater/memeater.c	15;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/machine/powerpc/vec_mallocr.c	150;"	d	file:
@@ -7332,7 +7334,7 @@ MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfiscanf.c	183;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfiwscanf.c	180;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfscanf.c	183;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfwscanf.c	180;"	d	file:
-MAX_MEMORY	lib/barrelfish/paging.c	27;"	d	file:
+MAX_MEMORY	lib/barrelfish/paging.c	30;"	d	file:
 MAX_MEM_LEVEL	include/zconf.h	136;"	d
 MAX_MEM_LEVEL	include/zconf.h	138;"	d
 MAX_MEM_REGIONS	include/barrelfish_kpi/init.h	58;"	d
@@ -11114,7 +11116,7 @@ S9	lib/oldc/msun/ld128/k_sinl.c	/^S9  = -0.8220635245834894781251212216344620249
 SAFE	include/deputy/nodeputy.h	21;"	d
 SAFE_LEFT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	368;"	d
 SAFE_RIGHT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	371;"	d
-SAFE_VADDR	usr/init/init.c	31;"	d	file:
+SAFE_VADDR	usr/init/init.c	33;"	d	file:
 SAFE_VADDR	usr/init_memtest/init.c	25;"	d	file:
 SAFE_VADDR	usr/memeater/memeater.c	17;"	d	file:
 SAMPLE_INTERVAL	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	76;"	d	file:
@@ -12584,7 +12586,7 @@ START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(strtoul_hex)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(strtoul_upper_hex)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(ungetc_multiple_test)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(ungetc_test)$/;"	f
-START_VADDR	lib/barrelfish/paging.c	26;"	d	file:
+START_VADDR	lib/barrelfish/paging.c	29;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	120;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	73;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	99;"	d	file:
@@ -13074,7 +13076,8 @@ S_IXOTH	include/sys/stat.h	54;"	d
 S_IXOTH	lib/newlib/newlib/libc/include/sys/stat.h	123;"	d
 S_IXUSR	include/sys/stat.h	48;"	d
 S_IXUSR	lib/newlib/newlib/libc/include/sys/stat.h	115;"	d
-S_SIZE	lib/barrelfish/paging.c	25;"	d	file:
+S_SIZE	lib/barrelfish/paging.c	28;"	d	file:
+S_SIZE_PER_THREAD	lib/barrelfish/paging.c	27;"	d	file:
 SafeFree	lib/barrelfish/misc.c	/^void SafeFree(void* addr) {$/;"	f
 SafeMalloc	lib/barrelfish/misc.c	/^void * SafeMalloc(size_t size) {$/;"	f
 SaveThese	tools/demo/Aquarium/Dialogs.cs	/^        public static bool SaveThese(string extension, string filter,$/;"	m	class:Aquarium.Dialogs
@@ -14311,7 +14314,7 @@ UNROLL_FACTOR	lib/newlib/newlib/libc/machine/mips/strncpy.c	39;"	d	file:
 UNSIGNED	lib/oldc/src/vfscanf.c	65;"	d	file:
 UNSTABLE	include/nfs/nfs_rpc.h	/^    UNSTABLE = 0,$/;"	e	enum:stable_how
 UNUSED	kernel/arch/omap44xx/startup_arch.c	34;"	d	file:
-UNUSED	usr/init/init.c	27;"	d	file:
+UNUSED	usr/init/init.c	28;"	d	file:
 UNUSED	usr/init_memtest/init.c	20;"	d	file:
 UPAP_DEFREQTIME	include/lwip/opt.h	1467;"	d
 UPAP_DEFTIMEOUT	include/lwip/opt.h	1463;"	d
@@ -22302,9 +22305,9 @@ buffer	lib/newlib/newlib/libc/time/strftime.c	/^  CHAR *buffer;$/;"	m	struct:__a
 buffer	lib/newlib/newlib/libm/test/convert.c	/^static char buffer[500];$/;"	v	file:
 buffer	lib/newlib/newlib/libm/test/dcvt.c	/^  char *buffer ;		\/* Destination of conversion *\/$/;"	m	struct:__anon276	file:
 buffer	lib/skb/skb_functions.c	/^static char buffer[BUFFER_SIZE];$/;"	v	file:
+buffer	usr/init/omap_uart.h	/^	char buffer[INPUT_BUF_SIZE];$/;"	m	struct:serial_ring_buffer
 buffer_desc	lib/lwip/src/barrelfish/idc_barrelfish.h	/^struct buffer_desc {$/;"	s
 buffer_descriptor	include/net_queue_manager/net_queue_manager.h	/^struct buffer_descriptor {$/;"	s
-buffer_head	usr/init/init.c	/^static int buffer_head = 0;$/;"	v	file:
 buffer_id	include/net_queue_manager/net_queue_manager.h	/^    uint64_t buffer_id;  \/\/ buffer identifier$/;"	m	struct:buffer_descriptor
 buffer_id	include/procon/procon.h	/^    volatile uint64_t buffer_id;$/;"	m	struct:slot_data
 buffer_id	lib/lwip/src/barrelfish/idc_barrelfish.h	/^    uint64_t buffer_id;  \/\/ Assigned by the network driver after registering$/;"	m	struct:buffer_desc
@@ -22316,7 +22319,6 @@ buffer_memory_types	include/barrelfish/net_constants.h	/^enum buffer_memory_type
 buffer_port_translation	lib/net_device_manager/port_management_support.h	/^struct buffer_port_translation {$/;"	s
 buffer_ptr	include/net_queue_manager/net_queue_manager.h	/^    struct buffer_descriptor *buffer_ptr; \/\/ buffer associated with client$/;"	m	struct:client_closure	typeref:struct:client_closure::buffer_descriptor
 buffer_size	lib/newlib/newlib/libm/test/dcvt.c	/^  int buffer_size;              \/* Size of output buffer *\/$/;"	m	struct:__anon276	file:
-buffer_tail	usr/init/init.c	/^static int buffer_tail = 0;$/;"	v	file:
 bufferable	include/target/arm/barrelfish_kpi/paging_arm_v7.h	/^        uint32_t        bufferable      :1;$/;"	m	struct:arm_l1_entry::__anon105
 bufferable	include/target/arm/barrelfish_kpi/paging_arm_v7.h	/^        uint32_t        bufferable      :1;$/;"	m	struct:arm_l1_entry::__anon106
 bufferable	include/target/arm/barrelfish_kpi/paging_arm_v7.h	/^        uint32_t        bufferable      :1;$/;"	m	struct:arm_l2_entry::__anon108
@@ -24803,7 +24805,7 @@ e_shstrndx	include/elf/elf.h	/^    uint16_t e_shstrndx;                \/\/ 50$/
 e_shstrndx	tools/dite/elf.h	/^    uint16_t       e_shstrndx;$/;"	m	struct:Elf64_Ehdr
 e_shstrndx	tools/dite/elf.h	/^    uint16_t e_shstrndx;                \/\/ 50$/;"	m	struct:Elf32_Ehdr
 e_stack	lib/barrelfish/paging.c	/^static char e_stack[S_SIZE];$/;"	v	file:
-e_stack_top	lib/barrelfish/paging.c	/^static char *e_stack_top = e_stack + S_SIZE;$/;"	v	file:
+e_stack_head	lib/barrelfish/paging.c	/^static int e_stack_head = 0;$/;"	v	file:
 e_type	include/elf/elf.h	/^    uint16_t       e_type;$/;"	m	struct:Elf64_Ehdr
 e_type	include/elf/elf.h	/^    uint16_t e_type;                    \/\/ 16$/;"	m	struct:Elf32_Ehdr
 e_type	tools/dite/elf.h	/^    uint16_t       e_type;$/;"	m	struct:Elf64_Ehdr
@@ -27313,6 +27315,7 @@ head	lib/newlib/newlib/libc/stdlib/reallocr.c	/^static GmListElement* head = 0;$
 head	lib/newlib/newlib/libc/stdlib/vallocr.c	/^static GmListElement* head = 0;$/;"	v	file:
 head	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  size_t                    head;$/;"	m	struct:malloc_tree_chunk	file:
 head	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  size_t               head;       \/* Size and inuse bits. *\/$/;"	m	struct:malloc_chunk	file:
+head	usr/init/omap_uart.h	/^	size_t head;$/;"	m	struct:serial_ring_buffer
 head32	tools/dite/dite.c	/^    struct Elf32_Ehdr *head32;$/;"	m	union:__anon309	typeref:struct:__anon309::Elf32_Ehdr	file:
 head64	tools/dite/dite.c	/^    struct Elf64_Ehdr *head64;$/;"	m	union:__anon309	typeref:struct:__anon309::Elf64_Ehdr	file:
 head_buf	include/barrelfish/core_state.h	/^    char    head_buf[SINGLE_SLOT_ALLOC_BUFLEN(SLOT_ALLOC_CNODE_SLOTS)];$/;"	m	struct:slot_alloc_state
@@ -27959,6 +27962,7 @@ initial_top	lib/newlib/newlib/libc/stdlib/vallocr.c	1590;"	d	file:
 initialize_mem_serv	usr/init/mem_serv.c	/^errval_t initialize_mem_serv(void)$/;"	f
 initialize_ram_alloc	usr/init/mem_alloc.c	/^errval_t initialize_ram_alloc(void)$/;"	f
 initialize_ram_alloc	usr/init_memtest/mem_alloc.c	/^errval_t initialize_ram_alloc(void)$/;"	f
+initialize_ring	usr/init/omap_uart.c	/^void initialize_ring(struct serial_ring_buffer* ring) {$/;"	f
 initialized	lib/barrelfish/domain.c	/^    bool initialized;                   \/\/\/< True if remote initialized$/;"	m	struct:span_domain_state	file:
 initialized	lib/barrelfish/domain.c	/^    bool initialized;             \/\/\/< true if remote core is fully initialized$/;"	m	struct:remote_core_state	file:
 initrd_size	include/target/arm/barrelfish_kpi/arm_core_data.h	/^    uint32_t	initrd_size;$/;"	m	struct:arm_core_data
@@ -33287,6 +33291,7 @@ paging_set_flags	kernel/arch/omap44xx/paging.c	/^paging_set_flags(union arm_l2_e
 paging_set_l2_entry	kernel/arch/omap44xx/paging.c	/^void paging_set_l2_entry(uintptr_t* l2e, lpaddr_t addr, uintptr_t flags)$/;"	f
 paging_state	include/barrelfish/core_state.h	/^    struct paging_state *paging_state;$/;"	m	struct:core_state_generic	typeref:struct:core_state_generic::paging_state
 paging_state	include/barrelfish/paging.h	/^struct paging_state {$/;"	s
+paging_tree_lock	include/barrelfish/paging.h	/^	struct thread_mutex paging_tree_lock;$/;"	m	struct:paging_state	typeref:struct:paging_state::thread_mutex
 paging_tree_lock	include/barrelfish/red_black_tree.h	/^  struct thread_mutex paging_tree_lock;$/;"	m	struct:rb_red_blk_tree	typeref:struct:rb_red_blk_tree::thread_mutex
 paging_unmap	kernel/include/target/x86_64/paging_kernel_target.h	/^static inline void paging_unmap(union x86_64_ptable_entry * NONNULL entry)$/;"	f
 paging_unmap	lib/barrelfish/paging.c	/^errval_t paging_unmap(struct paging_state *st, const void *region)$/;"	f
@@ -33643,7 +33648,7 @@ poll	lib/newlib/newlib/libc/posix/namespace.h	76;"	d
 poll	lib/oldc/src/locale/namespace.h	84;"	d
 poll	lib/oldc/src/locale/un-namespace.h	65;"	d
 poll_channel	lib/barrelfish/waitset.c	/^static void poll_channel(struct waitset_chanstate *chan)$/;"	f	file:
-poll_serial	usr/init/init.c	/^static int poll_serial(void) {$/;"	f	file:
+poll_serial_thread	usr/init/omap_uart.c	/^int poll_serial_thread(void * arg) {$/;"	f
 poll_tcp	lib/lwip/src/api/api_msg.c	/^static err_t poll_tcp(void *arg, struct tcp_pcb *pcb)$/;"	f	file:
 pollcycles_expired	lib/barrelfish/waitset.c	/^bool pollcycles_expired(cycles_t pollcycles)$/;"	f	file:
 pollcycles_reset	lib/barrelfish/waitset.c	/^cycles_t pollcycles_reset(void)$/;"	f	file:
@@ -35332,6 +35337,7 @@ read_ea	lib/newlib/newlib/libc/machine/spu/read_ea.c	/^COMPAT_EA_ALIAS (read_ea)
 read_ea	lib/newlib/newlib/libc/machine/spu/read_ea.c	/^read_ea (int fd, __ea void *buf, size_ea_t count)$/;"	f
 read_fail	lib/newlib/newlib/libc/sys/barrelfish/posix_syscalls.c	/^static int read_fail(int fd, void *buf, size_t len)        { FAIL_FN(); }$/;"	f	file:
 read_fn	include/stdio_file.h	/^    size_t (*read_fn)(void *, long int, size_t, void *);$/;"	m	struct:__file
+read_from_ring	usr/init/omap_uart.c	/^char * read_from_ring(struct serial_ring_buffer * ring, char * c) {$/;"	f
 read_globals	lib/newlib/newlib/libc/stdlib/getopt.c	/^read_globals (struct getopt_data *data)$/;"	f	file:
 read_pt_entry	kernel/arch/omap44xx/paging.c	/^static inline void read_pt_entry(struct capability *pgtable, size_t slot, genpaddr_t *paddr)$/;"	f	file:
 read_reg	include/procon/procon.h	/^    union vreg read_reg;  \/\/ slot-index that Consumer will consume next$/;"	m	struct:shared_pool	typeref:union:shared_pool::vreg
@@ -35793,7 +35799,9 @@ right	include/mdb/types.h	/^    struct cte *left, *right;$/;"	m	struct:mdbnode	t
 right	include/octopus/parser/ast.h	/^    struct ast_object* right;$/;"	m	struct:node_pair	typeref:struct:node_pair::ast_object
 right	include/red_black_tree.h	/^  struct rb_red_blk_node* right;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 right	lib/barrelfish/red_black_tree.h	/^  struct rb_red_blk_node* right;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
+ring	usr/init/init.c	/^static struct serial_ring_buffer ring;$/;"	v	typeref:struct:serial_ring_buffer	file:
 ring_current	kernel/schedule_rr.c	/^static struct dcb *ring_current = NULL;$/;"	v	typeref:struct:dcb	file:
+ring_lock	usr/init/omap_uart.h	/^	struct thread_mutex ring_lock;$/;"	m	struct:serial_ring_buffer	typeref:struct:serial_ring_buffer::thread_mutex
 rint	lib/newlib/newlib/libc/machine/i386/machine/fastmath.h	116;"	d
 rint	lib/newlib/newlib/libm/common/s_rint.c	/^	double rint(double x)$/;"	f
 rint	lib/newlib/newlib/libm/common/sf_rint.c	/^	double rint(double x)$/;"	f
@@ -36575,17 +36583,15 @@ serial_debug_port	kernel/arch/omap44xx/omap_uart.c	/^unsigned int serial_debug_p
 serial_debug_putchar	kernel/include/serial.h	/^static inline void serial_debug_putchar(char c)$/;"	f
 serial_early_init	kernel/arch/omap44xx/omap_uart.c	/^errval_t serial_early_init(unsigned port)$/;"	f
 serial_getchar	kernel/arch/omap44xx/omap_uart.c	/^char serial_getchar(unsigned port)$/;"	f
-serial_getchar	usr/init/init.c	/^char serial_getchar(void) {$/;"	f
 serial_getchar	usr/init/omap_uart.c	/^char serial_getchar(void) {$/;"	f
 serial_init	kernel/arch/omap44xx/omap_uart.c	/^errval_t serial_init(unsigned port)$/;"	f
-serial_input_buffer	usr/init/init.c	/^static char serial_input_buffer[4096];$/;"	v	file:
 serial_num_physical_ports	kernel/arch/omap44xx/omap_uart.c	/^unsigned const int serial_num_physical_ports = NUM_PORTS;$/;"	v
 serial_number	include/usb/usb_device.h	/^    char *serial_number;$/;"	m	struct:usb_device_t
 serial_portbase	tools/molly/molly_init.c	/^static int serial_portbase = 0x3f8; \/\/ COM1$/;"	v	file:
 serial_putchar	kernel/arch/omap44xx/omap_uart.c	/^void serial_putchar(unsigned port, char c)$/;"	f
 serial_putchar	tools/molly/molly_init.c	/^static void serial_putchar(char c)$/;"	f	file:
-serial_putchar	usr/init/init.c	/^void serial_putchar(char c) {$/;"	f
 serial_putchar	usr/init/omap_uart.c	/^void serial_putchar(char c) {$/;"	f
+serial_ring_buffer	usr/init/omap_uart.h	/^struct serial_ring_buffer { $/;"	s
 served	include/thc/thcsync.h	/^  int                served;$/;"	m	struct:thc_queue_entry
 server	lib/nfs/rpc.h	/^    struct ip_addr server;  \/\/\/< Server IP$/;"	m	struct:rpc_client	typeref:struct:rpc_client::ip_addr
 server_connected	lib/barrelfish/domain.c	/^static errval_t server_connected(void *st, struct interdisp_binding *b)$/;"	f	file:
@@ -38729,6 +38735,7 @@ tail	include/contmng/contmng.h	/^    int tail;$/;"	m	struct:cont_queue
 tail	include/lwip/snmp_msg.h	/^        struct snmp_varbind *tail;$/;"	m	struct:snmp_varbind_root	typeref:struct:snmp_varbind_root::snmp_varbind
 tail	include/lwip/snmp_structs.h	/^        struct mib_list_node *tail;$/;"	m	struct:mib_list_rootnode	typeref:struct:mib_list_rootnode::mib_list_node
 tail	lib/barrelfish/stack.h	/^  stk_stack_node * tail;$/;"	m	struct:stk_stack
+tail	usr/init/omap_uart.h	/^	size_t tail;$/;"	m	struct:serial_ring_buffer
 tail_index	include/trace/trace.h	/^    volatile uintptr_t tail_index;$/;"	m	struct:trace_buffer
 tan	lib/newlib/newlib/libc/include/machine/fastmath.h	30;"	d
 tan	lib/newlib/newlib/libm/machine/spu/s_tan.c	/^double tan(double angle)$/;"	f
@@ -40359,24 +40366,17 @@ uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake     = AmbaFake(pio_addr=0
 uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake     = AmbaFake(pio_addr=0xE000B000)$/;"	v	class:VExpress_ELT
 uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake    = AmbaFake(pio_addr=0x1000b000)$/;"	v	class:RealViewEB
 uart2_fake	tools/arm_gem5/RealView.py	/^    uart2_fake    = AmbaFake(pio_addr=0x1000b000)$/;"	v	class:RealViewPBX
-uart3_base	usr/init/init.c	/^static volatile lvaddr_t uart3_base;$/;"	v	file:
 uart3_base	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_base;$/;"	v	file:
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake     = AmbaFake(pio_addr=0x1C0C0000)$/;"	v	class:VExpress_EMM
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake     = AmbaFake(pio_addr=0xE000C000)$/;"	v	class:VExpress_ELT
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake    = AmbaFake(pio_addr=0x1000c000)$/;"	v	class:RealViewEB
 uart3_fake	tools/arm_gem5/RealView.py	/^    uart3_fake    = AmbaFake(pio_addr=0x1000c000)$/;"	v	class:RealViewPBX
-uart3_fcr	usr/init/init.c	/^static volatile lvaddr_t uart3_fcr;$/;"	v	file:
 uart3_fcr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_fcr;$/;"	v	file:
-uart3_ier	usr/init/init.c	/^static volatile lvaddr_t uart3_ier;$/;"	v	file:
 uart3_ier	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_ier;$/;"	v	file:
-uart3_lcr	usr/init/init.c	/^static volatile lvaddr_t uart3_lcr;$/;"	v	file:
 uart3_lcr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_lcr;$/;"	v	file:
-uart3_lsr	usr/init/init.c	/^static volatile lvaddr_t uart3_lsr;$/;"	v	file:
 uart3_lsr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_lsr;$/;"	v	file:
-uart3_thr	usr/init/init.c	/^static volatile lvaddr_t uart3_thr;$/;"	v	file:
 uart3_thr	usr/init/omap_uart.c	/^static volatile lvaddr_t uart3_thr;$/;"	v	file:
 uart_base	kernel/arch/omap44xx/omap_uart.c	/^lpaddr_t uart_base[NUM_PORTS] = {$/;"	v
-uart_initialize	usr/init/init.c	/^void uart_initialize(lvaddr_t mapped_address){$/;"	f
 uart_initialize	usr/init/omap_uart.c	/^void uart_initialize(lvaddr_t mapped_address){$/;"	f
 uart_initialized	kernel/arch/omap44xx/omap_uart.c	/^static bool uart_initialized[NUM_PORTS];$/;"	v	file:
 uart_size	kernel/arch/omap44xx/omap_uart.c	/^size_t uart_size[NUM_PORTS] = {$/;"	v
@@ -41603,6 +41603,7 @@ write_through	kernel/include/target/x86_64/paging_kernel_target.h	/^        uint
 write_through	tools/elver/elver.c	/^        uint64_t        write_through   :1;$/;"	m	struct:pdir_entry::__anon312	file:
 write_through	tools/elver/elver.c	/^        uint64_t        write_through   :1;$/;"	m	struct:ptable_entry::__anon313	file:
 write_through	tools/elver/elver.c	/^        uint64_t        write_through   :1;$/;"	m	struct:ptable_entry::__anon314	file:
+write_to_ring	usr/init/omap_uart.c	/^bool write_to_ring (struct serial_ring_buffer * ring, char * c) {$/;"	f
 writeb	kernel/include/arch/armv7/io.h	/^static inline void writeb(unsigned char b, volatile void *addr)$/;"	f
 writefn	lib/newlib/newlib/libc/stdio/fopencookie.c	/^  cookie_write_function_t *writefn;$/;"	m	struct:fccookie	file:
 writefn	lib/newlib/newlib/libc/stdio/funopen.c	/^  funwrite writefn;$/;"	m	struct:funcookie	file:

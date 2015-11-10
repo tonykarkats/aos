@@ -15,7 +15,7 @@
                       flounderDefs = [ "mem" ],
                       addLinkFlags = [ "-e _start_init"],
                       addLibraries = [ "mm", "getopt", "trace", "elf",
-                            "spawndomain", "elf" ],
+                            "spawndomain", "elf" , "barrelfish"],
                       mackerelDevices = [ "omap/omap_uart" ],
                       architectures = allArchitectures
                     }

@@ -11,7 +11,6 @@
  * If you do not find this file, copies can be found by writing to:
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
-
 #include "init.h"
 #include <stdlib.h>
 #include <string.h>
@@ -24,8 +23,11 @@
 #include <barrelfish/aos_rpc.h>
 #include <dev/omap/omap_uart_dev.h>
 #include "omap_uart.h"
+#include <barrelfish/thread_sync.h>
+
 #define UNUSED(x) (x) = (x)
 
+#define INPUT_BUF_SIZE 4096
 #define MALLOC_BUFSIZE (1UL<<20)
 #define BUFSIZE 32L * 1024 * 1024
 #define SAFE_VADDR (1UL<<25)
@@ -37,6 +39,8 @@
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
+static struct serial_ring_buffer ring;
+
 
 static void recv_handler(void *arg) 
 {
@@ -166,16 +170,16 @@ int main(int argc, char *argv[])
 		debug_printf("CAN not map dev frame");
 		abort();
 	}
-	
-    // TODO (milestone 3) STEP 2:
-    // get waitseti --> get_default_waitset()
-    // allocate lmp chan --> 
-    // init lmp chan --> lmp_chan_init
-    /* make local endpoint available -- this was minted in the kernel in a way
-     * such that the buffer is directly after the dispatcher struct and the
-     * buffer length corresponds DEFAULT_LMP_BUF_WORDS (excluding the kernel 
-     * sentinel word).
-     */
+
+	uart_initialize((lvaddr_t)vbuf);
+
+	initialize_ring(&ring);
+
+	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
+
+	serial_polling_thread = serial_polling_thread;	
+	//thread_join(serial_polling_thread, NULL) ;
+
 	struct waitset* ws = get_default_waitset();  	
 	
 	lmp_chan_init(&channel);
@@ -204,27 +208,7 @@ int main(int argc, char *argv[])
 		debug_printf("Error in registering the channel..\n");	
 		abort();
 	}
-
-//	char * uart_3_buf = (char *) vbuf;
-//	uart_fifo  = uart_3_buf + 0x14;
-//	uart_thres = uart_3_buf;
 	
-	uart_initialize((lvaddr_t)vbuf);
-
-	//debug_printf("thres = %p , fifo = %p \n", uart_thres, uart_fifo);
-
-	serial_putchar('C');
-	serial_putchar('O');
-	serial_putchar('C');
-	serial_putchar('K');
-	//serial_putchar('\r');	
-	serial_putchar('\n');	
-
-	// allocate slot for incoming capabilites
-    // register receive handler 
-    // go into messaging main loop
-
-
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {
