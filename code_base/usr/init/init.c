@@ -26,6 +26,8 @@
 
 #define UNUSED(x) (x) = (x)
 
+#define MEM_SERVER_NAME "armv7/sbin/mem_server"
+
 #define INPUT_BUF_SIZE 4096
 #define MALLOC_BUFSIZE (1UL<<20)
 #define BUFSIZE 32L * 1024 * 1024
@@ -40,6 +42,19 @@ static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
+static errval_t bootstrap_services(void) 
+{
+	errval_t err;
+
+	debug_printf("Spawing memory server...\n");
+	struct spawninfo si;
+	err = spawn_load_with_bootinfo( &si, bi, MEM_SERVER_NAME, my_core_id);
+	if (err_is_fail(err)) {
+		return err_push(err, INIT_ERR_SPAWN_MEM_SERV);
+	}
+
+	return SYS_ERR_OK;	
+}
 
 
 static void recv_handler(void *arg) 
@@ -177,7 +192,6 @@ int main(int argc, char *argv[])
     debug_printf("initialized dev memory management\n");
 
 
-
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
 	void * vbuf;	
@@ -222,6 +236,12 @@ int main(int argc, char *argv[])
 	err = lmp_chan_register_recv(&channel,ws, recv_handler_init);
 	if (err_is_fail(err)) {
 		debug_printf("Error in registering the channel..\n");	
+		abort();
+	}
+
+	err = bootstrap_services();
+	if (err_is_fail(err)) {
+		debug_printf("Can not spawn additional services!\n");
 		abort();
 	}
 	

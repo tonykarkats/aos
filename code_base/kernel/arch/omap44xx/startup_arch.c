@@ -677,6 +677,7 @@ void arm_kernel_startup(void)
         core_local_alloc_end = PHYS_MEMORY_START + ram_size;
 
 #if MILESTONE == 3
+	  	/*
         // Bring up memory consuming process
         struct spawn_state memeater_st;
         struct dcb *memeater_dcb;
@@ -684,8 +685,8 @@ void arm_kernel_startup(void)
         static struct cte memeater_rootcn; // gets put into mdb
         memeater_dcb = spawn_bsp_init(ADDTITIONAL_MODULE_NAME,
                                       bsp_alloc_phys, &memeater_rootcn, &memeater_st);
+		*/
 #endif
-
         // Bring up init
 		struct spawn_state init_st;
         memset(&init_st, 0, sizeof(struct spawn_state));
@@ -694,28 +695,18 @@ void arm_kernel_startup(void)
                                   &init_rootcn, &init_st);
 
 #if MILESTONE == 3
-        // TODO (milestone 3): create endpoints for domains:
-        // 1) selfep for each domain -- retype dcb cap into TASKCN_SLOT_SELFEP
-        // 2) create init's receive ep -- mint init's self ep into
-        //    TASKCN_SLOT_INITEP & use FIRSTEP_{OFFSET,BUFLEN} as arguments
-        //    for minting.
-        // 3) copy init's receive ep into all other domains'
-        //    TASKCN_SLOT_INITEP.
-
-//	printf("startup_arch: Init dispatcher handle = %u\n", init_dcb->disp);	
-//	printf("startup_arch: Memeater dispatcher handle = %u\n", memeater_dcb->disp);	
 	
 	err = caps_retype(ObjType_EndPoint,0, &init_st.taskcn->cap, TASKCN_SLOT_SELFEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_DISPATCHER),0);
 	if (err_is_fail(err)){
 		panic("startup_arch: Error in retyping for init!\n");
 	}
 
-
+    /*
 	err = caps_retype(ObjType_EndPoint,0, &memeater_st.taskcn->cap, TASKCN_SLOT_SELFEP, caps_locate_slot(CNODE(memeater_st.taskcn), TASKCN_SLOT_DISPATCHER),0);
 	if (err_is_fail(err)){
 		panic("startup_arch: Error in retyping for memeater!\n");
 	}
-	
+	*/
 		
 	err = caps_copy_to_cnode(init_st.taskcn  , TASKCN_SLOT_INITEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_SELFEP), 1,
 						 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
@@ -723,12 +714,13 @@ void arm_kernel_startup(void)
 		panic("startup_arch: Can not mint for init!\n");
 	}
 
+	/*
 	err = caps_copy_to_cnode(memeater_st.taskcn  , TASKCN_SLOT_INITEP, caps_locate_slot(CNODE(init_st.taskcn), TASKCN_SLOT_SELFEP), 1,
 							 FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
 	if (err_is_fail(err)) { 
 		panic("startup_arch: Can not mint for memeater!\n");
 	}
-
+	*/
 #endif
     } else {
         debug(SUBSYS_STARTUP, "Doing non-BSP related bootup \n");
