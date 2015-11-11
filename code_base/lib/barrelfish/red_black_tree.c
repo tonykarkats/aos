@@ -357,17 +357,17 @@ void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x) {
   rb_red_blk_node* root=tree->root;
   if (x != tree->nil) {
     InorderTreePrint(tree,x->left);
-    //printf("red_black_tree: info=");
+    //debug_printf("red_black_tree: info=");
     tree->PrintInfo(x->info);
-    //printf("  key="); 
+    //debug_printf("  key="); 
     tree->PrintKey(x->key);
-    //printf("  l->key=");
-    if( x->left == nil) printf("NULL"); else tree->PrintKey(x->left->key);
-    //printf("  r->key=");
-    if( x->right == nil) printf("NULL"); else tree->PrintKey(x->right->key);
-    //printf("  p->key=");
-    if( x->parent == root) printf("NULL"); else tree->PrintKey(x->parent->key);
-    //printf("  red=%i\n\n\n",x->red);
+    //debug_printf("  l->key=");
+    if( x->left == nil) debug_printf("NULL"); else tree->PrintKey(x->left->key);
+    //debug_printf("  r->key=");
+    if( x->right == nil) debug_printf("NULL"); else tree->PrintKey(x->right->key);
+    //debug_printf("  p->key=");
+    if( x->parent == root) debug_printf("NULL"); else tree->PrintKey(x->parent->key);
+    //debug_printf("  red=%i\n\n\n",x->red);
     InorderTreePrint(tree,x->right);
   }
 }
@@ -668,17 +668,17 @@ int VirtaddrComp(const void* a,const void* b) {
 
 void VirtaddrInfoDest(void *a) {
 
-  // printf("VirtAddr= %p\n",*(lvaddr_t*)a);
+  // debug_printf("VirtAddr= %p\n",*(lvaddr_t*)a);
 }
 
 void VirtaddrPrint(const void* a) {
-  printf("VirtAddr= %p\n",*(lvaddr_t*)a);
+  debug_printf("VirtAddr= %p\n",*(lvaddr_t*)a);
 }
 
 void VirtaddrInfo(const void* a) {
 
   memory_chunk* chunk = (memory_chunk*) a;
-  printf("Size = %zu . Reserved = %d\n",chunk->size,chunk->reserved);
+  debug_printf("Size = %zu . Reserved = %d\n",chunk->size,chunk->reserved);
 }
 
 int is_virtual_address_mapped(rb_red_blk_tree* tree, lvaddr_t q) {
@@ -701,7 +701,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
 
     if (x != tree->nil) {
             init_guard = find_memory_chunk(tree, x->left, bytes, init_guard);
-            //printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
+            //debug_printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
             if (init_guard == NULL) {
 
                 chunk =  ((memory_chunk*) x->info);
@@ -709,7 +709,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
                     init_guard = NULL;
                 else {
                     if (chunk->size > bytes) {
-                        //debug_printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
+                        //debug_debug_printf("find_memory_chunk:   ----- Memory area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
                         init_guard = x;
                     }
                     else
@@ -738,7 +738,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
     if (node == NULL)
         return -1;
 
-    //printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
+    //debug_printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
     chunk = (memory_chunk*) node->info;
 
     size_t size1 = bytes;
@@ -763,7 +763,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
     RBTreeInsert(tree, addr1, new_chunk_1);
     RBTreeInsert(tree, addr2, new_chunk_2);
     
-    //printf("Will return %p\n",*addr1);
+    //debug_printf("Will return %p\n",*addr1);
     return *addr1;
 }
 

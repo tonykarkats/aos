@@ -69,7 +69,6 @@ _DEFUN (__utf8_wctomb, (r, s, wchar, charset, state),
 {
   wint_t wchar = _wchar;
   int ret = 0;
-
   if (s == NULL)
     return 0; /* UTF-8 encoding is not state-dependent */
 
@@ -291,7 +290,6 @@ _DEFUN (__iso_wctomb, (r, s, wchar, charset, state),
         mbstate_t     *state)
 {
   wint_t wchar = _wchar;
-
   if (s == NULL)
     return 0;
 

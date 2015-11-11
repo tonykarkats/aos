@@ -11,12 +11,14 @@
 #include <barrelfish/cspace.h>
 #include <barrelfish/aos_rpc.h>
 
+/*
 static void custom_printf(const char *cp) {
   char c;
   while ((c=*(cp++))) {
   	aos_rpc_serial_putchar(get_init_chan(), c);
   }
 }
+*/
 
 #define BUFSIZE_2 (128UL*1024*1024)
 #define MALLOC_BUFSIZE 1   //(1UL<<20)
@@ -59,7 +61,8 @@ int main(int argc, char *argv[])
 	errval_t err;
 	struct aos_rpc *test_rpc = get_init_chan();
 
-	custom_printf("TEST\n");
+  	printf("Does it work?\n");
+	printf("Maybe not !\n");		
 	
 	while(1);	
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	

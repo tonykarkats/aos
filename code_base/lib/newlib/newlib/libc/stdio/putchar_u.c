@@ -75,7 +75,6 @@ _DEFUN(putchar_unlocked, (c),
        int c)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
-
   return _putchar_unlocked_r (_REENT, c);
 }
 

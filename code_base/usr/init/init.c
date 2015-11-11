@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     assert(err_is_ok(err));
     disp_set_core_id(my_core_id);
 
-    debug_printf("init: invoked as:");
+	debug_printf("init: invoked as:");
     for (int i = 0; i < argc; i++) {
        printf(" %s", argv[i]);
     }
@@ -176,7 +176,6 @@ int main(int argc, char *argv[])
     // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
     debug_printf("initialized dev memory management\n");
 
-// 	printf("IN INIT ALL OK!\n");
 
 
 	uint64_t size   = 0x1000;

@@ -126,6 +126,7 @@ _DEFUN(__fputwc, (ptr, wc, fp),
   char buf[MB_LEN_MAX];
   size_t i, len;
 
+
   if (MB_CUR_MAX == 1 && wc > 0 && wc <= UCHAR_MAX)
     {
       /*

@@ -123,6 +123,7 @@ void __assert(const char *exp, const char *file, const char *func, int line)
 
 int printf(const char *fmt, ...)
 {
+  
   putstr(fmt);
 }
 

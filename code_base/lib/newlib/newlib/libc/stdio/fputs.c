@@ -77,6 +77,7 @@ _DEFUN(_fputs_r, (ptr, s, fp),
        char _CONST * s _AND
        FILE * fp)
 {
+
   int result;
   struct __suio uio;
   struct __siov iov;

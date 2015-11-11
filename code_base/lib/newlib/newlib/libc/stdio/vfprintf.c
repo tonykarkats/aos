@@ -194,6 +194,7 @@ _DEFUN(__ssprint_r, (ptr, fp, uio),
        FILE *fp _AND
        register struct __suio *uio)
 {
+//    abort();
 	register size_t len;
 	register int w;
 	register struct __siov *iov;
@@ -296,7 +297,7 @@ _DEFUN(__sprint_r, (ptr, fp, uio),
        register struct __suio *uio)
 {
 	register int err = 0;
-
+	//abort();
 	if (uio->uio_resid == 0) {
 		uio->uio_iovcnt = 0;
 		return (0);
@@ -544,6 +545,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
        _CONST char *fmt0   _AND
        va_list ap)
 {
+	//abort();
 	register char *fmt;	/* format string */
 	register int ch;	/* character from fmt */
 	register int n, m;	/* handy integers (short term usage) */
@@ -644,7 +646,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	} \
 }
 #define PRINTANDPAD(p, ep, len, with) { \
-	int n = (ep) - (p); \
+    int n = (ep) - (p); \
 	if (n > (len)) \
 		n = (len); \
 	if (n > 0) \
@@ -805,6 +807,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
+		
 		case '\'':
 			thousands_sep = _localeconv_r (data)->thousands_sep;
 			thsnd_len = strlen (thousands_sep);
