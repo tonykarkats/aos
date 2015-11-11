@@ -11,6 +11,13 @@
 #include <barrelfish/cspace.h>
 #include <barrelfish/aos_rpc.h>
 
+static void custom_printf(const char *cp) {
+  char c;
+  while ((c=*(cp++))) {
+  	aos_rpc_serial_putchar(get_init_chan(), c);
+  }
+}
+
 #define BUFSIZE_2 (128UL*1024*1024)
 #define MALLOC_BUFSIZE 1   //(1UL<<20)
 #define BUFSIZE 32L * 1024 * 1024
@@ -30,7 +37,7 @@ static int test_thread(void){
 	void * vbuf;	
 	err = paging_alloc(get_current_paging_state(), &vbuf, (2*4096));
     if (err_is_fail(err)) {
-        printf("error in paging_alloc: %s\n", err_getstring(err));
+        debug_printf("error in paging_alloc: %s\n", err_getstring(err));
         abort();
     }
 
@@ -50,9 +57,11 @@ int main(int argc, char *argv[])
 {
 	
 	errval_t err;
-	
 	struct aos_rpc *test_rpc = get_init_chan();
+
+	custom_printf("TEST\n");
 	
+	while(1);	
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failure in sending string!!\n");
@@ -78,7 +87,6 @@ int main(int argc, char *argv[])
 	err = aos_rpc_serial_putchar(test_rpc, c4); 	
 
 	struct thread* t = thread_create((thread_func_t)  test_thread, NULL);
-	//struct thread* t2= thread_create((thread_func_t)  test_thread, NULL);
 	
 	int ret_val;
 	thread_join(t, &ret_val);

@@ -37,9 +37,11 @@ static void recv_handler(void *arg)
 	}
 	
 //	debug_printf("msg buflen %zu\n", msg.buf.msglen);
-	
-	ram_cap = cap;	
-	rpc_char = (char) msg.words[0];
+
+	if (!capref_is_null(cap))	
+		ram_cap = cap;	
+	if (msg.buf.msglen != 0)
+		rpc_char = (char) msg.words[0];
 
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));	
@@ -151,9 +153,10 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
 	}
+
+	event_dispatch(get_default_waitset());
 	
 	return SYS_ERR_OK;
-
 }
 
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,

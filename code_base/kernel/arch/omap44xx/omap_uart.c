@@ -125,6 +125,7 @@ void serial_putchar(unsigned port, char c)
 
     // Write character
     omap_uart_THR_thr_wrf(uart, c);
+	
 }
 
 /** 

@@ -41,6 +41,7 @@ static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
 
+
 static void recv_handler(void *arg) 
 {
 		
@@ -98,9 +99,13 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
+			debug_printf("\nGOT A CHAR!\n");
 			char out_c = (char) msg.words[1];
 			serial_putchar(out_c);
-			
+
+			err = lmp_chan_send0(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
+			if (err_is_fail(err))
+				DEBUG_ERR(err, "recv_handler: Error in sending acknowledgement back to the client!\n");			
 			break;
 		case AOS_RPC_GET_CHAR: ;
 			
@@ -170,6 +175,9 @@ int main(int argc, char *argv[])
     // cnode. Additionally, export the functionality of that system to other
     // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
     debug_printf("initialized dev memory management\n");
+
+// 	printf("IN INIT ALL OK!\n");
+
 
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;

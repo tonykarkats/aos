@@ -13,7 +13,10 @@
 #include <barrelfish_kpi/types.h>
 #include <errors/errno.h>
 #include <elf/elf.h>
+#include <barrelfish/aos_rpc.h>
 #include "../../kernel/include/multiboot.h"
+
+#define USE_PUTCHAR_RPC 1
 
 // Prototypes for functions from molly_boot.S:
 extern void molly_to_kernel_transition(void *entry_addr,
@@ -48,7 +51,7 @@ static void serial_putchar(char c)
 static void putstr(const char *cp) {
   char c;
   while ((c=*(cp++))) {
-    serial_putchar(c);
+		serial_putchar(c);
   }
 }
 

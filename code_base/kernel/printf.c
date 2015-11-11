@@ -118,7 +118,7 @@ printf(const char *fmt, ...)
 {
     va_list ap;
 
-    KPRINTF_MUTEX_ENTER();
+	KPRINTF_MUTEX_ENTER();
 
     va_start(ap, fmt);
     int retval = kprintf(NULL, 0, fmt, ap, TOCONS /*| TOLOG*/);
