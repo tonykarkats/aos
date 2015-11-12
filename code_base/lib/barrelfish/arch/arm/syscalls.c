@@ -26,7 +26,6 @@ STATIC_ASSERT(SYSCALL_REG == 0, "Bad register for system call argument.");
 
 errval_t sys_print(const char* string, size_t length)
 {
-    //abort();
     
 	return syscall3(SYSCALL_PRINT, (uintptr_t)string, (uintptr_t)length).error;
 }

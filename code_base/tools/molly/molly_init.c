@@ -50,6 +50,7 @@ static void serial_putchar(char c)
 
 static void putstr(const char *cp) {
   char c;
+  
   while ((c=*(cp++))) {
 		serial_putchar(c);
   }

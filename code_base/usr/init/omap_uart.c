@@ -51,10 +51,10 @@ int poll_serial_thread(void * arg) {
 	
 	while(1) {
 		c = serial_getchar();
-		debug_printf("poll_serial_thread: Got input from user c = %c\n", c);
+		//debug_printf("poll_serial_thread: Got input from user c = %c\n", c);
 		bool ret = write_to_ring(ring, &c)	;
 		if (!ret) 
-			debug_printf("poll_serial_thread: Ring buffer is full ! User input is dropped \n!");
+			; //debug_printf("poll_serial_thread: Ring buffer is full ! User input is dropped \n!");
 	}
 
 	return 1;	

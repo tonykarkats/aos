@@ -94,7 +94,10 @@ static size_t dummy_terminal_read(char *buf, size_t len)
 void barrelfish_libc_glue_init(void)
 {
     // TODO: change these to use the user-space serial driver if possible
-    _libc_terminal_read_func = dummy_terminal_read;
+    //_libc_terminal_read_func = dummy_terminal_read;
+    //_libc_terminal_write_func = syscall_terminal_write;
+
+	_libc_terminal_read_func = dummy_terminal_read;
     _libc_terminal_write_func = syscall_terminal_write;
     _libc_exit_func = libc_exit;
     _libc_assert_func = libc_assert;
@@ -184,19 +187,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
 
-    // TODO STEP 3: register ourselves with init
-    /* allocate lmp channel structure */
-    /* create local endpoint */
-    /* set remote endpoint to init's endpoint */
-    /* set receive handler */
-    /* send local ep to init */
-    /* wait for init to acknowledge receiving the endpoint */
-
-    /* TODO STEP 5: now we should have a channel with init set up and can
-     * use it for the ram allocator */
-
-    // right now we don't have the nameservice & don't need the terminal
-    // and domain spanning, so we return here
     return SYS_ERR_OK;
 }
 

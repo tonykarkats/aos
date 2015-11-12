@@ -65,7 +65,7 @@ bool is_l2_mapped(lvaddr_t vaddr) {
 	
 	int l1_index = ARM_L1_USER_OFFSET(vaddr);
 	
-	debug_printf("is_l2_mapped: Searcing for l1 index = %d\n", l1_index);
+	//debug_printf("is_l2_mapped: Searcing for l1 index = %d\n", l1_index);
 	return current.mem_tree->l2_maps[l1_index];	
 }
 
@@ -120,9 +120,9 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 	// Maping frame provided by user
 	if (!capref_is_null(usercap)) {
 		
-		debug_printf("User provided us with a frame!\n");
+		//debug_printf("User provided us with a frame!\n");
 		size_t pages_needed = size / 4096;
-		debug_printf("Will map %d pages ! l2_index = %d \n", pages_needed,l2_index);
+		//debug_printf("Will map %d pages ! l2_index = %d \n", pages_needed,l2_index);
 		chunk->current_frame_used = 0;
 		chunk->size_of_last_frame = -1;
 	

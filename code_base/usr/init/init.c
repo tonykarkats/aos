@@ -79,7 +79,7 @@ static void recv_handler(void *arg)
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
-			debug_printf("recv_handler: String received : %s\n", message_string);
+//			debug_printf("recv_handler: String received : %s\n", message_string);
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
@@ -89,7 +89,7 @@ static void recv_handler(void *arg)
 			
 			err = ram_alloc(&returned_cap, size_requested); 
 			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
+//				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
 				returned_cap = NULL_CAP;	
 			}
 				
@@ -99,7 +99,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
-			debug_printf("\nGOT A CHAR!\n");
+//			debug_printf("\nGOT A CHAR!\n");
 			char out_c = (char) msg.words[1];
 			serial_putchar(out_c);
 

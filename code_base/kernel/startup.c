@@ -225,7 +225,6 @@ struct dcb *spawn_module(struct spawn_state *st, struct cte *rootcn,
 	err = caps_create_new(ObjType_Dispatcher,
                           alloc_phys(1UL << OBJBITS_DISPATCHER),
                           OBJBITS_DISPATCHER, 0, init_dcb_cte);
-	printf("Type =%d \n", init_dcb_cte->cap.type); 
     assert(err_is_ok(err));
     struct dcb *init_dcb = init_dcb_cte->cap.u.dispatcher.dcb;
 

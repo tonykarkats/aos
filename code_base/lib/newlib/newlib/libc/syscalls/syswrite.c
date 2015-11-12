@@ -2,7 +2,7 @@
 
 #include <reent.h>
 #include <unistd.h>
-
+#include <barrelfish/aos_rpc.h>
 _READ_WRITE_RETURN_TYPE
 _DEFUN (write, (fd, buf, cnt),
      int fd _AND

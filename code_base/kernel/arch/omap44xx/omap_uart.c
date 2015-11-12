@@ -117,6 +117,7 @@ errval_t serial_early_init(unsigned port)
  */
 void serial_putchar(unsigned port, char c)
 {
+
     assert(port <= NUM_PORTS);
     omap_uart_t *uart = &ports[port];
 

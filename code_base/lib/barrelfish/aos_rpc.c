@@ -131,11 +131,11 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 		return AOS_ERR_LMP_SEND_FAILURE;
 	}
 
-	debug_printf("BEFORE WAITSET!\n");	
+	//debug_printf("BEFORE WAITSET!\n");	
 
 	event_dispatch(get_default_waitset());
 
-	debug_printf("SERVER RESPONDED WITH CHAR = %c!\n", rpc_char);	
+	//debug_printf("SERVER RESPONDED WITH CHAR = %c!\n", rpc_char);	
 
 
 	*retc = rpc_char;	

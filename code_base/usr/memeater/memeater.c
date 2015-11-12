@@ -28,8 +28,39 @@ static void custom_printf(const char *cp) {
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-static int thread_id = 0;
+//static int thread_id = 0;
+/*
+static int shell_thread(void) 
+{
+	errval_t err, err_1, err_2;
 
+	char command[1024];
+	size_t offset = 0;
+
+	struct aos_rpc * ch = get_init_chan();
+	
+	err = aos_rpc_serial_putchar(ch, '$');
+	while(1){
+		
+		err_1 = aos_rpc_serial_getchar(ch, command + offset);
+		if ( *(command+offset) == '\r') {
+			err_1 = aos_rpc_serial_putchar(ch , '\n');
+			command[offset+1] = '\0';
+			offset = 0;
+			err_1 = aos_rpc_serial_putchar(ch, '$');
+		
+			
+		}
+		else	
+			err_2 = aos_rpc_serial_putchar(ch, *(command + offset));
+		
+		offset++;	
+	}
+
+	return 1;
+}
+*/ 
+/*
 static int test_thread(void){
 
 	errval_t err;
@@ -54,17 +85,17 @@ static int test_thread(void){
 	thread_id++;
 	return 0;
 }
+*/ 
 
 int main(int argc, char *argv[])
 {
 	
-	errval_t err;
-	struct aos_rpc *test_rpc = get_init_chan();
+	//errval_t err;
 
-  	printf("Does it work?\n");
-	printf("Maybe not !\n");		
-	
-	while(1);	
+
+	printf("Should have aborted...\n");
+	abort();
+/*	
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failure in sending string!!\n");
@@ -95,7 +126,15 @@ int main(int argc, char *argv[])
 	thread_join(t, &ret_val);
 	
 	debug_printf("main: Thread finished!\n");
+
+	struct thread* t = thread_create((thread_func_t) shell_thread, NULL);
 	
+	int ret_val;
+	thread_join(t, &ret_val);
+
+ 	test_rpc = test_rpc;
+	err = SYS_ERR_OK;	
+*/
 	while(1);
 
    return 0;

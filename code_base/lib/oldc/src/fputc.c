@@ -20,6 +20,7 @@
 int
 fputc(int c, FILE *stream)
 {
+
     lock_stream(stream);
 
     if(stream->buffer == NULL) {
