@@ -47,13 +47,15 @@ char serial_getchar(void) {
 void serial_putstring(char *str) {
 
 	int printed = 0;
-
+	
 	while (1) {
 		if ( *(str + printed) == '\0')
 			break;
 
 		serial_putchar(*(str + printed)); 
 		printed++;
+		if (printed == 32)
+			break;
 	}
 
 }

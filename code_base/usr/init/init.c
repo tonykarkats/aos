@@ -80,9 +80,12 @@ static void recv_handler(void *arg)
 				*word = msg.words[i+1];   
 			}	
 			
-			debug_printf("recv_handler: String received : %s\n", message_string);
+			//debug_printf("recv_handler: String received : %s\n", message_string);
 			serial_putstring(message_string);
-				
+			
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
+			if (err_is_fail(err))
+				DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
@@ -118,6 +121,12 @@ static void recv_handler(void *arg)
 				if (ret_char != NULL)
 					break;
 			}
+				
+			if (in_c != '\r')
+				serial_putchar(in_c);
+			else 
+				serial_putchar('\n');
+
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");

@@ -86,24 +86,11 @@ static size_t custom_printf(const char *buf, int len) {
 	struct aos_rpc * init_chan = get_init_chan();
   	
     err = aos_rpc_send_string( init_chan, "rpc : ");
-	/*	
-	err = aos_rpc_serial_putchar( init_chan, 'r');	
-	err = aos_rpc_serial_putchar( init_chan, 'p');	
-	err = aos_rpc_serial_putchar( init_chan, 'c');	
-	err = aos_rpc_serial_putchar( init_chan, ':');	
-	*/
-	
+
+	// debug_printf("\ncustom_printf: %s\n", buf);
+
 	err = aos_rpc_send_string( init_chan, buf);
-	
-	/*
-	for (int i = 0; i < len; i++) {
-		err = aos_rpc_serial_putchar( init_chan, buf[i]);	
-		if (err_is_fail(err)) 
-			debug_printf("Error in custom printf!\n");
-		else 
-			printed++;
-	}
-	*/
+
 	return printed;
 }
 

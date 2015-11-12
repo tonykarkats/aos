@@ -23814,6 +23814,8 @@ current_netif	lib/lwip/src/core/ipv4/ip.c	/^static struct netif *current_netif;$
 current_pos	include/stdio_file.h	/^    size_t current_pos;         \/\/ Current position in file$/;"	m	struct:__file
 currentlocale	lib/newlib/newlib/libc/locale/locale.c	/^currentlocale()$/;"	f	file:
 currentlocale	lib/oldc/src/locale/setlocale.c	/^currentlocale(void)$/;"	f	file:
+custom_printf	lib/barrelfish/init.c	/^static size_t custom_printf(const char *buf, int len) {$/;"	f	file:
+custom_scanf	lib/barrelfish/init.c	/^static size_t custom_scanf(char *buf, size_t len) {$/;"	f	file:
 cv	include/thc/thcsync.h	/^  thc_condvar_t     cv;$/;"	m	struct:__anon119
 cv	lib/thc/thcsync.c	/^  thc_condvar_t     *cv;$/;"	m	struct:thc_cv_cancel_info	file:
 cv	lib/thc/thcsync.c	/^  thc_condvar_t *cv;$/;"	m	struct:__anon308	file:
@@ -24701,7 +24703,6 @@ dummy	usr/mmchs_driver/mmchs.c	/^volatile uint32_t dummy = 0;$/;"	v
 dummy	usr/mmchs_driver/twl6030.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
 dummy_event_closure	lib/barrelfish/flounder_support.c	/^struct event_closure dummy_event_closure = {$/;"	v	typeref:struct:event_closure
 dummy_event_handler	lib/barrelfish/flounder_support.c	/^static void dummy_event_handler(void *arg)$/;"	f	file:
-dummy_terminal_read	lib/barrelfish/init.c	/^static size_t dummy_terminal_read(char *buf, size_t len)$/;"	f	file:
 dummyseg	include/target/x86_64/barrelfish/dispatcher_target.h	/^    uintptr_t dummyseg[2];              $/;"	m	struct:dispatcher_x86_64
 dump	tools/harness/tests/mdbbench.py	/^    dump = True$/;"	v	class:MdbBench
 dump_arm_registers	kernel/arch/arm/exn.c	/^static void dump_arm_registers(arch_registers_state_t* save_area)$/;"	f	file:
@@ -36593,6 +36594,7 @@ serial_portbase	tools/molly/molly_init.c	/^static int serial_portbase = 0x3f8; \
 serial_putchar	kernel/arch/omap44xx/omap_uart.c	/^void serial_putchar(unsigned port, char c)$/;"	f
 serial_putchar	tools/molly/molly_init.c	/^static void serial_putchar(char c)$/;"	f	file:
 serial_putchar	usr/init/omap_uart.c	/^void serial_putchar(char c) {$/;"	f
+serial_putstring	usr/init/omap_uart.c	/^void serial_putstring(char *str) {$/;"	f
 serial_ring_buffer	usr/init/omap_uart.h	/^struct serial_ring_buffer { $/;"	s
 served	include/thc/thcsync.h	/^  int                served;$/;"	m	struct:thc_queue_entry
 server	lib/nfs/rpc.h	/^    struct ip_addr server;  \/\/\/< Server IP$/;"	m	struct:rpc_client	typeref:struct:rpc_client::ip_addr
@@ -38573,7 +38575,6 @@ syscall8	include/arch/x86_64/barrelfish/syscall_arch.h	107;"	d
 syscall9	include/arch/arm/barrelfish/syscall_arch.h	57;"	d
 syscall9	include/arch/x86_64/barrelfish/syscall_arch.h	105;"	d
 syscall_args	include/arch/arm/barrelfish_kpi/registers_arch.h	/^    } syscall_args;$/;"	m	union:registers_arm	typeref:struct:registers_arm::registers_arm_syscall_args
-syscall_terminal_write	lib/barrelfish/init.c	/^static size_t syscall_terminal_write(const char *buf, size_t len)$/;"	f	file:
 syscallx	include/arch/arm/barrelfish/syscall_arch.h	32;"	d
 syscontact_default	lib/lwip/src/core/snmp/mib2.c	/^static const u8_t syscontact_default[] = "";$/;"	v	file:
 syscontact_len_default	lib/lwip/src/core/snmp/mib2.c	/^static const u8_t syscontact_len_default = 0;$/;"	v	file:
@@ -40726,6 +40727,8 @@ used	lib/lwip/src/core/mem.c	/^    u8_t used;$/;"	m	struct:mem	file:
 used_fpu	lib/barrelfish/include/threads_priv.h	/^    bool                used_fpu;           \/\/\/< Ever used FPU?$/;"	m	struct:thread
 user_panic_fn	lib/barrelfish/debug.c	/^void user_panic_fn(const char *file, const char *func, int line,$/;"	f
 user_region_type	include/pci/confspace/pci_confspace.h	/^enum user_region_type {$/;"	g
+user_space_driver_read	lib/barrelfish/init.c	/^static size_t user_space_driver_read(char *buf, size_t len) {$/;"	f	file:
+user_space_driver_write	lib/barrelfish/init.c	/^static size_t user_space_driver_write(const char *buf, size_t len) {$/;"	f	file:
 user_supervisor	kernel/include/target/x86_32/paging_kernel_target.h	/^        uint32_t        user_supervisor :1;$/;"	m	struct:x86_32_pdir_entry::__anon133
 user_supervisor	kernel/include/target/x86_32/paging_kernel_target.h	/^        uint32_t        user_supervisor :1;$/;"	m	struct:x86_32_ptable_entry::__anon134
 user_supervisor	kernel/include/target/x86_32/paging_kernel_target.h	/^        uint32_t        user_supervisor :1;$/;"	m	struct:x86_32_ptable_entry::__anon135

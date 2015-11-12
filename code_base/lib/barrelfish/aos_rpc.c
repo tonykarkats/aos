@@ -50,31 +50,45 @@ static void recv_handler(void *arg)
 errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 {
 	errval_t err;
-
 	uint32_t buffer[9];
+	int i, length, string_chunks, last_chunk;
 
-	// Check length of user string in a safe manner
-	int i;
-	for (i=0; i < 34; i++)
+	for (i=0; i < 2000; i++)
 		if (string[i] == '\0')
 			break;
 
-	if (i == 34) 
+	if (i == 2000) {
+		debug_printf("Can not send string!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
+	}
+	length = i + 1;
+    string_chunks = (int) ceil(length / 32.0);
+	last_chunk = length % 32;
 	
-	buffer[0] = AOS_RPC_SEND_STRING;	
-	memcpy(buffer + 1, string, strlen(string)+1);
+	//debug_printf("length = %d , cunks = %d , last chunk = %d\n", length, string_chunks, last_chunk);
+
+
+	for (int s_chunk = 0; s_chunk < string_chunks; s_chunk++) { 	
+		buffer[0] = AOS_RPC_SEND_STRING;
+		
+		if (s_chunk == string_chunks - 1)	
+			memcpy(buffer + 1, string + 32*s_chunk, last_chunk);
+		else 
+			memcpy(buffer + 1, string + 32*s_chunk, 32);
 
 	//	for (int t=0; t<9; t++)
 	//		debug_printf("buf[%d] = 0x%lx\n",  t, buffer[t]);
 	
-	err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
-				  buffer[0] , buffer[1],buffer[2],
-				  buffer[3], buffer[4],buffer[5],
-				  buffer[6], buffer[7],buffer[8]);
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Error in sending the string!\n");
-		return AOS_ERR_LMP_SEND_FAILURE;
+		err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
+					  buffer[0] , buffer[1],buffer[2],
+					  buffer[3], buffer[4],buffer[5],
+					  buffer[6], buffer[7],buffer[8]);
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err, "Error in sending the string!\n");
+			return AOS_ERR_LMP_SEND_FAILURE;
+		}
+
+		event_dispatch(get_default_waitset());
 	}
 	
 	return SYS_ERR_OK;

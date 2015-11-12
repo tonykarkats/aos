@@ -11,15 +11,6 @@
 #include <barrelfish/cspace.h>
 #include <barrelfish/aos_rpc.h>
 
-/*
-static void custom_printf(const char *cp) {
-  char c;
-  while ((c=*(cp++))) {
-  	aos_rpc_serial_putchar(get_init_chan(), c);
-  }
-}
-*/
-
 #define BUFSIZE_2 (128UL*1024*1024)
 #define MALLOC_BUFSIZE 1   //(1UL<<20)
 #define BUFSIZE 32L * 1024 * 1024
@@ -27,39 +18,7 @@ static void custom_printf(const char *cp) {
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
-
-//static int thread_id = 0;
-/*
-static int shell_thread(void) 
-{
-	errval_t err, err_1, err_2;
-
-	char command[1024];
-	size_t offset = 0;
-
-	struct aos_rpc * ch = get_init_chan();
-	
-	err = aos_rpc_serial_putchar(ch, '$');
-	while(1){
-		
-		err_1 = aos_rpc_serial_getchar(ch, command + offset);
-		if ( *(command+offset) == '\r') {
-			err_1 = aos_rpc_serial_putchar(ch , '\n');
-			command[offset+1] = '\0';
-			offset = 0;
-			err_1 = aos_rpc_serial_putchar(ch, '$');
-		
-			
-		}
-		else	
-			err_2 = aos_rpc_serial_putchar(ch, *(command + offset));
-		
-		offset++;	
-	}
-
-	return 1;
-}
-*/ 
+ 
 /*
 static int test_thread(void){
 
@@ -92,16 +51,7 @@ int main(int argc, char *argv[])
 	
 	//errval_t err;
 
-    char i;
-	int test_i;
-
-	printf("Printf via rpc :)\n");
-    
-	scanf("%c%d", &i, &test_i);	
-
-	printf("Just read c = %c and test_i = %d \n", i, test_i);
-
-/*	
+	/*	
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failure in sending string!!\n");
@@ -141,7 +91,17 @@ int main(int argc, char *argv[])
  	test_rpc = test_rpc;
 	err = SYS_ERR_OK;	
 */
-	while(1);
+	char command[1024];
 
-   return 0;
+	while(1) {
+		printf("$>");
+		scanf();
+	}
+	
+	printf("$> ");
+	scanf("%s", command);
+    debug_printf("\nOK\n");
+    while(1);
+
+    return 0;
 }
