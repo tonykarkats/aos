@@ -35,6 +35,9 @@
 #define FIRSTEP_OFFSET          (33472u + 56u)
 #define CLIENT_LIMIT 			(1<<26)*10			
 
+#define BLUE "\033[1m\033[31m"
+#define RESET "\033[0m"
+
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
@@ -75,17 +78,20 @@ static void recv_handler(void *arg)
 
 	switch (rpc_operation) {
 		case AOS_RPC_SEND_STRING: ; // Send String
+			serial_putstring(BLUE);
+	
 			for (int i = 0; i<string_length; i++){
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
 			
-			//debug_printf("recv_handler: String received : %s\n", message_string);
 			serial_putstring(message_string);
-			
+		    // debug_printf("Message string = %s\n", message_string);	
 			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
+			
+			serial_putstring(RESET);
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
@@ -95,7 +101,7 @@ static void recv_handler(void *arg)
 			
 			err = ram_alloc(&returned_cap, size_requested); 
 			if (err_is_fail(err)) {
-//				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
+				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
 				returned_cap = NULL_CAP;	
 			}
 				
@@ -105,16 +111,19 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
-//			debug_printf("\nGOT A CHAR!\n");
+
+			serial_putstring(BLUE);
+
 			char out_c = (char) msg.words[1];
+			
 			serial_putchar(out_c);
 
-			err = lmp_chan_send0(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
-			if (err_is_fail(err))
-				DEBUG_ERR(err, "recv_handler: Error in sending acknowledgement back to the client!\n");			
+			serial_putstring(RESET);
 			break;
+
 		case AOS_RPC_GET_CHAR: ;
-			
+			serial_putstring(BLUE);
+
 			char in_c;
 			while(1) {
 				char * ret_char = read_from_ring(&ring, &in_c);
@@ -122,15 +131,19 @@ static void recv_handler(void *arg)
 					break;
 			}
 				
-			if (in_c != '\r')
+			if (in_c != 13)
 				serial_putchar(in_c);
-			else 
+			else { 
 				serial_putchar('\n');
-
+				in_c = '\n';
+			}
+			
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");
-			}	 
+			}	
+
+			serial_putstring(RESET); 
 			break;
 	}
 	

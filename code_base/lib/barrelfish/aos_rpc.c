@@ -63,21 +63,24 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 	}
 	length = i + 1;
     string_chunks = (int) ceil(length / 32.0);
-	last_chunk = length % 32;
 	
-	//debug_printf("length = %d , cunks = %d , last chunk = %d\n", length, string_chunks, last_chunk);
+	if (length % 32 != 0)
+		last_chunk = length % 32;
+	else 
+		last_chunk = 32;
 
+	 //debug_printf("%s    length = %d , cunks = %d , last chunk = %d\n", string, length, string_chunks, last_chunk);
 
 	for (int s_chunk = 0; s_chunk < string_chunks; s_chunk++) { 	
+		//debug_printf("Sending chunk %d from %d \n", s_chunk, s_chunk * 32);
+		memset(buffer, 0, 36);		
+
 		buffer[0] = AOS_RPC_SEND_STRING;
 		
 		if (s_chunk == string_chunks - 1)	
-			memcpy(buffer + 1, string + 32*s_chunk, last_chunk);
+			memcpy(buffer + 1, string + 32*s_chunk , last_chunk);
 		else 
 			memcpy(buffer + 1, string + 32*s_chunk, 32);
-
-	//	for (int t=0; t<9; t++)
-	//		debug_printf("buf[%d] = 0x%lx\n",  t, buffer[t]);
 	
 		err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
 					  buffer[0] , buffer[1],buffer[2],
@@ -168,7 +171,7 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 		return AOS_ERR_LMP_SEND_FAILURE;
 	}
 
-	event_dispatch(get_default_waitset());
+	// event_dispatch(get_default_waitset());
 	
 	return SYS_ERR_OK;
 }

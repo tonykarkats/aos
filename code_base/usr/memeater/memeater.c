@@ -18,33 +18,28 @@
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
- 
-/*
-static int test_thread(void){
+
+static int test_thread(void *arg){
 
 	errval_t err;
+	void* vbuff;
+	int size = * (int *) arg;
+	printf("Running memory test for %d bytes!\n", size);	
 
-	debug_printf("Hello from thread-%d!\n",thread_id);
+	err = paging_alloc( get_current_paging_state(), &vbuff, size);
+	
+	char * buf = (char *) vbuff;
+	for (int i = 0; i < size; i++) 
+		buf[i] = i%255;
 
-	void * vbuf;	
-	err = paging_alloc(get_current_paging_state(), &vbuf, (2*4096));
-    if (err_is_fail(err)) {
-        debug_printf("error in paging_alloc: %s\n", err_getstring(err));
-        abort();
-    }
+	for (int i = 0; i < size; i++) 
+		assert(buf[i] == i%255);
 
-	char* buf = (char *) vbuf;
-
-
-	buf[0] = 66;
-	buf[4096] = 77;
-
-	debug_printf("%d %d\n", buf[0], buf[4096]);
-
-	thread_id++;
+	printf("Memory test passed!\n");	
+	 	
 	return 0;
 }
-*/ 
+
 
 int main(int argc, char *argv[])
 {
@@ -91,17 +86,39 @@ int main(int argc, char *argv[])
  	test_rpc = test_rpc;
 	err = SYS_ERR_OK;	
 */
-	char command[1024];
 
+	//printf("123456789012345678901234567890\n");
+	//fflush(stdout);
+	//while(1);
+
+	char command[1024];
+	const char space_token[2] = " ";
+	char *token;
 	while(1) {
 		printf("$>");
-		scanf();
+		fflush(stdout);
+		memset(command, 0, 1024);
+		gets(command);
+		
+		token = strtok(command, space_token);
+		
+		if (!strcmp("echo", token)) {
+			token = strtok(NULL, space_token);
+			printf("%s\n", token);
+		}
+		else if (!strcmp("run_memtest", token)) {
+			token = strtok(NULL, space_token);
+			int memory_size = atoi(token);
+			struct thread* t = thread_create((thread_func_t)  test_thread, &memory_size);
+			int ret_val;
+			thread_join(t, &ret_val);
+		}
+		else if (!strcmp("exit", token)) {
+			printf("BY BY BABY!\n");
+			break;
+		}
 	}
 	
-	printf("$> ");
-	scanf("%s", command);
-    debug_printf("\nOK\n");
-    while(1);
 
     return 0;
 }

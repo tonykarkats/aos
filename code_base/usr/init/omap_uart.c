@@ -53,6 +53,7 @@ void serial_putstring(char *str) {
 			break;
 
 		serial_putchar(*(str + printed)); 
+		
 		printed++;
 		if (printed == 32)
 			break;

@@ -75,41 +75,44 @@ static void libc_assert(const char *expression, const char *file,
                    disp_name(), expression, function, file, line);
     sys_print(buf, len < sizeof(buf) ? len : sizeof(buf));
 }
-
 static size_t custom_printf(const char *buf, int len) {
 
 	errval_t err;
     size_t printed = 0;
+	char new_buf[len+1];	
 
-	//debug_printf("\nIN OUR CUSTOM PRINT!\n");
-
+	memcpy(new_buf, buf, len);
+	
+	new_buf[len] = '\0';
+	
 	struct aos_rpc * init_chan = get_init_chan();
   	
-    err = aos_rpc_send_string( init_chan, "rpc : ");
+	err = aos_rpc_send_string( init_chan, new_buf);
+	if (err_is_fail(err)) 
+		debug_printf("Error in custom printf in sending string to serial driver!\n");
 
-	// debug_printf("\ncustom_printf: %s\n", buf);
-
-	err = aos_rpc_send_string( init_chan, buf);
-
+	/*
+	for (int i = 0; i < len; i++)
+		err = aos_rpc_putchar( init_chan, buf[i]);
+	*/
+	
 	return printed;
 }
 
 static size_t custom_scanf(char *buf, size_t len) {
 
 	errval_t err;
-	size_t read_chars = 0;
 
 	struct aos_rpc * init_chan = get_init_chan();
 
-	for (int i = 0; i < len; i++) {
-		err = aos_rpc_serial_getchar( init_chan, buf + read_chars);
-		if (err_is_fail(err)) 
-			debug_printf("Error in custom scanf!\n");
-		else 
-			read_chars++;
-	}	
-
-	return read_chars;
+		
+ 	err = aos_rpc_serial_getchar( init_chan, buf);
+	if (err_is_fail(err)) {
+		debug_printf("Error in custom scanf!\n");
+ 		return 0;
+	}
+	else 
+		return 1;
 }
 
 
