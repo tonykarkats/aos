@@ -44,6 +44,20 @@ char serial_getchar(void) {
 	return (char) *(char *) uart3_thr;
 }
 
+void serial_putstring(char *str) {
+
+	int printed = 0;
+
+	while (1) {
+		if ( *(str + printed) == '\0')
+			break;
+
+		serial_putchar(*(str + printed)); 
+		printed++;
+	}
+
+}
+
 int poll_serial_thread(void * arg) {
 
 	struct serial_ring_buffer * ring = (struct serial_ring_buffer *) arg;

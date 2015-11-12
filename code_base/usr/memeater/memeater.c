@@ -92,9 +92,15 @@ int main(int argc, char *argv[])
 	
 	//errval_t err;
 
+    char i;
+	int test_i;
 
-	printf("Should have aborted...\n");
-	abort();
+	printf("Printf via rpc :)\n");
+    
+	scanf("%c%d", &i, &test_i);	
+
+	printf("Just read c = %c and test_i = %d \n", i, test_i);
+
 /*	
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	
 	if (err_is_fail(err)) {

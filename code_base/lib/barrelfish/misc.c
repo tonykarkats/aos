@@ -1,5 +1,5 @@
 #include <barrelfish/misc.h>
-
+#include <barrelfish/debug.h>
 /***********************************************************************/
 /*  FUNCTION:  void Assert(int assertion, char* error)  */
 /**/
@@ -20,7 +20,7 @@
 
 void Assert(int assertion, char* error) {
   if(!assertion) {
-    printf("Assertion Failed: %s\n",error);
+    debug_printf("Assertion Failed: %s\n",error);
     exit(-1);
   }
 }
@@ -68,7 +68,7 @@ static int pointer = 0;
 void * SafeMalloc(size_t size) {
 
 	if ((pointer + size)>BUFFER_SIZE) {
-		printf("OUT OF STATIC MEMORY!");
+		debug_printf("OUT OF STATIC MEMORY!");
 		abort();
 	}
 	char* return_address = memory_buffer+pointer;

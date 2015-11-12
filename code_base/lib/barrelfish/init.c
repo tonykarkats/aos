@@ -76,6 +76,75 @@ static void libc_assert(const char *expression, const char *file,
     sys_print(buf, len < sizeof(buf) ? len : sizeof(buf));
 }
 
+static size_t custom_printf(const char *buf, int len) {
+
+	errval_t err;
+    size_t printed = 0;
+
+	//debug_printf("\nIN OUR CUSTOM PRINT!\n");
+
+	struct aos_rpc * init_chan = get_init_chan();
+  	
+    err = aos_rpc_send_string( init_chan, "rpc : ");
+	/*	
+	err = aos_rpc_serial_putchar( init_chan, 'r');	
+	err = aos_rpc_serial_putchar( init_chan, 'p');	
+	err = aos_rpc_serial_putchar( init_chan, 'c');	
+	err = aos_rpc_serial_putchar( init_chan, ':');	
+	*/
+	
+	err = aos_rpc_send_string( init_chan, buf);
+	
+	/*
+	for (int i = 0; i < len; i++) {
+		err = aos_rpc_serial_putchar( init_chan, buf[i]);	
+		if (err_is_fail(err)) 
+			debug_printf("Error in custom printf!\n");
+		else 
+			printed++;
+	}
+	*/
+	return printed;
+}
+
+static size_t custom_scanf(char *buf, size_t len) {
+
+	errval_t err;
+	size_t read_chars = 0;
+
+	struct aos_rpc * init_chan = get_init_chan();
+
+	for (int i = 0; i < len; i++) {
+		err = aos_rpc_serial_getchar( init_chan, buf + read_chars);
+		if (err_is_fail(err)) 
+			debug_printf("Error in custom scanf!\n");
+		else 
+			read_chars++;
+	}	
+
+	return read_chars;
+}
+
+
+static size_t user_space_driver_write(const char *buf, size_t len) {
+
+	if (len) {
+		return custom_printf(buf, len);		
+	}
+
+	return 0;
+}
+
+static size_t user_space_driver_read(char *buf, size_t len) {
+	
+	if (len) {
+		return custom_scanf(buf, len);
+	}
+
+	return 0;
+}
+
+/*
 static size_t syscall_terminal_write(const char *buf, size_t len)
 {
     if (len) {
@@ -89,16 +158,19 @@ static size_t dummy_terminal_read(char *buf, size_t len)
     debug_printf("terminal read NYI! returning %d characters read\n", len);
     return len;
 }
+*/
 
 /* Set libc function pointers */
 void barrelfish_libc_glue_init(void)
 {
     // TODO: change these to use the user-space serial driver if possible
     //_libc_terminal_read_func = dummy_terminal_read;
-    //_libc_terminal_write_func = syscall_terminal_write;
+    
 
-	_libc_terminal_read_func = dummy_terminal_read;
-    _libc_terminal_write_func = syscall_terminal_write;
+	//_libc_terminal_write_func = syscall_terminal_write;
+	//_libc_terminal_read_func = dummy_terminal_read;
+    _libc_terminal_read_func = user_space_driver_read;
+	_libc_terminal_write_func = user_space_driver_write;
     _libc_exit_func = libc_exit;
     _libc_assert_func = libc_assert;
     /* morecore func is setup by morecore_init() */
@@ -166,6 +238,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_MORECORE_INIT);
     }
+
     lmp_endpoint_init();
 
     // init domains only get partial init

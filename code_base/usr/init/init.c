@@ -79,7 +79,10 @@ static void recv_handler(void *arg)
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
-//			debug_printf("recv_handler: String received : %s\n", message_string);
+			
+			debug_printf("recv_handler: String received : %s\n", message_string);
+			serial_putstring(message_string);
+				
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
@@ -146,9 +149,9 @@ int main(int argc, char *argv[])
 
 	debug_printf("init: invoked as:");
     for (int i = 0; i < argc; i++) {
-       printf(" %s", argv[i]);
+       debug_printf(" %s", argv[i]);
     }
-    printf("\n");
+    debug_printf("\n");
 
     debug_printf("FIRSTEP_OFFSET should be %zu + %zu\n",
             get_dispatcher_size(), offsetof(struct lmp_endpoint, k));

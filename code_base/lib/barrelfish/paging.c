@@ -83,13 +83,13 @@ errval_t map_l2 (lvaddr_t vaddr){
 
 	err = arml2_alloc(&l2_table);
 	if (err_is_fail(err)) {
-		printf("map_l2: Error in allocating cab for l2 table!\n");
+		debug_printf("map_l2: Error in allocating cab for l2 table!\n");
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
 
    	err = vnode_map(l1_table, l2_table, l1_index, FLAGS, 0, 1);
 	if (err_is_fail(err)) {
-		printf("map_page: Error in maping l2 table!\n");
+		debug_printf("map_page: Error in maping l2 table!\n");
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
 	
@@ -163,7 +163,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		//debug_printf("Mapping frame with index = %d at l2 table...\n",l2_index);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);	
 		if (err_is_fail(err)) {
-			printf("map_page: Error in mapping frame to l2 table !\n");
+			debug_printf("map_page: Error in mapping frame to l2 table !\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
 		}
 
@@ -182,7 +182,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		//		printf("Allocating huge frame with %d bytes\n", chunk->size_of_last_frame);
 				err = get_frame(chunk->size_of_last_frame, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
-					printf("map_page: Error in getting last frame for region!\n");
+					debug_printf("map_page: Error in getting last frame for region!\n");
 					return err_push(err, LIB_ERR_FRAME_ALLOC);
 				}				
 			}
@@ -190,7 +190,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		//		printf("Allocating a middle frame!\n");
 				err = get_frame(1024*1024, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
-					printf("map_page: Error in getting last frame for region!\n");
+					debug_printf("map_page: Error in getting last frame for region!\n");
 					return err_push(err, LIB_ERR_FRAME_ALLOC);
 				}
 			}
@@ -202,7 +202,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		//debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);
 		if (err_is_fail(err)) {
-			printf("map_page: Error in mapping frame to l2 table !\n");
+			debug_printf("map_page: Error in mapping frame to l2 table !\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
 		}
 		chunk->frame_caps_for_region[used_frame].slot++;
@@ -223,12 +223,12 @@ static void exception_handler(enum exception_type type,
 		//printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
 
 		if (addr == NULL){
-			printf("exception_handler: NULL pointer!\n");
+			debug_printf("exception_handler: NULL pointer!\n");
 			abort();
 		}
 
 		if ((lvaddr_t) addr < START_VADDR) {
-			printf("exception_handler: Address outside of valid boundaries!\n");		
+			debug_printf("exception_handler: Address outside of valid boundaries!\n");		
 			abort();
 		}		
 	
@@ -236,14 +236,14 @@ static void exception_handler(enum exception_type type,
 		thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 		
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
-			printf("exception_handler: Address not mapped!\n");
+			debug_printf("exception_handler: Address not mapped!\n");
 			abort();			
 		} 
 		else { 
-			//printf("Address is mapped!\n");
+			//debug_printf("Address is mapped!\n");
 			errval_t err = map_page((lvaddr_t) addr, NULL_CAP, 0, 0);
  			if (err_is_fail(err)) {
-				printf("exception_handler: Error in map_page!\n");
+				debug_printf("exception_handler: Error in map_page!\n");
 				abort();
 			}
 		}
@@ -265,7 +265,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 	memory_chunk* newMemory;
     rb_red_blk_tree* tree;
 
-//    printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
+    debug_printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
@@ -286,6 +286,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 
 	thread_mutex_init(&st->paging_tree_lock);
 
+	debug_printf("paging_init: Finalizing...\n");
     return SYS_ERR_OK;
 }
 
@@ -302,9 +303,9 @@ errval_t paging_init(void)
 
     struct capref p;
     
-    //printf("Before initializing our memory tree\n");
+    debug_printf("Before initializing our memory tree\n");
     paging_init_state(&current, START_VADDR, p);
-    printf("paging_init: Initial Memory State Tree\n");
+    debug_printf("paging_init: Initial Memory State Tree\n");
     RBTreePrint(current.mem_tree);
     set_current_paging_state(&current);
     return SYS_ERR_OK;
@@ -403,7 +404,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	alloc_bits = log2floor(bytes);
 	err = ram_alloc(&ram, alloc_bits);
     if (err_is_fail(err)){ 
-		printf("get_frame : Error in ram_alloc!\n");
+		debug_printf("get_frame : Error in ram_alloc!\n");
 		return err_push(err, LIB_ERR_RAM_ALLOC);
 	}
 
@@ -416,27 +417,27 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 		struct capref nextcncap; struct cnoderef nextcn;
 		err = cnode_create(&nextcncap, &nextcn, slots_needed, &slots);
 		if (err_is_fail(err)) {
-			printf("get_frame : Error in cnode_create!\n");
+			debug_printf("get_frame : Error in cnode_create!\n");
 			return err_push(err,LIB_ERR_CNODE_CREATE);
 		}
 		(*current_frame) = (struct capref) { .cnode = nextcn, .slot = 0 };
 	} else {
 		err = slot_alloc(current_frame);
         if (err_is_fail(err)) {
-			printf("get_frame: Error in slot_alloc!\n");
+			debug_printf("get_frame: Error in slot_alloc!\n");
 			return err_push(err,LIB_ERR_SLOT_ALLOC_INIT);
 		}
 	}
 	
 	err = cap_retype(*current_frame, ram, ObjType_Frame, BASE_PAGE_BITS);
     if (err_is_fail(err)) {
-		printf("get_frame: error in cap_retype!\n");
+		debug_printf("get_frame: error in cap_retype!\n");
 		return err_push(err,LIB_ERR_CAP_RETYPE);
 	}
 
     err = cap_destroy(ram);
 	if (err_is_fail(err)) {
-		printf("get_frame: error in cap_destroy!\n");
+		debug_printf("get_frame: error in cap_destroy!\n");
 		return err_push(err,LIB_ERR_CAP_DESTROY);
 	}
  
@@ -457,7 +458,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     //printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
-		printf("paging_alloc: Run out of virtual memory!");
+		debug_printf("paging_alloc: Run out of virtual memory!");
 		return LIB_ERR_OUT_OF_VIRTUAL_ADDR;
 	}
 

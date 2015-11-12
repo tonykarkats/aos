@@ -10,9 +10,8 @@ void test_func(void);
 void uart_initialize(lvaddr_t mapped_address);
 
 void serial_putchar(char c);
-
 char serial_getchar(void );
-
+void serial_putstring(char *str);
 struct serial_ring_buffer { 
 
 	char buffer[INPUT_BUF_SIZE];
