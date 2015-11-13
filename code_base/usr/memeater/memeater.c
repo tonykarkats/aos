@@ -44,7 +44,7 @@ static int test_thread(void *arg){
 int main(int argc, char *argv[])
 {
 	
-	//errval_t err;
+	errval_t err;
 
 	/*	
 	err = aos_rpc_send_string(test_rpc, "Hello"); 	
@@ -87,9 +87,21 @@ int main(int argc, char *argv[])
 	err = SYS_ERR_OK;	
 */
 
-	//printf("123456789012345678901234567890\n");
-	//fflush(stdout);
-	//while(1);
+    void* vbuff;
+	int size = 8193;
+
+    err = paging_alloc( get_current_paging_state(), &vbuff, size);
+		
+
+    char * buf = (char *) vbuff;
+    for (int i = 0; i < size; i++)
+        buf[i] = i%255;
+
+    for (int i = 0; i < size; i++)
+        assert(buf[i] == i%255);
+
+	debug_printf("Memory test passed!\n");
+    while(1);
 
 	char command[1024];
 	const char space_token[2] = " ";

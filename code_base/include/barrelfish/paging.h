@@ -47,22 +47,23 @@ typedef int paging_flags_t;
 #define VREGION_FLAGS_READ_WRITE_MPB \
     (VREGION_FLAGS_READ | VREGION_FLAGS_WRITE | VREGION_FLAGS_MPB)
 
+
+errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size);
+errval_t create_and_map_frame(lvaddr_t vaddr);
 errval_t map_l2 (lvaddr_t vaddr);
 struct capref get_l2_table(lvaddr_t vaddr);
 bool is_l2_mapped(lvaddr_t vaddr);
 errval_t map_page(lvaddr_t vaddr, struct capref, uint64_t off, uint64_t pte_count); 
 void handle_fault(lvaddr_t vaddr);
 errval_t get_frame(size_t, struct capref*);
+
 // struct to store the paging status of a process
 struct paging_state {
     
-    // A red-black tree that holds all the chunks of memory
-    // reserved or free.
 	rb_red_blk_tree* mem_tree;
 	struct thread_mutex paging_tree_lock;
     
 };
-
 
 struct thread;
 /// Initialize paging_state struct

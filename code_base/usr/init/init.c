@@ -86,6 +86,7 @@ static void recv_handler(void *arg)
 			}	
 			
 			serial_putstring(message_string);
+	
 		    // debug_printf("Message string = %s\n", message_string);	
 			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
 			if (err_is_fail(err))
