@@ -27,6 +27,7 @@
 #define UNUSED(x) (x) = (x)
 
 #define MEM_SERVER_NAME "armv7/sbin/mem_server"
+#define NAME_SERVER_NAME "armv7/sbin/name_server"
 
 #define INPUT_BUF_SIZE 4096
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -44,16 +45,20 @@ static struct serial_ring_buffer ring;
 
 static errval_t bootstrap_services(void) 
 {
+	
 	errval_t err;
 
-	debug_printf("Spawing memory server...\n");
+	debug_printf("Spawing name server...\n");
+	
 	struct spawninfo si;
-	err = spawn_load_with_bootinfo( &si, bi, MEM_SERVER_NAME, my_core_id);
+	err = spawn_load_with_bootinfo( &si, bi, NAME_SERVER_NAME, my_core_id);
 	if (err_is_fail(err)) {
 		return err_push(err, INIT_ERR_SPAWN_MEM_SERV);
 	}
 
+	
 	return SYS_ERR_OK;	
+	
 }
 
 
@@ -244,6 +249,8 @@ int main(int argc, char *argv[])
 		debug_printf("Can not spawn additional services!\n");
 		abort();
 	}
+	
+	while(1);
 	
 	while(true) {
 		err = event_dispatch(get_default_waitset());

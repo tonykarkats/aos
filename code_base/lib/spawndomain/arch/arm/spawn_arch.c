@@ -220,6 +220,7 @@ errval_t spawn_arch_load(struct spawninfo *si,
         return SPAWN_ERR_LOAD;
     }
 
+	debug_printf("spawn_arch_load: elf loaded good!\n");
     return SYS_ERR_OK;
 }
 
