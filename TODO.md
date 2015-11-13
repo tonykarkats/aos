@@ -17,3 +17,5 @@
 - Ask if it is safe to perform channel and all other initialization on main 
 
 - Separate exception stack for each thread
+
+- Fix map_page to handle arbitary user frames for consecutive l2 tables
