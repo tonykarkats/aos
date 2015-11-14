@@ -119,14 +119,33 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 	chunk->current_frame_used = 0;
 	chunk->size_of_last_frame = size;
 	chunk->user_provided_frame = true;
+	chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * pages_needed);
 
-    // Are we mapping a device ?
+	// Are we mapping a device ?
 	int mapping_flags;
-	if (usercap.slot == TASKCN_SLOT_IO) 	
+	if (usercap.slot == TASKCN_SLOT_IO) {
 		mapping_flags = DEVICE_FLAGS;
-	else
+	}
+	else {
 		mapping_flags = FLAGS;
+	}
 
+	for (int i = 0; i < pages_needed; i++) {
+		
+		err = slot_alloc(&chunk->frame_caps_for_region[i]);
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err, "map_user_frame: Can not allocate slot for capability!\n");
+			return err_push(err, LIB_ERR_VNODE_MAP);
+		}
+
+		err = cap_copy(chunk->frame_caps_for_region[i], usercap); 
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err, "map_user_frame: can not copy user provided frame to tree!\n");
+			return err_push(err, LIB_ERR_VNODE_MAP);
+		}
+	
+	}
+	 
 	debug_printf("Will map %d pages starting at address 0x%x\n", pages_needed, page_start);
 
 	// Map all pages of the memory region, that may span across multiple 
@@ -148,13 +167,13 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 	
 		//debug_printf("map_user_frame: Mapping page for virtual address = 0x%x at offset = %d\n", page_start, offset);
 		//debug_printf("map_user_frame: L2 index = %d\n", l2_index);
-		err = vnode_map(l2_table, usercap, l2_index, mapping_flags, offset, pages_needed);
+		err = vnode_map(l2_table, chunk->frame_caps_for_region[i], l2_index, mapping_flags, offset, 1);
 		if (err_is_fail(err)) {
 			DEBUG_ERR(err, "map_user_frame: Can not map page for user provided frame!\n");
 			abort();
 			return err_push(err, LIB_ERR_FRAME_ALLOC);
 		}
-		break;
+		
 		page_start += BYTES_PER_PAGE;
 		offset += BYTES_PER_PAGE;
 	}
@@ -234,8 +253,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 	   //	printf("Total fr needed = %d . Current frame = %d . Size of last frame = %d\n",chunk->total_frames_needed,chunk->current_frame_used,chunk->size_of_last_frame);
 			used_frame++;
 			if (used_frame == (chunk->total_frames_needed -1)) {
-				debug_printf("map_page: Allocating the LAST frame!\n");		
-		//		printf("Allocating huge frame with %d bytes\n", chunk->size_of_last_frame);
+				// debug_printf("map_page: Allocating the LAST frame!\n");		
 				err = get_frame(chunk->size_of_last_frame, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
 					debug_printf("map_page: Error in getting last frame for region!\n");
@@ -243,7 +261,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 				}				
 			}
 			else {
-				debug_printf("Allocating a middle frame!\n");
+				// debug_printf("Allocating a middle frame!\n");
 				err = get_frame(1024*1024, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
 					debug_printf("map_page: Error in getting last frame for region!\n");
@@ -446,12 +464,6 @@ errval_t paging_region_unmap(struct paging_region *pr, lvaddr_t base, size_t byt
     return SYS_ERR_OK;
 }
 
-/**
- * \brief Find a bit of free virtual address space that is large enough to
- *        accomodate a buffer of size `bytes`.
- */
-
-
 errval_t get_frame(size_t bytes, struct capref* current_frame)
 {
 	struct capref ram;
@@ -460,6 +472,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 
 	//alloc_bits = log2floor(bytes);
 	alloc_bits = log2ceil(bytes);
+	
 	//debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
 	
 	err = ram_alloc(&ram, alloc_bits);
@@ -516,7 +529,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
    
 	thread_mutex_lock(&st->paging_tree_lock);
  
-    debug_printf("Trying to allocate memory. Rounded up to %d\n",bytes);
+    // debug_printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
 		debug_printf("paging_alloc: Run out of virtual memory!");
@@ -545,7 +558,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 			size_of_last_frame = 1024*1024;
 		}
 		
-		debug_printf("SIZE OF LAST FRAME = %d\n", size_of_last_frame);
+		// debug_printf("SIZE OF LAST FRAME = %d\n", size_of_last_frame);
 		chunk->current_frame_used = -1;
 		chunk->total_frames_needed = frames_needed;
 		chunk->size_of_last_frame  = size_of_last_frame;
