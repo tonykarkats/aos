@@ -79,7 +79,8 @@ errval_t map_l2 (lvaddr_t vaddr){
         .slot = 0,
     };
    
-	//	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
+//	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
+	
 	err = arml2_alloc(&l2_table);
 	if (err_is_fail(err)) {
 		debug_printf("map_l2: Error in allocating cab for l2 table!\n");
@@ -100,11 +101,13 @@ errval_t map_l2 (lvaddr_t vaddr){
 
 errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size) {
 
+	debug_printf("map_user_frame: Initiating...\n");
+
 	errval_t err;
 	rb_red_blk_node* node = RBExactQuery(get_current_paging_state()->mem_tree, &vaddr);
 	memory_chunk* chunk = (memory_chunk*) node->info; 
 
-	size_t pages_needed = size / 4096;
+	size_t pages_needed = size / BYTES_PER_PAGE;
 	lvaddr_t page_start;
 	uint64_t offset;
 
@@ -116,40 +119,44 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 	chunk->current_frame_used = 0;
 	chunk->size_of_last_frame = size;
 	chunk->user_provided_frame = true;
-	chunk->frame_caps_for_region[0] = usercap;
 
-	// Are we mapping a device ?
+    // Are we mapping a device ?
 	int mapping_flags;
 	if (usercap.slot == TASKCN_SLOT_IO) 	
 		mapping_flags = DEVICE_FLAGS;
 	else
 		mapping_flags = FLAGS;
 
+	debug_printf("Will map %d pages starting at address 0x%x\n", pages_needed, page_start);
+
 	// Map all pages of the memory region, that may span across multiple 
-	// l2 tables
+	// l2 tables. AS OF NOW it only does ONE iteration and maps all the pages
 	for (int i = 0 ; i < pages_needed; i++) {
-		
-		if (!is_l2_mapped(page_start)) {
+
+	   if (!is_l2_mapped(page_start)) {
 			
-			//debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
-			err = map_l2(vaddr);
+			// debug_printf("map_user_frame: Mapping for l2 table %d\n", ARM_L2_USER_OFFSET(page_start));
+			err = map_l2(page_start);
 			if (err_is_fail(err)) {
 				debug_printf("map_user_frame: Error in mapping l2 table!\n");
 				return err_push(err, LIB_ERR_VNODE_MAP);
 			}
 		}
 
-		struct capref l2_table = get_l2_table(vaddr);
-		int l2_index = ARM_L2_USER_OFFSET(vaddr);
-
-		err = vnode_map(l2_table, usercap, l2_index, mapping_flags, offset, 1);
+		struct capref l2_table = get_l2_table(page_start);
+		int l2_index = ARM_L2_USER_OFFSET(page_start);
+	
+		//debug_printf("map_user_frame: Mapping page for virtual address = 0x%x at offset = %d\n", page_start, offset);
+		//debug_printf("map_user_frame: L2 index = %d\n", l2_index);
+		err = vnode_map(l2_table, usercap, l2_index, mapping_flags, offset, pages_needed);
 		if (err_is_fail(err)) {
-			debug_printf("map_user_frame: Can not map page for user provided frame!\n");
+			DEBUG_ERR(err, "map_user_frame: Can not map page for user provided frame!\n");
+			abort();
 			return err_push(err, LIB_ERR_FRAME_ALLOC);
 		}
-
-		page_start += 4096;
-		offset += 4096;
+		break;
+		page_start += BYTES_PER_PAGE;
+		offset += BYTES_PER_PAGE;
 	}
 
 	return SYS_ERR_OK;
@@ -177,10 +184,10 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 	}
 
 	int l2_index = ARM_L2_USER_OFFSET(vaddr);
-    int l1_index = ARM_L1_USER_OFFSET(vaddr);
+    //int l1_index = ARM_L1_USER_OFFSET(vaddr);
 
     if (!is_l2_mapped(vaddr)) {
-		debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
+		//debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
 		err = map_l2(vaddr);
 		if (err_is_fail(err)) {
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -193,10 +200,10 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 
 	// Logic for mapping frames created on the fly (on pagefaults)
 	if (chunk->current_frame_used == -1) {
-		debug_printf("map_page: Allocating our first large frame!\n");		
+		//debug_printf("map_page: Allocating our first large frame!\n");		
         chunk->current_frame_used = 0;
 		if (chunk->total_frames_needed == 1)
-			err = get_frame(chunk->size_of_last_frame,chunk->frame_caps_for_region);
+			err = get_frame(chunk->size_of_last_frame,&chunk->frame_caps_for_region[0]);
 		else 
 			err = get_frame(1024*1024, chunk->frame_caps_for_region);
 	   	
@@ -209,7 +216,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
  	if (chunk->total_frames_needed == 1) {
     	struct capref current_frame = chunk->frame_caps_for_region[0];
 
-		debug_printf("Mapping page from l2 table = %d with index = %d at slot = %d\n", l1_index, l2_index, chunk->frame_caps_for_region[0].slot);
+		//debug_printf("Mapping page from l2 table = %d with index = %d at slot = %d\n", l1_index, l2_index, chunk->frame_caps_for_region[0].slot);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);	
 		if (err_is_fail(err)) {
 			debug_printf("map_page: Error in mapping first frame to l2 table !\n");
@@ -220,14 +227,14 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		return SYS_ERR_OK;
 	}
 	else {
-		//printf("Larger than 1MB\n");
+		//debug_printf("Larger than 1MB\n");
 		int used_frame = chunk->current_frame_used;
 		struct capref current_frame = chunk->frame_caps_for_region[used_frame];
 		if (current_frame.slot == 256) {
 	   //	printf("Total fr needed = %d . Current frame = %d . Size of last frame = %d\n",chunk->total_frames_needed,chunk->current_frame_used,chunk->size_of_last_frame);
 			used_frame++;
 			if (used_frame == (chunk->total_frames_needed -1)) {
-		//		debug_printf("map_page: Allocating the LAST frame!\n");		
+				debug_printf("map_page: Allocating the LAST frame!\n");		
 		//		printf("Allocating huge frame with %d bytes\n", chunk->size_of_last_frame);
 				err = get_frame(chunk->size_of_last_frame, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
@@ -236,7 +243,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 				}				
 			}
 			else {
-		//		printf("Allocating a middle frame!\n");
+				debug_printf("Allocating a middle frame!\n");
 				err = get_frame(1024*1024, chunk->frame_caps_for_region + used_frame);
 				if (err_is_fail(err)) {
 					debug_printf("map_page: Error in getting last frame for region!\n");
@@ -247,10 +254,11 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 			chunk->current_frame_used++;
 		} 
 
-		debug_printf("Mapping for frame = %d and for slot = %d \n",used_frame,current_frame.slot);
+		//debug_printf("Mapping for frame = %d and for slot = %d at inner frame = %d\n",used_frame,current_frame.slot, chunk->current_frame_used);
 		//debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
 		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);
 		if (err_is_fail(err)) {
+			debug_printf("Error in mapping for frame = %d and for slot = %d \n",used_frame,current_frame.slot);
 			debug_printf("map_page: Error in mapping frame to l2 table !\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
 		}
@@ -450,7 +458,10 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	size_t alloc_bits;
 	errval_t err;
 
-	alloc_bits = log2floor(bytes);
+	//alloc_bits = log2floor(bytes);
+	alloc_bits = log2ceil(bytes);
+	//debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
+	
 	err = ram_alloc(&ram, alloc_bits);
     if (err_is_fail(err)){ 
 		debug_printf("get_frame : Error in ram_alloc!\n");
@@ -459,8 +470,8 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
-    
-    debug_printf("get_frame: Need %d slots\n", slots_needed);
+   	
+   	//debug_printf("get_frame: Need %d slots\n", slots_needed);
    	
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
@@ -505,15 +516,14 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
    
 	thread_mutex_lock(&st->paging_tree_lock);
  
-    //printf("Trying to allocate memory. Rounded up to %d\n",bytes);
+    debug_printf("Trying to allocate memory. Rounded up to %d\n",bytes);
     vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
 		debug_printf("paging_alloc: Run out of virtual memory!");
 		return LIB_ERR_OUT_OF_VIRTUAL_ADDR;
 	}
 
-	//printf("Memory allocated at %p\n",vaddr);
-   	//printf("Trying to find node that was just created to update its memory frame\n");
+	//debug_printf("paging_alloc: Memory allocated at %p\n",vaddr);
     node = RBExactQuery(st->mem_tree, &vaddr);
     struct memory_chunk* chunk = (struct memory_chunk*) node->info;
   
@@ -535,6 +545,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 			size_of_last_frame = 1024*1024;
 		}
 		
+		debug_printf("SIZE OF LAST FRAME = %d\n", size_of_last_frame);
 		chunk->current_frame_used = -1;
 		chunk->total_frames_needed = frames_needed;
 		chunk->size_of_last_frame  = size_of_last_frame;
@@ -557,7 +568,7 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
                                size_t bytes, struct capref frame,
                                int flags, void *arg1, void *arg2)
 {
-	debug_printf("paging_map_frame_attr: Initiating...\n");
+	debug_printf("paging_map_frame_attr: Initiating...Will allocate region of = %d bytes\n", bytes);
     errval_t err = paging_alloc(st, buf, bytes);
     if (err_is_fail(err)) {
         return err;

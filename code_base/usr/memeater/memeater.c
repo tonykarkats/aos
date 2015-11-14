@@ -87,20 +87,25 @@ int main(int argc, char *argv[])
 	err = SYS_ERR_OK;	
 */
 
-    void* vbuff;
-	int size = 8193;
 
-    err = paging_alloc( get_current_paging_state(), &vbuff, size);
+	int test_frames = 0;
+    void * vbuff; 
+	for (int j = 1; j < test_frames; j++) {
 		
+		err = paging_alloc( get_current_paging_state(), &vbuff, j*4096);
+		
+		char * buf = (char *) vbuff;
+    	for (int i = 0; i < j*4096; i++)
+        	buf[i] = i%255;
 
-    char * buf = (char *) vbuff;
-    for (int i = 0; i < size; i++)
-        buf[i] = i%255;
+    	for (int i = 0; i < j*4096; i++)
+    	    assert(buf[i] == i%255);
+	}
 
-    for (int i = 0; i < size; i++)
-        assert(buf[i] == i%255);
 
 	debug_printf("Memory test passed!\n");
+
+	
     while(1);
 
 	char command[1024];

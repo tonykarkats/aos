@@ -104,7 +104,8 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 {
 //	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
 	errval_t err;
-		
+
+	//debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
 	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_RAM_CAP, request_bits);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");

@@ -99,7 +99,9 @@ static void recv_handler(void *arg)
 			
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
-			
+
+			//debug_printf("recv_handler: Requested for size %d\n", size_requested );	
+		
 			err = ram_alloc(&returned_cap, size_requested); 
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Failed to allocate ram capability for client\n");

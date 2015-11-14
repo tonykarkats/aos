@@ -37,7 +37,10 @@ typedef struct memory_chunk {
 	
     struct capref* frame_caps_for_region;
 
+	// For user provided frames only
 	bool user_provided_frame;
+	struct cnoderef user_frame_cnode;
+
 } memory_chunk;
 
 /* Our paging state struct is a Red-Black tree whose nodes represent the

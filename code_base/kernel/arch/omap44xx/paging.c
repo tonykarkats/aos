@@ -17,6 +17,7 @@
 #include <arm_hal.h>
 #include <cap_predicates.h>
 #include <dispatch.h>
+#include <barrelfish/debug.h>
 /**
  * Kernel L1 page table
  */
@@ -415,7 +416,7 @@ caps_map_l2(struct capability* dest,
 	//printf("Size of frame = %" PRIu64 "\n", get_size(src));
     if ((offset + BYTES_PER_PAGE > get_size(src)) ||
         ((offset % BYTES_PER_PAGE) != 0)) {
-        panic("oops: frame offset invalid. Size of frame\n");
+		panic("oops: frame offset invalid. Size of frame\n");
         return SYS_ERR_FRAME_OFFSET_INVALID;
     }
 
@@ -440,8 +441,10 @@ caps_map_l2(struct capability* dest,
 
     struct cte *src_cte = cte_for_cap(src);
     src_cte->mapping_info.pte_count = pte_count;
-    src_cte->mapping_info.pte = dest_lpaddr;
-    src_cte->mapping_info.offset = offset;
+    
+	src_cte->mapping_info.pte = dest_lpaddr;
+	
+	src_cte->mapping_info.offset = offset;
 
     for (int i = 0; i < pte_count; i++) {
         entry->raw = 0;
@@ -470,9 +473,11 @@ errval_t caps_copy_to_vnode(struct cte *dest_vnode_cte, cslot_t dest_slot,
     struct capability *src_cap  = &src_cte->cap;
     struct capability *dest_cap = &dest_vnode_cte->cap;
 
+
     if (src_cte->mapping_info.pte) {
         return SYS_ERR_VM_ALREADY_MAPPED;
     }
+	
 
     if (ObjType_VNode_ARM_l1 == dest_cap->type) {
         //printf("caps_map_l1: %zu\n", (size_t)pte_count);
