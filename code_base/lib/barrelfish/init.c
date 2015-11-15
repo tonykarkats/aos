@@ -232,6 +232,8 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
         return err_push(err, LIB_ERR_MORECORE_INIT);
     }
 
+	return SYS_ERR_OK;
+
     lmp_endpoint_init();
 
     // init domains only get partial init

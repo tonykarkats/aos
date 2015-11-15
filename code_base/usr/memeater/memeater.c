@@ -46,47 +46,7 @@ int main(int argc, char *argv[])
 	
 	errval_t err;
 
-	/*	
-	err = aos_rpc_send_string(test_rpc, "Hello"); 	
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failure in sending string!!\n");
-		abort();
-	}
-
-	err = aos_rpc_serial_putchar(test_rpc, 'H'); 	
-	err = aos_rpc_serial_putchar(test_rpc, 'E'); 	
-	err = aos_rpc_serial_putchar(test_rpc, 'L'); 	
-	err = aos_rpc_serial_putchar(test_rpc, 'L'); 	
-	err = aos_rpc_serial_putchar(test_rpc, 'O'); 	
-	err = aos_rpc_serial_putchar(test_rpc, '\n'); 	
-
-	char c1,c2,c3,c4;	
-	err = aos_rpc_serial_getchar(test_rpc, &c1); 	
-	err = aos_rpc_serial_getchar(test_rpc, &c2); 	
-	err = aos_rpc_serial_getchar(test_rpc, &c3); 	
-	err = aos_rpc_serial_getchar(test_rpc, &c4); 	
-
-	err = aos_rpc_serial_putchar(test_rpc, c1); 	
-	err = aos_rpc_serial_putchar(test_rpc, c2); 	
-	err = aos_rpc_serial_putchar(test_rpc, c3); 	
-	err = aos_rpc_serial_putchar(test_rpc, c4); 	
-
-	struct thread* t = thread_create((thread_func_t)  test_thread, NULL);
-	
-	int ret_val;
-	thread_join(t, &ret_val);
-	
-	debug_printf("main: Thread finished!\n");
-
-	struct thread* t = thread_create((thread_func_t) shell_thread, NULL);
-	
-	int ret_val;
-	thread_join(t, &ret_val);
-
- 	test_rpc = test_rpc;
-	err = SYS_ERR_OK;	
-*/
-
+	debug_printf("Hello world from memeater!\n");
 
     void * vbuff; 
 	int size = 1024*1024*5;

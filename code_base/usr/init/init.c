@@ -43,7 +43,10 @@ static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
+static errval_t bootstrap_services(void) {
 
+	return SYS_ERR_OK;
+}
 
 static void recv_handler(void *arg) 
 {
@@ -197,14 +200,12 @@ int main(int argc, char *argv[])
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
+
+	err = bootstrap_services();
     
-	// TODO (milestone 4): Implement a system to manage the device memory
-    // that's referenced by the capability in TASKCN_SLOT_IO in the task
-    // cnode. Additionally, export the functionality of that system to other
-    // domains by implementing the rpc call `aos_rpc_get_dev_cap()'.
+	while (1);
+
     debug_printf("initialized dev memory management\n");
-
-
 
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;

@@ -658,7 +658,7 @@ struct dcb *spawn_bsp_init(const char *name, alloc_phys_func alloc_phys_fn,
 void arm_kernel_startup(void)
 {
     printk(LOG_NOTE, "arm_kernel_startup entered \n");
-	errval_t err;
+	// errval_t err;
 
     /* Initialize the core_data */
     /* Used when bringing up other cores, must be at consistent global address
