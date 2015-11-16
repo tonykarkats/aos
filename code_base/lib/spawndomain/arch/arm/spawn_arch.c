@@ -51,6 +51,8 @@ static int elf_to_vregion_flags(uint32_t flags)
 static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
                              uint32_t flags, void **retbase)
 {
+	debug_printf("elf_allocate: initiating...\n");
+
     errval_t err;
     lvaddr_t vaddr;
     size_t used_size;
@@ -146,10 +148,13 @@ static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
     struct paging_state *cp = si->vspace;
 
     // map allocated physical memory in virutal memory of child process
+
     vaddr = (lvaddr_t)base;
     used_size = size;
 
-    while (used_size > 0) {
+	debug_printf("elf_allocate : Base address = %p\n", vaddr);
+    
+	while (used_size > 0) {
         struct capref frame = {
             .cnode = si->segcn,
             .slot  = spawn_vspace_slot++,

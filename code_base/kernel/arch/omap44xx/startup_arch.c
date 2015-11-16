@@ -482,6 +482,7 @@ static void init_page_tables(struct spawn_state *spawn_state)
     // Map L2 into successive slots in pagecn
     size_t i;
     for (i = 0; i < INIT_L2_BYTES / BASE_PAGE_SIZE; i++) {
+		printf("KERNEL : Mapping l2 at slot %d\n", pagecn_pagemap);
         size_t objbits_vnode = vnode_objbits(ObjType_VNode_ARM_l2);
         assert(objbits_vnode == BASE_PAGE_BITS);
         caps_create_new(

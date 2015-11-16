@@ -150,6 +150,35 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	// Map all pages of the memory region, that may span across multiple 
 	// l2 tables. AS OF NOW it only does ONE iteration and maps all the pages
+
+	int l1_index = ARM_L1_USER_OFFSET(vaddr);
+    struct capref l2_table_1 = (struct capref) {
+        .cnode = cnode_page,
+        .slot = l1_index + 1,
+    };
+	struct capref l1_table_1 = (struct capref) {
+		.cnode = cnode_page,
+		.slot = 0,
+	};
+	l1_table_1 = l1_table_1;
+	int l2_index_1 = ARM_L2_USER_OFFSET(vaddr);
+	debug_printf("l1 index = %d l2 index = %d\n", l1_index, l2_index_1);
+  	
+
+
+	if (l1_index < 7) {	
+		//return SYS_ERR_OK;
+		err = vnode_unmap(l1_table_1, l2_table_1, l1_index, 1);
+		if (err_is_fail(err)) 
+			DEBUG_ERR(err, "SHIT\n");;	
+		//err = vnode_map(l2_table_1, usercap, l2_index_1, mapping_flags, 0, 1);
+		//if (err_is_fail(err)) 
+		//	abort();
+		//return SYS_ERR_OK;		
+	} 
+	
+	
+
 	for (int i = 0 ; i < pages_needed; i++) {
 
 	   if (!is_l2_mapped(page_start)) {

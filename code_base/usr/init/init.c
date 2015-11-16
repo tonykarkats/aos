@@ -23,8 +23,11 @@
 #include <barrelfish/aos_rpc.h>
 #include "omap_uart.h"
 #include <barrelfish/thread_sync.h>
-
+#include "spawn.h"
+#include <spawndomain/spawndomain.h>
 #define UNUSED(x) (x) = (x)
+#define NAME_MEMEATER "armv7/sbin/memeater"
+#include "../../lib/spawndomain/arch.h"
 
 #define INPUT_BUF_SIZE 4096
 #define MALLOC_BUFSIZE (1UL<<20)
@@ -43,7 +46,158 @@ static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
+
+static errval_t spawn_setup_vspace(struct spawninfo *si)
+{
+    errval_t err;
+
+    /* Create pagecn */
+    si->pagecn_cap = (struct capref){.cnode = si->rootcn, .slot = ROOTCN_SLOT_PAGECN};
+    err = cnode_create_raw(si->pagecn_cap, &si->pagecn, PAGE_CNODE_SLOTS, NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_PAGECN);
+    }
+
+    /* Init pagecn's slot allocator */
+
+    // XXX: satisfy a peculiarity of the single_slot_alloc_init_raw API
+    size_t bufsize = SINGLE_SLOT_ALLOC_BUFLEN(PAGE_CNODE_SLOTS);
+    void *buf = malloc(bufsize);
+    assert(buf != NULL);
+
+    err = single_slot_alloc_init_raw(&si->pagecn_slot_alloc, si->pagecn_cap,
+                                     si->pagecn, PAGE_CNODE_SLOTS,
+                                     buf, bufsize);
+    if (err_is_fail(err)) {
+        return err_push(err, LIB_ERR_SINGLE_SLOT_ALLOC_INIT_RAW);
+    }
+
+    // Create root of pagetable
+    err = si->pagecn_slot_alloc.a.alloc(&si->pagecn_slot_alloc.a, &si->vtree);
+    if (err_is_fail(err)) {
+        return err_push(err, LIB_ERR_SLOT_ALLOC);
+    }
+
+    // top-level table should always live in slot 0 of pagecn
+    assert(si->vtree.slot == 0);
+
+    err = vnode_create(si->vtree, ObjType_VNode_ARM_l1);
+    if (err_is_fail(err)) {
+         return err_push(err, SPAWN_ERR_CREATE_VNODE);
+    }
+
+    err = spawn_paging_init(si, si->vtree);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_VSPACE_INIT);
+    }
+
+    return SYS_ERR_OK;
+}
+
+
+/**
+ * \brief Setup an initial cspace
+ *
+ * Create an initial cspace layout
+ */
+static errval_t spawn_setup_cspace(struct spawninfo *si)
+{
+    errval_t err;
+    struct capref t1;
+
+    /* Create root CNode */
+    err = cnode_create(&si->rootcn_cap, &si->rootcn, DEFAULT_CNODE_SLOTS, NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_ROOTCN);
+    }
+
+    /* Create taskcn */
+    err = cnode_create(&si->taskcn_cap, &si->taskcn, DEFAULT_CNODE_SLOTS, NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_TASKCN);
+    }
+
+    // Mint into rootcn setting the guard
+    t1.cnode = si->rootcn;
+    t1.slot  = ROOTCN_SLOT_TASKCN;
+    err = cap_mint(t1, si->taskcn_cap, 0,
+                   GUARD_REMAINDER(2 * DEFAULT_CNODE_BITS));
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_MINT_TASKCN);
+    }
+
+    /* Create slot_alloc_cnode */
+    t1.cnode = si->rootcn;
+    t1.slot  = ROOTCN_SLOT_SLOT_ALLOC0;
+    err = cnode_create_raw(t1, NULL, (1<<SLOT_ALLOC_CNODE_BITS), NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_SLOTALLOC_CNODE);
+    }
+    t1.cnode = si->rootcn;
+    t1.slot  = ROOTCN_SLOT_SLOT_ALLOC1;
+    err = cnode_create_raw(t1, NULL, (1<<SLOT_ALLOC_CNODE_BITS), NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_SLOTALLOC_CNODE);
+    }
+    t1.cnode = si->rootcn;
+    t1.slot  = ROOTCN_SLOT_SLOT_ALLOC2;
+    err = cnode_create_raw(t1, NULL, (1<<SLOT_ALLOC_CNODE_BITS), NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_SLOTALLOC_CNODE);
+    }
+
+	return SYS_ERR_OK;
+}
+
 static errval_t bootstrap_services(void) {
+
+	errval_t err;
+
+	struct spawninfo memeater_si;
+	
+	// Get the module!
+	struct mem_region *module = multiboot_find_module(bi, NAME_MEMEATER);
+	if (module == NULL) {
+		debug_printf("could not find module!\n");
+		abort();
+		return SPAWN_ERR_FIND_MODULE;
+	}
+
+	// Lookup and map the elf image in our vspace!	
+	lvaddr_t binary;
+	size_t binary_size;
+	err = spawn_map_module(module, &binary_size, &binary, NULL);
+	if (err_is_fail(err)) {
+		debug_printf("could locate and map the elf image!\n");
+		abort();
+		return SPAWN_ERR_ELF_MAP;
+	}
+
+	// Initialize cspace of chiild
+	err = spawn_setup_cspace(&memeater_si);
+	if (err_is_fail(err)) {
+		debug_printf("could not setup cspace!\n");
+		abort();
+		return SPAWN_ERR_SETUP_CSPACE;
+	}
+
+	// Set up vspace of the child 
+	err = spawn_setup_vspace(&memeater_si);
+	if (err_is_fail(err)) {
+		debug_printf("could not set up vspace!\n");
+		abort();
+		return err_push(err, SPAWN_ERR_VSPACE_INIT);
+	}
+
+	genvaddr_t entry;
+	void * arch_info;
+	err = spawn_arch_load(&memeater_si, binary, binary_size, &entry, &arch_info);
+	if (err_is_fail(err)) {
+		debug_printf("error in loading the image to child!\n");
+		abort();
+		return err_push(err, SPAWN_ERR_LOAD);
+	}
+
 
 	return SYS_ERR_OK;
 }
@@ -200,7 +354,7 @@ int main(int argc, char *argv[])
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
-
+	
 	err = bootstrap_services();
     
 	while (1);

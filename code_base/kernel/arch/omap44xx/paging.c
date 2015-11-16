@@ -74,6 +74,8 @@ paging_write_l1_entry(uintptr_t ttbase, lvaddr_t va, union arm_l1_entry l1)
     }
     l1_table = (union arm_l1_entry *) ttbase;
     l1_table[ARM_L1_OFFSET(va)] = l1;
+
+// 	printf("L1 offset = %d\n", ARM_L1_OFFSET(va));
 }
 // ------------------------------------------------------------------------
 // Exported functions
