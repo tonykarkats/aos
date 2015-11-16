@@ -23,7 +23,6 @@
 #include <barrelfish/aos_rpc.h>
 #include "omap_uart.h"
 #include <barrelfish/thread_sync.h>
-#include "spawn.h"
 #include <spawndomain/spawndomain.h>
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
@@ -173,6 +172,8 @@ static errval_t bootstrap_services(void) {
 		return SPAWN_ERR_ELF_MAP;
 	}
 
+	debug_printf("bootstrap_services: Binary size = %zu and virtual address of binary in init vspace = %p\n", binary_size, binary);
+	
 	// Initialize cspace of chiild
 	err = spawn_setup_cspace(&memeater_si);
 	if (err_is_fail(err)) {
@@ -189,15 +190,16 @@ static errval_t bootstrap_services(void) {
 		return err_push(err, SPAWN_ERR_VSPACE_INIT);
 	}
 
-	genvaddr_t entry;
-	void * arch_info;
-	err = spawn_arch_load(&memeater_si, binary, binary_size, &entry, &arch_info);
-	if (err_is_fail(err)) {
-		debug_printf("error in loading the image to child!\n");
-		abort();
-		return err_push(err, SPAWN_ERR_LOAD);
-	}
+	debug_printf("bootstrap_services: Cspace and Vspace for child are set up!\n");
 
+   	/* Load the image */
+    genvaddr_t entry;
+    void* arch_info;
+    err = spawn_arch_load(&memeater_si, binary, binary_size, &entry, &arch_info);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_LOAD);
+    }
+				    
 
 	return SYS_ERR_OK;
 }

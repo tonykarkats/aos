@@ -52,8 +52,9 @@ static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
                              uint32_t flags, void **retbase)
 {
 	debug_printf("elf_allocate: initiating...\n");
-
-    errval_t err;
+	debug_printf("elf_allocate : Base address = %p\n", (lvaddr_t) base);
+    
+	errval_t err;
     lvaddr_t vaddr;
     size_t used_size;
 
@@ -193,6 +194,8 @@ errval_t spawn_arch_load(struct spawninfo *si,
 {
     errval_t err;
 
+	debug_printf("spawn_arch_load: Initiating...\n");
+
     // Reset the elfloader_slot
     si->elfload_slot = 0;
     struct capref cnode_cap = {
@@ -208,7 +211,7 @@ errval_t spawn_arch_load(struct spawninfo *si,
     si->tls_init_base = 0;
     si->tls_init_len = si->tls_total_len = 0;
 
-    debug_printf("spawn_arch_load: about to load elf %p\n", elf_allocate);
+    debug_printf("spawn_arch_load: about to load elf with binary at %p and size %zu\n", binary, binary_size);
     // Load the binary
     err = elf_load(EM_HOST, elf_allocate, si, binary, binary_size, entry);
     if (err_is_fail(err)) {

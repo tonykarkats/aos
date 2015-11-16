@@ -186,29 +186,9 @@ static errval_t spawn_setup_vspace(struct spawninfo *si)
     // top-level table should always live in slot 0 of pagecn
     assert(si->vtree.slot == 0);
 
-    switch(si->cpu_type) {
-    case CPU_X86_64:
-        err = vnode_create(si->vtree, ObjType_VNode_x86_64_pml4);
-        break;
 
-    case CPU_X86_32:
-    case CPU_SCC:
-#ifdef CONFIG_PAE
-        err = vnode_create(si->vtree, ObjType_VNode_x86_32_pdpt);
-#else
-        err = vnode_create(si->vtree, ObjType_VNode_x86_32_pdir);
-#endif
-        break;
 
-    case CPU_ARM:
-        err = vnode_create(si->vtree, ObjType_VNode_ARM_l1);
-        break;
-
-    default:
-        assert(!"Other architecture");
-        return err_push(err, SPAWN_ERR_UNKNOWN_TARGET_ARCH);
-    }
-
+    err = vnode_create(si->vtree, ObjType_VNode_ARM_l1);
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_CREATE_VNODE);
     }

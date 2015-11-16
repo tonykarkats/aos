@@ -26,7 +26,7 @@
 
 #define S_SIZE_PER_THREAD 2*8192
 #define S_SIZE 1024*100
-#define START_VADDR (1UL<<25)
+
 #define MAX_MEMORY (1024*1024*3*512)
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 #define DEVICE_FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE | KPI_PAGING_FLAGS_NOCACHE)
@@ -99,7 +99,7 @@ errval_t map_l2 (lvaddr_t vaddr){
 	return SYS_ERR_OK;
 }
 
-errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size) {
+errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags) {
 
 	debug_printf("map_user_frame: Initiating...\n");
 
@@ -121,16 +121,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 	chunk->user_provided_frame = true;
 	chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * pages_needed);
 
-	// Are we mapping a device ?
-	int mapping_flags;
-	if (usercap.slot == TASKCN_SLOT_IO) {
-		mapping_flags = DEVICE_FLAGS;
-	}
-	else {
-		mapping_flags = FLAGS;
-	}
-
-	for (int i = 0; i < pages_needed; i++) {
+   for (int i = 0; i < pages_needed; i++) {
 		
 		err = slot_alloc(&chunk->frame_caps_for_region[i]);
 		if (err_is_fail(err)) {
@@ -151,29 +142,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 	// Map all pages of the memory region, that may span across multiple 
 	// l2 tables. AS OF NOW it only does ONE iteration and maps all the pages
 
-	int l1_index = ARM_L1_USER_OFFSET(vaddr);
-    struct capref l2_table_1 = (struct capref) {
-        .cnode = cnode_page,
-        .slot = l1_index + 1,
-    };
-	struct capref l1_table_1 = (struct capref) {
-		.cnode = cnode_page,
-		.slot = 0,
-	};
-	l1_table_1 = l1_table_1;
-	int l2_index_1 = ARM_L2_USER_OFFSET(vaddr);
-	debug_printf("l1 index = %d l2 index = %d\n", l1_index, l2_index_1);
-  	if (l1_index < 7) {	
-		//return SYS_ERR_OK;
-		err = vnode_map(l2_table_1, usercap, l2_index_1, mapping_flags, 0, pages_needed);
-		if (err_is_fail(err)) 
-			abort();
-		return SYS_ERR_OK;		
-	} 
-	
-	
-
-	for (int i = 0 ; i < pages_needed; i++) {
+		for (int i = 0 ; i < pages_needed; i++) {
 
 	   if (!is_l2_mapped(page_start)) {
 			
@@ -200,7 +169,6 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 		page_start += BYTES_PER_PAGE;
 		offset += BYTES_PER_PAGE;
 	}
-
 	return SYS_ERR_OK;
 }
 
@@ -210,13 +178,13 @@ errval_t create_and_map_frame(lvaddr_t vaddr) {
 }
 
 
-errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size) {
+errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags) {
 	
 	errval_t err;
 	
 	if (!capref_is_null(usercap)) {
 		
-		err = map_user_frame(vaddr, usercap, off, size);
+		err = map_user_frame(vaddr, usercap, off, size, mapping_flags);
 		if (err_is_fail(err)) {
 			debug_printf("map_page: Error in mapping user frame!\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -259,7 +227,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
     	struct capref current_frame = chunk->frame_caps_for_region[0];
 
 		//debug_printf("Mapping page from l2 table = %d with index = %d at slot = %d\n", l1_index, l2_index, chunk->frame_caps_for_region[0].slot);
-		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);	
+		err = vnode_map(l2_table, current_frame, l2_index, mapping_flags, 0 , 1);	
 		if (err_is_fail(err)) {
 			debug_printf("map_page: Error in mapping first frame to l2 table !\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
@@ -297,7 +265,7 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 
 		//debug_printf("Mapping for frame = %d and for slot = %d at inner frame = %d\n",used_frame,current_frame.slot, chunk->current_frame_used);
 		//debug_printf("Mapping at offset = %d\n", chunk->frame_offset);
-		err = vnode_map(l2_table, current_frame, l2_index, FLAGS, 0 , 1);
+		err = vnode_map(l2_table, current_frame, l2_index, mapping_flags, 0 , 1);
 		if (err_is_fail(err)) {
 			debug_printf("Error in mapping for frame = %d and for slot = %d \n",used_frame,current_frame.slot);
 			debug_printf("map_page: Error in mapping frame to l2 table !\n");
@@ -339,7 +307,7 @@ static void exception_handler(enum exception_type type,
 		} 
 		else { 
 			//debug_printf("Address is mapped!\n");
-			errval_t err = map_page((lvaddr_t) addr, NULL_CAP, 0, 0);
+			errval_t err = map_page((lvaddr_t) addr, NULL_CAP, 0, 0, FLAGS);
  			if (err_is_fail(err)) {
 				DEBUG_ERR(err, "exception_handler: Error in map_page!\n");
 				abort();
@@ -367,7 +335,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
-	for (int i = 0 ; i < 4096; i++) {
+	for (int i = 0 ; i < 1024; i++) {
 		tree->l2_maps[i] = false;
 		tree->l2_tables[i] = NULL_CAP;
 	}
@@ -383,8 +351,29 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
     st->mem_tree = tree;
 
 	thread_mutex_init(&st->paging_tree_lock);
-
-	debug_printf("paging_init: Finalizing...\n");
+	/*
+	for (int i = 0; i < 6; i++) {
+		tree->l2_maps[i] = true;
+		
+		errval_t err = slot_alloc(&tree->l2_tables[i]);
+		if (err_is_fail(err)) {
+			debug_printf("paging_init_state: Error in allocating slot for l2 table!\n");
+			abort();
+		}
+	
+		struct capref l2_table = {
+			.cnode = cnode_page,
+			.slot = i + 1,
+		};
+	
+		err = cap_copy(tree->l2_tables[i], l2_table);
+		if (err_is_fail(err)) {
+			debug_printf("paging_init_state: Error in copying l2 table!\n");
+			abort();
+		}
+		
+	}
+	*/
     return SYS_ERR_OK;
 }
 
@@ -630,7 +619,7 @@ errval_t paging_map_fixed_attr_args(struct paging_state *st, lvaddr_t vaddr,
 	uint64_t offset = *(uint64_t *) arg1;
 	uint64_t size   = *(uint64_t *) arg2;
 	
-	return map_page(vaddr, frame, offset, size);
+	return map_page(vaddr, frame, offset, size, flags);
 }
 
 /**
@@ -642,7 +631,7 @@ errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
 	debug_printf("paging_map_fixed_attr: Initiating...\n");
 
 	
-	return map_page(vaddr, frame, 0, bytes);
+	return map_page(vaddr, frame, 0, bytes, flags);
 }
 
 /**

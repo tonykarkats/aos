@@ -157,6 +157,7 @@ spawn_init_map(union arm_l2_entry* l2_table,
 
     while (bi < li)
     {
+		// printf("spawn_init_map: Mapping for bi = %d\n", bi);
         paging_set_l2_entry((uintptr_t *)&l2_table[bi], pa_base, l2_flags);
         pa_base += BASE_PAGE_SIZE;
         bi++;

@@ -99,7 +99,7 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
     lvaddr_t vaddr = (lvaddr_t)vaddr_range;
 
     while (size > 0) {
-//        debug_printf("%s %d %zu\n", __FILE__, __LINE__, size);
+        debug_printf("%s %d %zu\n", __FILE__, __LINE__, size);
         assert((size & BASE_PAGE_MASK) == 0);
 
         struct frame_identity id;
