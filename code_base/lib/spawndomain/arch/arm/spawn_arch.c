@@ -51,9 +51,7 @@ static int elf_to_vregion_flags(uint32_t flags)
 static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
                              uint32_t flags, void **retbase)
 {
-	debug_printf("elf_allocate: initiating...\n");
-    
-	errval_t err;
+    errval_t err;
     lvaddr_t vaddr;
     size_t used_size;
 
@@ -148,10 +146,10 @@ static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
     struct paging_state *cp = si->vspace;
 
     // map allocated physical memory in virutal memory of child process
-
     vaddr = (lvaddr_t)base;
     used_size = size;
-	while (used_size > 0) {
+
+    while (used_size > 0) {
         struct capref frame = {
             .cnode = si->segcn,
             .slot  = spawn_vspace_slot++,
@@ -190,8 +188,6 @@ errval_t spawn_arch_load(struct spawninfo *si,
 {
     errval_t err;
 
-	debug_printf("spawn_arch_load: Initiating...Binary base = %p \n", binary);
-
     // Reset the elfloader_slot
     si->elfload_slot = 0;
     struct capref cnode_cap = {
@@ -207,6 +203,7 @@ errval_t spawn_arch_load(struct spawninfo *si,
     si->tls_init_base = 0;
     si->tls_init_len = si->tls_total_len = 0;
 
+    debug_printf("spawn_arch_load: about to load elf %p\n", elf_allocate);
     // Load the binary
     err = elf_load(EM_HOST, elf_allocate, si, binary, binary_size, entry);
     if (err_is_fail(err)) {

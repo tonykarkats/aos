@@ -14,7 +14,6 @@
 
 #include <barrelfish/barrelfish.h>
 #include <spawndomain/spawndomain.h>
-#include <barrelfish/paging.h>
 #include "spawn.h"
 
 /**
@@ -28,10 +27,9 @@ errval_t spawn_paging_init(struct spawninfo *si, struct capref vnode)
     si->vspace = calloc(1, sizeof(struct paging_state));
     assert(si->vspace);
 
-    err = paging_init_state(si->vspace, START_VADDR, vnode);
-
 	si->vspace->cnode_page = si->pagecn;
-
+    
+	err = paging_init_state(si->vspace, 32*1024UL*1024UL, vnode);
     if (err_is_fail(err)) {
         goto cleanup;
     }

@@ -163,6 +163,8 @@ static errval_t spawn_setup_vspace(struct spawninfo *si)
         return err_push(err, SPAWN_ERR_CREATE_PAGECN);
     }
 
+
+
     /* Init pagecn's slot allocator */
 
     // XXX: satisfy a peculiarity of the single_slot_alloc_init_raw API
@@ -186,9 +188,29 @@ static errval_t spawn_setup_vspace(struct spawninfo *si)
     // top-level table should always live in slot 0 of pagecn
     assert(si->vtree.slot == 0);
 
+    switch(si->cpu_type) {
+    case CPU_X86_64:
+        err = vnode_create(si->vtree, ObjType_VNode_x86_64_pml4);
+        break;
 
+    case CPU_X86_32:
+    case CPU_SCC:
+#ifdef CONFIG_PAE
+        err = vnode_create(si->vtree, ObjType_VNode_x86_32_pdpt);
+#else
+        err = vnode_create(si->vtree, ObjType_VNode_x86_32_pdir);
+#endif
+        break;
 
-    err = vnode_create(si->vtree, ObjType_VNode_ARM_l1);
+    case CPU_ARM:
+        err = vnode_create(si->vtree, ObjType_VNode_ARM_l1);
+        break;
+
+    default:
+        assert(!"Other architecture");
+        return err_push(err, SPAWN_ERR_UNKNOWN_TARGET_ARCH);
+    }
+
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_CREATE_VNODE);
     }
@@ -265,6 +287,7 @@ static errval_t spawn_setup_dispatcher(struct spawninfo *si,
                                        void* arch_info)
 {
     errval_t err;
+
     /* Create dispatcher frame (in taskcn) */
     si->dispframe.cnode = si->taskcn;
     si->dispframe.slot  = TASKCN_SLOT_DISPFRAME;
@@ -288,8 +311,6 @@ static errval_t spawn_setup_dispatcher(struct spawninfo *si,
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_MAP_DISPATCHER_TO_SELF);
     }
-
-	debug_printf("Before spawn_vspace_map_one_frame!\n");
 
     genvaddr_t spawn_dispatcher_base;
     err = spawn_vspace_map_one_frame(si, &spawn_dispatcher_base, spawn_dispframe,

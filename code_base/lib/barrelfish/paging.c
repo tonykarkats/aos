@@ -101,20 +101,20 @@ errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st){
 errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st) {
 
 	errval_t err;
-	debug_printf("map_user_frame_outside_tree: Initiating...\n");
+	//debug_printf("map_user_frame_outside_tree: Initiating...\n");
 		
 	size_t pages_needed = size / BYTES_PER_PAGE;
 	struct capref temporary_frame;
 	
 	int first_l2_table_index = ARM_L2_USER_OFFSET(vaddr);
 	int first_l2_total_pages;
-	if (pages_needed <= 1024) {
+	if (pages_needed <= 1024 - first_l2_table_index) {
 		first_l2_total_pages = pages_needed;
 	}
 	else {
 		first_l2_total_pages = 1024 - first_l2_table_index;
 	}
-	debug_printf("map_user_frame_outside_tree: First l2 table index = %d\n", first_l2_table_index);
+	//debug_printf("map_user_frame_outside_tree: First l2 table index = %d\n", first_l2_table_index);
 
 	int middle_l2_tables;
 	int last_l2_total_pages;
@@ -136,6 +136,7 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 	// Map first l2 table 
 	err = slot_alloc(&temporary_frame);	
 	if (err_is_fail(err)) {
+		abort();
 		return err_push(err, LIB_ERR_SLOT_ALLOC);
 	}
 
@@ -145,10 +146,12 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 			return err_push(err, LIB_ERR_VNODE_MAP);
 		}
 	}
-	
+
+		
 	l2_index = ARM_L2_USER_OFFSET(start_address);	
 	err = vnode_map( get_l2_table(start_address, st), usercap, l2_index, mapping_flags, offset, first_l2_total_pages);
 	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Failed in mapping first l2 table!\n");
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
 	offset = first_l2_total_pages * 4096;
@@ -168,6 +171,8 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 				return err_push(err, LIB_ERR_VNODE_MAP);
 			}
 		}
+	
+		err = cap_copy(temporary_frame, usercap);
 		
 		l2_index = ARM_L2_USER_OFFSET(start_address);	
 		err = vnode_map( get_l2_table(start_address, st), temporary_frame, l2_index, mapping_flags, offset, 1024);
@@ -192,10 +197,15 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 				return err_push(err, LIB_ERR_VNODE_MAP);
 		}
 	
+		err = cap_copy(temporary_frame, usercap);
+		
 		l2_index = ARM_L2_USER_OFFSET(start_address);	
+		//debug_printf("map_user_frame_outside_tree: Mapping last l2 table with index = %d, at offset = %d \n", l2_index, offset);
 		err = vnode_map( get_l2_table(start_address, st), temporary_frame, l2_index, mapping_flags, offset, last_l2_total_pages);
-		if (err_is_fail(err))
+		if (err_is_fail(err)){
+			DEBUG_ERR(err, "Failed in mapping last l2 table!\n");
 			return err_push(err, LIB_ERR_VNODE_MAP);
+		}
 	}
 
 
@@ -205,6 +215,8 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st) {
 
 	errval_t err;
+
+	debug_printf("map_user_frame: Will map user frame for address %p\n", vaddr);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings
@@ -219,7 +231,6 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 		return SYS_ERR_OK;
 	}
 
-	debug_printf("map_user_frame: Mapping for paging tree!\n");
 	// Addresses that were allocated via paging_alloc().
 	// Our tree is aware for those addresses.
 	// They reside higher that START_VADDR
@@ -428,7 +439,6 @@ errval_t paging_init(void)
     e_stack_head += S_SIZE_PER_THREAD;
 
     struct capref p;
-    
     debug_printf("Before initializing our memory tree\n");
     paging_init_state(&current, START_VADDR, p);
     debug_printf("paging_init: Initial Memory State Tree\n");
@@ -623,7 +633,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		
 	*buf = (void *)vaddr;
 
-	debug_printf("paging_alloc: Allocated address at %p with size = %zu\n", *buf, bytes);
+	//debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
     return SYS_ERR_OK;
 }
 
