@@ -11,6 +11,7 @@
  * If you do not find this file, copies can be found by writing to:
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
+
 #include "init.h"
 #include <stdlib.h>
 #include <string.h>
@@ -28,10 +29,12 @@
 #define NAME_MEMEATER "armv7/sbin/memeater"
 #include "../../lib/spawndomain/arch.h"
 
+#include <elf/elf.h>
 #define INPUT_BUF_SIZE 4096
 #define MALLOC_BUFSIZE (1UL<<20)
 #define BUFSIZE 32L * 1024 * 1024
 #define SAFE_VADDR (1UL<<25)
+#define MAP_ADDR 0x6400000
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
@@ -44,6 +47,248 @@ struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
+
+/**
+ * \brief Setup the dispatcher frame
+ */
+
+static errval_t spawn_setup_dispatcher(struct spawninfo *si,
+                                       coreid_t core_id,
+                                       const char *name,
+                                       genvaddr_t entry,
+                                       void* arch_info)
+{
+    errval_t err;
+
+    /* Create dispatcher frame (in taskcn) */
+ 
+	si->dispframe.cnode = si->taskcn;
+    si->dispframe.slot  = TASKCN_SLOT_DISPFRAME;
+    struct capref spawn_dispframe = {
+        .cnode = si->taskcn,
+        .slot  = TASKCN_SLOT_DISPFRAME2,
+    };
+    err = frame_create(si->dispframe, (1 << DISPATCHER_FRAME_BITS), NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_DISPATCHER_FRAME);
+    }
+    err = cap_copy(spawn_dispframe, si->dispframe);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_DISPATCHER_FRAME);
+    }
+
+    /* Map in dispatcher frame */
+    dispatcher_handle_t handle;
+    err = paging_map_frame(get_current_paging_state(), (void**)&handle,
+            1ul << DISPATCHER_FRAME_BITS, si->dispframe, NULL, NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_MAP_DISPATCHER_TO_SELF);
+    }
+
+
+	debug_printf("Before mapping dipsatcher at new process!\n");
+    genvaddr_t spawn_dispatcher_base;
+    err = spawn_vspace_map_one_frame(si, &spawn_dispatcher_base, spawn_dispframe,
+                                     1UL << DISPATCHER_FRAME_BITS);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_MAP_DISPATCHER_TO_NEW);
+    }
+
+    /* Set initial state */
+    // XXX: Confusion address translation about l/gen/addr in entry
+    struct dispatcher_shared_generic *disp =
+        get_dispatcher_shared_generic(handle);
+    struct dispatcher_generic *disp_gen = get_dispatcher_generic(handle);
+    arch_registers_state_t *enabled_area =
+        dispatcher_get_enabled_save_area(handle);
+    arch_registers_state_t *disabled_area =
+        dispatcher_get_disabled_save_area(handle);
+
+    /* Place core_id */
+    disp_gen->core_id = core_id;
+
+    /* Setup dispatcher and make it runnable */
+    disp->udisp = spawn_dispatcher_base;
+    disp->disabled = 1;
+    disp->fpu_trap = 1;
+
+    // Copy the name for debugging
+    const char *copy_name = strrchr(name, '/');
+    if (copy_name == NULL) {
+        copy_name = name;
+    } else {
+        copy_name++;
+    }
+    strncpy(disp->name, copy_name, DISP_NAME_LEN);
+
+    spawn_arch_set_registers(arch_info, handle, enabled_area, disabled_area);
+    registers_set_entry(disabled_area, entry);
+
+    si->handle = handle;
+    return SYS_ERR_OK;
+}
+
+errval_t spawn_map_bootinfo(struct spawninfo *si, genvaddr_t *retvaddr)
+{
+    errval_t err;
+
+    struct capref src = {
+        .cnode = cnode_task,
+        .slot  = TASKCN_SLOT_BOOTINFO
+    };
+    struct capref dest = {
+        .cnode = si->taskcn,
+        .slot  = TASKCN_SLOT_BOOTINFO
+    };
+    err = cap_copy(dest, src);
+    if (err_is_fail(err)) {
+        return err_push(err, LIB_ERR_CAP_COPY);
+    }
+
+    err = spawn_vspace_map_one_frame(si, retvaddr, dest, BOOTINFO_SIZE);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_MAP_BOOTINFO);
+    }
+
+    return SYS_ERR_OK;
+}
+
+static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
+                             uint32_t flags, void **retbase)
+{
+	debug_printf("elf_allocate: initiating...\n");
+	//debug_printf("elf_allocate : Base address = %p\n", (lvaddr_t) base);
+    
+	errval_t err;
+    lvaddr_t vaddr;
+    size_t used_size;
+
+    struct spawninfo *si = state;
+
+    // Increase size by space wasted on first page due to page-alignment
+    size_t base_offset = BASE_PAGE_OFFSET(base);
+    size += base_offset;
+    base -= base_offset;
+    // Page-align
+    size = ROUND_UP(size, BASE_PAGE_SIZE);
+
+    cslot_t vspace_slot = si->elfload_slot;
+
+    // Step 1: Allocate the frames
+    size_t sz = 0;
+    for (lpaddr_t offset = 0; offset < size; offset += sz) {
+        sz = 1UL << log2floor(size - offset);
+        struct capref frame = {
+            .cnode = si->segcn,
+            .slot  = si->elfload_slot++,
+        };
+        err = frame_create(frame, sz, NULL);
+        if (err_is_fail(err)) {
+            return err_push(err, LIB_ERR_FRAME_CREATE);
+        }
+    }
+
+    cslot_t spawn_vspace_slot = si->elfload_slot;
+    cslot_t new_slot_count = si->elfload_slot - vspace_slot;
+
+    // Step 2: create copies of the frame capabilities for child vspace
+    for (int copy_idx = 0; copy_idx < new_slot_count; copy_idx++) {
+        struct capref frame = {
+            .cnode = si->segcn,
+            .slot = vspace_slot + copy_idx,
+        };
+
+        struct capref spawn_frame = {
+            .cnode = si->segcn,
+            .slot = si->elfload_slot++,
+        };
+        err = cap_copy(spawn_frame, frame);
+        if (err_is_fail(err)) {
+            debug_printf("cap_copy failed for src_slot = %"PRIuCSLOT
+                    ", dest_slot = %"PRIuCSLOT"\n", frame.slot,
+                    spawn_frame.slot);
+            return err_push(err, LIB_ERR_CAP_COPY);
+        }
+    }
+
+    // Step 3: map into own vspace
+
+    // Get virtual address range to hold the module
+    void *vaddr_range;
+    err = paging_alloc(get_current_paging_state(), &vaddr_range, size);
+    if (err_is_fail(err)) {
+        debug_printf("elf_allocate: paging_alloc failed\n");
+        return (err);
+    }
+
+    // map allocated physical memory in virutal memory of parent process
+    vaddr = (lvaddr_t)vaddr_range;
+    used_size = size;
+
+    while (used_size > 0) {
+        struct capref frame = {
+            .cnode = si->segcn,
+            .slot  = vspace_slot++,
+        };       // find out the size of the frame
+
+        struct frame_identity id;
+        err = invoke_frame_identify(frame, &id);
+        assert(err_is_ok(err));
+        size_t slot_size = (1UL << id.bits);
+
+        // map frame to provide physical memory backing
+        err = paging_map_fixed_attr(get_current_paging_state(), vaddr, frame, slot_size,
+                VREGION_FLAGS_READ_WRITE);
+
+        if (err_is_fail(err)) {
+            debug_printf("elf_allocate: paging_map_fixed_attr failed\n");
+            return err;
+        }
+
+        used_size -= slot_size;
+        vaddr +=  slot_size;
+    } // end while:
+
+
+    // Step 3: map into new process
+    struct paging_state *cp = si->vspace;
+
+    // map allocated physical memory in virutal memory of child process
+
+    vaddr = (lvaddr_t)base;
+    used_size = size;
+
+	debug_printf("elf_allocate : Base address = %p\n", vaddr);
+	while (used_size > 0) {
+        struct capref frame = {
+            .cnode = si->segcn,
+            .slot  = spawn_vspace_slot++,
+        };
+
+        // find out the size of the frame
+        struct frame_identity id;
+        err = invoke_frame_identify(frame, &id);
+        assert(err_is_ok(err));
+        size_t slot_size = (1UL << id.bits);
+
+        // map frame to provide physical memory backing
+        err = paging_map_fixed_attr(cp, vaddr, frame, slot_size,
+                flags);
+
+        if (err_is_fail(err)) {
+            debug_printf("elf_allocate: paging_map_fixed_attr failed\n");
+            return err;
+        }
+
+        used_size -= slot_size;
+        vaddr +=  slot_size;
+    } // end while:
+
+    *retbase = (void*) vaddr_range + base_offset;
+
+    return SYS_ERR_OK;
+} // end function: elf_allocate
+
 
 
 static errval_t spawn_setup_vspace(struct spawninfo *si)
@@ -192,15 +437,52 @@ static errval_t bootstrap_services(void) {
 
 	debug_printf("bootstrap_services: Cspace and Vspace for child are set up!\n");
 
-   	/* Load the image */
-    genvaddr_t entry;
-    void* arch_info;
-    err = spawn_arch_load(&memeater_si, binary, binary_size, &entry, &arch_info);
+	genvaddr_t entry_2;
+	void* arch_info_2;
+
+	err = spawn_arch_load(&memeater_si, binary, binary_size, &entry_2, &arch_info_2);
+	abort();
+
+    // Reset the elfloader_slot
+    memeater_si.elfload_slot = 0;
+    struct capref cnode_cap = {
+        .cnode = memeater_si.rootcn,
+        .slot  = ROOTCN_SLOT_SEGCN,
+    };
+    err = cnode_create_raw(cnode_cap, &memeater_si.segcn, DEFAULT_CNODE_SLOTS, NULL);
     if (err_is_fail(err)) {
-        return err_push(err, SPAWN_ERR_LOAD);
+    	abort();
+	    return err_push(err, SPAWN_ERR_CREATE_SEGCN);
     }
 				    
+	void * ret;
+	void * arch_info;
+	
+	err = elf_allocate(&memeater_si, MAP_ADDR, binary_size, VREGION_FLAGS_EXECUTE | VREGION_FLAGS_READ_WRITE, &ret);
+	 if (err_is_fail(err)) {
+		abort();
+        return err_push(err, SPAWN_ERR_ELF_MAP);
+    }
 
+	// abort();	
+	struct Elf32_Shdr* got_shdr =
+        elf32_find_section_header_name(binary, binary_size, ".got");
+    if (got_shdr)
+    {
+        arch_info = (void*)got_shdr->sh_addr;
+    }
+    else {
+        return SPAWN_ERR_LOAD;
+    }
+	debug_printf("Before seting dispatcher frame!\n");
+	genvaddr_t * ret_1 = (genvaddr_t *) ret;	
+	err = spawn_setup_dispatcher(&memeater_si, my_core_id, NAME_MEMEATER, *ret_1, arch_info);
+	if (err_is_fail(err)) {
+		debug_printf("error in spawn_setup_dispatcher");
+		abort();
+	}
+	debug_printf("bootstrap OK\n");
+	abort();
 	return SYS_ERR_OK;
 }
 

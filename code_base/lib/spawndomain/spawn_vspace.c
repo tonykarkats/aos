@@ -29,6 +29,9 @@ errval_t spawn_paging_init(struct spawninfo *si, struct capref vnode)
     assert(si->vspace);
 
     err = paging_init_state(si->vspace, START_VADDR, vnode);
+
+	si->vspace->cnode_page = si->pagecn;
+
     if (err_is_fail(err)) {
         goto cleanup;
     }

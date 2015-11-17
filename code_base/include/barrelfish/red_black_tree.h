@@ -82,6 +82,7 @@ typedef struct rb_red_blk_tree {
 	rb_red_blk_node* root;             
 	rb_red_blk_node* nil;              
 
+	lvaddr_t lowest_memory_address;
 	struct capref l2_tables[1024];
 	bool l2_maps[1024];
 	struct thread_mutex paging_tree_lock;

@@ -40,7 +40,7 @@ rb_red_blk_node* find_node (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t by
 
     if (x != tree->nil) {
 			init_guard = find_node(tree, x->left, bytes, init_guard);
-	    	printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
+//	    	printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
 			if (init_guard == NULL) { 
 				 
 				chunk =  ((memory_chunk*) x->info);
@@ -48,7 +48,7 @@ rb_red_blk_node* find_node (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t by
 					init_guard = NULL;
 				else {
 					if (chunk->size > bytes) {
-						printf("----- Memory area can fit into memory chunk that starts at %p\n", *((lvaddr_t*)x->key));
+//						printf("----- Memory area can fit into memory chunk that starts at %p\n", *((lvaddr_t*)x->key));
    						init_guard = x;
    					}
 					else 
@@ -66,7 +66,6 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
 
 	memory_chunk *chunk, *new_chunk_1, *new_chunk_2;
 	lvaddr_t *addr1, *addr2;
-
 	
 	rb_red_blk_node* node = find_node(tree, tree->root->left, bytes, NULL);	
 	
@@ -75,7 +74,7 @@ lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
 
 	printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
 	chunk = (memory_chunk*) node->info;
-
+	
 	size_t size1 = bytes;
 	size_t size2 = chunk->size - bytes;				
 	addr1 = (lvaddr_t*) malloc(sizeof(lvaddr_t));  

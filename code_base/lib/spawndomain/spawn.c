@@ -265,7 +265,6 @@ static errval_t spawn_setup_dispatcher(struct spawninfo *si,
                                        void* arch_info)
 {
     errval_t err;
-
     /* Create dispatcher frame (in taskcn) */
     si->dispframe.cnode = si->taskcn;
     si->dispframe.slot  = TASKCN_SLOT_DISPFRAME;
@@ -289,6 +288,8 @@ static errval_t spawn_setup_dispatcher(struct spawninfo *si,
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_MAP_DISPATCHER_TO_SELF);
     }
+
+	debug_printf("Before spawn_vspace_map_one_frame!\n");
 
     genvaddr_t spawn_dispatcher_base;
     err = spawn_vspace_map_one_frame(si, &spawn_dispatcher_base, spawn_dispframe,

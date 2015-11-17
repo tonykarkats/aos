@@ -30,7 +30,7 @@ typedef int paging_flags_t;
 #define ARM_L2_USER_OFFSET(addr) ((addr)>>12 & 0x3ff)
 #define ARM_L2_USER_ENTRIES 1024u
 
-#define START_VADDR (1UL<<25)
+#define START_VADDR (1024*1024*1024)
 
 #define VREGION_FLAGS_READ     0x01 // Reading allowed
 #define VREGION_FLAGS_WRITE    0x02 // Writing allowed
@@ -49,23 +49,24 @@ typedef int paging_flags_t;
 #define VREGION_FLAGS_READ_WRITE_MPB \
     (VREGION_FLAGS_READ | VREGION_FLAGS_WRITE | VREGION_FLAGS_MPB)
 
-
-errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int flags);
-errval_t create_and_map_frame(lvaddr_t vaddr);
-errval_t map_l2 (lvaddr_t vaddr);
-struct capref get_l2_table(lvaddr_t vaddr);
-bool is_l2_mapped(lvaddr_t vaddr);
-errval_t map_page(lvaddr_t vaddr, struct capref, uint64_t off, uint64_t pte_count, int flags); 
-void handle_fault(lvaddr_t vaddr);
-errval_t get_frame(size_t, struct capref*);
-
 // struct to store the paging status of a process
 struct paging_state {
     
 	rb_red_blk_tree* mem_tree;
 	struct thread_mutex paging_tree_lock;
+	struct cnoderef cnode_page;
     
 };
+
+errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int flags, struct paging_state * st);
+errval_t create_and_map_frame(lvaddr_t vaddr);
+errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st);
+struct capref get_l2_table(lvaddr_t vaddr, struct paging_state * st);
+bool is_l2_mapped(lvaddr_t vaddr, struct paging_state * st);
+errval_t map_page(lvaddr_t vaddr, struct capref, uint64_t off, uint64_t pte_count, int flags, struct paging_state * st); 
+void handle_fault(lvaddr_t vaddr);
+errval_t get_frame(size_t, struct capref*);
+errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st);
 
 struct thread;
 /// Initialize paging_state struct
