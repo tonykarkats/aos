@@ -368,12 +368,18 @@ static void free_thread(struct thread *thread)
  *
  * \returns Thread pointer on success, NULL on failure
  */
+// static char stack_2[65536];
 struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
                                         size_t stacksize)
 {
+
+	debug_printf("thread_create_unrunnable: Initiating...Stack size = %zu\n", stacksize);
     // allocate stack
     assert((stacksize % sizeof(uintptr_t)) == 0);
-    void *stack = malloc(stacksize);
+   
+	debug_printf("thread_create_unrunnable: Before malloc...\n");
+	void *stack = malloc(stacksize);
+	debug_printf("thread_create_unrunnable: After malloc...\n");
     if (stack == NULL) {
         return NULL;
     }
@@ -381,6 +387,8 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
     // allocate space for TCB + initial TLS data
     // no mutex as it may deadlock: see comment for thread_slabs_spinlock
     // thread_mutex_lock(&thread_slabs_mutex);
+
+	debug_printf("thread_create_unrunnable: Before slab alloc!\n");
     acquire_spinlock(&thread_slabs_spinlock);
     void *space = slab_alloc(&thread_slabs);
     release_spinlock(&thread_slabs_spinlock);
@@ -396,9 +404,14 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
     void *tls_data = space;
     struct thread *newthread = (void *)((uintptr_t)space + tls_block_total_len);
 
-    // init thread
+    
+	debug_printf("thread_create_unrunnable: Before thread_init...\n");
+	// init thread
     thread_init(curdispatcher(), newthread);
     newthread->slab = space;
+
+	debug_printf("thread_create_unrunnable: After thread_init...\n");
+
 
     if (tls_block_total_len > 0) {
         // populate initial TLS data from pristine copy
@@ -433,6 +446,7 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
                           (lvaddr_t)newthread->stack_top,
                           (lvaddr_t)start_func, (lvaddr_t)arg, 0, 0);
 
+	debug_printf("thread_create_unrunnable: Ending...\n");
     return newthread;
 }
 
@@ -1035,7 +1049,9 @@ static int bootstrap_thread(struct spawn_domain_params *params)
  */
 void thread_init_disabled(dispatcher_handle_t handle, bool init_domain)
 {
-    struct dispatcher_shared_generic *disp =
+    debug_printf("thread_init_disabled: Initiating...\n");
+	
+	struct dispatcher_shared_generic *disp =
         get_dispatcher_shared_generic(handle);
     struct dispatcher_generic *disp_gen = get_dispatcher_generic(handle);
     arch_registers_state_t *enabled_area =
@@ -1064,12 +1080,16 @@ void thread_init_disabled(dispatcher_handle_t handle, bool init_domain)
                           (lvaddr_t)thread->stack_top,
                           (lvaddr_t)bootstrap_thread, param, 0, 0);
 
+	
+	debug_printf("thread_init_disabled: After registers_set_initial...\n");
     // Switch to it (always on this dispatcher)
     thread->disp = handle;
     thread_enqueue(thread, &disp_gen->runq);
     disp_gen->current = thread;
     disp->haswork = true;
     disp_resume(handle, &thread->regs);
+
+	debug_printf("thread_init_disabled: Returning...\n");
 }
 
 /**

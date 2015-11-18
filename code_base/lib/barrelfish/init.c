@@ -196,7 +196,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 {
     errval_t err;
 	
-	debug_printf("barrelfish_init_onthread: Initializing...\n");
     // do we have an environment?
     if (params != NULL && params->envp[0] != NULL) {
         extern char **environ;
@@ -208,7 +207,8 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     waitset_init(default_ws);
 
     // Initialize ram_alloc state
-
+	
+	debug_printf("barrelfish_init_onthread: Setting up fixed ram allocator!\n");
 	ram_alloc_init();
 
     /* All domains use smallcn to initialize */
@@ -217,22 +217,32 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
         return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
 
+	debug_printf("barrelfish_init_onthread: Setting up slot allocator!\n");
     err = slot_alloc_init();
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
     }
 
-    err = paging_init();
-    if (err_is_fail(err)) {
+	if (params->vspace_buf != NULL) {
+		debug_printf("barrelfish_init_onthread: Not null vspace data with legnth = %zu!\n", params->vspace_buf_len);
+
+	
+	}
+
+    debug_printf("barrelfish_init_onthread: Initializing our paging!\n");
+	err = paging_init();
+   	if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_VSPACE_INIT);
     }
 
-
+	debug_printf("barrelfish_init_onthread: Initializing our morecore backend!\n");
     err = morecore_init();
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_MORECORE_INIT);
     }
 
+	debug_printf("barrelfish_init_onthread: Returning...\n");
+	
 	return SYS_ERR_OK;
 
     lmp_endpoint_init();
@@ -270,6 +280,8 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 void barrelfish_init_disabled(dispatcher_handle_t handle, bool init_dom_arg);
 void barrelfish_init_disabled(dispatcher_handle_t handle, bool init_dom_arg)
 {
+	debug_printf("barrelfish_init_disabled: Initializing...\n");
+	
     init_domain = init_dom_arg;
     disp_init_disabled(handle);
     thread_init_disabled(handle, init_dom_arg);

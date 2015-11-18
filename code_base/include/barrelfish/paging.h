@@ -54,7 +54,8 @@ struct paging_state {
     
 	rb_red_blk_tree* mem_tree;
 	struct thread_mutex paging_tree_lock;
-	struct cnoderef cnode_page;
+
+	struct capref pdir;
     
 };
 

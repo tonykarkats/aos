@@ -52,6 +52,7 @@ static errval_t bootstrap_services(void) {
 
 	errval_t err;
 
+	debug_printf("BOOTSTRAP SERVICES STARTS HERE\n");
 	struct spawninfo memeater_si;
 
 	err = spawn_load_with_bootinfo(&memeater_si, bi, NAME_MEMEATER, my_core_id);
@@ -59,13 +60,12 @@ static errval_t bootstrap_services(void) {
 		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
 		abort();
 	}
-	
-	// disp_enable(memeater_si.handle);
 
+	debug_printf("bootstrap_services: Size of paging struct for child = %zu\n", sizeof(*memeater_si.vspace));
 	
 	err = spawn_run(&memeater_si);
 	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
+		debug_printf("spawn_run: ERROR!\n");
 		abort();
 	}
 			

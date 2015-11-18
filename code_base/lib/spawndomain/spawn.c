@@ -163,9 +163,7 @@ static errval_t spawn_setup_vspace(struct spawninfo *si)
         return err_push(err, SPAWN_ERR_CREATE_PAGECN);
     }
 
-
-
-    /* Init pagecn's slot allocator */
+	/* Init pagecn's slot allocator */
 
     // XXX: satisfy a peculiarity of the single_slot_alloc_init_raw API
     size_t bufsize = SINGLE_SLOT_ALLOC_BUFLEN(PAGE_CNODE_SLOTS);
@@ -266,6 +264,7 @@ static errval_t spawn_determine_cputype(struct spawninfo *si, lvaddr_t binary)
         break;
 
     case EM_ARM:
+		// debug_printf("spawn_determine_cputype: Arm arch detected!\n");
         si->cpu_type = CPU_ARM;
         break;
 
@@ -356,6 +355,7 @@ static errval_t spawn_setup_dispatcher(struct spawninfo *si,
 errval_t spawn_map_bootinfo(struct spawninfo *si, genvaddr_t *retvaddr)
 {
     errval_t err;
+
 
     struct capref src = {
         .cnode = cnode_task,
@@ -767,7 +767,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_SETUP_DISPATCHER);
     }
 
-    /* Map bootinfo */
+
+    // Map bootinfo 
     // XXX: Confusion address translation about l/gen/addr in entry
     genvaddr_t vaddr;
     err = spawn_map_bootinfo(si, &vaddr);
@@ -775,8 +776,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_MAP_BOOTINFO);
     }
 
-    /* Construct cmdline args, 0 is name, 1 is bootinfo address,
-       remaining are from the multiboot */
+    // Construct cmdline args, 0 is name, 1 is bootinfo address,
+    //   remaining are from the multiboot 
     // Name
     char args[1024];
     strcpy(args, name);
@@ -820,6 +821,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
 
     // unmap bootinfo module pages
     spawn_unmap_module(binary);
+
 
     return SYS_ERR_OK;
 }

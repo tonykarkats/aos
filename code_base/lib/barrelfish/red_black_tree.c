@@ -44,7 +44,6 @@ rb_red_blk_tree* RBTreeCreate( int (*CompFunc) (const void*,const void*),
   temp=newTree->root= (rb_red_blk_node*) SafeMalloc(sizeof(rb_red_blk_node));
   temp->parent=temp->left=temp->right=newTree->nil;
   temp->key=0;
-  temp->red=0;
   return(newTree);
 }
 
@@ -362,12 +361,22 @@ void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x) {
     //debug_printf("  key="); 
     tree->PrintKey(x->key);
     //debug_printf("  l->key=");
-    if( x->left == nil) debug_printf("NULL"); else tree->PrintKey(x->left->key);
+    if( x->left == nil) 
+		;	// debug_printf("NULL"); 
+	else 
+		; 	//tree->PrintKey(x->left->key);
     //debug_printf("  r->key=");
-    if( x->right == nil) debug_printf("NULL"); else tree->PrintKey(x->right->key);
+    if( x->right == nil) 
+		debug_printf("NULL"); 
+	else 
+		tree->PrintKey(x->right->key);
     //debug_printf("  p->key=");
-    if( x->parent == root) debug_printf("NULL"); else tree->PrintKey(x->parent->key);
-    //debug_printf("  red=%i\n\n\n",x->red);
+    if( x->parent == root) 
+		;	//debug_printf("NULL"); 
+	else 
+		tree->PrintKey(x->parent->key);
+    
+	//debug_printf("  red=%i\n\n\n",x->red);
     InorderTreePrint(tree,x->right);
   }
 }

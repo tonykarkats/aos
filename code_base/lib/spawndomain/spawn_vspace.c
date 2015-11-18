@@ -27,7 +27,7 @@ errval_t spawn_paging_init(struct spawninfo *si, struct capref vnode)
     si->vspace = calloc(1, sizeof(struct paging_state));
     assert(si->vspace);
 
-	si->vspace->cnode_page = si->pagecn;
+	// si->vspace->cnode_page = si->pagecn;
     
 	err = paging_init_state(si->vspace, 32*1024UL*1024UL, vnode);
     if (err_is_fail(err)) {
@@ -50,6 +50,7 @@ errval_t spawn_vspace_map_one_frame(struct spawninfo *si, genvaddr_t *retaddr,
     errval_t err;
 
     void *vbuf;
+	debug_printf("spawn_vspace_map_one_frame: Allocating and mapping for the child process!!!\n");
     err = paging_map_frame(si->vspace, &vbuf, size, frame, NULL, NULL);
     if (err_is_fail(err)) {
         return err;

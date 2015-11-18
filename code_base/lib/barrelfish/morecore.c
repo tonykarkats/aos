@@ -1,3 +1,4 @@
+
 /**
  * \file
  * \brief Morecore implementation for malloc
@@ -26,13 +27,13 @@ extern morecore_free_func_t sys_morecore_free;
 
 // this define makes morecore use an implementation that just has a static
 // 16MB heap.
-//#define USE_STATIC_HEAP
+// #define USE_STATIC_HEAP
 
-
-#define HEAP_SIZE (16*1024*1024)
+#define HEAP_SIZE (32*1024*1024)
 
 #ifdef USE_STATIC_HEAP
 
+static char *endp;
 // dummy mini heap (16M)
 static char mymem[HEAP_SIZE] = { 0 };
 //static char *endp = mymem + HEAP_SIZE;
@@ -93,13 +94,11 @@ errval_t morecore_init(void)
  * be smaller than bytes if we were able to allocate a smaller memory
  * region than requested for.
  */
-#endif
-
 static char *endp;
-
 
 static void *morecore_alloc(size_t bytes, size_t *retbytes)
 {
+//	debug_printf("morecore_alloc: Initiating...\n");
     struct morecore_state *state = get_morecore_state();
 
     char *freep = state->freep;
@@ -116,6 +115,8 @@ static void *morecore_alloc(size_t bytes, size_t *retbytes)
     }
     *retbytes = aligned_bytes;
 
+
+//	debug_printf("morecore_alloc: Returning...\n");
     return ret;
 }
 
@@ -144,6 +145,7 @@ errval_t morecore_init(void)
     return SYS_ERR_OK;
 }
 
+#endif
 
 Header *get_malloc_freep(void);
 Header *get_malloc_freep(void)

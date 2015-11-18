@@ -74,11 +74,12 @@ errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st){
 	errval_t err;
     int l1_index = ARM_L1_USER_OFFSET(vaddr);
 	struct capref l2_table;
-    struct capref l1_table = (struct capref) {
-        .cnode = st->cnode_page,
-        .slot = 0,
-    };
-   
+    //struct capref l1_table = (struct capref) {
+    //   .cnode = st->cnode_page,
+    //    .slot = 0,
+    //};
+    struct capref l1_table = st->pdir;
+
 //	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
 	err = arml2_alloc(&l2_table);
 	if (err_is_fail(err)) {
@@ -127,8 +128,8 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 		last_l2_total_pages =  (pages_needed - first_l2_total_pages) % 1024;
 	}
 	
-	debug_printf("map_user_frame_outside_tree: Total pages needed %d. Will map %d pages for first l2 table. %d pages for each middle l2 table and %d pages for last l2 table!\n", 
-				 pages_needed, first_l2_total_pages, middle_l2_tables, last_l2_total_pages);	
+	//debug_printf("map_user_frame_outside_tree: Total pages needed %d. Will map %d pages for first l2 table. %d pages for each middle l2 table and %d pages for last l2 table!\n", 
+	//			 pages_needed, first_l2_total_pages, middle_l2_tables, last_l2_total_pages);	
 	uint64_t start_address = vaddr;	
 	uint64_t offset = 0;
 	int l2_index;
@@ -216,7 +217,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	errval_t err;
 
-	debug_printf("map_user_frame: Will map user frame for address %p\n", vaddr);
+	debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings
@@ -358,7 +359,7 @@ static void exception_handler(enum exception_type type,
 			      arch_registers_fpu_state_t *fpuregs) 
 {
 	if (type == EXCEPT_PAGEFAULT) {
-		//printf("Pagefault exception of subtype %d at address %p\n", subtype, addr);
+		 debug_printf("Pagefault exception at address \n");
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -400,20 +401,24 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 {
 	
     debug_printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
+
+	// Keep in paging state the l1 table
+	st->pdir = pdir;
+
     lvaddr_t* newAddr;
 	memory_chunk* newMemory;
     rb_red_blk_tree* tree;
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
-	tree->lowest_memory_address = START_VADDR;
+	tree->lowest_memory_address = start_vaddr;
 	for (int i = 0 ; i < 1024; i++) {
 		tree->l2_maps[i] = false;
 		tree->l2_tables[i] = NULL_CAP;
 	}
     newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
 
-    *newAddr = START_VADDR;
+    *newAddr = start_vaddr;
 
     newMemory = (memory_chunk *) SafeMalloc(sizeof(memory_chunk));
     newMemory->reserved = 0;
@@ -432,20 +437,22 @@ static int e_stack_head = 0;
 
 errval_t paging_init(void)
 {
-    debug_printf("paging_init\n");
 
     // Initialize self-paging handler
     thread_set_exception_handler(exception_handler, NULL, e_stack, e_stack + e_stack_head + S_SIZE_PER_THREAD, NULL, NULL);
     e_stack_head += S_SIZE_PER_THREAD;
 
-    struct capref p;
-    debug_printf("Before initializing our memory tree\n");
-    paging_init_state(&current, START_VADDR, p);
-    debug_printf("paging_init: Initial Memory State Tree\n");
+    struct capref pdir = {
+		.cnode = cnode_page,
+		.slot   = 0,
+	};
+   
+	paging_init_state(&current, START_VADDR, pdir);
+
     RBTreePrint(current.mem_tree);
+
     set_current_paging_state(&current);
 
-	current.cnode_page = cnode_page;
     return SYS_ERR_OK;
 }
 
@@ -458,7 +465,8 @@ errval_t paging_init(void)
 void paging_init_onthread(struct thread *t)
 {
     // TODO: setup exception handler for thread `t'.
-    
+	debug_printf("paging_init_onthread: Initializing...\n");
+	    
 	t->exception_handler = exception_handler;
 
 	t->exception_stack = e_stack + e_stack_head;
@@ -592,8 +600,9 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
    
 	thread_mutex_lock(&st->paging_tree_lock);
  
-    // debug_printf("Trying to allocate memory. Rounded up to %d\n",bytes);
-    vaddr = allocate_memory(st->mem_tree, bytes);
+	debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
+    
+	vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
 		debug_printf("paging_alloc: Run out of virtual memory!");
 		return LIB_ERR_OUT_OF_VIRTUAL_ADDR;
