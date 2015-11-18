@@ -61,6 +61,7 @@ static errval_t bootstrap_services(void) {
 	}
 	
 	// disp_enable(memeater_si.handle);
+
 	
 	err = spawn_run(&memeater_si);
 	if (err_is_fail(err)) {
