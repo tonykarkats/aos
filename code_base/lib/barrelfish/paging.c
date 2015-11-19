@@ -14,6 +14,7 @@
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
 
+
 #include <barrelfish/barrelfish.h>
 #include <barrelfish/paging.h>
 #include <barrelfish/except.h>
@@ -24,12 +25,14 @@
 #include <stdbool.h>
 #include <barrelfish/thread_sync.h>
 #include <math.h>
+
 #define S_SIZE_PER_THREAD 2*8192
 #define S_SIZE 1024*100
 
 #define MAX_MEMORY (1024*1024*3*512)
 #define FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE)
 #define DEVICE_FLAGS (KPI_PAGING_FLAGS_READ | KPI_PAGING_FLAGS_WRITE | KPI_PAGING_FLAGS_NOCACHE)
+
 static struct paging_state current;
 
 /**
@@ -65,7 +68,6 @@ bool is_l2_mapped(lvaddr_t vaddr, struct paging_state * st) {
 	
 	int l1_index = ARM_L1_USER_OFFSET(vaddr);
 	
-	//debug_printf("is_l2_mapped: Searcing for l1 index = %d\n", l1_index);
 	return st->mem_tree->l2_maps[l1_index];	
 }
 
@@ -74,10 +76,6 @@ errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st){
 	errval_t err;
     int l1_index = ARM_L1_USER_OFFSET(vaddr);
 	struct capref l2_table;
-    //struct capref l1_table = (struct capref) {
-    //   .cnode = st->cnode_page,
-    //    .slot = 0,
-    //};
     struct capref l1_table = st->pdir;
 
 //	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
@@ -148,7 +146,6 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 		}
 	}
 
-		
 	l2_index = ARM_L2_USER_OFFSET(start_address);	
 	err = vnode_map( get_l2_table(start_address, st), usercap, l2_index, mapping_flags, offset, first_l2_total_pages);
 	if (err_is_fail(err)) {
@@ -184,7 +181,6 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 		start_address += 1024 * 4096;
 	}
 
-	
 	// Map last l2 table 
 	if (last_l2_total_pages != 0) {
 		err = slot_alloc(&temporary_frame);	
@@ -231,7 +227,10 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 		return SYS_ERR_OK;
 	}
-	
+
+	// Arbitary frame mapped by user at addresses allocated by paging alloc
+	// We do not keep those frames yet in our implementation we should 
+	// fix this for efficiently unmapping	
 	err = map_user_frame_outside_tree(vaddr, usercap, off, size, mapping_flags, st);
 	if (err_is_fail(err)) {
 		return err_push(err, LIB_ERR_VNODE_MAP);
@@ -349,6 +348,7 @@ static void exception_handler(enum exception_type type,
 {
 	
 	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
+	
 	if (type == EXCEPT_PAGEFAULT) {
 		debug_printf("Pagefault exception at address %p\n", addr);
 
@@ -545,7 +545,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
    	
-   	debug_printf("get_frame: Need %d slots\n", slots_needed);
+   	// debug_printf("get_frame: Need %d slots\n", slots_needed);
    	
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
