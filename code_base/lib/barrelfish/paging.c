@@ -350,7 +350,7 @@ static void exception_handler(enum exception_type type,
 	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 	
 	if (type == EXCEPT_PAGEFAULT) {
-		// debug_printf("Pagefault exception at address %p\n", addr);
+		debug_printf("Pagefault exception at address %p\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -390,6 +390,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 	
     debug_printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
 
+	assert(st != NULL);
 	// Keep in paging state the l1 table
 	st->pdir = pdir;
 
@@ -399,17 +400,23 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 
     tree=RBTreeCreate(VirtaddrComp,VirtaddrDest,VirtaddrInfoDest,VirtaddrPrint,VirtaddrInfo);
 
+	assert(tree != NULL);
+
 	tree->lowest_memory_address = start_vaddr;
 	for (int i = 0 ; i < 1024; i++) {
 		tree->l2_maps[i] = false;
 		tree->l2_tables[i] = NULL_CAP;
 	}
-    newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
 
+    newAddr = (lvaddr_t*) SafeMalloc(sizeof(lvaddr_t));
+	assert(newAddr != NULL);
+	
     *newAddr = start_vaddr;
 
     newMemory = (memory_chunk *) SafeMalloc(sizeof(memory_chunk));
-    newMemory->reserved = 0;
+   	assert(newMemory != NULL);
+	
+	newMemory->reserved = 0;
     newMemory->size = MAX_MEMORY;
 	 
     RBTreeInsert(tree, newAddr ,newMemory);
@@ -417,6 +424,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 	st->mem_tree = tree;
 	thread_mutex_init(&st->paging_tree_lock);
 
+	debug_printf("paging_init_state: ALLGOOD!\n");
     return SYS_ERR_OK;
 }
 

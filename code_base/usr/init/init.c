@@ -151,6 +151,15 @@ static void recv_handler(void *arg)
 
 			serial_putstring(RESET); 
 			break;
+		case AOS_RPC_PROC_SPAWN:
+			;
+			break;
+		case AOS_RPC_PROC_GET_NAME:
+			;
+			break;
+		case AOS_RPC_PROC_GET_PIDS:
+			;
+			break;
 	}
 	
 	if (!capref_is_null(cap)) {
@@ -164,7 +173,7 @@ static void recv_handler(void *arg)
 			MKCLOSURE(recv_handler, arg));
 }
 
-static errval_t setup_endpoints_and_bootstrap_services(void) {
+static errval_t setup_channel(void) {
 
 	errval_t err;
 	struct waitset* ws = get_default_waitset();  	
@@ -205,22 +214,30 @@ static errval_t setup_endpoints_and_bootstrap_services(void) {
 	}
 
 	cap_initep = retcap;	
+	return SYS_ERR_OK;	
+}
 
-	struct spawninfo memeater_si;
+static errval_t bootstrap_domain(char *name)
+{
+	errval_t err;
+	struct spawninfo domain_si;
+	char prefix[12] = "armv7/sbin/";	
 
-	err = spawn_load_with_bootinfo(&memeater_si, bi, NAME_MEMEATER, my_core_id);
+	char * module_name = strcat(prefix, name);
+	
+	err = spawn_load_with_bootinfo(&domain_si, bi, module_name, my_core_id);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
 		abort();
 	}
 
-	err = spawn_run(&memeater_si);
+	err = spawn_run(&domain_si);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_run: ERROR!\n");
 		abort();
 	}
-			
-	return SYS_ERR_OK;	
+
+	return SYS_ERR_OK;
 }
 
 int main(int argc, char *argv[])
@@ -275,13 +292,20 @@ int main(int argc, char *argv[])
 
 	initialize_ring(&ring);
 
-	debug_printf("Before thread create!\n");
-	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
-	serial_polling_thread = serial_polling_thread;
+	//struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
+	//serial_polling_thread = serial_polling_thread;
 
-	err = setup_endpoints_and_bootstrap_services();
+	err = setup_channel();
    	assert(err_is_ok(err));
- 
+
+	debug_printf("Spawning memeater!\n"); 
+	err = bootstrap_domain("memeater");
+	assert(err_is_ok(err));
+
+	debug_printf("Spawning led_on!\n");
+	err = bootstrap_domain("led_on");
+	assert(err_is_ok(err));
+		
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {

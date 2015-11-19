@@ -228,6 +228,7 @@ static errval_t spawn_setup_vspace(struct spawninfo *si)
         return err_push(err, SPAWN_ERR_VSPACE_INIT);
     }
 
+	debug_printf("ALL OK MOVING ON!\n");
     return SYS_ERR_OK;
 }
 
@@ -757,19 +758,23 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_SETUP_CSPACE);
     }
 
+
     /* Initialize vspace */
     err = spawn_setup_vspace(si);
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_VSPACE_INIT);
     }
 
-    /* Load the image */
+   
+	debug_printf("Setted vpspace ready to load the image...\n"); 
+	/* Load the image */
     genvaddr_t entry;
     void* arch_info;
     err = spawn_arch_load(si, binary, binary_size, &entry, &arch_info);
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_LOAD);
     }
+	debug_printf("Image loaded ready to set up the dispatcher!\n");
 
     /* Setup dispatcher frame */
     err = spawn_setup_dispatcher(si, coreid, name, entry, arch_info);
@@ -777,7 +782,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_SETUP_DISPATCHER);
     }
 
-
+	debug_printf("Dispatcher is set up !\n");
     // Map bootinfo 
     // XXX: Confusion address translation about l/gen/addr in entry
     genvaddr_t vaddr;
@@ -811,6 +816,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_GET_CMDLINE_ARGS);
     }
+
+
     // Lop off the name
     char *multiboot_args_lop = strchr(multiboot_args, ' ');
     if (multiboot_args_lop) {
@@ -827,13 +834,14 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_SETUP_ENV);
     }
+
     free(multiboot_args);
 
     // unmap bootinfo module pages
     spawn_unmap_module(binary);
 
-
-    return SYS_ERR_OK;
+	debug_printf("spawn with bootinfo returning!\n");
+	return SYS_ERR_OK;
 }
 
 errval_t spawn_run(struct spawninfo *si)

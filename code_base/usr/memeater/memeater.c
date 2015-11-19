@@ -47,23 +47,8 @@ int main(int argc, char *argv[])
 	// errval_t err;
 
 	debug_printf("Hello world from memeater!\n");
-	// while(1);
-    /*
-	void * vbuff; 
-	int size = 1024*1024*5;
-	err = paging_alloc( get_current_paging_state(), &vbuff, size);
-	
-	char * buf = (char *) vbuff;
-   	for (int i = 0; i < size; i++)
-       	buf[i] = i%255;
 
-   	for (int i = 0; i < size; i++)
-   	    assert(buf[i] == i%255);
-	*/
-
-	debug_printf("Memory test passed!\n");
-
-	
+	while(1);
 	char command[1024];
 	const char space_token[2] = " ";
 	char *token;

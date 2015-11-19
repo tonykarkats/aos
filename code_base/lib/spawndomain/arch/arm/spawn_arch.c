@@ -149,7 +149,7 @@ static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
     vaddr = (lvaddr_t)base;
     used_size = size;
 
-	debug_printf("elf_allocate: READY TO MAP MODULE INTO CHILD!\n");
+	// debug_printf("elf_allocate: READY TO MAP MODULE INTO CHILD!\n");
 
     while (used_size > 0) {
         struct capref frame = {
@@ -177,7 +177,7 @@ static errval_t elf_allocate(void *state, genvaddr_t base, size_t size,
     } // end while:
 
 	
-	debug_printf("elf_allocate: MAPPED MODULE INTO CHILD!\n");
+	// debug_printf("elf_allocate: MAPPED MODULE INTO CHILD!\n");
 
     *retbase = (void*) vaddr_range + base_offset;
 
