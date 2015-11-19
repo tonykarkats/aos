@@ -62,7 +62,7 @@ static void recv_handler(void *arg)
 							MKCLOSURE(recv_handler, arg));
 	}
 
-		lc->remote_cap = cap;
+	lc->remote_cap = cap;
 
 	int message_length = msg.buf.msglen;
 	
