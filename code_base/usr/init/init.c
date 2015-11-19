@@ -45,7 +45,7 @@
 
 struct bootinfo *bi;
 static coreid_t my_core_id;
-//static struct lmp_chan channel ;
+static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
 static errval_t bootstrap_services(void) {
@@ -247,12 +247,10 @@ int main(int argc, char *argv[])
 	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
 	serial_polling_thread = serial_polling_thread;
 
-	// while(1);
-	//thread_join(serial_polling_thread, NULL) ;
-
-/*	
+	
 	struct waitset* ws = get_default_waitset();  	
-
+		ws = ws;
+	
 	// Create our endpoint to self
 	err = cap_retype(cap_selfep, cap_dispatcher, ObjType_EndPoint, 0);
 	if (err_is_fail(err)) {
@@ -267,16 +265,15 @@ int main(int argc, char *argv[])
 	}
 
 	lmp_chan_init(&channel);
-	
+
 	channel.local_cap =  cap_initep;
-	
-	
+
 	err = lmp_chan_alloc_recv_slot(&channel);
 	if (err_is_fail(err)) {
 		debug_printf("Error in allocating receiver slot!\n");
 		abort();
 	}
-
+/*
 	struct event_closure recv_handler_init = {
         .handler = recv_handler,
         .arg = &channel,

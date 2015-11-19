@@ -688,6 +688,7 @@ BKVAMASK	include/sys/param.h	169;"	d
 BKVASIZE	include/sys/param.h	168;"	d
 BLANK	lib/newlib/newlib/libc/machine/hppa/DEFS.h	20;"	d
 BLKTYPE	lib/newlib/newlib/libc/include/tar.h	20;"	d
+BLUE	usr/init/init.c	43;"	d	file:
 BMS_INACTIVE	include/contmng/netbench.h	/^    BMS_INACTIVE = 0,$/;"	e	enum:Benchmark_states
 BMS_RUNNING	include/contmng/netbench.h	/^    BMS_RUNNING = 2,$/;"	e	enum:Benchmark_states
 BMS_START_REQUEST	include/contmng/netbench.h	/^    BMS_START_REQUEST = 1,$/;"	e	enum:Benchmark_states
@@ -792,10 +793,10 @@ BUFMAX	kernel/gdb_stub.c	71;"	d	file:
 BUFSIZ	include/oldc/stdio.h	98;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	106;"	d
 BUFSIZ	lib/newlib/newlib/libc/include/stdio.h	108;"	d
-BUFSIZE	usr/init/init.c	31;"	d	file:
+BUFSIZE	usr/init/init.c	35;"	d	file:
 BUFSIZE	usr/init_memtest/init.c	24;"	d	file:
-BUFSIZE	usr/memeater/memeater.c	25;"	d	file:
-BUFSIZE_2	usr/memeater/memeater.c	23;"	d	file:
+BUFSIZE	usr/memeater/memeater.c	16;"	d	file:
+BUFSIZE_2	usr/memeater/memeater.c	14;"	d	file:
 BUF_BUCKET	lib/newlib/newlib/libc/search/hash.h	75;"	d
 BUF_DISK	lib/newlib/newlib/libc/search/hash.h	74;"	d
 BUF_INSERT	lib/newlib/newlib/libc/search/hash_buf.c	83;"	d	file:
@@ -1204,7 +1205,7 @@ CLEAN_OPTIONS_FLAGS	lib/net_queue_manager/frag.c	99;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	113;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	66;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	92;"	d	file:
-CLIENT_LIMIT	usr/init/init.c	36;"	d	file:
+CLIENT_LIMIT	usr/init/init.c	41;"	d	file:
 CLK_TCK	lib/newlib/newlib/libc/include/time.h	25;"	d
 CLOCAL	include/sys/_termios.h	143;"	d
 CLOCKDRIFT_TIMEOUT	tools/harness/tests/clockdrift.py	/^CLOCKDRIFT_TIMEOUT = datetime.timedelta(hours=13)$/;"	v
@@ -1500,7 +1501,7 @@ Command line arguments	doc/003-hake/Hake.tex	/^can often help work out what went
 Command line options	doc/002-mackerel/Mackerel.tex	/^Chapter~\\ref{chap:bitfielddriver}. $/;"	s
 CommandLineArguments	tools/demo/Aquarium/App.xaml.cs	/^        public string[] CommandLineArguments;$/;"	f	class:Aquarium.App
 Commands	doc/015-disk-driver-arch/intro.tex	/^\\end{figure}$/;"	b
-Compare	include/barrelfish/red_black_tree.h	/^  int (*Compare)(const void* a, const void* b); $/;"	m	struct:rb_red_blk_tree
+Compare	include/barrelfish/red_black_tree.h	/^	int (*Compare)(const void* a, const void* b); $/;"	m	struct:rb_red_blk_tree
 Compare	include/red_black_tree.h	/^  int (*Compare)(const lvadd_t vaddr1, const lvaddr b); $/;"	m	struct:rb_red_blk_tree
 Compare	lib/barrelfish/red_black_tree.h	/^  int (*Compare)(const void* a, const void* b); $/;"	m	struct:rb_red_blk_tree
 CompareTo	tools/demo/Aquarium/Window1.xaml.cs	/^            public int CompareTo(ChannelAction other)$/;"	m	struct:Aquarium.Window1.ChannelAction
@@ -1976,7 +1977,7 @@ DETECTNULL	lib/newlib/newlib/libc/string/strncmp.c	51;"	d	file:
 DETECTNULL	lib/newlib/newlib/libc/string/strncpy.c	51;"	d	file:
 DETECTNULL	lib/newlib/newlib/libc/string/strncpy.c	55;"	d	file:
 DEVICE_COMMANDS_H	include/usb/device_commands.h	18;"	d
-DEVICE_FLAGS	lib/barrelfish/paging.c	32;"	d	file:
+DEVICE_FLAGS	lib/barrelfish/paging.c	34;"	d	file:
 DEVICE_MANAGER_DEBUG_H_	lib/net_device_manager/device_manager_debug.h	11;"	d
 DEVICE_OFFSET	kernel/include/arch/armv7/offsets.h	137;"	d
 DEVICE_REGISTERS_H_	include/arch/arm/omap44xx/device_registers.h	14;"	d
@@ -2426,10 +2427,10 @@ Design	doc/015-disk-driver-arch/libahci.tex	/^\\end{figure}$/;"	b
 Design	doc/015-disk-driver-arch/libahci.tex	/^bother with the \\ac{ahci} specification details.$/;"	b
 Design Options	doc/015-disk-driver-arch/design.tex	/^\\section{Design Options}$/;"	s
 Design and Implementation of the Tracing Framework in Barrelfish	doc/008-tracing/Tracing.tex	/^trace data with external tools in an easy fashion.$/;"	c
-DestroyInfo	include/barrelfish/red_black_tree.h	/^  void (*DestroyInfo)(void* a);$/;"	m	struct:rb_red_blk_tree
+DestroyInfo	include/barrelfish/red_black_tree.h	/^	void (*DestroyInfo)(void* a);$/;"	m	struct:rb_red_blk_tree
 DestroyInfo	include/red_black_tree.h	/^  void (*DestroyInfo)(void* a);$/;"	m	struct:rb_red_blk_tree
 DestroyInfo	lib/barrelfish/red_black_tree.h	/^  void (*DestroyInfo)(void* a);$/;"	m	struct:rb_red_blk_tree
-DestroyKey	include/barrelfish/red_black_tree.h	/^  void (*DestroyKey)(void* a);$/;"	m	struct:rb_red_blk_tree
+DestroyKey	include/barrelfish/red_black_tree.h	/^	void (*DestroyKey)(void* a);$/;"	m	struct:rb_red_blk_tree
 DestroyKey	include/red_black_tree.h	/^  void (*DestroyKey)(void* a);$/;"	m	struct:rb_red_blk_tree
 DestroyKey	lib/barrelfish/red_black_tree.h	/^  void (*DestroyKey)(void* a);$/;"	m	struct:rb_red_blk_tree
 Device level declarations	doc/002-mackerel/Mackerel.tex	/^as device prefix that can. $/;"	s
@@ -4042,12 +4043,12 @@ FIONREAD	include/lwip/sockets.h	251;"	d
 FIRSTEP_BUFLEN	kernel/arch/omap44xx/startup_arch.c	53;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/aos_rpc.c	18;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/lmp_endpoints.c	507;"	d	file:
-FIRSTEP_BUFLEN	usr/init/init.c	34;"	d	file:
-FIRSTEP_BUFLEN	usr/memeater/memeater.c	28;"	d	file:
+FIRSTEP_BUFLEN	usr/init/init.c	39;"	d	file:
+FIRSTEP_BUFLEN	usr/memeater/memeater.c	19;"	d	file:
 FIRSTEP_OFFSET	kernel/arch/omap44xx/startup_arch.c	49;"	d	file:
 FIRSTEP_OFFSET	lib/barrelfish/aos_rpc.c	19;"	d	file:
-FIRSTEP_OFFSET	usr/init/init.c	35;"	d	file:
-FIRSTEP_OFFSET	usr/memeater/memeater.c	29;"	d	file:
+FIRSTEP_OFFSET	usr/init/init.c	40;"	d	file:
+FIRSTEP_OFFSET	usr/memeater/memeater.c	20;"	d	file:
 FIRST_RANGE_INDEX	lib/newlib/newlib/libc/iconv/ccs/ccs.h	125;"	d
 FIRST_UNRANGED_INDEX_INDEX	lib/newlib/newlib/libc/iconv/ccs/ccs.h	123;"	d
 FIS Setup	doc/015-disk-driver-arch/flounder-ahci.tex	/^memory.$/;"	b
@@ -4057,7 +4058,7 @@ FLAG	lib/newlib/newlib/libc/stdio/local.h	/^  FLAG,   \/* format flag *\/$/;"	e	
 FLAG4_BIT	lib/dmalloc/dmalloc.c	2242;"	d	file:
 FLAG4_BIT	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2247;"	d	file:
 FLAGBITS	lib/mm/mm.c	50;"	d	file:
-FLAGS	lib/barrelfish/paging.c	31;"	d	file:
+FLAGS	lib/barrelfish/paging.c	33;"	d	file:
 FLAG_BITS	lib/dmalloc/dmalloc.c	2244;"	d	file:
 FLAG_BITS	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2249;"	d	file:
 FLOATING_POINT	lib/newlib/newlib/libc/machine/powerpc/vfprintf.c	154;"	d	file:
@@ -5403,7 +5404,7 @@ INIT_VBASE	kernel/include/arch/armv7/offsets.h	102;"	d
 INLCR	include/sys/_termios.h	102;"	d
 INLINE	include/arch/cc.h	57;"	d
 INPCK	include/sys/_termios.h	100;"	d
-INPUT_BUF_SIZE	usr/init/init.c	29;"	d	file:
+INPUT_BUF_SIZE	usr/init/init.c	33;"	d	file:
 INPUT_BUF_SIZE	usr/init/omap_uart.h	7;"	d
 INRANGE	lib/oldc/msun/src/s_lround.c	52;"	d	file:
 INSECURE	lib/dmalloc/dmalloc.c	610;"	d	file:
@@ -7077,9 +7078,9 @@ MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/msizer.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/pvallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/reallocr.c	1405;"	d	file:
 MALLOC_ALIGN_MASK	lib/newlib/newlib/libc/stdlib/vallocr.c	1405;"	d	file:
-MALLOC_BUFSIZE	usr/init/init.c	30;"	d	file:
+MALLOC_BUFSIZE	usr/init/init.c	34;"	d	file:
 MALLOC_BUFSIZE	usr/init_memtest/init.c	23;"	d	file:
-MALLOC_BUFSIZE	usr/memeater/memeater.c	24;"	d	file:
+MALLOC_BUFSIZE	usr/memeater/memeater.c	15;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/machine/powerpc/vec_mallocr.c	150;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/stdlib/callocr.c	546;"	d	file:
 MALLOC_COPY	lib/newlib/newlib/libc/stdlib/callocr.c	585;"	d	file:
@@ -7209,6 +7210,7 @@ MANL_SHIFT	lib/oldc/msun/src/e_fmodl.c	50;"	d	file:
 MANL_SHIFT	lib/oldc/msun/src/s_remquol.c	50;"	d	file:
 MANT_DIG	lib/oldc/msun/src/e_hypotl.c	54;"	d	file:
 MAP	lib/newlib/newlib/libc/posix/regcomp.c	1111;"	d	file:
+MAP_ADDR	usr/init/init.c	37;"	d	file:
 MAP_ANON	lib/newlib/newlib/libc/machine/spu/sys/mman.h	52;"	d
 MAP_ANONYMOUS	lib/dmalloc/dmalloc.c	1525;"	d	file:
 MAP_ANONYMOUS	lib/newlib/newlib/libc/machine/spu/sys/mman.h	51;"	d
@@ -7334,7 +7336,7 @@ MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfiscanf.c	183;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfiwscanf.c	180;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfscanf.c	183;"	d	file:
 MAX_LONG_LEN	lib/newlib/newlib/libc/stdio/vfwscanf.c	180;"	d	file:
-MAX_MEMORY	lib/barrelfish/paging.c	30;"	d	file:
+MAX_MEMORY	lib/barrelfish/paging.c	32;"	d	file:
 MAX_MEM_LEVEL	include/zconf.h	136;"	d
 MAX_MEM_LEVEL	include/zconf.h	138;"	d
 MAX_MEM_REGIONS	include/barrelfish_kpi/init.h	58;"	d
@@ -8217,6 +8219,7 @@ NAME	lib/newlib/newlib/libc/time/strftime.c	1779;"	d	file:
 NAME_LEN	include/dist/barrier.h	19;"	d
 NAME_MAX	include/sys/dirent.h	15;"	d
 NAME_MAX	lib/newlib/newlib/libc/include/sys/syslimits.h	47;"	d
+NAME_MEMEATER	usr/init/init.c	29;"	d	file:
 NAME_SIZE	include/contmng/netbench.h	52;"	d
 NAN	include/oldc/math.h	62;"	d
 NAN	include/oldc/math.h	67;"	d
@@ -10075,10 +10078,10 @@ Pleco A new Domain Specific Language	doc/008-tracing/Tracing.tex	/^\\end{figure}
 Pmap	doc/004-virtual_memory/VirtualMemory.tex	/^This supports users that have a large frame that need not be mapped in its entirety.$/;"	s
 Portability	doc/004-virtual_memory/VirtualMemory.tex	/^Currently, the memory object is used in the heap, slot allocator, spawning domains, pci domain, and vmkit domain.$/;"	s
 Preamble	doc/002-mackerel/Mackerel.tex	/^This chapter will describe the contents of this header file. $/;"	s
-PrintInfo	include/barrelfish/red_black_tree.h	/^  void (*PrintInfo)(const void* a);$/;"	m	struct:rb_red_blk_tree
+PrintInfo	include/barrelfish/red_black_tree.h	/^	 void (*PrintInfo)(const void* a);$/;"	m	struct:rb_red_blk_tree
 PrintInfo	include/red_black_tree.h	/^  void (*PrintInfo)(void* a);$/;"	m	struct:rb_red_blk_tree
 PrintInfo	lib/barrelfish/red_black_tree.h	/^  void (*PrintInfo)(void* a);$/;"	m	struct:rb_red_blk_tree
-PrintKey	include/barrelfish/red_black_tree.h	/^  void (*PrintKey)(const void* a);$/;"	m	struct:rb_red_blk_tree
+PrintKey	include/barrelfish/red_black_tree.h	/^	void (*PrintKey)(const void* a);$/;"	m	struct:rb_red_blk_tree
 PrintKey	include/red_black_tree.h	/^  void (*PrintKey)(const void* a);$/;"	m	struct:rb_red_blk_tree
 PrintKey	lib/barrelfish/red_black_tree.h	/^  void (*PrintKey)(const void* a);$/;"	m	struct:rb_red_blk_tree
 Privacy model	doc/014-bulk-transfer/bulk-transfer.tex	/^give more details about these stricter privacy models.$/;"	s
@@ -10598,6 +10601,7 @@ RESERVED_SIZE	lib/newlib/newlib/libc/stdlib/msizer.c	1097;"	d	file:
 RESERVED_SIZE	lib/newlib/newlib/libc/stdlib/pvallocr.c	1097;"	d	file:
 RESERVED_SIZE	lib/newlib/newlib/libc/stdlib/reallocr.c	1097;"	d	file:
 RESERVED_SIZE	lib/newlib/newlib/libc/stdlib/vallocr.c	1097;"	d	file:
+RESET	usr/init/init.c	44;"	d	file:
 RESTORE_OLD_STACK_POINTER	include/thc/thcinternal.h	264;"	d
 RESTORE_OLD_STACK_POINTER	include/thc/thcinternal.h	271;"	d
 RESTORE_OLD_STACK_POINTER	include/thc/thcinternal.h	276;"	d
@@ -11116,9 +11120,9 @@ S9	lib/oldc/msun/ld128/k_sinl.c	/^S9  = -0.8220635245834894781251212216344620249
 SAFE	include/deputy/nodeputy.h	21;"	d
 SAFE_LEFT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	368;"	d
 SAFE_RIGHT_SHIFT	lib/newlib/newlib/libm/common/fdlibm.h	371;"	d
-SAFE_VADDR	usr/init/init.c	32;"	d	file:
+SAFE_VADDR	usr/init/init.c	36;"	d	file:
 SAFE_VADDR	usr/init_memtest/init.c	25;"	d	file:
-SAFE_VADDR	usr/memeater/memeater.c	26;"	d	file:
+SAFE_VADDR	usr/memeater/memeater.c	17;"	d	file:
 SAMPLE_INTERVAL	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	76;"	d	file:
 SARG	kernel/printf.c	228;"	d	file:
 SARG	lib/newlib/newlib/libc/machine/powerpc/vfprintf.c	480;"	d	file:
@@ -12392,6 +12396,7 @@ SPAWN_ARCH_H	lib/spawndomain/arch.h	16;"	d
 SPAWN_DOMAIN_PARAMS_H	include/barrelfish_kpi/domain_params.h	16;"	d
 SPAWN_GETOPT_H	include/spawndomain/getopt.h	16;"	d
 SPAWN_H	lib/spawndomain/spawn.h	16;"	d
+SPAWN_H	usr/init/spawn.h	16;"	d
 SPEC	lib/newlib/newlib/libc/stdio/local.h	/^  SPEC,   \/* format specifier *\/$/;"	e	enum:__anon251
 SPECNAMELEN	include/sys/param.h	54;"	d
 SPECTRUM	kernel/schedule_rbed.c	64;"	d	file:
@@ -12586,7 +12591,7 @@ START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(strtoul_hex)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(strtoul_upper_hex)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(ungetc_multiple_test)$/;"	f
 START_TEST	lib/oldc/test/test_libs_c.c	/^START_TEST(ungetc_test)$/;"	f
-START_VADDR	lib/barrelfish/paging.c	29;"	d	file:
+START_VADDR	include/barrelfish/paging.h	33;"	d
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	120;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	73;"	d	file:
 STATESETUP	lib/newlib/newlib/libc/posix/regexec.c	99;"	d	file:
@@ -13076,8 +13081,8 @@ S_IXOTH	include/sys/stat.h	54;"	d
 S_IXOTH	lib/newlib/newlib/libc/include/sys/stat.h	123;"	d
 S_IXUSR	include/sys/stat.h	48;"	d
 S_IXUSR	lib/newlib/newlib/libc/include/sys/stat.h	115;"	d
-S_SIZE	lib/barrelfish/paging.c	28;"	d	file:
-S_SIZE_PER_THREAD	lib/barrelfish/paging.c	27;"	d	file:
+S_SIZE	lib/barrelfish/paging.c	30;"	d	file:
+S_SIZE_PER_THREAD	lib/barrelfish/paging.c	29;"	d	file:
 SafeFree	lib/barrelfish/misc.c	/^void SafeFree(void* addr) {$/;"	f
 SafeMalloc	lib/barrelfish/misc.c	/^void * SafeMalloc(size_t size) {$/;"	f
 SaveThese	tools/demo/Aquarium/Dialogs.cs	/^        public static bool SaveThese(string extension, string filter,$/;"	m	class:Aquarium.Dialogs
@@ -14314,7 +14319,7 @@ UNROLL_FACTOR	lib/newlib/newlib/libc/machine/mips/strncpy.c	39;"	d	file:
 UNSIGNED	lib/oldc/src/vfscanf.c	65;"	d	file:
 UNSTABLE	include/nfs/nfs_rpc.h	/^    UNSTABLE = 0,$/;"	e	enum:stable_how
 UNUSED	kernel/arch/omap44xx/startup_arch.c	34;"	d	file:
-UNUSED	usr/init/init.c	27;"	d	file:
+UNUSED	usr/init/init.c	28;"	d	file:
 UNUSED	usr/init_memtest/init.c	20;"	d	file:
 UPAP_DEFREQTIME	include/lwip/opt.h	1467;"	d
 UPAP_DEFTIMEOUT	include/lwip/opt.h	1463;"	d
@@ -14614,27 +14619,27 @@ VOLATILE	lib/newlib/newlib/libc/machine/powerpc/simdldtoa.c	374;"	d	file:
 VOLATILE	lib/newlib/newlib/libc/stdlib/ldtoa.c	380;"	d	file:
 VPDIG	lib/newlib/newlib/libc/stdio/local.h	/^  VPDIG,  \/* have digits in variable precision specification *\/$/;"	e	enum:__anon252
 VQUIT	include/sys/_termios.h	72;"	d
-VREGION_FLAGS_EXECUTE	include/barrelfish/paging.h	35;"	d
+VREGION_FLAGS_EXECUTE	include/barrelfish/paging.h	37;"	d
 VREGION_FLAGS_EXECUTE	include/barrelfish/vregion.h	24;"	d
-VREGION_FLAGS_GUARD	include/barrelfish/paging.h	38;"	d
+VREGION_FLAGS_GUARD	include/barrelfish/paging.h	40;"	d
 VREGION_FLAGS_GUARD	include/barrelfish/vregion.h	27;"	d
-VREGION_FLAGS_MASK	include/barrelfish/paging.h	39;"	d
+VREGION_FLAGS_MASK	include/barrelfish/paging.h	41;"	d
 VREGION_FLAGS_MASK	include/barrelfish/vregion.h	28;"	d
-VREGION_FLAGS_MPB	include/barrelfish/paging.h	37;"	d
+VREGION_FLAGS_MPB	include/barrelfish/paging.h	39;"	d
 VREGION_FLAGS_MPB	include/barrelfish/vregion.h	26;"	d
-VREGION_FLAGS_NOCACHE	include/barrelfish/paging.h	36;"	d
+VREGION_FLAGS_NOCACHE	include/barrelfish/paging.h	38;"	d
 VREGION_FLAGS_NOCACHE	include/barrelfish/vregion.h	25;"	d
-VREGION_FLAGS_READ	include/barrelfish/paging.h	33;"	d
+VREGION_FLAGS_READ	include/barrelfish/paging.h	35;"	d
 VREGION_FLAGS_READ	include/barrelfish/vregion.h	22;"	d
-VREGION_FLAGS_READ_EXECUTE	include/barrelfish/paging.h	43;"	d
+VREGION_FLAGS_READ_EXECUTE	include/barrelfish/paging.h	45;"	d
 VREGION_FLAGS_READ_EXECUTE	include/barrelfish/vregion.h	32;"	d
-VREGION_FLAGS_READ_WRITE	include/barrelfish/paging.h	41;"	d
+VREGION_FLAGS_READ_WRITE	include/barrelfish/paging.h	43;"	d
 VREGION_FLAGS_READ_WRITE	include/barrelfish/vregion.h	30;"	d
-VREGION_FLAGS_READ_WRITE_MPB	include/barrelfish/paging.h	47;"	d
+VREGION_FLAGS_READ_WRITE_MPB	include/barrelfish/paging.h	49;"	d
 VREGION_FLAGS_READ_WRITE_MPB	include/barrelfish/vregion.h	36;"	d
-VREGION_FLAGS_READ_WRITE_NOCACHE	include/barrelfish/paging.h	45;"	d
+VREGION_FLAGS_READ_WRITE_NOCACHE	include/barrelfish/paging.h	47;"	d
 VREGION_FLAGS_READ_WRITE_NOCACHE	include/barrelfish/vregion.h	34;"	d
-VREGION_FLAGS_WRITE	include/barrelfish/paging.h	34;"	d
+VREGION_FLAGS_WRITE	include/barrelfish/paging.h	36;"	d
 VREGION_FLAGS_WRITE	include/barrelfish/vregion.h	23;"	d
 VREPRINT	include/sys/_termios.h	67;"	d
 VSTART	include/sys/_termios.h	77;"	d
@@ -22239,6 +22244,7 @@ boot_pml4	tools/elver/elver.c	/^union pdir_entry boot_pml4[PTABLE_SIZE]$/;"	v	ty
 bootinfo	include/barrelfish_kpi/init.h	/^struct bootinfo {$/;"	s
 bootinfo	kernel/arch/omap44xx/startup_arch.c	/^struct bootinfo* bootinfo = (struct bootinfo*)INIT_BOOTINFO_VBASE;$/;"	v	typeref:struct:bootinfo
 bootstrap	tools/molly/m5script.py	/^                             bootstrap = (i == 0)))$/;"	v
+bootstrap_services	usr/init/init.c	/^static errval_t bootstrap_services(void) {$/;"	f	file:
 bootstrap_thread	lib/barrelfish/threads.c	/^static int bootstrap_thread(struct spawn_domain_params *params)$/;"	f	file:
 borrow	lib/newlib/newlib/libc/stdlib/mprec.c	/^  __Long borrow, y;		\/* We need signed shifts here. *\/$/;"	m	struct:b	file:
 borrow	lib/newlib/newlib/libc/stdlib/mprec.c	/^  borrow = 0;$/;"	m	struct:b	file:
@@ -22781,7 +22787,6 @@ change_mparam	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^static int chan
 change_waitset	include/thc/thcstubs.h	/^  common_change_waitset_fn *change_waitset;$/;"	m	struct:common_binding
 changed_cond	include/arch/sys_arch.h	/^    struct thread_cond changed_cond;$/;"	m	struct:bf_sys_mbox	typeref:struct:bf_sys_mbox::thread_cond
 changes	tools/harness/checkout.py	/^    def changes(self):$/;"	m	class:Checkout
-channel	usr/init/init.c	/^static struct lmp_chan channel ;$/;"	v	typeref:struct:lmp_chan	file:
 channel_cost	tools/harness/tests/__init__.py	/^    multihoptests, perfmontest, freemem, spawntest, spantest$/;"	i
 chantype	include/barrelfish/waitset.h	/^    enum ws_chantype chantype;              \/\/\/< Channel type$/;"	m	struct:waitset_chanstate	typeref:enum:waitset_chanstate::ws_chantype
 char_ptr_t	lib/newlib/newlib/libc/stdio/svfiprintf.c	/^typedef char *   char_ptr_t;$/;"	t	file:
@@ -23211,6 +23216,7 @@ cname	lib/newlib/newlib/libc/posix/cname.h	/^static struct cname {$/;"	s
 cnames	lib/newlib/newlib/libc/posix/cname.h	/^} cnames[] = {$/;"	v	typeref:struct:cname
 cndx	lib/newlib/newlib/libc/search/hash.h	/^	int		cndx;		\/* Index of next item on cpage *\/$/;"	m	struct:htab
 cnode	include/barrelfish/caddr.h	/^    struct cnoderef cnode;    \/\/\/< CNode this cap resides in$/;"	m	struct:capref	typeref:struct:capref::cnoderef
+cnode	include/barrelfish/red_black_tree.h	/^	struct capref cnode;$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 cnode	include/barrelfish/slot_alloc.h	/^    struct cnoderef cnode;       \/\/\/< cnoderef for the cnode to allocate from$/;"	m	struct:range_slot_allocator	typeref:struct:range_slot_allocator::cnoderef
 cnode	include/barrelfish/slot_alloc.h	/^    struct cnoderef cnode;      \/\/\/< Cnode the allocator is tracking$/;"	m	struct:single_slot_allocator	typeref:struct:single_slot_allocator::cnoderef
 cnode	usr/mmchs_driver/main.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
@@ -26743,7 +26749,7 @@ get_ipbench_test	tools/harness/tests/echoserver.py	/^    def get_ipbench_test(se
 get_irq_type	kernel/arch/armv7/gic.c	/^static enum IrqType get_irq_type(uint32_t int_id)$/;"	f	file:
 get_kernel_args	tools/harness/machines/__init__.py	/^    def get_kernel_args(self):$/;"	m	class:Machine
 get_kernel_args	tools/harness/machines/eth.py	/^    def get_kernel_args(self):$/;"	m	class:ETHMachine
-get_l2_table	lib/barrelfish/paging.c	/^struct capref get_l2_table(lvaddr_t vaddr){$/;"	f
+get_l2_table	lib/barrelfish/paging.c	/^struct capref get_l2_table(lvaddr_t vaddr, struct paging_state * st){$/;"	f
 get_load_generator	tools/harness/siteconfig/__init__.py	/^    def get_load_generator(self):$/;"	m	class:BaseSite
 get_load_generator	tools/harness/siteconfig/eth.py	/^    def get_load_generator(self):$/;"	m	class:ETH
 get_load_generator	tools/harness/siteconfig/msrc.py	/^    def get_load_generator(self):$/;"	m	class:MSRC
@@ -27902,7 +27908,7 @@ inflateReset	include/zconf.h	34;"	d
 inflateSetDictionary	include/zconf.h	30;"	d
 inflateSync	include/zconf.h	31;"	d
 inflateSyncPoint	include/zconf.h	32;"	d
-info	include/barrelfish/red_black_tree.h	/^  void* info;$/;"	m	struct:rb_red_blk_node
+info	include/barrelfish/red_black_tree.h	/^ 	void* info;$/;"	m	struct:rb_red_blk_node
 info	include/barrelfish/stack.h	/^  DATA_TYPE info;$/;"	m	struct:stk_stack_node
 info	lib/barrelfish/red_black_tree.h	/^  void* info;$/;"	m	struct:rb_red_blk_node
 info	lib/barrelfish/stack.h	/^  DATA_TYPE info;$/;"	m	struct:stk_stack_node
@@ -28554,7 +28560,7 @@ is_intmax	include/oldc/printf.h	/^	unsigned	is_intmax;$/;"	m	struct:printf_info
 is_inuse	lib/dmalloc/dmalloc.c	2252;"	d	file:
 is_inuse	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2257;"	d	file:
 is_ip_present_in_arp_cache	lib/lwip/src/netif/etharp.c	/^bool is_ip_present_in_arp_cache(struct ip_addr *ipaddr)$/;"	f
-is_l2_mapped	lib/barrelfish/paging.c	/^bool is_l2_mapped(lvaddr_t vaddr) {$/;"	f
+is_l2_mapped	lib/barrelfish/paging.c	/^bool is_l2_mapped(lvaddr_t vaddr, struct paging_state * st) {$/;"	f
 is_leap_year	lib/newlib/newlib/libc/time/strptime.c	/^is_leap_year (int year)$/;"	f	file:
 is_long	include/oldc/printf.h	/^	unsigned	is_long;$/;"	m	struct:printf_info
 is_long_double	include/oldc/printf.h	/^	unsigned 	is_long_double;$/;"	m	struct:printf_info
@@ -28906,7 +28912,7 @@ kernel_timeslice	kernel/dispatch.c	/^int kernel_timeslice = CONFIG_TIMESLICE;$/;
 kernel_timeslice	tools/schedsim/simulator.c	/^static int kernel_timeslice = 80;$/;"	v	file:
 kevent	lib/newlib/newlib/libc/posix/un-namespace.h	57;"	d
 kevent	lib/oldc/src/locale/un-namespace.h	60;"	d
-key	include/barrelfish/red_black_tree.h	/^  void* key;$/;"	m	struct:rb_red_blk_node
+key	include/barrelfish/red_black_tree.h	/^	void* key;$/;"	m	struct:rb_red_blk_node
 key	include/collections/hash_table.h	/^	uint64_t	key;$/;"	m	struct:_collections_hash_elem
 key	include/concurrent/linked_list.h	/^    void* key;$/;"	m	struct:ll_element
 key	include/hashtable/hashtable.h	/^    const void* key;$/;"	m	struct:_ht_entry
@@ -28964,9 +28970,9 @@ l	lib/newlib/newlib/libm/mathfp/zmath.h	/^  long l;$/;"	m	union:__anon275
 l	lib/newlib/newlib/libm/mathfp/zmath.h	/^  long l[2];$/;"	m	union:__anon274
 l2_base	kernel/arch/omap44xx/startup_arch.c	/^    lvaddr_t   l2_base;$/;"	m	struct:startup_l2_info	file:
 l2_mapped	lib/barrelfish/red_black_tree.h	/^  int l2_mapped[4096];$/;"	m	struct:rb_red_blk_tree
-l2_maps	include/barrelfish/red_black_tree.h	/^  bool l2_maps[4096];$/;"	m	struct:rb_red_blk_tree
+l2_maps	include/barrelfish/red_black_tree.h	/^	bool l2_maps[1024];$/;"	m	struct:rb_red_blk_tree
 l2_table	kernel/arch/omap44xx/startup_arch.c	/^    union arm_l2_entry* l2_table;$/;"	m	struct:startup_l2_info	typeref:union:startup_l2_info::arm_l2_entry	file:
-l2_tables	include/barrelfish/red_black_tree.h	/^  struct capref l2_tables[4096];$/;"	m	struct:rb_red_blk_tree	typeref:struct:rb_red_blk_tree::capref
+l2_tables	include/barrelfish/red_black_tree.h	/^	struct capref l2_tables[1024];$/;"	m	struct:rb_red_blk_tree	typeref:struct:rb_red_blk_tree::capref
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0x2C100000, pio_size=0xfff)$/;"	v	class:VExpress_EMM
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0xE0202000, pio_size=0xfff)$/;"	v	class:VExpress_ELT
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake     = IsaFake(pio_addr=0x1f002000, pio_size=0xfff)$/;"	v	class:RealViewPBX
@@ -29179,7 +29185,7 @@ leave_sent	include/lwip/stats.h	/^        STAT_COUNTER leave_sent;        \/* *\
 led_flash	kernel/arch/omap44xx/init.c	/^void led_flash(int counter)$/;"	f
 led_remap_register	kernel/arch/omap44xx/init.c	/^static void led_remap_register(void)$/;"	f	file:
 led_set_state	kernel/arch/omap44xx/init.c	/^void led_set_state(bool new_state)$/;"	f
-left	include/barrelfish/red_black_tree.h	/^  struct rb_red_blk_node* left;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
+left	include/barrelfish/red_black_tree.h	/^    struct rb_red_blk_node* left;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 left	include/mdb/types.h	/^    struct cte *left, *right;$/;"	m	struct:mdbnode	typeref:struct:mdbnode::cte
 left	include/octopus/parser/ast.h	/^    struct ast_object* left;$/;"	m	struct:node_pair	typeref:struct:node_pair::ast_object
 left	include/oldc/printf.h	/^	unsigned	left;$/;"	m	struct:printf_info
@@ -29723,6 +29729,7 @@ low_level_init	lib/lwip/src/netif/bfeth.c	/^static void low_level_init(struct ne
 low_level_output	lib/lwip/src/netif/bfeth.c	/^static err_t low_level_output(struct netif *netif, struct pbuf *p)$/;"	f	file:
 low_mask	lib/newlib/newlib/libc/search/hash.h	/^	int		low_mask;	\/* Mask to modulo into lower half of $/;"	m	struct:hashhdr
 low_pc	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	/^  uintptr_t low_pc;$/;"	m	struct:gmon_hist_hdr	file:
+lowest_memory_address	include/barrelfish/red_black_tree.h	/^	lvaddr_t lowest_memory_address;$/;"	m	struct:rb_red_blk_tree
 loword	lib/newlib/newlib/libc/machine/powerpc/fix64.h	74;"	d
 loword	lib/newlib/newlib/libc/machine/powerpc/fix64.h	77;"	d
 lpaddr_t	include/barrelfish_kpi/types.h	/^typedef uintptr_t lpaddr_t;$/;"	t
@@ -30624,11 +30631,13 @@ map	lib/oldc/src/locale/runefile.h	/^	int32_t		map;$/;"	m	struct:__anon300
 map_bars	lib/pci/mem.c	/^errval_t map_bars(struct device_mem *bars, int nr_mapped_bars)$/;"	f
 map_device	lib/pci/mem.c	/^errval_t map_device(struct device_mem *mem)$/;"	f
 map_device_register	lib/driverkit/map_devices.c	/^errval_t map_device_register(lpaddr_t address, size_t size, lvaddr_t *return_address)$/;"	f
-map_l2	lib/barrelfish/paging.c	/^errval_t map_l2 (lvaddr_t vaddr){$/;"	f
-map_page	lib/barrelfish/paging.c	/^errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size) {$/;"	f
+map_l2	lib/barrelfish/paging.c	/^errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st){$/;"	f
+map_page	lib/barrelfish/paging.c	/^errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state * st) {$/;"	f
 map_page	lib/pci/confspace/pcie_confspace.c	/^static lvaddr_t map_page(uint64_t page)$/;"	f	file:
 map_private_memory_region	kernel/arch/omap44xx/omap.c	/^void map_private_memory_region(void)$/;"	f
 map_region	include/barrelfish/memobj.h	/^    errval_t (*map_region)(struct memobj *memobj, struct vregion *vregion);$/;"	m	struct:memobj_funcs
+map_user_frame	lib/barrelfish/paging.c	/^errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st) {$/;"	f
+map_user_frame_outside_tree	lib/barrelfish/paging.c	/^errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st) {$/;"	f
 maplower	lib/newlib/newlib/libc/posix/runetype.h	/^	rune_t		maplower[_CACHED_RUNES];$/;"	m	struct:__anon243
 maplower	lib/oldc/src/locale/runefile.h	/^	int32_t		maplower[_CACHED_RUNES];$/;"	m	struct:__anon301
 maplower_ext	lib/newlib/newlib/libc/posix/runetype.h	/^	_RuneRange	maplower_ext;$/;"	m	struct:__anon243
@@ -32297,7 +32306,7 @@ nfsstat3	include/nfs/nfs_rpc.h	/^typedef enum nfsstat3 nfsstat3;$/;"	t	typeref:e
 nfsstat_to_errval	lib/nfs/nfs.c	/^errval_t nfsstat_to_errval(enum nfsstat3 s)$/;"	f
 nfstime3	include/nfs/nfs_rpc.h	/^struct nfstime3 {$/;"	s
 nfstime3	include/nfs/nfs_rpc.h	/^typedef struct nfstime3 nfstime3;$/;"	t	typeref:struct:nfstime3
-nil	include/barrelfish/red_black_tree.h	/^  rb_red_blk_node* nil;              $/;"	m	struct:rb_red_blk_tree
+nil	include/barrelfish/red_black_tree.h	/^	rb_red_blk_node* nil;              $/;"	m	struct:rb_red_blk_tree
 nil	include/red_black_tree.h	/^  rb_red_blk_node* nil;              $/;"	m	struct:rb_red_blk_tree
 nil	lib/barrelfish/red_black_tree.h	/^  rb_red_blk_node* nil;      $/;"	m	struct:rb_red_blk_tree
 nkeys	lib/newlib/newlib/libc/search/hash.h	/^	int		nkeys;		\/* Number of keys in hash table *\/$/;"	m	struct:hashhdr
@@ -33295,7 +33304,7 @@ paging_set_l2_entry	kernel/arch/omap44xx/paging.c	/^void paging_set_l2_entry(uin
 paging_state	include/barrelfish/core_state.h	/^    struct paging_state *paging_state;$/;"	m	struct:core_state_generic	typeref:struct:core_state_generic::paging_state
 paging_state	include/barrelfish/paging.h	/^struct paging_state {$/;"	s
 paging_tree_lock	include/barrelfish/paging.h	/^	struct thread_mutex paging_tree_lock;$/;"	m	struct:paging_state	typeref:struct:paging_state::thread_mutex
-paging_tree_lock	include/barrelfish/red_black_tree.h	/^  struct thread_mutex paging_tree_lock;$/;"	m	struct:rb_red_blk_tree	typeref:struct:rb_red_blk_tree::thread_mutex
+paging_tree_lock	include/barrelfish/red_black_tree.h	/^	struct thread_mutex paging_tree_lock;$/;"	m	struct:rb_red_blk_tree	typeref:struct:rb_red_blk_tree::thread_mutex
 paging_unmap	kernel/include/target/x86_64/paging_kernel_target.h	/^static inline void paging_unmap(union x86_64_ptable_entry * NONNULL entry)$/;"	f
 paging_unmap	lib/barrelfish/paging.c	/^errval_t paging_unmap(struct paging_state *st, const void *region)$/;"	f
 paging_write_l1_entry	kernel/arch/omap44xx/paging.c	/^paging_write_l1_entry(uintptr_t ttbase, lvaddr_t va, union arm_l1_entry l1)$/;"	f	file:
@@ -33325,7 +33334,7 @@ paging_x86_64_modify_flags	kernel/include/target/x86_64/paging_kernel_target.h	/
 paired_surrogates	lib/newlib/newlib/testsuite/newlib.locale/UTF-8.c	/^char paired_surrogates[8][6] = {$/;"	v
 panic	kernel/arch/arm/misc.c	/^void panic(const char *msg, ...)$/;"	f
 panic	tools/schedsim/simulator.c	/^static void panic(const char *msg, ...)$/;"	f	file:
-parent	include/barrelfish/red_black_tree.h	/^  struct rb_red_blk_node* parent;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
+parent	include/barrelfish/red_black_tree.h	/^	struct rb_red_blk_node* parent;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 parent	include/red_black_tree.h	/^  struct rb_red_blk_node* parent;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 parent	include/usb/usb_topology.h	/^    struct usb_node_t *parent;  \/\/ Parent for it $/;"	m	struct:usb_node_t	typeref:struct:usb_node_t::usb_node_t
 parent	lib/barrelfish/red_black_tree.h	/^  struct rb_red_blk_node* parent;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
@@ -33441,6 +33450,7 @@ pcoq	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^pcoq: .equ	18			; Progra
 pcsq	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^pcsq: .equ	17			; Program Counter Space queue$/;"	l
 pd	lib/newlib/newlib/libm/test/convert.c	/^double_type *pd = doubles;$/;"	v
 pdd	lib/newlib/newlib/libm/test/convert.c	/^ddouble_type *pdd;$/;"	v
+pdir	include/barrelfish/paging.h	/^	struct capref pdir;$/;"	m	struct:paging_state	typeref:struct:paging_state::capref
 pdir	tools/elver/elver.c	/^static union ptable_entry pdir[PTABLE_SIZE]$/;"	v	typeref:union:ptable_entry	file:
 pdir_entry	tools/elver/elver.c	/^union pdir_entry {$/;"	u	file:
 pdir_index	include/target/x86_32/barrelfish/pmap_target.h	/^    size_t pdir_index, pt_index;$/;"	m	struct:pmap_dump_info
@@ -35422,7 +35432,6 @@ recv_cptr	include/barrelfish_kpi/lmp.h	/^    capaddr_t     recv_cptr;  \/\/\/< C
 recv_data	lib/lwip/src/core/tcp_in.c	/^static struct pbuf *recv_data;$/;"	v	typeref:struct:pbuf	file:
 recv_flags	lib/lwip/src/core/tcp_in.c	/^static u8_t recv_flags;$/;"	v	file:
 recv_handler	lib/barrelfish/aos_rpc.c	/^static void recv_handler(void *arg) $/;"	f	file:
-recv_handler	usr/init/init.c	/^static void recv_handler(void *arg) $/;"	f	file:
 recv_raw	lib/lwip/src/api/api_msg.c	/^recv_raw(void *arg, struct raw_pcb *pcb, struct pbuf *p, struct ip_addr *addr)$/;"	f	file:
 recv_slot	include/barrelfish/lmp_endpoints.h	/^    struct capref recv_slot;\/\/\/< Receive slot$/;"	m	struct:lmp_endpoint	typeref:struct:lmp_endpoint::capref
 recv_slot	include/barrelfish_kpi/lmp.h	/^    capaddr_t     recv_slot;  \/\/\/< Slot number in #recv_cptr$/;"	m	struct:lmp_endpoint_kern
@@ -35440,7 +35449,7 @@ recvmsg	lib/newlib/newlib/libc/posix/un-namespace.h	78;"	d
 recvmsg	lib/oldc/src/locale/namespace.h	209;"	d
 recvmsg	lib/oldc/src/locale/un-namespace.h	190;"	d
 recvsize	lib/newlib/newlib/libc/xdr/xdr_rec.c	/^  u_int recvsize;               \/* must be <= INT_MAX *\/$/;"	m	struct:rec_strm	file:
-red	include/barrelfish/red_black_tree.h	/^  int red; \/* if red=0 then the node is black *\/$/;"	m	struct:rb_red_blk_node
+red	include/barrelfish/red_black_tree.h	/^ 	int red; \/* if red=0 then the node is black *\/$/;"	m	struct:rb_red_blk_node
 red	include/lwip/api_msg.h	/^            } red;$/;"	m	union:api_msg_msg::__anon27	typeref:struct:api_msg_msg::__anon27::__anon35
 red	include/red_black_tree.h	/^  int red; \/* if red=0 then the node is black *\/$/;"	m	struct:rb_red_blk_node
 red	lib/barrelfish/red_black_tree.h	/^  int red; \/* if red=0 then the node is black *\/$/;"	m	struct:rb_red_blk_node
@@ -35797,7 +35806,7 @@ rhl	include/lwip/snmp_msg.h	/^        struct snmp_resp_header_lengths rhl;$/;"	m
 rid	include/lwip/snmp_msg.h	/^        s32_t rid;$/;"	m	struct:snmp_msg_pstat
 ridlen	include/lwip/snmp_msg.h	/^        u16_t ridlen;$/;"	m	struct:snmp_resp_header_lengths
 ridlenlen	include/lwip/snmp_msg.h	/^        u8_t ridlenlen;$/;"	m	struct:snmp_resp_header_lengths
-right	include/barrelfish/red_black_tree.h	/^  struct rb_red_blk_node* right;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
+right	include/barrelfish/red_black_tree.h	/^	struct rb_red_blk_node* right;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 right	include/mdb/types.h	/^    struct cte *left, *right;$/;"	m	struct:mdbnode	typeref:struct:mdbnode::
 right	include/octopus/parser/ast.h	/^    struct ast_object* right;$/;"	m	struct:node_pair	typeref:struct:node_pair::ast_object
 right	include/red_black_tree.h	/^  struct rb_red_blk_node* right;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
@@ -35834,7 +35843,7 @@ role	include/net_queue_manager/net_queue_manager.h	/^    uint8_t role;  \/\/ Rol
 role	include/procon/procon.h	/^    uint8_t     role;       \/\/ Producer or consumer?$/;"	m	struct:shared_pool_private
 role	lib/lwip/src/barrelfish/idc_barrelfish.h	/^    uint8_t  role;  \/\/ RX or TX buffer$/;"	m	struct:buffer_desc
 role	lib/lwip/src/barrelfish/idc_barrelfish.h	/^    uint8_t  role;  \/\/ RX or TX buffer$/;"	m	struct:client_closure_NC
-root	include/barrelfish/red_black_tree.h	/^  rb_red_blk_node* root;             $/;"	m	struct:rb_red_blk_tree
+root	include/barrelfish/red_black_tree.h	/^	rb_red_blk_node* root;             $/;"	m	struct:rb_red_blk_tree
 root	include/mm/mm.h	/^    struct mmnode *root;    \/\/\/< Root node$/;"	m	struct:mm	typeref:struct:mm::mmnode
 root	include/red_black_tree.h	/^  rb_red_blk_node* root;             $/;"	m	struct:rb_red_blk_tree
 root	include/target/x86/barrelfish/pmap_target.h	/^    struct vnode root;          \/\/\/< Root of the vnode tree$/;"	m	struct:pmap_x86	typeref:struct:pmap_x86::vnode
@@ -39002,6 +39011,7 @@ test_tan	lib/newlib/newlib/libm/test/tan_vec.c	/^test_tan(m)   {run_vector_1(m,t
 test_tanf	lib/newlib/newlib/libm/test/tanf_vec.c	/^test_tanf(m)   {run_vector_1(m,tanf_vec,(char *)(tanf),"tanf","ff");   }	$/;"	f
 test_tanh	lib/newlib/newlib/libm/test/tanh_vec.c	/^test_tanh(m)   {run_vector_1(m,tanh_vec,(char *)(tanh),"tanh","dd");   }	$/;"	f
 test_tanhf	lib/newlib/newlib/libm/test/tanhf_vec.c	/^test_tanhf(m)   {run_vector_1(m,tanhf_vec,(char *)(tanhf),"tanhf","ff");   }	$/;"	f
+test_thread	usr/memeater/memeater.c	/^static int test_thread(void *arg){$/;"	f	file:
 test_y0	lib/newlib/newlib/libm/test/y0_vec.c	/^test_y0(m)   {run_vector_1(m,y0_vec,(char *)(y0),"y0","dd");   }	$/;"	f
 test_y0f	lib/newlib/newlib/libm/test/y0f_vec.c	/^test_y0f(m)   {run_vector_1(m,y0f_vec,(char *)(y0f),"y0f","ff");   }	$/;"	f
 test_y1	lib/newlib/newlib/libm/test/y1_vec.c	/^test_y1(m)   {run_vector_1(m,y1_vec,(char *)(y1),"y1","dd");   }	$/;"	f
@@ -39692,6 +39702,7 @@ total_events	include/contmng/netbench.h	/^    uint32_t total_events;$/;"	m	struc
 total_frames_needed	include/barrelfish/red_black_tree.h	/^    int total_frames_needed;$/;"	m	struct:memory_chunk
 total_interrupt_time	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_interrupt_time = 0;$/;"	v
 total_processing_time	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_processing_time = 0;$/;"	v
+total_pte	kernel/include/paging_generic.h	/^	size_t total_pte;$/;"	m	struct:mapping_info
 total_queues	lib/net_device_manager/port_management_support.h	/^qid_t total_queues; \/\/ Total no. of valid queues (0, ..., total_queues-1)$/;"	v
 total_rx_datasize	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_rx_datasize = 0;$/;"	v
 total_rx_p_count	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_rx_p_count = 0;$/;"	v
@@ -40725,7 +40736,9 @@ used	include/lwip/stats.h	/^        mem_size_t used;$/;"	m	struct:stats_mem
 used	include/nfs/nfs_rpc.h	/^    size3 used;$/;"	m	struct:fattr3
 used	lib/lwip/src/core/mem.c	/^    u8_t used;$/;"	m	struct:mem	file:
 used_fpu	lib/barrelfish/include/threads_priv.h	/^    bool                used_fpu;           \/\/\/< Ever used FPU?$/;"	m	struct:thread
+user_frame_cnode	include/barrelfish/red_black_tree.h	/^	struct cnoderef user_frame_cnode;$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::cnoderef
 user_panic_fn	lib/barrelfish/debug.c	/^void user_panic_fn(const char *file, const char *func, int line,$/;"	f
+user_provided_frame	include/barrelfish/red_black_tree.h	/^	bool user_provided_frame;$/;"	m	struct:memory_chunk
 user_region_type	include/pci/confspace/pci_confspace.h	/^enum user_region_type {$/;"	g
 user_space_driver_read	lib/barrelfish/init.c	/^static size_t user_space_driver_read(char *buf, size_t len) {$/;"	f	file:
 user_space_driver_write	lib/barrelfish/init.c	/^static size_t user_space_driver_write(const char *buf, size_t len) {$/;"	f	file:

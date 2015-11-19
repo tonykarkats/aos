@@ -373,11 +373,10 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
 {
 
 	debug_printf("thread_create_unrunnable: Initiating...Stack size = %zu\n", stacksize);
-    // allocate stack
+    
+	// allocate stack
     assert((stacksize % sizeof(uintptr_t)) == 0);
-   
-	debug_printf("thread_create_unrunnable: Before malloc...\n");
-	void *stack = malloc(stacksize);
+   	void *stack = malloc(stacksize);
 	debug_printf("thread_create_unrunnable: After malloc...address at %p\n", (char *) stack);
     if (stack == NULL) {
         return NULL;
