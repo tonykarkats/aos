@@ -239,7 +239,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 	
     lmp_endpoint_init();
 
-	return SYS_ERR_OK; 
+	// return SYS_ERR_OK; 
 	// init domains only get partial init
     if (init_domain) {
         return SYS_ERR_OK;

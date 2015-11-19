@@ -350,7 +350,7 @@ static void exception_handler(enum exception_type type,
 	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 	
 	if (type == EXCEPT_PAGEFAULT) {
-		debug_printf("Pagefault exception at address %p\n", addr);
+		// debug_printf("Pagefault exception at address %p\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -362,15 +362,12 @@ static void exception_handler(enum exception_type type,
 			abort();
 		}		
 	
-		// Get lock 
-
-		
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
 			debug_printf("exception_handler: Address not mapped!\n");
 			abort();			
 		} 
 		else { 
-			//debug_printf("Address is mapped!\n");
+			// debug_printf("Address is mapped %p!\n");
 			errval_t err = map_page((lvaddr_t) addr, NULL_CAP, 0, 0, FLAGS, get_current_paging_state());
  			if (err_is_fail(err)) {
 				DEBUG_ERR(err, "exception_handler: Error in map_page!\n");

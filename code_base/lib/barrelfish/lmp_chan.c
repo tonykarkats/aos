@@ -420,7 +420,6 @@ errval_t lmp_chan_alloc_recv_slot(struct lmp_chan *lc)
 {
     struct capref slot;
 
-	debug_printf("lmp_chan_alloc_recv_slot: Initiating!\n");
     errval_t err = slot_alloc(&slot);
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_SLOT_ALLOC);

@@ -48,30 +48,6 @@ static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
-static errval_t bootstrap_services(void) {
-
-	errval_t err;
-
-	debug_printf("BOOTSTRAP SERVICES STARTS HERE\n");
-	struct spawninfo memeater_si;
-
-	err = spawn_load_with_bootinfo(&memeater_si, bi, NAME_MEMEATER, my_core_id);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
-		abort();
-	}
-
-	debug_printf("bootstrap_services: Size of paging struct for child = %zu\n", sizeof(*memeater_si.vspace));
-	
-	err = spawn_run(&memeater_si);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_run: ERROR!\n");
-		abort();
-	}
-			
-	return SYS_ERR_OK;	
-}
-/*
 static void recv_handler(void *arg) 
 {
 		
@@ -177,7 +153,6 @@ static void recv_handler(void *arg)
 			break;
 	}
 	
-	
 	if (!capref_is_null(cap)) {
 		err = lmp_chan_alloc_recv_slot(lc);
 		if (err_is_fail(err)) {
@@ -188,7 +163,67 @@ static void recv_handler(void *arg)
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));
 }
-*/
+
+static errval_t bootstrap_services(void) {
+
+	errval_t err;
+	struct waitset* ws = get_default_waitset();  	
+	
+	lmp_chan_init(&channel);
+	
+	// Create our endpoint to self
+	err = cap_retype(cap_selfep, cap_dispatcher, ObjType_EndPoint, 0);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Failed to create our endpoint to self");
+		abort();
+	}
+
+	struct capref retcap;
+	
+	endpoint_create(FIRSTEP_BUFLEN, &retcap, 
+					&channel.endpoint);
+	if (err_is_fail(err)) {
+		debug_printf("Error in creating endpoint!\n");
+		abort();
+	}
+
+	err = lmp_chan_alloc_recv_slot(&channel);
+	if (err_is_fail(err)) {
+		debug_printf("Error in allocating receiver slot!\n");
+		abort();
+	}
+
+	struct event_closure recv_handler_init = {
+        .handler = recv_handler,
+        .arg = &channel,
+    };
+
+	err = lmp_chan_register_recv(&channel,ws, recv_handler_init);
+	if (err_is_fail(err)) {
+		debug_printf("Error in registering the channel..\n");	
+		abort();
+	}
+
+	cap_initep = retcap;	
+
+	struct spawninfo memeater_si;
+
+	err = spawn_load_with_bootinfo(&memeater_si, bi, NAME_MEMEATER, my_core_id);
+	if (err_is_fail(err)) {
+		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
+		abort();
+	}
+
+	debug_printf("bootstrap_services: Size of paging struct for child = %zu\n", sizeof(*memeater_si.vspace));
+	
+	err = spawn_run(&memeater_si);
+	if (err_is_fail(err)) {
+		debug_printf("spawn_run: ERROR!\n");
+		abort();
+	}
+			
+	return SYS_ERR_OK;	
+}
 
 int main(int argc, char *argv[])
 {
@@ -247,44 +282,9 @@ int main(int argc, char *argv[])
 	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
 	serial_polling_thread = serial_polling_thread;
 
-	
-	struct waitset* ws = get_default_waitset();  	
-		ws = ws;
-	
-	// Create our endpoint to self
-	err = cap_retype(cap_selfep, cap_dispatcher, ObjType_EndPoint, 0);
-	if (err_is_fail(err)) {
-	 DEBUG_ERR(err, "Failed to create our endpoint to self");
-	 abort();
-	}
-
-	err = cap_mint(cap_initep, cap_selfep,FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failed to create our endpoint to self");
-		abort();
-	}
-
-	lmp_chan_init(&channel);
-
-	channel.local_cap =  cap_initep;
-
-	err = lmp_chan_alloc_recv_slot(&channel);
-	if (err_is_fail(err)) {
-		debug_printf("Error in allocating receiver slot!\n");
-		abort();
-	}
-/*
-	struct event_closure recv_handler_init = {
-        .handler = recv_handler,
-        .arg = &channel,
-    };
-
-	err = lmp_chan_register_recv(&channel,ws, recv_handler_init);
-	if (err_is_fail(err)) {
-		debug_printf("Error in registering the channel..\n");	
-		abort();
-	}
-	
+		err = bootstrap_services();
+   	assert(err_is_ok(err));
+ 
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {
@@ -292,13 +292,6 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}		
 	}
-*/	
-	
-	err = bootstrap_services();
-   	assert(err_is_ok(err));
- 
-	while (1);
-
 
     return EXIT_SUCCESS;
 }

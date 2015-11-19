@@ -95,6 +95,16 @@ static errval_t spawn_setup_cspace(struct spawninfo *si)
         return err_push(err, SPAWN_ERR_CREATE_SELFEP);
     }
 
+    // Give domain endpoint to itself (in taskcn)
+    struct capref domain_initep = {
+        .cnode = si->taskcn,
+        .slot = TASKCN_SLOT_INITEP,
+    };
+    err = cap_copy(domain_initep, cap_initep);
+    if (err_is_fail(err)) {
+        return err_push(err, SPAWN_ERR_CREATE_SELFEP);
+    }
+
     // Map root CNode (in taskcn)
     t1.cnode = si->taskcn;
     t1.slot  = TASKCN_SLOT_ROOTCN;
