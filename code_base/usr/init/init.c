@@ -61,6 +61,8 @@ static void recv_handler(void *arg)
 		lmp_chan_register_recv(lc,get_default_waitset(),
 							MKCLOSURE(recv_handler, arg));
 	}
+	
+	lc->remote_cap = cap;
 
 	int message_length = msg.buf.msglen;
 //	debug_printf("recv_handler: Received length = %d\n", message_length);	
@@ -75,13 +77,8 @@ static void recv_handler(void *arg)
 	assert(message_length != 0);
 	
 	switch (rpc_operation) {
-		case AOS_RPC_CONNECT: ;
-			debug_printf("recv_handler: AOS_RPC_CONNECT from endpoint %d\n", cap.slot);
-			lc->remote_cap = cap;
-			break;	
-
 		case AOS_RPC_SEND_STRING: ; // Send String
-			debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", lc->remote_cap.slot);
+			debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
 			serial_putstring(BLUE);
 	
 			for (int i = 0; i<string_length; i++){
@@ -100,7 +97,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
-			debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", lc->remote_cap.slot);
+			debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 
@@ -118,7 +115,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
-			debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", lc->remote_cap.slot);
+			debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", cap.slot);
 			serial_putstring(BLUE);
 
 			char out_c = (char) msg.words[1];
@@ -310,7 +307,7 @@ int main(int argc, char *argv[])
 	
 	//err = spawn_run(&mem_si);	
 	err = spawn_run(&l_si);	
-	err = spawn_run(&loff_si);	
+	//err = spawn_run(&loff_si);	
 	
 	debug_printf("Entering main messaging loop...\n");	
 	while(true) {

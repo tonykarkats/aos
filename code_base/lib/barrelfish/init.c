@@ -83,8 +83,10 @@ static size_t custom_printf(const char *buf, int len) {
 
 	memcpy(new_buf, buf, len);
 
-	//sys_print( buf, len);
-		
+	sys_print( buf, len);
+	
+	return len;
+	
 	new_buf[len] = '\0';
 	
 	struct aos_rpc * init_chan = get_init_chan();
