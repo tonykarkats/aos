@@ -135,15 +135,16 @@ errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
                          uint64_t minbase, uint64_t maxlimit)
 {
     struct ram_alloc_state *state = get_ram_alloc_state();
-
-    if (size_bits == BASE_PAGE_BITS) {
+    
+	if (size_bits == BASE_PAGE_BITS) {
         // XXX: Return error if check to see if out of slots
         assert(state->base_capnum < OBJSPERPAGE_CTE);
         ret->cnode = cnode_base;
-        ret->slot  = state->base_capnum++;
+	    ret->slot  = state->base_capnum++;
         return SYS_ERR_OK;
     } else {
-        return LIB_ERR_RAM_ALLOC_WRONG_SIZE;
+    	debug_printf("ram_alloc_fixed: Returning error..\n");
+	    return LIB_ERR_RAM_ALLOC_WRONG_SIZE;
     }
 }
 
@@ -178,12 +179,14 @@ errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
 errval_t ram_alloc(struct capref *ret, uint8_t size_bits)
 {
     struct ram_alloc_state *ram_alloc_state = get_ram_alloc_state();
-    assert(ram_alloc_state->ram_alloc_func != NULL);
-    errval_t err = ram_alloc_state->
+    
+	assert(ram_alloc_state->ram_alloc_func != NULL);
+    
+	errval_t err = ram_alloc_state->
         ram_alloc_func(ret, size_bits, ram_alloc_state->default_minbase,
                        ram_alloc_state->default_maxlimit);
     if(err_is_fail(err)) {
-      printf("ram_alloc: Error in ram_alloc_func!\n");
+      debug_printf("ram_alloc: Error in ram_alloc_func!\n");
 
    /*
       DEBUG_ERR(err, "ram_alloc");

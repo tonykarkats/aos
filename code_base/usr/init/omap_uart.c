@@ -22,6 +22,7 @@ void uart_initialize(lvaddr_t mapped_address){
 	uart3_fcr = mapped_address + 0x08;
 	uart3_lcr = mapped_address + 0x0C;
 
+	
 	*(char *) uart3_ier = 0;
 	*(char *) uart3_fcr = 0xf1;
 	*(char *) uart3_lcr = 0x03;

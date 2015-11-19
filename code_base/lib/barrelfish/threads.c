@@ -368,7 +368,6 @@ static void free_thread(struct thread *thread)
  *
  * \returns Thread pointer on success, NULL on failure
  */
-// static char stack_2[65536];
 struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
                                         size_t stacksize)
 {
@@ -379,7 +378,7 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
    
 	debug_printf("thread_create_unrunnable: Before malloc...\n");
 	void *stack = malloc(stacksize);
-	debug_printf("thread_create_unrunnable: After malloc...\n");
+	debug_printf("thread_create_unrunnable: After malloc...address at %p\n", (char *) stack);
     if (stack == NULL) {
         return NULL;
     }
@@ -462,6 +461,7 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
 struct thread *thread_create_varstack(thread_func_t start_func, void *arg,
                                       size_t stacksize)
 {
+	debug_printf("thread_create_varstack: Initiating...\n");
     struct thread *newthread = thread_create_unrunnable(start_func, arg, stacksize);
     if (newthread) {
         // enqueue on runq
@@ -484,6 +484,7 @@ struct thread *thread_create_varstack(thread_func_t start_func, void *arg,
  */
 struct thread *thread_create(thread_func_t start_func, void *arg)
 {
+	debug_printf("thread_create : Initiating!\n");
     return thread_create_varstack(start_func, arg, THREADS_DEFAULT_STACK_BYTES);
 }
 

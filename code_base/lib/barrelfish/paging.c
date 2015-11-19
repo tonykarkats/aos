@@ -131,7 +131,7 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 	//debug_printf("map_user_frame_outside_tree: Total pages needed %d. Will map %d pages for first l2 table. %d pages for each middle l2 table and %d pages for last l2 table!\n", 
 	//			 pages_needed, first_l2_total_pages, middle_l2_tables, last_l2_total_pages);	
 	uint64_t start_address = vaddr;	
-	uint64_t offset = 0;
+	uint64_t offset = off;
 	int l2_index;
 
 	// Map first l2 table 
@@ -231,25 +231,14 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 		return SYS_ERR_OK;
 	}
-
-	// Addresses that were allocated via paging_alloc().
-	// Our tree is aware for those addresses.
-	// They reside higher that START_VADDR
-	// Now we do not keep the user frames (for unmap)
-	// Need to fix this in order to be able to unmap for both cases
+	
 	err = map_user_frame_outside_tree(vaddr, usercap, off, size, mapping_flags, st);
 	if (err_is_fail(err)) {
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
-
-	return SYS_ERR_OK;
+	
+    return SYS_ERR_OK;
 }
-
-errval_t create_and_map_frame(lvaddr_t vaddr) {
-
-	return SYS_ERR_OK;
-}
-
 
 errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state * st) {
 	
@@ -359,7 +348,7 @@ static void exception_handler(enum exception_type type,
 			      arch_registers_fpu_state_t *fpuregs) 
 {
 	if (type == EXCEPT_PAGEFAULT) {
-		 debug_printf("Pagefault exception at address \n");
+		debug_printf("Pagefault exception at address %p\n");
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -494,7 +483,6 @@ errval_t paging_region_init(struct paging_state *st, struct paging_region *pr, s
     // TODO: maybe add paging regions to paging state?
     return SYS_ERR_OK;
 }
-
 /**
  * \brief return a pointer to a bit of the paging region `pr`.
  * This function gets used in some of the code that is responsible
@@ -544,7 +532,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	//alloc_bits = log2floor(bytes);
 	alloc_bits = log2ceil(bytes);
 	
-	//debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
+	debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
 	
 	err = ram_alloc(&ram, alloc_bits);
     if (err_is_fail(err)){ 
@@ -555,7 +543,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
    	
-   	//debug_printf("get_frame: Need %d slots\n", slots_needed);
+   	debug_printf("get_frame: Need %d slots\n", slots_needed);
    	
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
@@ -659,6 +647,9 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
     if (err_is_fail(err)) {
         return err;
     }
+
+	if (frame.slot == TASKCN_SLOT_IO)
+		flags = DEVICE_FLAGS; 
 
     if ((arg1 != NULL)&&(arg2 != NULL) )
     	return paging_map_fixed_attr_args(st, (lvaddr_t)(*buf), frame, bytes, flags, arg1, arg2);

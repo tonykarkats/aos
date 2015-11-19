@@ -223,12 +223,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
         return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
     }
 
-	if (params->vspace_buf != NULL) {
-		debug_printf("barrelfish_init_onthread: Not null vspace data with legnth = %zu!\n", params->vspace_buf_len);
-
-	
-	}
-
     debug_printf("barrelfish_init_onthread: Initializing our paging!\n");
 	err = paging_init();
    	if (err_is_fail(err)) {
@@ -243,11 +237,10 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 
 	debug_printf("barrelfish_init_onthread: Returning...\n");
 	
-	return SYS_ERR_OK;
-
     lmp_endpoint_init();
 
-    // init domains only get partial init
+	return SYS_ERR_OK; 
+	// init domains only get partial init
     if (init_domain) {
         return SYS_ERR_OK;
     }

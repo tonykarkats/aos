@@ -45,7 +45,7 @@
 
 struct bootinfo *bi;
 static coreid_t my_core_id;
-static struct lmp_chan channel ;
+//static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
 static errval_t bootstrap_services(void) {
@@ -71,7 +71,7 @@ static errval_t bootstrap_services(void) {
 			
 	return SYS_ERR_OK;	
 }
-
+/*
 static void recv_handler(void *arg) 
 {
 		
@@ -188,7 +188,7 @@ static void recv_handler(void *arg)
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));
 }
-
+*/
 
 int main(int argc, char *argv[])
 {
@@ -225,13 +225,8 @@ int main(int argc, char *argv[])
         abort();
     }
 	
-	err = bootstrap_services();
+	debug_printf("initialized dev memory management\n");
 
-   	assert(err_is_ok(err));
- 
-	while (1);
-
-    debug_printf("initialized dev memory management\n");
 
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
@@ -242,16 +237,22 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
+
 	uart_initialize((lvaddr_t)vbuf);
+	debug_printf("initialized uart!\n");
 
 	initialize_ring(&ring);
 
+	debug_printf("Before thread create!\n");
 	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
+	serial_polling_thread = serial_polling_thread;
 
-	serial_polling_thread = serial_polling_thread;	
+	// while(1);
 	//thread_join(serial_polling_thread, NULL) ;
 
+	/*
 	struct waitset* ws = get_default_waitset();  	
+
 	
 	lmp_chan_init(&channel);
 	
@@ -287,7 +288,13 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}		
 	}
+	*/
+	
+	err = bootstrap_services();
+   	assert(err_is_ok(err));
+ 
+	while (1);
 
 
-   return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
