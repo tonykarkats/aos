@@ -250,20 +250,27 @@ int main(int argc, char *argv[])
 	// while(1);
 	//thread_join(serial_polling_thread, NULL) ;
 
-	/*
+/*	
 	struct waitset* ws = get_default_waitset();  	
 
-	
+	// Create our endpoint to self
+	err = cap_retype(cap_selfep, cap_dispatcher, ObjType_EndPoint, 0);
+	if (err_is_fail(err)) {
+	 DEBUG_ERR(err, "Failed to create our endpoint to self");
+	 abort();
+	}
+
+	err = cap_mint(cap_initep, cap_selfep,FIRSTEP_OFFSET, FIRSTEP_BUFLEN);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Failed to create our endpoint to self");
+		abort();
+	}
+
 	lmp_chan_init(&channel);
 	
 	channel.local_cap =  cap_initep;
 	
-	err = lmp_endpoint_setup(0, DEFAULT_LMP_BUF_WORDS,  &channel.endpoint);
-	if (err_is_fail(err)) {
-		debug_printf("Error in seting up the endpoint..\n");	
-		abort();
-	}
-
+	
 	err = lmp_chan_alloc_recv_slot(&channel);
 	if (err_is_fail(err)) {
 		debug_printf("Error in allocating receiver slot!\n");
@@ -288,7 +295,7 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}		
 	}
-	*/
+*/	
 	
 	err = bootstrap_services();
    	assert(err_is_ok(err));

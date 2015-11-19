@@ -135,6 +135,7 @@ errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
                          uint64_t minbase, uint64_t maxlimit)
 {
     struct ram_alloc_state *state = get_ram_alloc_state();
+
     
 	if (size_bits == BASE_PAGE_BITS) {
         // XXX: Return error if check to see if out of slots
@@ -143,7 +144,7 @@ errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
 	    ret->slot  = state->base_capnum++;
         return SYS_ERR_OK;
     } else {
-    	debug_printf("ram_alloc_fixed: Returning error..\n");
+    	debug_printf("ram_alloc_fixed: Returning error! BASE_PAGE_BITS = %zu\n", BASE_PAGE_BITS);
 	    return LIB_ERR_RAM_ALLOC_WRONG_SIZE;
     }
 }
