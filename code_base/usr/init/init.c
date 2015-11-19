@@ -56,8 +56,6 @@ static void recv_handler(void *arg)
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
 
-	debug_printf("recv_handler: Just woke up with remote endpoint = %d\n", lc->remote_cap.slot);
-
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
 		lmp_chan_register_recv(lc,get_default_waitset(),
@@ -76,10 +74,12 @@ static void recv_handler(void *arg)
 	uint32_t rpc_operation = msg.words[0];
 	assert(message_length != 0);
 	
-	if (!capref_is_null(cap))
-		lc->remote_cap = cap;  
-
 	switch (rpc_operation) {
+		case AOS_RPC_CONNECT: ;
+			debug_printf("recv_handler: AOS_RPC_CONNECT from endpoint %d\n", cap.slot);
+			lc->remote_cap = cap;
+			break;	
+
 		case AOS_RPC_SEND_STRING: ; // Send String
 			debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", lc->remote_cap.slot);
 			serial_putstring(BLUE);
@@ -115,8 +115,6 @@ static void recv_handler(void *arg)
 			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
-			else
-				debug_printf("recv_handler: All ok!\n");
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;

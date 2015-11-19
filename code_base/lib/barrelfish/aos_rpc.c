@@ -112,7 +112,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 //	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
 	errval_t err;
 
-	//debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
+	debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
 	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_RAM_CAP, request_bits);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");
@@ -278,7 +278,9 @@ errval_t aos_rpc_init(int slot_number)
 		return LIB_ERR_LMP_ALLOC_RECV_SLOT;
 	}
 
-	lmp_chan_send1(&memory_channel.init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep, 0);
+	debug_printf("aos_rpc_init: Created endpoint at slot = %d \n", rem_ep.slot);
+
+	lmp_chan_send1(&memory_channel.init_channel, LMP_SEND_FLAGS_DEFAULT, rem_ep, AOS_RPC_CONNECT);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in sending our own endpoint to init\n!");
 		return LIB_ERR_LMP_CHAN_SEND;

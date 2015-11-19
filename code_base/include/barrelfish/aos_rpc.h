@@ -32,6 +32,7 @@
 
 /* Defined here are the operation ids for the different RPC calls */
 
+#define AOS_RPC_CONNECT		 0
 #define AOS_RPC_SEND_STRING  1
 #define AOS_RPC_GET_RAM_CAP  2
 #define AOS_RPC_PUT_CHAR	 3
