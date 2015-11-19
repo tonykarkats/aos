@@ -12,6 +12,7 @@ module	/armv7/sbin/cpu_omap44xx
 module	/armv7/sbin/init
 module /armv7/sbin/memeater
 module /armv7/sbin/led_on
+module /armv7/sbin/led_off
 # TODO: add different modules here for later milestones
 
 # For pandaboard, use following values.

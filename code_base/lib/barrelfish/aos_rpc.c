@@ -38,8 +38,15 @@ static void recv_handler(void *arg)
 	
 //	debug_printf("msg buflen %zu\n", msg.buf.msglen);
 
-	if (!capref_is_null(cap))	
+	if (!capref_is_null(cap)) {
+		err = lmp_chan_alloc_recv_slot(lc);
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
+		}
+
 		ram_cap = cap;	
+	}
+	
 	if (msg.buf.msglen != 0)
 		rpc_char = (char) msg.words[0];
 

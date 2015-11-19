@@ -367,7 +367,7 @@ void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x) {
 		; 	//tree->PrintKey(x->left->key);
     //debug_printf("  r->key=");
     if( x->right == nil) 
-		debug_printf("NULL"); 
+		; //debug_printf("NULL"); 
 	else 
 		tree->PrintKey(x->right->key);
     //debug_printf("  p->key=");

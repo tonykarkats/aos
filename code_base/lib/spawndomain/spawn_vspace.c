@@ -27,15 +27,11 @@ errval_t spawn_paging_init(struct spawninfo *si, struct capref vnode)
     si->vspace = calloc(1, sizeof(struct paging_state));
     assert(si->vspace);
 
-	// si->vspace->cnode_page = si->pagecn;
-    
-	err = paging_init_state(si->vspace, 32*1024UL*1024UL, vnode);
-    debug_printf("AAA\n"); 
+   	err = paging_init_state(si->vspace, 32*1024UL*1024UL, vnode);
 	if (err_is_fail(err)) {
        return SPAWN_ERR_VSPACE_INIT;
     }
 
-	debug_printf("spawn_paging_init: ALL GOOG FROM HERE!\n");
     return SYS_ERR_OK;
 
 }

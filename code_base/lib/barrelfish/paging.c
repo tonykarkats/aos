@@ -424,8 +424,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 	st->mem_tree = tree;
 	thread_mutex_init(&st->paging_tree_lock);
 
-	debug_printf("paging_init_state: ALLGOOD!\n");
-    return SYS_ERR_OK;
+	return SYS_ERR_OK;
 }
 
 static char e_stack[S_SIZE];
