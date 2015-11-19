@@ -372,12 +372,12 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
                                         size_t stacksize)
 {
 
-	debug_printf("thread_create_unrunnable: Initiating...Stack size = %zu\n", stacksize);
+	//debug_printf("thread_create_unrunnable: Initiating...Stack size = %zu\n", stacksize);
     
 	// allocate stack
     assert((stacksize % sizeof(uintptr_t)) == 0);
    	void *stack = malloc(stacksize);
-	debug_printf("thread_create_unrunnable: After malloc...address at %p\n", (char *) stack);
+	//debug_printf("thread_create_unrunnable: After malloc...address at %p\n", (char *) stack);
     if (stack == NULL) {
         return NULL;
     }
@@ -386,7 +386,7 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
     // no mutex as it may deadlock: see comment for thread_slabs_spinlock
     // thread_mutex_lock(&thread_slabs_mutex);
 
-	debug_printf("thread_create_unrunnable: Before slab alloc!\n");
+	//debug_printf("thread_create_unrunnable: Before slab alloc!\n");
     acquire_spinlock(&thread_slabs_spinlock);
     void *space = slab_alloc(&thread_slabs);
     release_spinlock(&thread_slabs_spinlock);
@@ -403,13 +403,12 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
     struct thread *newthread = (void *)((uintptr_t)space + tls_block_total_len);
 
     
-	debug_printf("thread_create_unrunnable: Before thread_init...\n");
+	// debug_printf("thread_create_unrunnable: Before thread_init...\n");
 	// init thread
     thread_init(curdispatcher(), newthread);
     newthread->slab = space;
 
-	debug_printf("thread_create_unrunnable: After thread_init...\n");
-
+	// debug_printf("thread_create_unrunnable: After thread_init...\n");
 
     if (tls_block_total_len > 0) {
         // populate initial TLS data from pristine copy
@@ -444,7 +443,7 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
                           (lvaddr_t)newthread->stack_top,
                           (lvaddr_t)start_func, (lvaddr_t)arg, 0, 0);
 
-	debug_printf("thread_create_unrunnable: Ending...\n");
+	// debug_printf("thread_create_unrunnable: Ending...\n");
     return newthread;
 }
 
@@ -460,7 +459,7 @@ struct thread *thread_create_unrunnable(thread_func_t start_func, void *arg,
 struct thread *thread_create_varstack(thread_func_t start_func, void *arg,
                                       size_t stacksize)
 {
-	debug_printf("thread_create_varstack: Initiating...\n");
+	// debug_printf("thread_create_varstack: Initiating...\n");
     struct thread *newthread = thread_create_unrunnable(start_func, arg, stacksize);
     if (newthread) {
         // enqueue on runq
@@ -483,7 +482,7 @@ struct thread *thread_create_varstack(thread_func_t start_func, void *arg,
  */
 struct thread *thread_create(thread_func_t start_func, void *arg)
 {
-	debug_printf("thread_create : Initiating!\n");
+	// debug_printf("thread_create : Initiating!\n");
     return thread_create_varstack(start_func, arg, THREADS_DEFAULT_STACK_BYTES);
 }
 
@@ -1049,7 +1048,7 @@ static int bootstrap_thread(struct spawn_domain_params *params)
  */
 void thread_init_disabled(dispatcher_handle_t handle, bool init_domain)
 {
-    debug_printf("thread_init_disabled: Initiating...\n");
+    //debug_printf("thread_init_disabled: Initiating...\n");
 	
 	struct dispatcher_shared_generic *disp =
         get_dispatcher_shared_generic(handle);
@@ -1081,7 +1080,7 @@ void thread_init_disabled(dispatcher_handle_t handle, bool init_domain)
                           (lvaddr_t)bootstrap_thread, param, 0, 0);
 
 	
-	debug_printf("thread_init_disabled: After registers_set_initial...\n");
+	//debug_printf("thread_init_disabled: After registers_set_initial...\n");
     // Switch to it (always on this dispatcher)
     thread->disp = handle;
     thread_enqueue(thread, &disp_gen->runq);
@@ -1089,7 +1088,7 @@ void thread_init_disabled(dispatcher_handle_t handle, bool init_domain)
     disp->haswork = true;
     disp_resume(handle, &thread->regs);
 
-	debug_printf("thread_init_disabled: Returning...\n");
+	//debug_printf("thread_init_disabled: Returning...\n");
 }
 
 /**

@@ -103,7 +103,7 @@ static void recv_handler(void *arg)
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 
-			debug_printf("recv_handler: Requested for size %d\n", size_requested );	
+			// debug_printf("recv_handler: Requested for size %d\n", size_requested );	
 		
 			err = ram_alloc(&returned_cap, size_requested); 
 			if (err_is_fail(err)) {
@@ -164,7 +164,7 @@ static void recv_handler(void *arg)
 			MKCLOSURE(recv_handler, arg));
 }
 
-static errval_t bootstrap_services(void) {
+static errval_t setup_endpoints_and_bootstrap_services(void) {
 
 	errval_t err;
 	struct waitset* ws = get_default_waitset();  	
@@ -214,8 +214,6 @@ static errval_t bootstrap_services(void) {
 		abort();
 	}
 
-	debug_printf("bootstrap_services: Size of paging struct for child = %zu\n", sizeof(*memeater_si.vspace));
-	
 	err = spawn_run(&memeater_si);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_run: ERROR!\n");
@@ -272,7 +270,6 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 
@@ -282,7 +279,7 @@ int main(int argc, char *argv[])
 	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
 	serial_polling_thread = serial_polling_thread;
 
-		err = bootstrap_services();
+	err = setup_endpoints_and_bootstrap_services();
    	assert(err_is_ok(err));
  
 	while(true) {

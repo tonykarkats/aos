@@ -213,7 +213,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	errval_t err;
 
-	debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
+	// debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings
@@ -453,7 +453,7 @@ errval_t paging_init(void)
 void paging_init_onthread(struct thread *t)
 {
     // TODO: setup exception handler for thread `t'.
-	debug_printf("paging_init_onthread: Initializing...\n");
+	// debug_printf("paging_init_onthread: Initializing...\n");
 	    
 	t->exception_handler = exception_handler;
 
@@ -531,7 +531,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	//alloc_bits = log2floor(bytes);
 	alloc_bits = log2ceil(bytes);
 	
-	debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
+	// debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
 	
 	err = ram_alloc(&ram, alloc_bits);
     if (err_is_fail(err)){ 
@@ -587,7 +587,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
    
 	thread_mutex_lock(&st->paging_tree_lock);
  
-	debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
+	// debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
     
 	vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {

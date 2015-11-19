@@ -208,7 +208,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 
     // Initialize ram_alloc state
 	
-	debug_printf("barrelfish_init_onthread: Setting up fixed ram allocator!\n");
+	// debug_printf("barrelfish_init_onthread: Setting up fixed ram allocator!\n");
 	ram_alloc_init();
 
     /* All domains use smallcn to initialize */
@@ -217,42 +217,41 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
         return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
 
-	debug_printf("barrelfish_init_onthread: Setting up slot allocator!\n");
+	// debug_printf("barrelfish_init_onthread: Setting up slot allocator!\n");
     err = slot_alloc_init();
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
     }
 
-    debug_printf("barrelfish_init_onthread: Initializing our paging!\n");
+    // debug_printf("barrelfish_init_onthread: Initializing our paging!\n");
 	err = paging_init();
    	if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_VSPACE_INIT);
     }
 
-	debug_printf("barrelfish_init_onthread: Initializing our morecore backend!\n");
+	// debug_printf("barrelfish_init_onthread: Initializing our morecore backend!\n");
     err = morecore_init();
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_MORECORE_INIT);
     }
 
-	debug_printf("barrelfish_init_onthread: Returning...\n");
 	
     lmp_endpoint_init();
 
-	// return SYS_ERR_OK; 
 	// init domains only get partial init
     if (init_domain) {
         return SYS_ERR_OK;
     }
 
-	debug_printf("Initializing our endpoint with init!\n");
+	//debug_printf("Initializing our endpoint with init!\n");
+
 	err = aos_rpc_init(TASKCN_SLOT_REMEP);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Error in aos_rpc_init!\n");
 		return err_push(err, SYS_ERR_LRPC_SLOT_INVALID);
 	}
 
-	debug_printf("Setting our local ram allocator to talk with server!\n");
+	//debug_printf("Setting our local ram allocator to talk with server!\n");
     err = ram_alloc_set(NULL);
     if (err_is_fail(err)) {
     	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
