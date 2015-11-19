@@ -146,7 +146,7 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 {
    	errval_t err;
 		
-	err = lmp_chan_send1(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_CHAR);	
+	err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_CHAR);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
@@ -252,9 +252,7 @@ errval_t aos_rpc_init(int slot_number)
 	errval_t err;
 	
 	lmp_chan_init(&memory_channel.rpc_channel);
-	//lmp_chan_init(&memory_channel.init_channel);
 	
-	//memory_channel.init_channel.remote_cap = cap_initep;
 	memory_channel.rpc_channel.remote_cap = cap_initep;	
 
 	err = endpoint_create(FIRSTEP_BUFLEN, &memory_channel.rpc_channel.local_cap,

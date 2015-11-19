@@ -82,10 +82,6 @@ static size_t custom_printf(const char *buf, int len) {
 	char new_buf[len+1];	
 
 	memcpy(new_buf, buf, len);
-
-	sys_print( buf, len);
-	
-	return len;
 	
 	new_buf[len] = '\0';
 	
@@ -260,12 +256,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
 
-	err = aos_rpc_send_string(get_init_chan(), "Hello 1\n");
-   
-	err = aos_rpc_send_string(get_init_chan(), "Hello 2\n");
-
-	while(1);
-	return SYS_ERR_OK;
+  	return SYS_ERR_OK;
 }
 
 

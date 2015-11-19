@@ -61,8 +61,8 @@ static void recv_handler(void *arg)
 		lmp_chan_register_recv(lc,get_default_waitset(),
 							MKCLOSURE(recv_handler, arg));
 	}
-	
-	lc->remote_cap = cap;
+
+		lc->remote_cap = cap;
 
 	int message_length = msg.buf.msglen;
 	
@@ -71,10 +71,18 @@ static void recv_handler(void *arg)
 		
 	uint32_t rpc_operation = msg.words[0];
 	assert(message_length != 0);
+
+	lmp_chan_register_recv(lc, get_default_waitset(),
+			MKCLOSURE(recv_handler, arg));
+	err = lmp_chan_alloc_recv_slot(lc);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
+	}	
 	
+
 	switch (rpc_operation) {
 		case AOS_RPC_SEND_STRING: ; // Send String
-			debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
+			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
 			serial_putstring(BLUE);
 	
 			for (int i = 0; i<string_length; i++){
@@ -93,7 +101,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
-			debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
+			// debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 
@@ -111,7 +119,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
-			debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", cap.slot);
+			// debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", cap.slot);
 			serial_putstring(BLUE);
 
 			char out_c = (char) msg.words[1];
@@ -122,7 +130,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_GET_CHAR: ;
-			debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
+			// debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
 			serial_putstring(BLUE);
 
 			char in_c;
@@ -156,14 +164,6 @@ static void recv_handler(void *arg)
 			;
 			break;
 	}
-	
-	err = lmp_chan_alloc_recv_slot(lc);
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
-	}	
-
-	lmp_chan_register_recv(lc, get_default_waitset(),
-			MKCLOSURE(recv_handler, arg));
 }
 
 static errval_t setup_channel(void) {
@@ -286,31 +286,30 @@ int main(int argc, char *argv[])
 	err = setup_channel();
    	assert(err_is_ok(err));
 
-/*
+
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	err = bootstrap_domain("memeater", &mem_si);
 	assert(err_is_ok(err));
 
 	
-	debug_printf("Spawning led_on!\n");
-	struct spawninfo l_si;
-	err = bootstrap_domain("led_on", &l_si);
-	assert(err_is_ok(err));
-*/	
-	debug_printf("Spawning led_off\n");
-	struct spawninfo loff_si;
-	err = bootstrap_domain("led_off", &loff_si);
-	assert(err_is_ok(err));
+	//debug_printf("Spawning led_on!\n");
+	//struct spawninfo l_si;
+	//err = bootstrap_domain("led_on", &l_si);
+	//assert(err_is_ok(err));
 	
-	//err = spawn_run(&mem_si);	
+	//debug_printf("Spawning led_off\n");
+	//struct spawninfo loff_si;
+	//err = bootstrap_domain("led_off", &loff_si);
+	//assert(err_is_ok(err));
+	
+	err = spawn_run(&mem_si);	
 	//err = spawn_run(&l_si);	
-	err = spawn_run(&loff_si);	
+	//err = spawn_run(&loff_si);	
 
 	debug_printf("Entering main messaging loop...\n");	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
-		debug_printf("Rentering waiting state.....\n");	
 		if (err_is_fail(err)) {
 			DEBUG_ERR(err, "in main event_dispatch loop");
 			return EXIT_FAILURE;

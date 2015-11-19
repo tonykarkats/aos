@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
 
 	debug_printf("Hello world from memeater!\n");
 
-	while(1);
 	char command[1024];
 	const char space_token[2] = " ";
 	char *token;
