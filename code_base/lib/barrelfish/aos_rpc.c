@@ -38,14 +38,8 @@ static void recv_handler(void *arg)
 	
 //	debug_printf("msg buflen %zu\n", msg.buf.msglen);
 
-	if (!capref_is_null(cap)) {
-		err = lmp_chan_alloc_recv_slot(lc);
-		if (err_is_fail(err)) {
-			DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
-		}
-
+	if (!capref_is_null(cap)) 
 		ram_cap = cap;	
-	}
 	
 	if (msg.buf.msglen != 0)
 		rpc_char = (char) msg.words[0];
@@ -89,7 +83,7 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 		else 
 			memcpy(buffer + 1, string + 32*s_chunk, 32);
 	
-		err = lmp_chan_send(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
+		err = lmp_chan_send(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
 					  buffer[0] , buffer[1],buffer[2],
 					  buffer[3], buffer[4],buffer[5],
 					  buffer[6], buffer[7],buffer[8]);
@@ -113,14 +107,16 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 	errval_t err;
 
 	debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
-	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
+	
+	chan->rpc_channel.remote_cap = cap_initep;
+	
+	err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
 	}
 
 	event_dispatch(get_default_waitset());
-//	debug_printf("aos_rpc_get_ram_cap: Server responded!\n");	
 
 	if (capref_is_null(ram_cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
@@ -131,7 +127,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 		debug_printf("aos_rpc_get_ram_cap: Server responded with a memory region!\n");
 	
 	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
-
+	
 	*retcap = ram_cap;
 	return SYS_ERR_OK;
 
@@ -173,7 +169,7 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 {
 	errval_t err;
 		
-	err = lmp_chan_send2(&chan->init_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
+	err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
  	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
 		return AOS_ERR_LMP_SEND_FAILURE;
@@ -256,9 +252,11 @@ errval_t aos_rpc_init(int slot_number)
 	errval_t err;
 	
 	lmp_chan_init(&memory_channel.rpc_channel);
+	//lmp_chan_init(&memory_channel.init_channel);
 	
-	memory_channel.init_channel.remote_cap = cap_initep;
-	
+	//memory_channel.init_channel.remote_cap = cap_initep;
+	memory_channel.rpc_channel.remote_cap = cap_initep;	
+
 	err = endpoint_create(FIRSTEP_BUFLEN, &memory_channel.rpc_channel.local_cap,
 									  &memory_channel.rpc_channel.endpoint);		  
 	if (err_is_fail(err)) {

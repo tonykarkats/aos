@@ -260,7 +260,12 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
 
-    return SYS_ERR_OK;
+	err = aos_rpc_send_string(get_init_chan(), "Hello 1\n");
+   
+	err = aos_rpc_send_string(get_init_chan(), "Hello 2\n");
+
+	while(1);
+	return SYS_ERR_OK;
 }
 
 

@@ -65,10 +65,6 @@ static void recv_handler(void *arg)
 	lc->remote_cap = cap;
 
 	int message_length = msg.buf.msglen;
-//	debug_printf("recv_handler: Received length = %d\n", message_length);	
-	
-//	for (int i=0 ; i<message_length; i++) 
-//		debug_printf("msg->words[%d] = 0x%lx\n",i,msg.words[i]);	
 	
 	int string_length = message_length - 1;
 	char message_string[string_length * 4];
@@ -161,12 +157,10 @@ static void recv_handler(void *arg)
 			break;
 	}
 	
-	if (!capref_is_null(cap)) {
-		err = lmp_chan_alloc_recv_slot(lc);
-		if (err_is_fail(err)) {
-			DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
-		}	
-	}
+	err = lmp_chan_alloc_recv_slot(lc);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
+	}	
 
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));
@@ -186,9 +180,7 @@ static errval_t setup_channel(void) {
 		abort();
 	}
 
-	struct capref retcap;
-	
-	endpoint_create(FIRSTEP_BUFLEN, &retcap, 
+	endpoint_create(FIRSTEP_BUFLEN, &channel.local_cap, 
 					&channel.endpoint);
 	if (err_is_fail(err)) {
 		debug_printf("Error in creating endpoint!\n");
@@ -212,7 +204,12 @@ static errval_t setup_channel(void) {
 		abort();
 	}
 
-	cap_initep = retcap;	
+	err = cap_copy(cap_initep, channel.local_cap);
+	if (err_is_fail(err)) {
+		debug_printf("Error in copying endpoint to cap_initep\n");	
+		abort();
+	}
+		
 	return SYS_ERR_OK;	
 }
 
@@ -289,6 +286,7 @@ int main(int argc, char *argv[])
 	err = setup_channel();
    	assert(err_is_ok(err));
 
+/*
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	err = bootstrap_domain("memeater", &mem_si);
@@ -299,19 +297,20 @@ int main(int argc, char *argv[])
 	struct spawninfo l_si;
 	err = bootstrap_domain("led_on", &l_si);
 	assert(err_is_ok(err));
-	
+*/	
 	debug_printf("Spawning led_off\n");
 	struct spawninfo loff_si;
 	err = bootstrap_domain("led_off", &loff_si);
 	assert(err_is_ok(err));
 	
 	//err = spawn_run(&mem_si);	
-	err = spawn_run(&l_si);	
-	//err = spawn_run(&loff_si);	
-	
+	//err = spawn_run(&l_si);	
+	err = spawn_run(&loff_si);	
+
 	debug_printf("Entering main messaging loop...\n");	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
+		debug_printf("Rentering waiting state.....\n");	
 		if (err_is_fail(err)) {
 			DEBUG_ERR(err, "in main event_dispatch loop");
 			return EXIT_FAILURE;
