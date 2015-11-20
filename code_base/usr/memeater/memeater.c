@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 			domainid_t pid;
 			
 			err = aos_rpc_process_spawn(get_init_chan(), token, &pid);
-			if (err_is_fail(err) || (pid == -1))
+			if (err_is_fail(err) || (pid == 1))
 				printf("Could not spawn domain [%s]\n", token);
 			else 
 				printf("Domain spawned with pid = %d\n", pid);

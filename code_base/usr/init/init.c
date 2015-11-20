@@ -76,6 +76,41 @@ static errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si)
 	return SYS_ERR_OK;
 }
 
+
+static int get_char_thread(void *arg) 
+{
+	errval_t err;	
+
+	// debug_printf("get_char_thread: Initiating...\n");
+	
+	struct capref remep = *(struct capref *) arg;
+
+	char in_c;
+	
+	while(1) {
+		char * ret_char = read_from_ring(&ring, &in_c);
+		if (ret_char != NULL)
+		break;
+	}
+			
+	if (in_c != 13)
+		serial_putchar(in_c);
+		else { 
+			serial_putchar('\n');
+			in_c = '\n';
+		}
+				
+	err = lmp_ep_send1(remep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
+	if (err_is_fail(err)) {
+			DEBUG_ERR(err,"get_char_thread: Can not send character back to client!\n");
+	}	
+
+//	cap_destroy(remep);
+	serial_putstring(RESET); 
+
+	return 0;
+}
+
 static void recv_handler(void *arg) 
 {
 		
@@ -160,27 +195,15 @@ static void recv_handler(void *arg)
 		case AOS_RPC_GET_CHAR: ;
 			// debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
 			serial_putstring(BLUE);
+	
+			struct capref* temp_cap = (struct capref*) malloc(sizeof(struct capref));
 
-			char in_c;
-			while(1) {
-				char * ret_char = read_from_ring(&ring, &in_c);
-				if (ret_char != NULL)
-					break;
-			}
-			
-			if (in_c != 13)
-				serial_putchar(in_c);
-			else { 
-				serial_putchar('\n');
-				in_c = '\n';
-			}
+			slot_alloc(temp_cap);
+			cap_copy(*temp_cap, cap);
 				
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");
-			}	
-
-			serial_putstring(RESET); 
+			struct thread *s_t = thread_create(get_char_thread, temp_cap);
+			s_t = s_t;			
+			
 			break;
 		case AOS_RPC_PROC_SPAWN:;
 			domainid_t d_id;
@@ -190,18 +213,18 @@ static void recv_handler(void *arg)
 				*word = msg.words[i+1];   
 			}	
 				
-			// debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
+			debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
 		
 		 	struct spawninfo si;	
 			err = bootstrap_domain(message_string, &si);
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Can not spawn process for the client! \n");
-				d_id = -1;	
+				d_id = 1;	
 			}
-			else 
+			else { 
 				d_id = si.domain_id;
-
-			 debug_printf("recv_handler: Spawned domain with id %zu!\n", si.domain_id);
+				debug_printf("recv_handler: Spawned domain with id %zu!\n", d_id);
+			}
 			
 			lc = &channel;
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
@@ -216,6 +239,8 @@ static void recv_handler(void *arg)
 			;
 			break;
 	}
+
+	//cap_destroy(cap);
 }
 
 static errval_t setup_channel(void) {
