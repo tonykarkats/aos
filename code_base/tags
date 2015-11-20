@@ -227,10 +227,14 @@ ANSI	lib/oldc/src/gdtoa/gdtoa.h	50;"	d
 ANSI	lib/oldc/src/gdtoa/gdtoa.h	53;"	d
 ANSIC	lib/newlib/newlib/libc/machine/powerpc/simdldtoa.c	371;"	d	file:
 ANSIC	lib/newlib/newlib/libc/stdlib/ldtoa.c	377;"	d	file:
-AOS_RPC_GET_CHAR	include/barrelfish/aos_rpc.h	38;"	d
-AOS_RPC_GET_RAM_CAP	include/barrelfish/aos_rpc.h	36;"	d
-AOS_RPC_PUT_CHAR	include/barrelfish/aos_rpc.h	37;"	d
-AOS_RPC_SEND_STRING	include/barrelfish/aos_rpc.h	35;"	d
+AOS_RPC_CONNECT	include/barrelfish/aos_rpc.h	35;"	d
+AOS_RPC_GET_CHAR	include/barrelfish/aos_rpc.h	39;"	d
+AOS_RPC_GET_RAM_CAP	include/barrelfish/aos_rpc.h	37;"	d
+AOS_RPC_PROC_GET_NAME	include/barrelfish/aos_rpc.h	41;"	d
+AOS_RPC_PROC_GET_PIDS	include/barrelfish/aos_rpc.h	42;"	d
+AOS_RPC_PROC_SPAWN	include/barrelfish/aos_rpc.h	40;"	d
+AOS_RPC_PUT_CHAR	include/barrelfish/aos_rpc.h	38;"	d
+AOS_RPC_SEND_STRING	include/barrelfish/aos_rpc.h	36;"	d
 API_EVENT	include/lwip/api.h	163;"	d
 API_LIB_DEBUG	include/lwip/opt.h	1614;"	d
 API_MSG_DEBUG	include/lwip/opt.h	1621;"	d
@@ -7286,7 +7290,7 @@ MAXINT	kernel/printf.c	218;"	d	file:
 MAXINTERP	include/sys/param.h	50;"	d
 MAXLINELEN	lib/newlib/newlib/libc/posix/wordexp.c	24;"	d	file:
 MAXLOGNAME	include/sys/param.h	51;"	d
-MAXNAMELEN	include/barrelfish/aos_rpc.h	112;"	d
+MAXNAMELEN	include/barrelfish/aos_rpc.h	119;"	d
 MAXNAMELEN	include/lwip/opt.h	1515;"	d
 MAXNAMLEN	include/oldc/dirent.h	9;"	d
 MAXNAMLEN	lib/newlib/newlib/libc/include/dirent.h	9;"	d
@@ -22244,7 +22248,7 @@ boot_pml4	tools/elver/elver.c	/^union pdir_entry boot_pml4[PTABLE_SIZE]$/;"	v	ty
 bootinfo	include/barrelfish_kpi/init.h	/^struct bootinfo {$/;"	s
 bootinfo	kernel/arch/omap44xx/startup_arch.c	/^struct bootinfo* bootinfo = (struct bootinfo*)INIT_BOOTINFO_VBASE;$/;"	v	typeref:struct:bootinfo
 bootstrap	tools/molly/m5script.py	/^                             bootstrap = (i == 0)))$/;"	v
-bootstrap_services	usr/init/init.c	/^static errval_t bootstrap_services(void) {$/;"	f	file:
+bootstrap_domain	usr/init/init.c	/^static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)$/;"	f	file:
 bootstrap_thread	lib/barrelfish/threads.c	/^static int bootstrap_thread(struct spawn_domain_params *params)$/;"	f	file:
 borrow	lib/newlib/newlib/libc/stdlib/mprec.c	/^  __Long borrow, y;		\/* We need signed shifts here. *\/$/;"	m	struct:b	file:
 borrow	lib/newlib/newlib/libc/stdlib/mprec.c	/^  borrow = 0;$/;"	m	struct:b	file:
@@ -22787,6 +22791,7 @@ change_mparam	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^static int chan
 change_waitset	include/thc/thcstubs.h	/^  common_change_waitset_fn *change_waitset;$/;"	m	struct:common_binding
 changed_cond	include/arch/sys_arch.h	/^    struct thread_cond changed_cond;$/;"	m	struct:bf_sys_mbox	typeref:struct:bf_sys_mbox::thread_cond
 changes	tools/harness/checkout.py	/^    def changes(self):$/;"	m	class:Checkout
+channel	usr/init/init.c	/^static struct lmp_chan channel ;$/;"	v	typeref:struct:lmp_chan	file:
 channel_cost	tools/harness/tests/__init__.py	/^    multihoptests, perfmontest, freemem, spawntest, spantest$/;"	i
 chantype	include/barrelfish/waitset.h	/^    enum ws_chantype chantype;              \/\/\/< Channel type$/;"	m	struct:waitset_chanstate	typeref:enum:waitset_chanstate::ws_chantype
 char_ptr_t	lib/newlib/newlib/libc/stdio/svfiprintf.c	/^typedef char *   char_ptr_t;$/;"	t	file:
@@ -24603,6 +24608,7 @@ domain_id	include/barrelfish/dispatcher.h	/^    domainid_t domain_id;$/;"	m	stru
 domain_id	include/spawndomain/spawndomain.h	/^    domainid_t domain_id;$/;"	m	struct:spawninfo
 domain_id	kernel/include/dispatch.h	/^    uint64_t            domain_id;      \/\/\/< ID of dispatcher's domain$/;"	m	struct:dcb
 domain_init	lib/barrelfish/domain.c	/^errval_t domain_init(void)$/;"	f
+domain_name	lib/barrelfish/aos_rpc.c	/^static char domain_name[32];$/;"	v	file:
 domain_new_dispatcher	lib/barrelfish/domain.c	/^errval_t domain_new_dispatcher(coreid_t core_id,$/;"	f
 domain_new_dispatcher_varstack	lib/barrelfish/domain.c	/^static errval_t domain_new_dispatcher_varstack(coreid_t core_id,$/;"	f	file:
 domain_send_cap	lib/barrelfish/domain.c	/^errval_t domain_send_cap(coreid_t core_id, struct capref cap)$/;"	f
@@ -29377,34 +29383,34 @@ lmp_chan_migrate_send	lib/barrelfish/lmp_chan.c	/^void lmp_chan_migrate_send(str
 lmp_chan_recv	include/barrelfish/lmp_chan.h	/^static inline errval_t lmp_chan_recv(struct lmp_chan *lc,$/;"	f
 lmp_chan_register_recv	include/barrelfish/lmp_chan.h	/^static inline errval_t lmp_chan_register_recv(struct lmp_chan *lc,$/;"	f
 lmp_chan_register_send	lib/barrelfish/lmp_chan.c	/^errval_t lmp_chan_register_send(struct lmp_chan *lc, struct waitset *ws,$/;"	f
-lmp_chan_send	include/arch/arm/barrelfish/lmp_chan_arch.h	88;"	d
+lmp_chan_send	include/arch/arm/barrelfish/lmp_chan_arch.h	89;"	d
 lmp_chan_send	include/arch/x86_32/barrelfish/lmp_chan_arch.h	63;"	d
 lmp_chan_send	include/arch/x86_64/barrelfish/lmp_chan_arch.h	90;"	d
-lmp_chan_send0	include/arch/arm/barrelfish/lmp_chan_arch.h	115;"	d
+lmp_chan_send0	include/arch/arm/barrelfish/lmp_chan_arch.h	116;"	d
 lmp_chan_send0	include/arch/x86_32/barrelfish/lmp_chan_arch.h	74;"	d
 lmp_chan_send0	include/arch/x86_64/barrelfish/lmp_chan_arch.h	113;"	d
-lmp_chan_send1	include/arch/arm/barrelfish/lmp_chan_arch.h	113;"	d
+lmp_chan_send1	include/arch/arm/barrelfish/lmp_chan_arch.h	114;"	d
 lmp_chan_send1	include/arch/x86_32/barrelfish/lmp_chan_arch.h	72;"	d
 lmp_chan_send1	include/arch/x86_64/barrelfish/lmp_chan_arch.h	111;"	d
 lmp_chan_send10	include/arch/x86_64/barrelfish/lmp_chan_arch.h	93;"	d
-lmp_chan_send2	include/arch/arm/barrelfish/lmp_chan_arch.h	111;"	d
+lmp_chan_send2	include/arch/arm/barrelfish/lmp_chan_arch.h	112;"	d
 lmp_chan_send2	include/arch/x86_32/barrelfish/lmp_chan_arch.h	70;"	d
 lmp_chan_send2	include/arch/x86_64/barrelfish/lmp_chan_arch.h	109;"	d
-lmp_chan_send3	include/arch/arm/barrelfish/lmp_chan_arch.h	109;"	d
+lmp_chan_send3	include/arch/arm/barrelfish/lmp_chan_arch.h	110;"	d
 lmp_chan_send3	include/arch/x86_32/barrelfish/lmp_chan_arch.h	68;"	d
 lmp_chan_send3	include/arch/x86_64/barrelfish/lmp_chan_arch.h	107;"	d
-lmp_chan_send4	include/arch/arm/barrelfish/lmp_chan_arch.h	107;"	d
+lmp_chan_send4	include/arch/arm/barrelfish/lmp_chan_arch.h	108;"	d
 lmp_chan_send4	include/arch/x86_32/barrelfish/lmp_chan_arch.h	66;"	d
 lmp_chan_send4	include/arch/x86_64/barrelfish/lmp_chan_arch.h	105;"	d
-lmp_chan_send5	include/arch/arm/barrelfish/lmp_chan_arch.h	104;"	d
+lmp_chan_send5	include/arch/arm/barrelfish/lmp_chan_arch.h	105;"	d
 lmp_chan_send5	include/arch/x86_64/barrelfish/lmp_chan_arch.h	103;"	d
-lmp_chan_send6	include/arch/arm/barrelfish/lmp_chan_arch.h	101;"	d
+lmp_chan_send6	include/arch/arm/barrelfish/lmp_chan_arch.h	102;"	d
 lmp_chan_send6	include/arch/x86_64/barrelfish/lmp_chan_arch.h	101;"	d
-lmp_chan_send7	include/arch/arm/barrelfish/lmp_chan_arch.h	98;"	d
+lmp_chan_send7	include/arch/arm/barrelfish/lmp_chan_arch.h	99;"	d
 lmp_chan_send7	include/arch/x86_64/barrelfish/lmp_chan_arch.h	99;"	d
-lmp_chan_send8	include/arch/arm/barrelfish/lmp_chan_arch.h	95;"	d
+lmp_chan_send8	include/arch/arm/barrelfish/lmp_chan_arch.h	96;"	d
 lmp_chan_send8	include/arch/x86_64/barrelfish/lmp_chan_arch.h	97;"	d
-lmp_chan_send9	include/arch/arm/barrelfish/lmp_chan_arch.h	92;"	d
+lmp_chan_send9	include/arch/arm/barrelfish/lmp_chan_arch.h	93;"	d
 lmp_chan_send9	include/arch/x86_64/barrelfish/lmp_chan_arch.h	95;"	d
 lmp_chan_set_recv_slot	include/barrelfish/lmp_chan.h	/^static inline void lmp_chan_set_recv_slot(struct lmp_chan *lc,$/;"	f
 lmp_channels_retry_send_disabled	lib/barrelfish/lmp_chan.c	/^void lmp_channels_retry_send_disabled(dispatcher_handle_t handle)$/;"	f
@@ -29434,31 +29440,31 @@ lmp_endpoints_poll_disabled	lib/barrelfish/lmp_endpoints.c	/^void lmp_endpoints_
 lmp_ep_send	include/arch/arm/barrelfish/lmp_chan_arch.h	/^lmp_ep_send($/;"	f
 lmp_ep_send	include/arch/x86_32/barrelfish/lmp_chan_arch.h	/^static inline errval_t lmp_ep_send(struct capref ep, lmp_send_flags_t flags,$/;"	f
 lmp_ep_send	include/arch/x86_64/barrelfish/lmp_chan_arch.h	/^static inline errval_t lmp_ep_send(struct capref ep, lmp_send_flags_t flags,$/;"	f
-lmp_ep_send0	include/arch/arm/barrelfish/lmp_chan_arch.h	85;"	d
+lmp_ep_send0	include/arch/arm/barrelfish/lmp_chan_arch.h	86;"	d
 lmp_ep_send0	include/arch/x86_32/barrelfish/lmp_chan_arch.h	60;"	d
 lmp_ep_send0	include/arch/x86_64/barrelfish/lmp_chan_arch.h	87;"	d
-lmp_ep_send1	include/arch/arm/barrelfish/lmp_chan_arch.h	83;"	d
+lmp_ep_send1	include/arch/arm/barrelfish/lmp_chan_arch.h	84;"	d
 lmp_ep_send1	include/arch/x86_32/barrelfish/lmp_chan_arch.h	58;"	d
 lmp_ep_send1	include/arch/x86_64/barrelfish/lmp_chan_arch.h	85;"	d
 lmp_ep_send10	include/arch/x86_64/barrelfish/lmp_chan_arch.h	67;"	d
-lmp_ep_send2	include/arch/arm/barrelfish/lmp_chan_arch.h	81;"	d
+lmp_ep_send2	include/arch/arm/barrelfish/lmp_chan_arch.h	82;"	d
 lmp_ep_send2	include/arch/x86_32/barrelfish/lmp_chan_arch.h	56;"	d
 lmp_ep_send2	include/arch/x86_64/barrelfish/lmp_chan_arch.h	83;"	d
-lmp_ep_send3	include/arch/arm/barrelfish/lmp_chan_arch.h	79;"	d
+lmp_ep_send3	include/arch/arm/barrelfish/lmp_chan_arch.h	80;"	d
 lmp_ep_send3	include/arch/x86_32/barrelfish/lmp_chan_arch.h	54;"	d
 lmp_ep_send3	include/arch/x86_64/barrelfish/lmp_chan_arch.h	81;"	d
-lmp_ep_send4	include/arch/arm/barrelfish/lmp_chan_arch.h	77;"	d
+lmp_ep_send4	include/arch/arm/barrelfish/lmp_chan_arch.h	78;"	d
 lmp_ep_send4	include/arch/x86_32/barrelfish/lmp_chan_arch.h	52;"	d
 lmp_ep_send4	include/arch/x86_64/barrelfish/lmp_chan_arch.h	79;"	d
-lmp_ep_send5	include/arch/arm/barrelfish/lmp_chan_arch.h	75;"	d
+lmp_ep_send5	include/arch/arm/barrelfish/lmp_chan_arch.h	76;"	d
 lmp_ep_send5	include/arch/x86_64/barrelfish/lmp_chan_arch.h	77;"	d
-lmp_ep_send6	include/arch/arm/barrelfish/lmp_chan_arch.h	73;"	d
+lmp_ep_send6	include/arch/arm/barrelfish/lmp_chan_arch.h	74;"	d
 lmp_ep_send6	include/arch/x86_64/barrelfish/lmp_chan_arch.h	75;"	d
-lmp_ep_send7	include/arch/arm/barrelfish/lmp_chan_arch.h	71;"	d
+lmp_ep_send7	include/arch/arm/barrelfish/lmp_chan_arch.h	72;"	d
 lmp_ep_send7	include/arch/x86_64/barrelfish/lmp_chan_arch.h	73;"	d
-lmp_ep_send8	include/arch/arm/barrelfish/lmp_chan_arch.h	69;"	d
+lmp_ep_send8	include/arch/arm/barrelfish/lmp_chan_arch.h	70;"	d
 lmp_ep_send8	include/arch/x86_64/barrelfish/lmp_chan_arch.h	71;"	d
-lmp_ep_send9	include/arch/arm/barrelfish/lmp_chan_arch.h	67;"	d
+lmp_ep_send9	include/arch/arm/barrelfish/lmp_chan_arch.h	68;"	d
 lmp_ep_send9	include/arch/x86_64/barrelfish/lmp_chan_arch.h	69;"	d
 lmp_err_is_transient	include/barrelfish/lmp_chan.h	/^static inline bool lmp_err_is_transient(errval_t err)$/;"	f
 lmp_hint	include/barrelfish_kpi/dispatcher_shared.h	/^    lvaddr_t    lmp_hint;                       \/\/\/< Hint for location of LMP$/;"	m	struct:dispatcher_shared_generic
@@ -30136,6 +30142,8 @@ main	tools/schedsim/simulator.c	/^int main(int argc, char **argv)$/;"	f
 main	tools/tracing/analyze_traces.py	/^def main():$/;"	f
 main	usr/init/init.c	/^int main(int argc, char *argv[])$/;"	f
 main	usr/init_memtest/init.c	/^int main(int argc, char *argv[])$/;"	f
+main	usr/led_off/led_off.c	/^int main(int argc, char *argv[])$/;"	f
+main	usr/led_on/led_on.c	/^int main(int argc, char *argv[])$/;"	f
 main	usr/memeater/memeater.c	/^int main(int argc, char *argv[])$/;"	f
 main	usr/mmchs_driver/main.c	/^int main(int argc, char **argv)$/;"	f
 mainCanvas_AddChild	tools/demo/Aquarium/Window1.xaml.cs	/^        void mainCanvas_AddChild(UIElement uie)$/;"	m	class:Aquarium.Window1	file:
@@ -33554,6 +33562,7 @@ pidr1	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^pidr1: .equ	8$/;"	l
 pidr2	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^pidr2: .equ	9$/;"	l
 pidr3	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^pidr3: .equ	12			; Protection ID 3$/;"	l
 pidr4	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^pidr4: .equ	13			; Protection ID 4$/;"	l
+pids	lib/barrelfish/aos_rpc.c	/^static domainid_t pids[32];$/;"	v	file:
 pin	include/barrelfish/memobj.h	/^    errval_t (*pin)(struct memobj* memobj, struct vregion* region,$/;"	m	struct:memobj_funcs
 pinned_state	include/arch/arm/barrelfish/core_state_arch.h	/^    struct pinned_state pinned_state;$/;"	m	struct:core_state_arch	typeref:struct:core_state_arch::pinned_state
 pinned_state	include/arch/arm/barrelfish/core_state_arch.h	/^struct pinned_state {$/;"	s
@@ -35432,6 +35441,7 @@ recv_cptr	include/barrelfish_kpi/lmp.h	/^    capaddr_t     recv_cptr;  \/\/\/< C
 recv_data	lib/lwip/src/core/tcp_in.c	/^static struct pbuf *recv_data;$/;"	v	typeref:struct:pbuf	file:
 recv_flags	lib/lwip/src/core/tcp_in.c	/^static u8_t recv_flags;$/;"	v	file:
 recv_handler	lib/barrelfish/aos_rpc.c	/^static void recv_handler(void *arg) $/;"	f	file:
+recv_handler	usr/init/init.c	/^static void recv_handler(void *arg) $/;"	f	file:
 recv_raw	lib/lwip/src/api/api_msg.c	/^recv_raw(void *arg, struct raw_pcb *pcb, struct pbuf *p, struct ip_addr *addr)$/;"	f	file:
 recv_slot	include/barrelfish/lmp_endpoints.h	/^    struct capref recv_slot;\/\/\/< Receive slot$/;"	m	struct:lmp_endpoint	typeref:struct:lmp_endpoint::capref
 recv_slot	include/barrelfish_kpi/lmp.h	/^    capaddr_t     recv_slot;  \/\/\/< Slot number in #recv_cptr$/;"	m	struct:lmp_endpoint_kern
@@ -36146,6 +36156,7 @@ s_addr	lib/newlib/newlib/libc/machine/hppa/strncpy.S	/^#define	s_addr  r25$/;"	d
 s_highpc	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	/^static uintptr_t s_highpc = 0;$/;"	v	file:
 s_lowpc	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	/^static uintptr_t s_lowpc = 0;$/;"	v	file:
 s_textsize	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	/^static unsigned long s_textsize = 0;$/;"	v	file:
+s_waitset	include/barrelfish/aos_rpc.h	/^	struct waitset s_waitset;$/;"	m	struct:aos_rpc	typeref:struct:aos_rpc::waitset
 sa	include/lwip/tcp.h	/^        s16_t sa, sv;           \/* @todo document this *\/$/;"	m	struct:tcp_pcb
 sa1	lib/newlib/newlib/libm/math/s_erf.c	/^sa1  =  1.96512716674392571292e+01, \/* 0x4033A6B9, 0xBD707687 *\/$/;"	v	file:
 sa1	lib/newlib/newlib/libm/math/sf_erf.c	/^sa1  =  1.9651271820e+01, \/* 0x419d35ce *\/$/;"	v	file:
@@ -36537,6 +36548,7 @@ send_event	kernel/arch/omap44xx/start_aps.c	/^void send_event(void)$/;"	f
 send_filterID_for_deregistration	lib/net_device_manager/soft_filt_cl_impl.c	/^static errval_t send_filterID_for_deregistration(struct q_entry e)$/;"	f	file:
 send_filter_for_registration	lib/net_device_manager/soft_filt_cl_impl.c	/^static errval_t send_filter_for_registration(struct q_entry e)$/;"	f	file:
 send_filter_memory_cap	lib/net_device_manager/soft_filt_cl_impl.c	/^static errval_t send_filter_memory_cap(struct q_entry e)$/;"	f	file:
+send_handler	lib/barrelfish/aos_rpc.c	/^static void send_handler(void *arg) {$/;"	f	file:
 send_mac_address_request	lib/net_device_manager/soft_filt_cl_impl.c	/^static errval_t send_mac_address_request(struct q_entry e)$/;"	f	file:
 send_mac_address_response	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^static errval_t send_mac_address_response(struct q_entry entry)$/;"	f	file:
 send_new_buffer_id	lib/net_queue_manager/queue_manager.c	/^static errval_t send_new_buffer_id(struct q_entry entry)$/;"	f	file:
@@ -36833,6 +36845,7 @@ setup	tools/harness/tests/webserver.py	/^    def setup(self, *args):$/;"	m	class
 setup	tools/harness/tests/webserver.py	/^    def setup(self, build, machine, testdir):$/;"	m	class:WebCommon
 setupBootLoader	tools/arm_gem5/RealView.py	/^    def setupBootLoader(self, mem_bus, cur_sys, loc):$/;"	m	class:RealView
 setupBootLoader	tools/arm_gem5/RealView.py	/^    def setupBootLoader(self, mem_bus, cur_sys, loc):$/;"	m	class:VExpress_EMM
+setup_channel	usr/init/init.c	/^static errval_t setup_channel(void) {$/;"	f	file:
 setup_tcp	lib/lwip/src/api/api_msg.c	/^static void setup_tcp(struct netconn *conn)$/;"	f	file:
 setupper	lib/newlib/newlib/libm/test/test_is.c	/^int setupper;$/;"	v
 setutent	lib/newlib/newlib/libc/unix/getut.c	/^setutent ()$/;"	f
@@ -37856,6 +37869,7 @@ spawn_tokenize_cmdargs	lib/spawndomain/spawn.c	/^int spawn_tokenize_cmdargs(char
 spawn_unmap_module	lib/spawndomain/multiboot.c	/^errval_t spawn_unmap_module(lvaddr_t mapped_addr)$/;"	f
 spawn_vspace_map_fixed_one_frame	lib/spawndomain/spawn_vspace.c	/^errval_t spawn_vspace_map_fixed_one_frame(struct spawninfo *si, genvaddr_t addr,$/;"	f
 spawn_vspace_map_one_frame	lib/spawndomain/spawn_vspace.c	/^errval_t spawn_vspace_map_one_frame(struct spawninfo *si, genvaddr_t *retaddr,$/;"	f
+spawned_domain	lib/barrelfish/aos_rpc.c	/^static domainid_t spawned_domain;$/;"	v	file:
 spawninfo	include/spawndomain/spawndomain.h	/^struct spawninfo {$/;"	s
 spawntest	tools/harness/tests/__init__.py	/^    multihoptests, perfmontest, freemem, spawntest, spantest$/;"	i
 spc_trap	include/lwip/snmp_msg.h	/^        u32_t spc_trap;$/;"	m	struct:snmp_msg_trap
@@ -39698,6 +39712,7 @@ total	lib/newlib/newlib/libc/stdio/svfiscanf.c	/^  size_t total;$/;"	m	struct:fp
 total	lib/newlib/newlib/libc/stdio/svfscanf.c	/^  size_t total;$/;"	m	struct:fp	file:
 total	lib/newlib/newlib/libc/stdio/vfiscanf.c	/^  size_t total;$/;"	m	struct:fp	file:
 total	lib/newlib/newlib/libc/stdio/vfscanf.c	/^  size_t total;$/;"	m	struct:fp	file:
+total_domains	lib/barrelfish/aos_rpc.c	/^static int total_domains;$/;"	v	file:
 total_events	include/contmng/netbench.h	/^    uint32_t total_events;$/;"	m	struct:netbench_details
 total_frames_needed	include/barrelfish/red_black_tree.h	/^    int total_frames_needed;$/;"	m	struct:memory_chunk
 total_interrupt_time	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^uint64_t total_interrupt_time = 0;$/;"	v

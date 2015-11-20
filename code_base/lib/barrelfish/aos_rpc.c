@@ -27,11 +27,11 @@ static int total_domains;
 static char domain_name[32];
 
 static void send_handler(void *arg) {
-	
+
 	errval_t err;
 	struct lmp_chan *lc = arg;
 
-	err = lmp_chan_register_send(lc, get_default_waitset(),
+	err = lmp_chan_register_send(lc, &get_init_chan()->s_waitset,
 			MKCLOSURE(send_handler, arg));	
 	if (err_is_fail(err)) {
 		debug_printf("Error in re-registering send handler!\n");
@@ -151,19 +151,18 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
                              struct capref *retcap, size_t *ret_bits)
 {
-//	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
 	errval_t err;
 
 	// debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
-	
-	chan->rpc_channel.remote_cap = cap_initep;
 
-	do {
+	while (true) {
+		event_dispatch(&chan->s_waitset);
 		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
-			return err_push(err, AOS_RPC_GET_RAM_CAP);	
-	
-	} while (err_no(err) == 17) ;
+			return err_push(err, AOS_ERR_LMP_GET_CAP);	
+		else if (!err_is_fail(err)) 
+			break;
+	} 
 
 	event_dispatch(get_default_waitset());
 
@@ -384,6 +383,8 @@ errval_t aos_rpc_init(int slot_number)
         .arg = &memory_channel.rpc_channel,
     };
 		
+	waitset_init(&memory_channel.s_waitset);
+
 	err = lmp_chan_register_recv(&memory_channel.rpc_channel, get_default_waitset(), 
 			rpc_handler_init);
 	if (err_is_fail(err)) {
@@ -393,7 +394,7 @@ errval_t aos_rpc_init(int slot_number)
 
 	rpc_handler_init.handler = send_handler;
 	
-	err = lmp_chan_register_send(&memory_channel.rpc_channel, get_default_waitset(),
+	err = lmp_chan_register_send(&memory_channel.rpc_channel, &memory_channel.s_waitset,
 			rpc_handler_init);	
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in registering the channel for send_handler!\n");	

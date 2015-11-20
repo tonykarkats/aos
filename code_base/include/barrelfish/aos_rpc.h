@@ -46,6 +46,8 @@ struct aos_rpc {
 	struct lmp_chan rpc_channel;
 
 	struct thread_mutex lock;
+
+	struct waitset s_waitset;
 };
 
 /**
