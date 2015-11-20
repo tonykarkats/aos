@@ -26,6 +26,20 @@ static domainid_t pids[32];
 static int total_domains;
 static char domain_name[32];
 
+static void send_handler(void *arg) {
+	
+	errval_t err;
+	struct lmp_chan *lc = arg;
+
+	err = lmp_chan_register_send(lc, get_default_waitset(),
+			MKCLOSURE(send_handler, arg));	
+	if (err_is_fail(err)) {
+		debug_printf("Error in re-registering send handler!\n");
+	}
+
+	return; 
+}
+
 static void recv_handler(void *arg) 
 {
 //	debug_printf("recv_handler: Got a message or a cap!");
@@ -116,18 +130,18 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 			memcpy(buffer + 1, string + 32*s_chunk , last_chunk);
 		else 
 			memcpy(buffer + 1, string + 32*s_chunk, 32);
-	
-		err = lmp_chan_send(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
+
+		do {	
+			err = lmp_chan_send(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
 					  buffer[0] , buffer[1],buffer[2],
 					  buffer[3], buffer[4],buffer[5],
 					  buffer[6], buffer[7],buffer[8]);
-		if (err_is_fail(err)) {
-			DEBUG_ERR(err, "Error in sending the string!\n");
-			return AOS_ERR_LMP_SEND_FAILURE;
-		}
-
+			if ((err_no(err) != 17)&&(err_is_fail(err)))
+				return err_push(err, AOS_RPC_SEND_STRING);	
+		} while (err_no(err) == 17);
+				
 		event_dispatch(get_default_waitset());
-	}
+	} 	
 	
 	return SYS_ERR_OK;
 }
@@ -143,25 +157,26 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 	// debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
 	
 	chan->rpc_channel.remote_cap = cap_initep;
+
+	do {
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
+		if ((err_no(err) != 17)&&(err_is_fail(err)))
+			return err_push(err, AOS_RPC_GET_RAM_CAP);	
 	
-	err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
- 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Could not sent request for memory in the server!\n");
-		return AOS_ERR_LMP_SEND_FAILURE;
-	}
+	} while (err_no(err) == 17) ;
 
 	event_dispatch(get_default_waitset());
 
 	if (capref_is_null(ram_cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
    		*ret_bits = 0;
-	 	return LIB_ERR_RAM_ALLOC;
+	 	return AOS_RPC_GET_RAM_CAP;
 	}
 
 	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
 	
 	*retcap = ram_cap;
-	return SYS_ERR_OK;
+	return err;
 
 }
 
@@ -178,11 +193,13 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 {
    	errval_t err;
 		
-	err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_CHAR);	
- 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
-		return AOS_ERR_LMP_SEND_FAILURE;
-	}
+	do {
+		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_CHAR);	
+		if ((err_no(err) != 17)&&(err_is_fail(err)))
+			return err_push(err, AOS_ERR_LMP_PUT_CHAR);	
+	
+	} while (err_no(err) == 17) ;
+
 
 	//debug_printf("BEFORE WAITSET!\n");	
 
@@ -200,12 +217,18 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 {
 	errval_t err;
-		
-	err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
- 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Could not send char to serial driver service for output!\n");
+	
+	do {	
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
+		if ((err_no(err) != 17)&&(err_is_fail(err)))
+			return err_push(err, AOS_ERR_LMP_PUT_CHAR);	
+	
+	} while (err_no(err) == 17) ;
+
+
+
 		return AOS_ERR_LMP_SEND_FAILURE;
-	}
+	
 
 	// event_dispatch(get_default_waitset());
 	
@@ -225,16 +248,15 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
     memcpy(buffer + 1, name, name_length);
 
     //Maybe use fixed buffer[9] for send?
-
-    err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, buffer[0], 
+	
+   	err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, buffer[0], 
 					  buffer[1],buffer[2],
                       buffer[3], buffer[4],buffer[5],
                       buffer[6], buffer[7],buffer[8]);
     if (err_is_fail(err)) {
-        debug_printf("aos_rpc_process_spawn: Error in sending request\n");
-        return AOS_ERR_LMP_SEND_FAILURE;
+       	debug_printf("aos_rpc_process_spawn: Error in sending request\n");
+       	return AOS_ERR_LMP_SEND_FAILURE;
     }
-
     event_dispatch(get_default_waitset());
 
    	debug_printf("Spawned process with pid = %d\n", spawned_domain);
@@ -362,10 +384,20 @@ errval_t aos_rpc_init(int slot_number)
         .arg = &memory_channel.rpc_channel,
     };
 		
-	err = lmp_chan_register_recv(&memory_channel.rpc_channel, get_default_waitset(), rpc_handler_init);
+	err = lmp_chan_register_recv(&memory_channel.rpc_channel, get_default_waitset(), 
+			rpc_handler_init);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in registering the channel for recv_handler!\n");	
 		return LIB_ERR_CHAN_REGISTER_RECV;
+	}
+
+	rpc_handler_init.handler = send_handler;
+	
+	err = lmp_chan_register_send(&memory_channel.rpc_channel, get_default_waitset(),
+			rpc_handler_init);	
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Error in registering the channel for send_handler!\n");	
+		return LIB_ERR_NO_LMP_BIND_HANDLER;
 	}
 
 	set_init_chan(&memory_channel);

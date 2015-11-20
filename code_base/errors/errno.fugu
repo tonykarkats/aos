@@ -925,4 +925,12 @@ errors common ERR_ {
 errors aos AOS_ERR_ {
     failure LMP_SEND_FAILURE        "Failure while sending AOS LMP message",
     failure LMP_MSGTYPE_UNKNOWN     "Unknown message type for AOS LMP implementation",
+
+    failure LMP_GET_CAP_     "Unknown message type for AOS LMP implementation",
+    failure LMP_SEND_STRING   "Unknown message type for AOS LMP implementation",
+    failure LMP_PUT_CHAR     "Unknown message type for AOS LMP implementation",
+    failure LMP_GET_CHAR     "Unknown message type for AOS LMP implementation",
+    failure LMP_SPAWN_DOM     "Unknown message type for AOS LMP implementation",
+	failure LMP_GET_PIDS     "Unknown message type for AOS LMP implementation",
+    failure LMP_GET_NAME     "Unknown message type for AOS LMP implementation",
 };
