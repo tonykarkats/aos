@@ -13,6 +13,6 @@
 
 int main(int argc, char *argv[])
 {
-	printf("Hello world from led OFF!\n");
+	debug_printf("Hello world from led OFF!\n");
     return 0;
 }

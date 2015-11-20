@@ -149,7 +149,7 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 	l2_index = ARM_L2_USER_OFFSET(start_address);	
 	err = vnode_map( get_l2_table(start_address, st), usercap, l2_index, mapping_flags, offset, first_l2_total_pages);
 	if (err_is_fail(err)) {
-		DEBUG_ERR(err, "Failed in mapping first l2 table!\n");
+		DEBUG_ERR(err, "Failed in mapping first l2 table %s\n", err_getstring(err));
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
 	offset = first_l2_total_pages * 4096;

@@ -49,13 +49,16 @@ static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
 
-static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)
+static errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si)
 {
+	// debug_printf("bootstrap_domain: Starting... Address of domain_si %p and name %p\n", domain_si, name);
+	
 	errval_t err;
 	char prefix[12] = "armv7/sbin/";	
 
 	char * module_name = strcat(prefix, name);
-	
+
+	// debug_printf("Before spawning the module!\n");	
 	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
@@ -164,7 +167,7 @@ static void recv_handler(void *arg)
 				if (ret_char != NULL)
 					break;
 			}
-				
+			
 			if (in_c != 13)
 				serial_putchar(in_c);
 			else { 
@@ -324,15 +327,17 @@ int main(int argc, char *argv[])
 	err = bootstrap_domain("memeater", &mem_si);
 	assert(err_is_ok(err));
 
+	//char led_on[7] = "led_on";
+	// const char led_off[7] = "led_off";
 	
 	//debug_printf("Spawning led_on!\n");
 	//struct spawninfo l_si;
-	//err = bootstrap_domain("led_on", &l_si);
+	//err = bootstrap_domain(led_on, &l_si);
 	//assert(err_is_ok(err));
 	
 	//debug_printf("Spawning led_off\n");
 	//struct spawninfo loff_si;
-	//err = bootstrap_domain("led_off", &loff_si);
+	//err = bootstrap_domain(led_on, &loff_si);
 	//assert(err_is_ok(err));
 	
 	//err = spawn_run(&mem_si);	

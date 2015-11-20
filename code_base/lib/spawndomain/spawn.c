@@ -730,6 +730,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
                                   const char *name, coreid_t coreid)
 {
     errval_t err;
+	
+	// debug_printf("spawn_load_with_bootinfo: Spawninfo at address %p \n", si);
 
     /* Get the module from the multiboot */
     struct mem_region *module = multiboot_find_module(bi, name);
@@ -738,6 +740,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return SPAWN_ERR_FIND_MODULE;
     }
 
+	// debug_printf("module find... moving on..\n");
     /* Lookup and map the elf image */
     lvaddr_t binary;
     size_t binary_size;
@@ -746,6 +749,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_ELF_MAP);
     }
 
+	// debug_printf("module mapped... moving on!\n");
     /* Determine cpu type */
     err = spawn_determine_cputype(si, binary);
     if (err_is_fail(err)) {
@@ -757,6 +761,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_SETUP_CSPACE);
     }
+
+	// debug_printf("cspace is set up... moving on..\n");
 
     /* Initialize vspace */
     err = spawn_setup_vspace(si);
@@ -816,8 +822,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_GET_CMDLINE_ARGS);
     }
 
-
-    // Lop off the name
+	// Lop off the name
     char *multiboot_args_lop = strchr(multiboot_args, ' ');
     if (multiboot_args_lop) {
         multiboot_args_lop++;
@@ -839,7 +844,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     // unmap bootinfo module pages
     spawn_unmap_module(binary);
 
-	// debug_printf("spawn with bootinfo returning!\n");
+	debug_printf("spawn with bootinfo returning!\n");
 	return SYS_ERR_OK;
 }
 
