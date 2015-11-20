@@ -118,7 +118,7 @@ static void recv_handler(void *arg)
 			serial_putstring(message_string);
 	
 		    // debug_printf("Message string = %s\n", message_string);	
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_SEND_STRING);
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
 			
@@ -138,7 +138,7 @@ static void recv_handler(void *arg)
 				returned_cap = NULL_CAP;	
 			}
 				
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap, AOS_RPC_GET_RAM_CAP);	 
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 			break;
@@ -171,8 +171,8 @@ static void recv_handler(void *arg)
 				serial_putchar('\n');
 				in_c = '\n';
 			}
-			
-			err = lmp_chan_send2(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_CHAR, in_c);
+				
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");
 			}	
@@ -187,7 +187,7 @@ static void recv_handler(void *arg)
 				*word = msg.words[i+1];   
 			}	
 				
-			debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
+			// debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
 		
 		 	struct spawninfo si;	
 			err = bootstrap_domain(message_string, &si);
@@ -198,10 +198,10 @@ static void recv_handler(void *arg)
 			else 
 				d_id = si.domain_id;
 
-			debug_printf("recv_handler: Spawned domain with id %zu!\n", si.domain_id);
+			 debug_printf("recv_handler: Spawned domain with id %zu!\n", si.domain_id);
 			
 			lc = &channel;
-			err = lmp_chan_send2(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_PROC_SPAWN, d_id);
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 			}		

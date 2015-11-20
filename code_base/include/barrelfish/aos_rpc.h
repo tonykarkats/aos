@@ -42,12 +42,14 @@
 #define AOS_RPC_PROC_GET_PIDS	 7
 
 struct aos_rpc {
-	struct lmp_chan init_channel;    
 	struct lmp_chan rpc_channel;
 
 	struct thread_mutex lock;
-
 	struct waitset s_waitset;
+
+	size_t message_length;	
+	uint32_t words[9];
+	struct capref cap;
 };
 
 /**

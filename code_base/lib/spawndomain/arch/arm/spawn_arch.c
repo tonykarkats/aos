@@ -208,7 +208,7 @@ errval_t spawn_arch_load(struct spawninfo *si,
     si->tls_init_base = 0;
     si->tls_init_len = si->tls_total_len = 0;
 
-    debug_printf("spawn_arch_load: about to load elf %p\n", elf_allocate);
+    // debug_printf("spawn_arch_load: about to load elf %p\n", elf_allocate);
     // Load the binary
     err = elf_load(EM_HOST, elf_allocate, si, binary, binary_size, entry);
     if (err_is_fail(err)) {

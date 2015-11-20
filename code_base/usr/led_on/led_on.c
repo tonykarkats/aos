@@ -14,6 +14,5 @@
 int main(int argc, char *argv[])
 {
 	debug_printf("Hello world from led ON!\n");
-	while(1);
     return 0;
 }

@@ -71,7 +71,7 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
     // Get virtual address range to hold the module
 //    debug_printf("%s %d\n", __FILE__, __LINE__);
     void *vaddr_range;
-	debug_printf("spawn_map_module: Mapping module in our vspace with size = %zu\n", size);
+	//debug_printf("spawn_map_module: Mapping module in our vspace with size = %zu\n", size);
     err = paging_alloc(get_current_paging_state(), &vaddr_range, size);
     if (err_is_fail(err)) {
         printf("spawn_map_module: paging_alloc failed\n");

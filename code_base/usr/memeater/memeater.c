@@ -45,18 +45,7 @@ int main(int argc, char *argv[])
 {
 	
 	errval_t err;
-	domainid_t dom;
-	//domainid_t *dids[7];
-	//size_t count;
-	// char *name;
-	err = aos_rpc_process_spawn(get_init_chan(), "led_on", &dom);
-
-	err = aos_rpc_process_spawn(get_init_chan(), "led_off", &dom);
 	
-	// err = aos_rpc_process_get_all_pids(get_init_chan(), dids, &count);
-	//err = aos_rpc_process_get_name(get_init_chan(), 42, &name);
-
-	while(1);
 	char command[1024];
 	const char space_token[2] = " ";
 	char *token;
@@ -66,6 +55,9 @@ int main(int argc, char *argv[])
 		memset(command, 0, 1024);
 		gets(command);
 		
+		if (!strcmp(command, "\n"))
+			continue;
+	
 		token = strtok(command, space_token);
 		
 		if (!strcmp("echo", token)) {
@@ -79,10 +71,17 @@ int main(int argc, char *argv[])
 			int ret_val;
 			thread_join(t, &ret_val);
 		}
-		else if (!strcmp("exit", token)) {
-			printf("BY BY BABY!\n");
-			break;
-		}
+		else if (!strcmp("spawn", token)) {
+			token = strtok(NULL, space_token);
+			domainid_t pid;
+			
+			err = aos_rpc_process_spawn(get_init_chan(), token, &pid);
+			if (err_is_fail(err) || (pid == -1))
+				printf("Could not spawn domain [%s]\n", token);
+			else 
+				printf("Domain spawned with pid = %d\n", pid);
+			
+		}	
 	}
 	
 

@@ -270,7 +270,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 void barrelfish_init_disabled(dispatcher_handle_t handle, bool init_dom_arg);
 void barrelfish_init_disabled(dispatcher_handle_t handle, bool init_dom_arg)
 {
-	debug_printf("barrelfish_init_disabled: Initializing...\n");
+	// debug_printf("barrelfish_init_disabled: Initializing...\n");
 	
     init_domain = init_dom_arg;
     disp_init_disabled(handle);

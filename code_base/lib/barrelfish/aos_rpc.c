@@ -18,8 +18,6 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-static char rpc_char;
-static struct capref ram_cap;
 static struct aos_rpc memory_channel;
 static domainid_t spawned_domain;
 static domainid_t pids[32];
@@ -58,19 +56,26 @@ static void recv_handler(void *arg)
 		MKCLOSURE(recv_handler, arg));	
 
 	int message_length = msg.buf.msglen;
-	
 	int string_length = message_length - 1;
-	//char message_string[string_length * 4];
-		
-	// uint32_t rpc_operation = msg.words[0];
+	
+ 	struct aos_rpc * rpc_channel = get_init_chan();
+
+	rpc_channel->message_length = msg.buf.msglen;
+	rpc_channel->cap = cap;
+	for (int i = 0; i < msg.buf.msglen; i++)	
+		rpc_channel->words[i] = msg.words[i];
+
+	if (!capref_is_null(cap)) {
+		err = lmp_chan_alloc_recv_slot(lc);
+		if (err_is_fail(err)) {
+			debug_printf("Error in allocating capability slot in the channel!\n");
+		}
+	}
+
+	return ;	
+
 	// debug_printf("msg buflen %zu\n", msg.buf.msglen);
 	switch (msg.words[0]) {
-		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
-			ram_cap = cap;
-			break;
-		case AOS_RPC_GET_CHAR: ;
-			rpc_char = (char) msg.words[1];
-			break;
 		case AOS_RPC_SEND_STRING: ;
 			break;
 		case AOS_RPC_PROC_SPAWN: ;
@@ -166,15 +171,16 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 
 	event_dispatch(get_default_waitset());
 
-	if (capref_is_null(ram_cap))  {
+	struct capref cap = chan->cap;
+
+	if (capref_is_null(cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
    		*ret_bits = 0;
-	 	return AOS_RPC_GET_RAM_CAP;
+	 	*retcap = NULL_CAP;
+		return err_push(err, AOS_ERR_LMP_GET_CAP);
 	}
 
-	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
-	
-	*retcap = ram_cap;
+	*retcap = cap;
 	return err;
 
 }
@@ -182,33 +188,54 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
                              size_t length, struct capref *retcap,
                              size_t *retlen)
-{
-    // TODO (milestone 4): implement functionality to request device memory
-    // capability.
-    return SYS_ERR_OK;
+{	
+	return SYS_ERR_OK;
+	/*
+	errval_t err;
+	
+	while (true) {
+		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
+		if ((err_no(err) != 17)&&(err_is_fail(err)))
+			return err_push(err, AOS_ERR_LMP_GET_CAP);	
+		else if (!err_is_fail(err)) 
+			break;
+	} 
+
+	event_dispatch(get_default_waitset());
+
+	struct capref cap = chan->cap;
+
+	if (capref_is_null(cap))  {
+		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
+   		*ret_bits = 0;
+	 	*retcap = NULL_CAP;
+		return err_push(err, AOS_ERR_LMP_GET_CAP);
+	}
+
+	*retcap = cap;
+	return err;
+	*/ 
+
 }
 
 errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 {
    	errval_t err;
 		
-	do {
+	while(true) {
+		event_dispatch(&chan->s_waitset);
 		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_CHAR);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
-			return err_push(err, AOS_ERR_LMP_PUT_CHAR);	
-	
-	} while (err_no(err) == 17) ;
-
-
-	//debug_printf("BEFORE WAITSET!\n");	
+			return err_push(err, AOS_ERR_LMP_GET_CHAR);	
+		else if (!err_is_fail(err))
+			break;	
+	};
 
 	event_dispatch(get_default_waitset());
 
-	//debug_printf("SERVER RESPONDED WITH CHAR = %c!\n", rpc_char);	
-
-
-	*retc = rpc_char;	
-		
+	*retc = (char) chan->words[0];
+	
 	return SYS_ERR_OK;
 }
 
@@ -217,20 +244,15 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 {
 	errval_t err;
 	
-	do {	
+	while(true) {
+		event_dispatch(&chan->s_waitset);	
 		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_PUT_CHAR);	
-	
-	} while (err_no(err) == 17) ;
+		else if (!err_is_fail(err))
+			break;
+	}
 
-
-
-		return AOS_ERR_LMP_SEND_FAILURE;
-	
-
-	// event_dispatch(get_default_waitset());
-	
 	return SYS_ERR_OK;
 }
 
@@ -240,27 +262,29 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 	errval_t err;
     uint32_t buffer[9];
     size_t name_length = strlen(name);
-
+	
     assert(name_length <= 32);
 
     buffer[0] = AOS_RPC_PROC_SPAWN;
-    memcpy(buffer + 1, name, name_length);
+    memcpy(buffer + 1, name, name_length+1);
 
-    //Maybe use fixed buffer[9] for send?
-	
-   	err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, buffer[0], 
-					  buffer[1],buffer[2],
-                      buffer[3], buffer[4],buffer[5],
-                      buffer[6], buffer[7],buffer[8]);
-    if (err_is_fail(err)) {
-       	debug_printf("aos_rpc_process_spawn: Error in sending request\n");
-       	return AOS_ERR_LMP_SEND_FAILURE;
-    }
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 
+						  buffer[0], buffer[1],buffer[2],
+        	              buffer[3], buffer[4],buffer[5],
+        	              buffer[6], buffer[7],buffer[8]);
+    	if (err_is_fail(err)) {
+       		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
+       		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
+    	}
+		else if (err_is_ok(err))
+			break;
+	}
+
     event_dispatch(get_default_waitset());
 
-   	debug_printf("Spawned process with pid = %d\n", spawned_domain);
-
-	*newpid = spawned_domain;
+	*newpid = chan->words[0];
 
     return SYS_ERR_OK;
 }
@@ -358,7 +382,7 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
 errval_t aos_rpc_init(int slot_number)
 {
 	errval_t err;
-	
+		
 	lmp_chan_init(&memory_channel.rpc_channel);
 	
 	memory_channel.rpc_channel.remote_cap = cap_initep;	

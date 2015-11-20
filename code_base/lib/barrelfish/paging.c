@@ -388,7 +388,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
         struct capref pdir)
 {
 	
-    debug_printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
+    // debug_printf("paging_init: Initialzing the red-black tree that holds the paging state\n");
 
 	assert(st != NULL);
 	// Keep in paging state the l1 table

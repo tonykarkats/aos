@@ -765,7 +765,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     }
 
    
-	debug_printf("Setted vpspace ready to load the image...\n"); 
+	// debug_printf("Setted vpspace ready to load the image...\n"); 
 	/* Load the image */
     genvaddr_t entry;
     void* arch_info;
@@ -773,7 +773,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_LOAD);
     }
-	debug_printf("Image loaded ready to set up the dispatcher!\n");
+	// debug_printf("Image loaded ready to set up the dispatcher!\n");
 
     /* Setup dispatcher frame */
     err = spawn_setup_dispatcher(si, coreid, name, entry, arch_info);
@@ -781,7 +781,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_SETUP_DISPATCHER);
     }
 
-	debug_printf("Dispatcher is set up !\n");
+	// debug_printf("Dispatcher is set up !\n");
     // Map bootinfo 
     // XXX: Confusion address translation about l/gen/addr in entry
     genvaddr_t vaddr;
@@ -839,7 +839,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     // unmap bootinfo module pages
     spawn_unmap_module(binary);
 
-	debug_printf("spawn with bootinfo returning!\n");
+	// debug_printf("spawn with bootinfo returning!\n");
 	return SYS_ERR_OK;
 }
 
