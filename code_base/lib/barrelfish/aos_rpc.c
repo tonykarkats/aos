@@ -24,6 +24,7 @@ static struct aos_rpc memory_channel;
 static domainid_t spawned_domain;
 static domainid_t pids[32];
 static int total_domains;
+static char domain_name[32];
 
 static void recv_handler(void *arg) 
 {
@@ -42,7 +43,13 @@ static void recv_handler(void *arg)
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));	
 
-	//debug_printf("msg buflen %zu\n", msg.buf.msglen);
+	int message_length = msg.buf.msglen;
+	
+	int string_length = message_length - 1;
+	//char message_string[string_length * 4];
+		
+	// uint32_t rpc_operation = msg.words[0];
+	// debug_printf("msg buflen %zu\n", msg.buf.msglen);
 	switch (msg.words[0]) {
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			ram_cap = cap;
@@ -56,11 +63,20 @@ static void recv_handler(void *arg)
 			spawned_domain = (domainid_t) msg.words[1];
 			break;
 		case AOS_RPC_PROC_GET_NAME:
+		  			
+			for (int i = 0; i< string_length; i++) {
+				uint32_t * word = (uint32_t *) (domain_name + i*4);
+				*word = msg.words[i+1];   
+			}
+			// debug_printf("ALL READ %s\n", domain_name);
 			break;
 		case AOS_RPC_PROC_GET_PIDS: ;
 			total_domains = (int) msg.words[1];
-			for (int i = 0; i < total_domains; i++)
+			debug_printf("Received %d\n", total_domains);
+			for (int i = 0; i < total_domains; i++) {
+				debug_printf("Pid = %d\n", msg.words[i+2]);
 				pids[i] = msg.words[i+2];
+			}
 			break;
 	}
 
@@ -199,7 +215,7 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
                                domainid_t *newpid)
 {
-errval_t err;
+	errval_t err;
     uint32_t buffer[9];
     size_t name_length = strlen(name);
 
@@ -210,8 +226,8 @@ errval_t err;
 
     //Maybe use fixed buffer[9] for send?
 
-    err = lmp_chan_send(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
-                      buffer[0] , buffer[1],buffer[2],
+    err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, buffer[0], 
+					  buffer[1],buffer[2],
                       buffer[3], buffer[4],buffer[5],
                       buffer[6], buffer[7],buffer[8]);
     if (err_is_fail(err)) {
@@ -221,12 +237,9 @@ errval_t err;
 
     event_dispatch(get_default_waitset());
 
-    //if (spawned_domain == -1)
-    //    debug_printf("Failure in spawning process %s\n", name);
-    //else
-    //    debug_printf("Spawned process %s with pid = %d\n", spawned_domain);
-	
-	//*newpid = spawned_domain;
+   	debug_printf("Spawned process with pid = %d\n", spawned_domain);
+
+	*newpid = spawned_domain;
 
     return SYS_ERR_OK;
 }
@@ -244,8 +257,9 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
 
     event_dispatch(get_default_waitset());
    
-	// debug_printf("Client: Process with pid = %d has name = %s\n", *name);
-    
+	debug_printf("Client: Process with %s\n", domain_name);
+    	
+	*name = domain_name;
     return SYS_ERR_OK;
 }
 
@@ -262,14 +276,15 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 
     event_dispatch(get_default_waitset());
 
-    debug_printf("-------PROCESS LIST-------\n");
+    debug_printf("-------PROCESS LIST TOTAL DOMAINS %d-------\n", total_domains);
     debug_printf("--------------------------\n");
+
+	for (size_t i=0; i < total_domains; i++) {
+        debug_printf("%zu\n", pids[i]);
+	}
 
 	*pid_count = total_domains;
     *pids_returned = pids;
-	for (size_t i=0; i < total_domains; i++) {
-        debug_printf("%d\n", &pids[i]);
-	}
 
     return SYS_ERR_OK;
 }

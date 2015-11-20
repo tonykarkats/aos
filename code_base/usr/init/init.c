@@ -47,7 +47,6 @@ struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
-static struct spawninfo si;
 
 
 static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)
@@ -68,6 +67,8 @@ static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)
 		debug_printf("bootstrap_domain: Error in spawn run!\n");
 		return err;
 	}
+
+	err = spawn_free(domain_si);
 	
 	return SYS_ERR_OK;
 }
@@ -187,18 +188,20 @@ static void recv_handler(void *arg)
 			}	
 				
 			debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
-		// 	struct spawninfo si;	
+		
+		 	struct spawninfo si;	
 			err = bootstrap_domain(message_string, &si);
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Can not spawn process for the client! \n");
 				d_id = -1;	
 			}
 			else 
-				d_id = -1 ;//si.domain_id;
+				d_id = si.domain_id;
 
 			debug_printf("recv_handler: Spawned domain with id %zu!\n", si.domain_id);
 			
-			err = lmp_chan_send3(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_PROC_SPAWN, 'c', 'b');
+			lc = &channel;
+			err = lmp_chan_send2(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_PROC_SPAWN, d_id);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 			}		
@@ -347,3 +350,4 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+

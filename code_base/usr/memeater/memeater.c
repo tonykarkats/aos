@@ -46,8 +46,12 @@ int main(int argc, char *argv[])
 	
 	errval_t err;
 	domainid_t dom;
-
-	 err = aos_rpc_process_spawn(get_init_chan(), "led_on", &dom);
+	//domainid_t *dids[7];
+	//size_t count;
+	// char *name;
+	err = aos_rpc_process_spawn(get_init_chan(), "led_on", &dom);
+	// err = aos_rpc_process_get_all_pids(get_init_chan(), dids, &count);
+	//err = aos_rpc_process_get_name(get_init_chan(), 42, &name);
 
 	while(1);
 	char command[1024];

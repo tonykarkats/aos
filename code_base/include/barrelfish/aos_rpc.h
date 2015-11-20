@@ -40,6 +40,7 @@
 #define AOS_RPC_PROC_SPAWN	 5
 #define AOS_RPC_PROC_GET_NAME	 6
 #define AOS_RPC_PROC_GET_PIDS	 7
+
 struct aos_rpc {
 	struct lmp_chan init_channel;    
 	struct lmp_chan rpc_channel;

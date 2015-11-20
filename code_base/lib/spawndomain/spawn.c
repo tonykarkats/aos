@@ -758,7 +758,6 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_SETUP_CSPACE);
     }
 
-
     /* Initialize vspace */
     err = spawn_setup_vspace(si);
     if (err_is_fail(err)) {

@@ -18,7 +18,7 @@
 #include <barrelfish/syscall_arch.h>
 #include <barrelfish/caddr.h>
 #include <barrelfish_kpi/lmp.h>
-
+#include <barrelfish/debug.h>
 /**
  * \brief Send a message on the given LMP channel, if possible
  *
@@ -48,7 +48,8 @@ lmp_ep_send(
     uintptr_t arg9
     )
 {
-    uint8_t invoke_bits = get_cap_valid_bits(ep);
+    // debug_printf("IN lmp_ep_send!\n");
+	uint8_t invoke_bits = get_cap_valid_bits(ep);
     capaddr_t invoke_cptr = get_cap_addr(ep) >> (CPTR_BITS - invoke_bits);
 
     uint8_t send_bits = get_cap_valid_bits(send_cap);
