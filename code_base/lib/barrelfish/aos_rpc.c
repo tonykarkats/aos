@@ -38,8 +38,11 @@ static void recv_handler(void *arg)
 		lmp_chan_register_recv(lc,get_default_waitset(),
 							MKCLOSURE(recv_handler, arg));
 	}
-	
-//	debug_printf("msg buflen %zu\n", msg.buf.msglen);
+
+	lmp_chan_register_recv(lc, get_default_waitset(),
+		MKCLOSURE(recv_handler, arg));	
+
+	//debug_printf("msg buflen %zu\n", msg.buf.msglen);
 	switch (msg.words[0]) {
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			ram_cap = cap;
@@ -60,9 +63,6 @@ static void recv_handler(void *arg)
 				pids[i] = msg.words[i+2];
 			break;
 	}
-
-	lmp_chan_register_recv(lc, get_default_waitset(),
-		MKCLOSURE(recv_handler, arg));	
 
 }
 
@@ -141,7 +141,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
    		*ret_bits = 0;
 	 	return LIB_ERR_RAM_ALLOC;
 	}
-	
+
 	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
 	
 	*retcap = ram_cap;
@@ -221,13 +221,12 @@ errval_t err;
 
     event_dispatch(get_default_waitset());
 
-    // If new_pid == -1 then the server responded with FAILURE
-    if (spawned_domain == -1)
-        debug_printf("Failure in spawning process %s\n", name);
-    else
-        debug_printf("Spawned process %s with pid = %d\n", spawned_domain);
+    //if (spawned_domain == -1)
+    //    debug_printf("Failure in spawning process %s\n", name);
+    //else
+    //    debug_printf("Spawned process %s with pid = %d\n", spawned_domain);
 	
-	*newpid = spawned_domain;
+	//*newpid = spawned_domain;
 
     return SYS_ERR_OK;
 }

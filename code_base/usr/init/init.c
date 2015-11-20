@@ -47,6 +47,8 @@ struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
+static struct spawninfo si;
+
 
 static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)
 {
@@ -177,19 +179,30 @@ static void recv_handler(void *arg)
 			serial_putstring(RESET); 
 			break;
 		case AOS_RPC_PROC_SPAWN:;
-
+			domainid_t d_id;
+			
 			for (int i = 0; i<string_length; i++){
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
 				
-			debug_printf("recv_handler: Request for starting process with name '%s' !\n", message_string);
-			struct spawninfo si;	
+			debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
+		// 	struct spawninfo si;	
 			err = bootstrap_domain(message_string, &si);
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Can not spawn process for the client! \n");
+				d_id = -1;	
 			}
+			else 
+				d_id = -1 ;//si.domain_id;
+
+			debug_printf("recv_handler: Spawned domain with id %zu!\n", si.domain_id);
 			
+			err = lmp_chan_send3(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_PROC_SPAWN, 'c', 'b');
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+			}		
+	
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
 			break;
