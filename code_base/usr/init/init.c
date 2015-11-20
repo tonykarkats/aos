@@ -48,6 +48,28 @@ static coreid_t my_core_id;
 static struct lmp_chan channel ;
 static struct serial_ring_buffer ring;
 
+static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)
+{
+	errval_t err;
+	char prefix[12] = "armv7/sbin/";	
+
+	char * module_name = strcat(prefix, name);
+	
+	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id);
+	if (err_is_fail(err)) {
+		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
+		return err;
+	}
+
+	err = spawn_run(domain_si);
+	if (err_is_fail(err)) {
+		debug_printf("bootstrap_domain: Error in spawn run!\n");
+		return err;
+	}
+	
+	return SYS_ERR_OK;
+}
+
 static void recv_handler(void *arg) 
 {
 		
@@ -93,7 +115,7 @@ static void recv_handler(void *arg)
 			serial_putstring(message_string);
 	
 		    // debug_printf("Message string = %s\n", message_string);	
-			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_SEND_STRING);
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
 			
@@ -105,7 +127,7 @@ static void recv_handler(void *arg)
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 
-			debug_printf("recv_handler: Requested for size %d\n", size_requested );	
+			// debug_printf("recv_handler: Requested for size %d\n", size_requested );	
 		
 			err = ram_alloc(&returned_cap, size_requested); 
 			if (err_is_fail(err)) {
@@ -113,7 +135,7 @@ static void recv_handler(void *arg)
 				returned_cap = NULL_CAP;	
 			}
 				
-			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap, AOS_RPC_GET_RAM_CAP);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 			break;
@@ -147,18 +169,29 @@ static void recv_handler(void *arg)
 				in_c = '\n';
 			}
 			
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
+			err = lmp_chan_send2(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, AOS_RPC_GET_CHAR, in_c);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send character back to client!\n");
 			}	
 
 			serial_putstring(RESET); 
 			break;
-		case AOS_RPC_PROC_SPAWN:
-			;
+		case AOS_RPC_PROC_SPAWN:;
+
+			for (int i = 0; i<string_length; i++){
+				uint32_t * word = (uint32_t *) (message_string + i*4);
+				*word = msg.words[i+1];   
+			}	
+				
+			debug_printf("recv_handler: Request for starting process with name '%s' !\n", message_string);
+			struct spawninfo si;	
+			err = bootstrap_domain(message_string, &si);
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not spawn process for the client! \n");
+			}
+			
 			break;
-		case AOS_RPC_PROC_GET_NAME:
-			;
+		case AOS_RPC_PROC_GET_NAME:;
 			break;
 		case AOS_RPC_PROC_GET_PIDS:
 			;
@@ -212,23 +245,6 @@ static errval_t setup_channel(void) {
 		
 	return SYS_ERR_OK;	
 }
-
-static errval_t bootstrap_domain(char *name, struct spawninfo *domain_si)
-{
-	errval_t err;
-	char prefix[12] = "armv7/sbin/";	
-
-	char * module_name = strcat(prefix, name);
-	
-	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
-		abort();
-	}
-
-	return SYS_ERR_OK;
-}
-
 int main(int argc, char *argv[])
 {
     errval_t err;
@@ -303,7 +319,7 @@ int main(int argc, char *argv[])
 	//err = bootstrap_domain("led_off", &loff_si);
 	//assert(err_is_ok(err));
 	
-	err = spawn_run(&mem_si);	
+	//err = spawn_run(&mem_si);	
 	//err = spawn_run(&l_si);	
 	//err = spawn_run(&loff_si);	
 

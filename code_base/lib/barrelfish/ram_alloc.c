@@ -254,7 +254,7 @@ errval_t ram_alloc_set(ram_alloc_func_t local_allocator)
 
     struct aos_rpc *ic = get_init_chan();
     assert(ic);
-	debug_printf("ram_alloc_set: Setting our ram alloc to talk with server!\n");
+	// debug_printf("ram_alloc_set: Setting our ram alloc to talk with server!\n");
     ram_alloc_state->ram_alloc_func = server_ram_alloc;
     return SYS_ERR_OK;
 }

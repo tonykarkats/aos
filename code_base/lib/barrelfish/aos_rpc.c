@@ -21,6 +21,9 @@
 static char rpc_char;
 static struct capref ram_cap;
 static struct aos_rpc memory_channel;
+static domainid_t spawned_domain;
+static domainid_t pids[32];
+static int total_domains;
 
 static void recv_handler(void *arg) 
 {
@@ -37,15 +40,30 @@ static void recv_handler(void *arg)
 	}
 	
 //	debug_printf("msg buflen %zu\n", msg.buf.msglen);
-
-	if (!capref_is_null(cap)) 
-		ram_cap = cap;	
-	
-	if (msg.buf.msglen != 0)
-		rpc_char = (char) msg.words[0];
+	switch (msg.words[0]) {
+		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
+			ram_cap = cap;
+			break;
+		case AOS_RPC_GET_CHAR: ;
+			rpc_char = (char) msg.words[1];
+			break;
+		case AOS_RPC_SEND_STRING: ;
+			break;
+		case AOS_RPC_PROC_SPAWN: ;
+			spawned_domain = (domainid_t) msg.words[1];
+			break;
+		case AOS_RPC_PROC_GET_NAME:
+			break;
+		case AOS_RPC_PROC_GET_PIDS: ;
+			total_domains = (int) msg.words[1];
+			for (int i = 0; i < total_domains; i++)
+				pids[i] = msg.words[i+2];
+			break;
+	}
 
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));	
+
 }
 
 errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
@@ -106,7 +124,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 //	debug_printf("aos_rpc_get_ram_cap: Initiating...\n");
 	errval_t err;
 
-	debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
+	// debug_printf("aos_rpc_get_ram_cap: request for %d in bits!\n", request_bits);		
 	
 	chan->rpc_channel.remote_cap = cap_initep;
 	
@@ -123,8 +141,6 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
    		*ret_bits = 0;
 	 	return LIB_ERR_RAM_ALLOC;
 	}
-	else 
-		debug_printf("aos_rpc_get_ram_cap: Server responded with a memory region!\n");
 	
 	lmp_chan_alloc_recv_slot(&chan->rpc_channel);	
 	
@@ -183,22 +199,79 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
                                domainid_t *newpid)
 {
-    // TODO (milestone 5): implement spawn new process rpc
+errval_t err;
+    uint32_t buffer[9];
+    size_t name_length = strlen(name);
+
+    assert(name_length <= 32);
+
+    buffer[0] = AOS_RPC_PROC_SPAWN;
+    memcpy(buffer + 1, name, name_length);
+
+    //Maybe use fixed buffer[9] for send?
+
+    err = lmp_chan_send(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
+                      buffer[0] , buffer[1],buffer[2],
+                      buffer[3], buffer[4],buffer[5],
+                      buffer[6], buffer[7],buffer[8]);
+    if (err_is_fail(err)) {
+        debug_printf("aos_rpc_process_spawn: Error in sending request\n");
+        return AOS_ERR_LMP_SEND_FAILURE;
+    }
+
+    event_dispatch(get_default_waitset());
+
+    // If new_pid == -1 then the server responded with FAILURE
+    if (spawned_domain == -1)
+        debug_printf("Failure in spawning process %s\n", name);
+    else
+        debug_printf("Spawned process %s with pid = %d\n", spawned_domain);
+	
+	*newpid = spawned_domain;
+
     return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
                                   char **name)
 {
-    // TODO (milestone 5): implement name lookup for process given a process
-    // id
+    errval_t err;
+        
+    err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_NAME, (uint32_t) pid);
+    if (err_is_fail(err)) {
+        debug_printf("aos_rpc_process_get_name: Error in sending request\n");
+        return AOS_ERR_LMP_SEND_FAILURE;
+    }
+
+    event_dispatch(get_default_waitset());
+   
+	// debug_printf("Client: Process with pid = %d has name = %s\n", *name);
+    
     return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
-                                      domainid_t **pids, size_t *pid_count)
+                                      domainid_t **pids_returned, size_t *pid_count)
 {
-    // TODO (milestone 5): implement process id discovery
+ errval_t err;
+
+    err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_PIDS);
+    if (err_is_fail(err)) {
+        debug_printf("aos_rpc_process_get_all_pids: Error in sending request\n");
+        return AOS_ERR_LMP_SEND_FAILURE;
+    }
+
+    event_dispatch(get_default_waitset());
+
+    debug_printf("-------PROCESS LIST-------\n");
+    debug_printf("--------------------------\n");
+
+	*pid_count = total_domains;
+    *pids_returned = pids;
+	for (size_t i=0; i < total_domains; i++) {
+        debug_printf("%d\n", &pids[i]);
+	}
+
     return SYS_ERR_OK;
 }
 
@@ -262,7 +335,7 @@ errval_t aos_rpc_init(int slot_number)
 		abort();
 	}	
     
-	debug_printf("aos_rpc_init: Created endpoint in slot %zu\n", memory_channel.rpc_channel.local_cap.slot);
+	//debug_printf("aos_rpc_init: Created endpoint in slot %zu\n", memory_channel.rpc_channel.local_cap.slot);
 		
 	err = lmp_chan_alloc_recv_slot(&memory_channel.rpc_channel);
 	if (err_is_fail(err)) {

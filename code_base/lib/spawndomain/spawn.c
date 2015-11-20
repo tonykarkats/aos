@@ -228,7 +228,7 @@ static errval_t spawn_setup_vspace(struct spawninfo *si)
         return err_push(err, SPAWN_ERR_VSPACE_INIT);
     }
 
-	debug_printf("ALL OK MOVING ON!\n");
+	// debug_printf("ALL OK MOVING ON!\n");
     return SYS_ERR_OK;
 }
 

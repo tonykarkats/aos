@@ -44,10 +44,12 @@ static int test_thread(void *arg){
 int main(int argc, char *argv[])
 {
 	
-	// errval_t err;
+	errval_t err;
+	domainid_t dom;
 
-	debug_printf("Hello world from memeater!\n");
+	err = aos_rpc_process_spawn(get_init_chan(), "led_on", &dom);
 
+	while(1);
 	char command[1024];
 	const char space_token[2] = " ";
 	char *token;
