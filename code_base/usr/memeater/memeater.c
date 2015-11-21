@@ -45,6 +45,20 @@ int main(int argc, char *argv[])
 {
 	
 	errval_t err;
+	char *test;
+	
+	err = aos_rpc_process_get_name(get_init_chan(), 1, &test);
+	debug_printf("Name returned %s\n", test);
+	err = aos_rpc_process_get_name(get_init_chan(), 2, &test);
+	debug_printf("Name returned %s\n", test);
+	err = aos_rpc_process_get_name(get_init_chan(), 3, &test);
+	debug_printf("Name returned %s\n", test);
+	err = aos_rpc_process_get_name(get_init_chan(), 4, &test);
+	debug_printf("Name returned %s\n", test);
+	
+
+	while(1); 
+
 	
 	char command[1024];
 	const char space_token[2] = " ";

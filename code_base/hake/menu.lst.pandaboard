@@ -13,6 +13,7 @@ module	/armv7/sbin/init
 module /armv7/sbin/memeater
 module /armv7/sbin/led_on
 module /armv7/sbin/led_off
+module /armv7/sbin/stress_paging
 # TODO: add different modules here for later milestones
 
 # For pandaboard, use following values.

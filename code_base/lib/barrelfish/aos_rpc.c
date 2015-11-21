@@ -19,10 +19,6 @@
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
 static struct aos_rpc memory_channel;
-static domainid_t spawned_domain;
-static domainid_t pids[32];
-static int total_domains;
-static char domain_name[32];
 
 static void send_handler(void *arg) {
 
@@ -55,9 +51,6 @@ static void recv_handler(void *arg)
 	lmp_chan_register_recv(lc, get_default_waitset(),
 		MKCLOSURE(recv_handler, arg));	
 
-	int message_length = msg.buf.msglen;
-	int string_length = message_length - 1;
-	
  	struct aos_rpc * rpc_channel = get_init_chan();
 
 	rpc_channel->message_length = msg.buf.msglen;
@@ -70,33 +63,6 @@ static void recv_handler(void *arg)
 		if (err_is_fail(err)) {
 			debug_printf("Error in allocating capability slot in the channel!\n");
 		}
-	}
-
-	return ;	
-
-	// debug_printf("msg buflen %zu\n", msg.buf.msglen);
-	switch (msg.words[0]) {
-		case AOS_RPC_SEND_STRING: ;
-			break;
-		case AOS_RPC_PROC_SPAWN: ;
-			spawned_domain = (domainid_t) msg.words[1];
-			break;
-		case AOS_RPC_PROC_GET_NAME:
-		  			
-			for (int i = 0; i< string_length; i++) {
-				uint32_t * word = (uint32_t *) (domain_name + i*4);
-				*word = msg.words[i+1];   
-			}
-			// debug_printf("ALL READ %s\n", domain_name);
-			break;
-		case AOS_RPC_PROC_GET_PIDS: ;
-			total_domains = (int) msg.words[1];
-			debug_printf("Received %d\n", total_domains);
-			for (int i = 0; i < total_domains; i++) {
-				debug_printf("Pid = %d\n", msg.words[i+2]);
-				pids[i] = msg.words[i+2];
-			}
-			break;
 	}
 
 }
@@ -171,17 +137,17 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 
 	event_dispatch(get_default_waitset());
 
-	struct capref cap = chan->cap;
-
-	if (capref_is_null(cap))  {
+	*retcap = chan->cap;
+	*ret_bits = chan->words[0];
+		
+	if (capref_is_null(chan->cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
    		*ret_bits = 0;
 	 	*retcap = NULL_CAP;
 		return err_push(err, AOS_ERR_LMP_GET_CAP);
 	}
 
-	*retcap = cap;
-	return err;
+	return SYS_ERR_OK;
 
 }
 
@@ -189,13 +155,11 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
                              size_t length, struct capref *retcap,
                              size_t *retlen)
 {	
-	return SYS_ERR_OK;
-	/*
 	errval_t err;
 	
 	while (true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
+		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_DEV_CAP, (uint32_t) paddr, (uint32_t) length);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_GET_CAP);	
 		else if (!err_is_fail(err)) 
@@ -204,18 +168,17 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
 
 	event_dispatch(get_default_waitset());
 
-	struct capref cap = chan->cap;
+	*retcap = chan->cap;
+	*retlen = chan->words[0];
 
-	if (capref_is_null(cap))  {
+	if (capref_is_null(chan->cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
-   		*ret_bits = 0;
+   		*retlen = 0;
 	 	*retcap = NULL_CAP;
 		return err_push(err, AOS_ERR_LMP_GET_CAP);
 	}
 
-	*retcap = cap;
-	return err;
-	*/ 
+	return SYS_ERR_OK;
 
 }
 
@@ -285,6 +248,9 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
     event_dispatch(get_default_waitset());
 
 	*newpid = chan->words[0];
+	if (newpid == 0) {
+		return AOS_ERR_LMP_SPAWN_DOM;
+	}
 
     return SYS_ERR_OK;
 }
@@ -293,16 +259,31 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
                                   char **name)
 {
     errval_t err;
-        
-    err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_NAME, (uint32_t) pid);
-    if (err_is_fail(err)) {
-        debug_printf("aos_rpc_process_get_name: Error in sending request\n");
-        return AOS_ERR_LMP_SEND_FAILURE;
-    }
+	char *domain_name;
+	
+	//debug_printf("WIll request name of pid %d\n", pid);
+
+	domain_name = (char *) malloc(36);    
+    
+	while(true) {
+		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_NAME, (uint32_t) pid);
+		if (err_is_fail(err)) {
+       		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
+       		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
+    	}
+		else if (err_is_ok(err))
+			break;	
+	}
 
     event_dispatch(get_default_waitset());
+
+	for (int i = 0; i< 9; i++) {
+		uint32_t * word = (uint32_t *) (domain_name + i*4);
+		*word = chan->words[i];   
+	}
    
-	debug_printf("Client: Process with %s\n", domain_name);
+	//debug_printf("Client: Process with %s\n", domain_name);
     	
 	*name = domain_name;
     return SYS_ERR_OK;
@@ -311,6 +292,7 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
 errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
                                       domainid_t **pids_returned, size_t *pid_count)
 {
+	/*
  errval_t err;
 
     err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_PIDS);
@@ -330,7 +312,7 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 
 	*pid_count = total_domains;
     *pids_returned = pids;
-
+	*/
     return SYS_ERR_OK;
 }
 

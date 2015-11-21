@@ -26,6 +26,7 @@
 #include <barrelfish/thread_sync.h>
 #include <spawndomain/spawndomain.h>
 #include <barrelfish/thread_sync.h>
+#include "proc.h"
 
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
@@ -52,31 +53,12 @@ static struct serial_ring_buffer ring_b;
 static struct serial_capref_ring_buffer ring_c;
 static struct thread_cond char_cond;
 static struct thread_cond capref_cond;
+static struct process_node* pr_head;
 
-static errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si)
+errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
 {
-	// debug_printf("bootstrap_domain: Starting... Address of domain_si %p and name %p\n", domain_si, name);
-	
-	errval_t err;
-	char prefix[12] = "armv7/sbin/";	
-
-	char * module_name = strcat(prefix, name);
-
-	// debug_printf("Before spawning the module!\n");	
-	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
-		return err;
-	}
-
-	err = spawn_run(domain_si);
-	if (err_is_fail(err)) {
-		debug_printf("bootstrap_domain: Error in spawn run!\n");
-		return err;
-	}
-
-	err = spawn_free(domain_si);
-	
+	*ret = cap_io; 
+	*retlen = length;
 	return SYS_ERR_OK;
 }
 
@@ -144,7 +126,7 @@ static void recv_handler(void *arg)
 				returned_cap = NULL_CAP;	
 			}
 				
-			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap, (uint32_t) size_requested);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
 			
@@ -177,10 +159,10 @@ static void recv_handler(void *arg)
 				*word = msg.words[i+1];   
 			}	
 				
-			debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
+			//debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
 		
 		 	struct spawninfo si;	
-			err = bootstrap_domain(message_string, &si);
+			err = bootstrap_domain(message_string, &si, bi, my_core_id);
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Can not spawn process for the client! \n");
 				d_id = 1;	
@@ -196,16 +178,66 @@ static void recv_handler(void *arg)
 				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 			}		
 
-			cap_destroy(cap);	
+			//debug_printf("recv_handler: Id sent back to the client!\n");
+			
+			// TODO why cap_destroy issues page fault?
+			// cap_destroy(cap);	
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
+			//debug_printf("recv_handler: Request for domain name with d_Id = %d\n", msg.words[1]);
+			domainid_t did = msg.words[1];
+			char * d_name;
+			uint32_t buffer[40];
+
+			d_name = get_name_by_did (pr_head, did);
+			if (d_name == NULL) {
+				memcpy( buffer, "Not Found!", 11);
+			}
+			else if (strlen(d_name) > 39) {
+				memcpy( buffer, d_name, 39);
+				buffer[39] = '\0';
+			}
+			else 
+				memcpy(buffer, d_name, strlen(d_name));
+
+			//debug_printf("Will send to client name %s\n", buffer);
+			
+			err = lmp_chan_send(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
+					  buffer[0] , buffer[1],buffer[2],
+					  buffer[3], buffer[4],buffer[5],
+					  buffer[6], buffer[7],buffer[8]);
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not send domain name back to the client !\n");
+			}	
+		
+			cap_destroy(cap);
 			break;
 		case AOS_RPC_PROC_GET_PIDS:
-			;
+			break;
+		case AOS_RPC_GET_DEV_CAP:;
+			 debug_printf("recv_handler: Received request for device! \n");		
+
+			lpaddr_t paddr = msg.words[1];
+			size_t length = msg.words[2];
+			
+			struct capref dev_cap;
+			size_t retlen = 1;	
+			err = get_devframe(&dev_cap, &retlen, paddr, length);
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not break up device frame!\n");
+				dev_cap = NULL_CAP;
+			}
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, dev_cap, retlen);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send dev cap back to the client!\n");
+			}
+		
+			cap_destroy(cap);
+			break;
+		case AOS_RPC_TERMINATING:;
 			break;
 	}
-
-	//cap_destroy(cap);
 }
 
 static errval_t setup_channel(void) {
@@ -254,10 +286,11 @@ static errval_t setup_channel(void) {
 		
 	return SYS_ERR_OK;	
 }
+
 int main(int argc, char *argv[])
 {
     errval_t err;
-
+	
     /* Set the core id in the disp_priv struct */
     err = invoke_kernel_get_core_id(cap_kernel, &my_core_id);
     assert(err_is_ok(err));
@@ -288,7 +321,13 @@ int main(int argc, char *argv[])
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
-	
+
+	pr_head = insert_process_node(pr_head, 1,"test1");
+	pr_head = insert_process_node(pr_head, 2,"test2");
+	pr_head = insert_process_node(pr_head, 3,"test3");
+	pr_head = insert_process_node(pr_head, 4,"test4");
+
+
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
 	void * vbuf;	
@@ -325,7 +364,7 @@ int main(int argc, char *argv[])
 
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
-	err = bootstrap_domain("memeater", &mem_si);
+	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id);
 	assert(err_is_ok(err));
 
 	debug_printf("Entering main messaging loop...\n");	
