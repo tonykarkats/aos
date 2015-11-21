@@ -236,7 +236,7 @@ static void recv_handler(void *arg)
 
 			break;
 		case AOS_RPC_GET_DEV_CAP:;
-			 debug_printf("recv_handler: Received request for device! \n");		
+			 // debug_printf("recv_handler: Received request for device! \n");		
 
 			lpaddr_t paddr = msg.words[1];
 			size_t length = msg.words[2];
