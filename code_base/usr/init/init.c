@@ -25,6 +25,8 @@
 #include "omap_uart.h"
 #include <barrelfish/thread_sync.h>
 #include <spawndomain/spawndomain.h>
+#include <barrelfish/thread_sync.h>
+
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
 #include "../../lib/spawndomain/arch.h"
@@ -46,8 +48,10 @@
 struct bootinfo *bi;
 static coreid_t my_core_id;
 static struct lmp_chan channel ;
-static struct serial_ring_buffer ring;
-
+static struct serial_ring_buffer ring_b;
+static struct serial_capref_ring_buffer ring_c;
+static struct thread_cond char_cond;
+static struct thread_cond capref_cond;
 
 static errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si)
 {
@@ -74,41 +78,6 @@ static errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si)
 	err = spawn_free(domain_si);
 	
 	return SYS_ERR_OK;
-}
-
-
-static int get_char_thread(void *arg) 
-{
-	errval_t err;	
-
-	// debug_printf("get_char_thread: Initiating...\n");
-	
-	struct capref remep = *(struct capref *) arg;
-
-	char in_c;
-	
-	while(1) {
-		char * ret_char = read_from_ring(&ring, &in_c);
-		if (ret_char != NULL)
-		break;
-	}
-			
-	if (in_c != 13)
-		serial_putchar(in_c);
-		else { 
-			serial_putchar('\n');
-			in_c = '\n';
-		}
-				
-	err = lmp_ep_send1(remep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
-	if (err_is_fail(err)) {
-			DEBUG_ERR(err,"get_char_thread: Can not send character back to client!\n");
-	}	
-
-//	cap_destroy(remep);
-	serial_putstring(RESET); 
-
-	return 0;
 }
 
 static void recv_handler(void *arg) 
@@ -146,7 +115,6 @@ static void recv_handler(void *arg)
 	switch (rpc_operation) {
 		case AOS_RPC_SEND_STRING: ; // Send String
 			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
-			serial_putstring(BLUE);
 	
 			for (int i = 0; i<string_length; i++){
 				uint32_t * word = (uint32_t *) (message_string + i*4);
@@ -160,7 +128,7 @@ static void recv_handler(void *arg)
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
 			
-			serial_putstring(RESET);
+			cap_destroy(cap);
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
@@ -179,30 +147,26 @@ static void recv_handler(void *arg)
 			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap);	 
 		    if (err_is_fail(err))
 				DEBUG_ERR(err, "recv_handler: Error in sending cap back to the client!\n");					
+			
+			cap_destroy(cap);
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
 			// debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", cap.slot);
-			serial_putstring(BLUE);
 
 			char out_c = (char) msg.words[1];
 			
 			serial_putchar(out_c);
 
-			serial_putstring(RESET);
+			cap_destroy(cap);
 			break;
 
 		case AOS_RPC_GET_CHAR: ;
-			// debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
-			serial_putstring(BLUE);
+			//debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
+			// serial_putstring(BLUE);
 	
-			struct capref* temp_cap = (struct capref*) malloc(sizeof(struct capref));
-
-			slot_alloc(temp_cap);
-			cap_copy(*temp_cap, cap);
-				
-			struct thread *s_t = thread_create(get_char_thread, temp_cap);
-			s_t = s_t;			
+			write_capref_to_ring(&ring_c, &cap);
+			thread_cond_signal(&capref_cond);
 			
 			break;
 		case AOS_RPC_PROC_SPAWN:;
@@ -231,7 +195,8 @@ static void recv_handler(void *arg)
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 			}		
-	
+
+			cap_destroy(cap);	
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
 			break;
@@ -324,8 +289,6 @@ int main(int argc, char *argv[])
         abort();
     }
 	
-	debug_printf("initialized dev memory management\n");
-
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
 	void * vbuf;	
@@ -338,36 +301,32 @@ int main(int argc, char *argv[])
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 
-	initialize_ring(&ring);
+	initialize_ring(&ring_b);
+	initialize_capref_ring(&ring_c);
 
-	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &ring);
+	struct ring_arguments args = {
+		.r_b = &ring_b,
+		.r_c = &ring_c,
+		.char_wait_cond = &char_cond,
+		.capref_wait_cond = &capref_cond,
+	};
+
+	thread_cond_init(&char_cond);
+	thread_cond_init(&capref_cond);
+
+	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &args);
 	serial_polling_thread = serial_polling_thread;
-
+	
+	struct thread * serial_client_thread = thread_create( get_char_thread, &args);
+	serial_client_thread = serial_client_thread;
+	
 	err = setup_channel();
    	assert(err_is_ok(err));
-
 
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	err = bootstrap_domain("memeater", &mem_si);
 	assert(err_is_ok(err));
-
-	//char led_on[7] = "led_on";
-	// const char led_off[7] = "led_off";
-	
-	//debug_printf("Spawning led_on!\n");
-	//struct spawninfo l_si;
-	//err = bootstrap_domain(led_on, &l_si);
-	//assert(err_is_ok(err));
-	
-	//debug_printf("Spawning led_off\n");
-	//struct spawninfo loff_si;
-	//err = bootstrap_domain(led_on, &loff_si);
-	//assert(err_is_ok(err));
-	
-	//err = spawn_run(&mem_si);	
-	//err = spawn_run(&l_si);	
-	//err = spawn_run(&loff_si);	
 
 	debug_printf("Entering main messaging loop...\n");	
 	while(true) {

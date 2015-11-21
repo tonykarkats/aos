@@ -15,8 +15,7 @@
 #ifndef SPAWN_ARCH_H
 #define SPAWN_ARCH_H
 
-errval_t spawn_arch_load(struct spawninfo *si,
-                         lvaddr_t binary, size_t binary_size,
+errval_t spawn_arch_load(struct spawninfo *si,lvaddr_t binary, size_t binary_size,
                          genvaddr_t *entry, void** arch_load_info);
 
 void spawn_arch_set_registers(void *arch_load_info,
