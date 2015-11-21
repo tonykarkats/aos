@@ -116,7 +116,7 @@ static void *morecore_alloc(size_t bytes, size_t *retbytes)
     *retbytes = aligned_bytes;
 
 
-//	debug_printf("morecore_alloc: Returning...\n");
+	//debug_printf("morecore_alloc: Returning...%d \n", ret);
     return ret;
 }
 

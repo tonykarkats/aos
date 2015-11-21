@@ -93,7 +93,8 @@ static void recv_handler(void *arg)
 		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
 	}	
 	
-
+	uint32_t buffer[38];
+	
 	switch (rpc_operation) {
 		case AOS_RPC_SEND_STRING: ; // Send String
 			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
@@ -184,10 +185,10 @@ static void recv_handler(void *arg)
 			// cap_destroy(cap);	
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
+			
 			//debug_printf("recv_handler: Request for domain name with d_Id = %d\n", msg.words[1]);
 			domainid_t did = msg.words[1];
 			char * d_name;
-			uint32_t buffer[40];
 
 			d_name = get_name_by_did (pr_head, did);
 			if (d_name == NULL) {
@@ -195,7 +196,7 @@ static void recv_handler(void *arg)
 			}
 			else if (strlen(d_name) > 39) {
 				memcpy( buffer, d_name, 39);
-				buffer[39] = '\0';
+				* (char *) (buffer + 35) = '\0';
 			}
 			else 
 				memcpy(buffer, d_name, strlen(d_name));
@@ -207,12 +208,32 @@ static void recv_handler(void *arg)
 					  buffer[3], buffer[4],buffer[5],
 					  buffer[6], buffer[7],buffer[8]);
 			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not send domain name back to the client !\n");
+				debug_printf("recv_handler: Can not send domain name back to the client!\n");
 			}	
 		
 			cap_destroy(cap);
 			break;
-		case AOS_RPC_PROC_GET_PIDS:
+		case AOS_RPC_PROC_GET_PIDS:;
+			
+			memset(buffer, 0, 36);
+
+			struct process_node * temp = pr_head;
+			size_t count = 0;
+			while (temp != NULL) {
+		
+				//debug_printf("Added to list %d\n", temp->d_id);
+				buffer[count++] = temp->d_id;
+				temp = temp->next_pr;
+			}					
+
+			err = lmp_chan_send(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
+					  buffer[0] , buffer[1],buffer[2],
+					  buffer[3], buffer[4],buffer[5],
+					  buffer[6], buffer[7],buffer[8]);
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not send pids back to the client!\n");
+			}	
+
 			break;
 		case AOS_RPC_GET_DEV_CAP:;
 			 debug_printf("recv_handler: Received request for device! \n");		

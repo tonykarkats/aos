@@ -269,7 +269,7 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
 		event_dispatch(&chan->s_waitset);
 		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_NAME, (uint32_t) pid);
 		if (err_is_fail(err)) {
-       		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
+       		debug_printf("aos_rpc_process_spawn: Error in getting process name!\n");
        		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
     	}
 		else if (err_is_ok(err))
@@ -292,28 +292,41 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
 errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
                                       domainid_t **pids_returned, size_t *pid_count)
 {
-	/*
- errval_t err;
+	errval_t err;
 
-    err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_PIDS);
-    if (err_is_fail(err)) {
-        debug_printf("aos_rpc_process_get_all_pids: Error in sending request\n");
-        return AOS_ERR_LMP_SEND_FAILURE;
-    }
-
-    event_dispatch(get_default_waitset());
-
-    debug_printf("-------PROCESS LIST TOTAL DOMAINS %d-------\n", total_domains);
-    debug_printf("--------------------------\n");
-
-	for (size_t i=0; i < total_domains; i++) {
-        debug_printf("%zu\n", pids[i]);
+	while(true) {
+		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_PIDS);
+		if (err_is_fail(err)) {
+       		debug_printf("aos_rpc_process_spawn: Error in getting pids!\n");
+       		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
+    	}
+		else if (err_is_ok(err))
+			break;	
 	}
 
-	*pid_count = total_domains;
-    *pids_returned = pids;
-	*/
-    return SYS_ERR_OK;
+    event_dispatch(get_default_waitset());
+	
+	//debug_printf("Returned!\n");
+	
+	// Count valid pids
+	size_t count = 0;
+	while(true) {
+		if (chan->words[count] == 0) 
+			break;
+		count++;
+	}
+
+	//debug_printf("Returned! Count = %d\n", count);
+	
+	for (int i = 0; i<count; i++) {
+		//debug_printf("Returned pid %d\n", chan->words[i]);
+		(*pids_returned)[i] = (domainid_t) chan->words[i];
+		//debug_printf("Returned pid %d\n",(*pids_returned)[i] );
+	}
+
+	*pid_count = count;
+	return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd)

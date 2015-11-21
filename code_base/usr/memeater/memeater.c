@@ -45,20 +45,6 @@ int main(int argc, char *argv[])
 {
 	
 	errval_t err;
-	char *test;
-	
-	err = aos_rpc_process_get_name(get_init_chan(), 1, &test);
-	debug_printf("Name returned %s\n", test);
-	err = aos_rpc_process_get_name(get_init_chan(), 2, &test);
-	debug_printf("Name returned %s\n", test);
-	err = aos_rpc_process_get_name(get_init_chan(), 3, &test);
-	debug_printf("Name returned %s\n", test);
-	err = aos_rpc_process_get_name(get_init_chan(), 4, &test);
-	debug_printf("Name returned %s\n", test);
-	
-
-	while(1); 
-
 	
 	char command[1024];
 	const char space_token[2] = " ";
@@ -94,10 +80,26 @@ int main(int argc, char *argv[])
 				printf("Could not spawn domain [%s]\n", token);
 			else 
 				printf("Domain spawned with pid = %d\n", pid);
-			
-		}	
-	}
-	
+		}
+		else if (!strcmp("ps", token)) {
+			domainid_t * pids;
+			char * name;
+			pids = (domainid_t *) malloc(sizeof(domainid_t)*32);
+			size_t pid_count;
+			err = aos_rpc_process_get_all_pids(get_init_chan(), &pids, &pid_count);
+			if (err_is_fail(err)) {
+				printf("Could not fetch pids from server!\n");
+				continue;
+			}
 
-    return 0;
+			for (int i = 0; i < pid_count; i++) {
+				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &name);	
+				if (err_is_ok(err)) 
+					printf("PID: %d NAME: %s\n", pids[i], name); 
+			}
+			
+		}
+	}		
+			
+	return 0;
 }

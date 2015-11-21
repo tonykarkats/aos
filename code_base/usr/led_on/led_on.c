@@ -10,7 +10,5 @@ int main(int argc, char *argv[])
 {
 	debug_printf("led_on: Turning led ON!\n");
 
-	while(1);
-    
 	return 0;
 }
