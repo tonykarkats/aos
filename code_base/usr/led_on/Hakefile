@@ -11,7 +11,7 @@
 --------------------------------------------------------------------------
 
 [ build application { target = "led_on",
-  		      cFiles = [ "led_on.c", "leds.c" ],
+  		      cFiles = [ "led_on.c", "leds.c", "omap_uart.c" ],
                       flounderDefs = [ "mem" ],
                       architectures = allArchitectures
                     }

@@ -278,8 +278,6 @@ errval_t aos_rpc_process_kill_process(struct aos_rpc *chan, domainid_t pid)
 		else if (err_is_ok(err))
 			break;	
 	}
-
-    event_dispatch(get_default_waitset());
 	
     return SYS_ERR_OK;
 }

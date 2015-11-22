@@ -294,8 +294,31 @@ static void recv_handler(void *arg)
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 			}	
+
+			cap_destroy(terminated_process->client_endpoint);
+			cap_destroy(terminated_process->dispatcher_frame);
 			break;
 		case AOS_RPC_KILL:;
+			debug_printf("Terminating node with pid = %d\n", msg.words[1]);
+
+			struct process_node * killed_process = delete_process_node(&pr_head, msg.words[1], "");
+			if (killed_process == NULL) {
+				debug_printf("Process to kill does not exist!\n");
+				return;
+			}
+			
+			err = cap_revoke(killed_process->dispatcher_frame);	
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not kill process!\n");
+				return ;
+			}
+		
+			err = cap_delete(killed_process->dispatcher_frame);	
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not destroy capability of domain...!\n");
+				return ;
+			}
+
 			break;	
 	}
 }
@@ -422,18 +445,20 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-//	debug_printf("Spawning led_on!\n"); 
-//	struct spawninfo led_si;
-//	err = bootstrap_domain("led_on", &led_si, bi, my_core_id);
-//	assert(err_is_ok(err));
-
+/*
+	debug_printf("Spawning led_on!\n");
+	struct capref disp_frame; 
+	struct spawninfo led_si;
+	err = bootstrap_domain("led_on", &led_si, bi, my_core_id, &disp_frame);
+	assert(err_is_ok(err));
+*/
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
 	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame);
 	assert(err_is_ok(err));
 
-	debug_printf("Entering main messaging loop... Address of pr_head = %p\n", &pr_head);	
+	debug_printf("Entering main messaging loop...");	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {

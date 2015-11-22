@@ -106,7 +106,16 @@ int main(int argc, char *argv[])
 			
 		}
 		else if (!strcmp("kill", token)) {
-
+			token = strtok(NULL, space_token);
+			if (token == NULL)
+				continue;
+			
+			domainid_t did = atoi(token);
+			err = aos_rpc_process_kill_process(get_init_chan(), did);
+			if (err_is_fail(err)) {
+				printf("Could not fetch pids from server!\n");
+				continue;
+			}
 
 		}
 	}		

@@ -23,7 +23,5 @@ int main(int argc, char *argv[])
 
     printf("Memory test passed!\n"); 	
 
-
-	while(1);
-    return 0;
+	return 0;
 }
