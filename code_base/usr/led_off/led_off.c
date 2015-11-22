@@ -4,7 +4,8 @@
 #include <barrelfish_kpi/types.h>
 #include <barrelfish/aos_rpc.h>
 #include "led_off.h"
-#include "leds.c"
+#include "leds.h"
+
 int main(int argc, char *argv[])
 {
 	errval_t err;

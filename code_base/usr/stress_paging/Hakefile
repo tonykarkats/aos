@@ -6,12 +6,12 @@
 -- If you do not find this file, copies can be found by writing to:
 -- ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
 --
--- Hakefile for /usr/led_off
+-- Hakefile for /usr/stress_paging
 --
 --------------------------------------------------------------------------
 
-[ build application { target = "led_off",
-  		      cFiles = [ "led_off.c", "leds.c" ],
+[ build application { target = "stress_paging",
+  		      cFiles = [ "stress_paging.c" ],
                       flounderDefs = [ "mem" ],
                       architectures = allArchitectures
                     }

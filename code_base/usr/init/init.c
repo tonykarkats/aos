@@ -47,15 +47,15 @@
 #define RESET "\033[0m"
 
 struct bootinfo *bi;
-static struct bootinfo bi_2;
 static coreid_t my_core_id;
-static struct lmp_chan channel ;
 struct serial_ring_buffer ring_b;
 struct serial_capref_ring_buffer ring_c;
 struct thread_cond char_cond;
 struct thread_cond capref_cond;
+
 struct process_node* pr_head;
-static int global_did = 1;
+
+int global_did = 1;
 
 
 errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
@@ -72,6 +72,8 @@ static void recv_handler(void *arg)
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
+
+	//debug_printf("recv_handler initiating!\n");
 
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
@@ -95,7 +97,8 @@ static void recv_handler(void *arg)
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
 	}	
-	
+
+	//debug_printf("Entering switch!\n");	
 	uint32_t buffer[38];
 	
 	switch (rpc_operation) {
@@ -166,8 +169,6 @@ static void recv_handler(void *arg)
 				*word = msg.words[i+1];   
 			}	
 				
-			debug_printf("recv_handler: Received request for spawn for elf32 %s\n", message_string);
-				
 			token = strtok(message_string, " ");
 			next_token = strtok(NULL, " ");
 				
@@ -181,23 +182,19 @@ static void recv_handler(void *arg)
 		 	struct spawninfo si;	
 			struct capref disp_frame;
 			
-			//debug_printf("", &si, &bi, &disp_frame, &cap);
-			err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame);
+			err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame);
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Can not spawn process for the client! \n");
+				debug_printf("address of lc = %p\n", &lc);
 				d_id = 0;	
 			}
 			else {
-				//debug_printf("address of si %p bi %p disp_frame %p cap %p\n", &si, &bi, &disp_frame, &cap);
-				//debug_printf("DUMMY 2\n");
+				debug_printf("token %s address\n", token);
 				d_id = global_did;
 				global_did++;
-				pr_head = insert_process_node(pr_head, d_id, message_string, background, disp_frame, channel.remote_cap);
+				pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
 			}
-			
-			//print_processes(pr_head);	
-			//debug_printf("Returning did %zu to the client\n", d_id);	
-			lc = &channel;
+				
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
@@ -243,7 +240,6 @@ static void recv_handler(void *arg)
 			struct process_node * temp = pr_head;
 			size_t count = 0;
 			while (temp != NULL) {
-		
 				//debug_printf("Added to list %d\n", temp->d_id);
 				buffer[count++] = temp->d_id;
 				temp = temp->next_pr;
@@ -285,34 +281,31 @@ static void recv_handler(void *arg)
 				*word = msg.words[i+1];   
 			}	
 	
-			//char name[32];	
-			//strcpy(name, message_string + 11); 	
-			
-			//debug_printf("recv_handler: Received termination request from domain %s\n", name);
-			/*	
+			char name[32];	
+			strcpy(name, message_string + 11); 	
+				
 			struct process_node * terminated_process = delete_process_node(&pr_head, 0, name);
 			if (terminated_process == NULL) {
 				debug_printf("recv_handler: Received message from unknown process?!\n");
 				return;
 			}
-			*/
-	
-			//err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
-			//if (err_is_fail(err)) {
-			//	DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-			//}	
+
+			err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+			}	
 			break;
 		case AOS_RPC_KILL:;
 			break;	
 	}
 }
 
-static errval_t setup_channel(void) {
+static errval_t setup_channel(struct lmp_chan *channel) {
 
 	errval_t err;
 	struct waitset* ws = get_default_waitset();  	
 	
-	lmp_chan_init(&channel);
+	lmp_chan_init(channel);
 
 	// Create our endpoint to self
 	err = cap_retype(cap_selfep, cap_dispatcher, ObjType_EndPoint, 0);
@@ -321,14 +314,14 @@ static errval_t setup_channel(void) {
 		abort();
 	}
 
-	endpoint_create(FIRSTEP_BUFLEN, &channel.local_cap, 
-					&channel.endpoint);
+	endpoint_create(FIRSTEP_BUFLEN, &channel->local_cap, 
+					&channel->endpoint);
 	if (err_is_fail(err)) {
 		debug_printf("Error in creating endpoint!\n");
 		abort();
 	}
 
-	err = lmp_chan_alloc_recv_slot(&channel);
+	err = lmp_chan_alloc_recv_slot(channel);
 	if (err_is_fail(err)) {
 		debug_printf("Error in allocating receiver slot!\n");
 		abort();
@@ -336,16 +329,16 @@ static errval_t setup_channel(void) {
 
 	struct event_closure recv_handler_init = {
         .handler = recv_handler,
-        .arg = &channel,
+        .arg = channel,
     };
 
-	err = lmp_chan_register_recv(&channel,ws, recv_handler_init);
+	err = lmp_chan_register_recv(channel,ws, recv_handler_init);
 	if (err_is_fail(err)) {
 		debug_printf("Error in registering the channel..\n");	
 		abort();
 	}
 
-	err = cap_copy(cap_initep, channel.local_cap);
+	err = cap_copy(cap_initep, channel->local_cap);
 	if (err_is_fail(err)) {
 		debug_printf("Error in copying endpoint to cap_initep\n");	
 		abort();
@@ -357,8 +350,8 @@ static errval_t setup_channel(void) {
 int main(int argc, char *argv[])
 {
     errval_t err;
+	struct lmp_chan channel;
 
-		
     /* Set the core id in the disp_priv struct */
     err = invoke_kernel_get_core_id(cap_kernel, &my_core_id);
     assert(err_is_ok(err));
@@ -375,7 +368,6 @@ int main(int argc, char *argv[])
 
     // First argument contains the bootinfo location
     bi = (struct bootinfo*)strtol(argv[1], NULL, 10);
-	bi_2 = *bi;
 
     // setup memory serving
     err = initialize_ram_alloc();
@@ -391,10 +383,10 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	//pr_head = insert_process_node(pr_head, 1,"test1", 1);
-	//pr_head = insert_process_node(pr_head, 2,"test2", 1);
-	//pr_head = insert_process_node(pr_head, 3,"test3", 1);
-	//pr_head = insert_process_node(pr_head, 4,"test4", 1);
+	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);
+	//pr_head = insert_process_node(pr_head, 2,"test2", 1, NULL_CAP, NULL_CAP);
+	//pr_head = insert_process_node(pr_head, 3,"test3", 1, NULL_CAP, NULL_CAP);
+	//pr_head = insert_process_node(pr_head, 4,"test4", 1, NULL_CAP, NULL_CAP);
 
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
@@ -427,7 +419,7 @@ int main(int argc, char *argv[])
 	struct thread * serial_client_thread = thread_create( get_char_thread, &args);
 	serial_client_thread = serial_client_thread;
 	
-	err = setup_channel();
+	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
 //	debug_printf("Spawning led_on!\n"); 
@@ -441,7 +433,7 @@ int main(int argc, char *argv[])
 	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame);
 	assert(err_is_ok(err));
 
-	// debug_printf("Entering main messaging loop... Address of pr_head = %p\n", &pr_head);	
+	debug_printf("Entering main messaging loop... Address of pr_head = %p\n", &pr_head);	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {
