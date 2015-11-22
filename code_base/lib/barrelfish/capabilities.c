@@ -23,6 +23,7 @@
 #include <barrelfish/monitor_client.h>
 #include <trace/trace.h>
 
+
 /// Root CNode
 struct cnoderef cnode_root = {
     .address = CPTR_ROOTCN,

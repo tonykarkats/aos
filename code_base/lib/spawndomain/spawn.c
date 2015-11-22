@@ -859,7 +859,7 @@ errval_t spawn_free(struct spawninfo *si)
     cap_destroy(si->rootcn_cap);
     cap_destroy(si->taskcn_cap);
     cap_destroy(si->pagecn_cap);
-    cap_destroy(si->dispframe);
+    // cap_destroy(si->dispframe);
     cap_destroy(si->dcb);
     cap_destroy(si->argspg);
     cap_destroy(si->vtree);

@@ -248,12 +248,42 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
     event_dispatch(get_default_waitset());
 
 	*newpid = chan->words[0];
-	if (newpid == 0) {
+	if (*newpid == 0) {
+		debug_printf("spawn_domain: Can not spawn!\n");
 		return AOS_ERR_LMP_SPAWN_DOM;
 	}
-
+	
+	if (strchr(name, '&') != NULL) {
+		return SYS_ERR_OK;
+	}
+	else {
+		// debug_printf("Waiting for process to finish!\n");
+		event_dispatch(get_default_waitset());
+	}
+	
     return SYS_ERR_OK;
 }
+
+errval_t aos_rpc_process_kill_process(struct aos_rpc *chan, domainid_t pid)
+{
+    errval_t err;
+
+	while(true) {
+		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_KILL, (uint32_t) pid);
+		if (err_is_fail(err)) {
+       		debug_printf("aos_rpc_process_spawn: Error in killing process!\n");
+       		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
+    	}
+		else if (err_is_ok(err))
+			break;	
+	}
+
+    event_dispatch(get_default_waitset());
+	
+    return SYS_ERR_OK;
+}
+
 
 errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
                                   char **name)
@@ -326,6 +356,34 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 	}
 
 	*pid_count = count;
+	return SYS_ERR_OK;
+}
+
+errval_t aos_rpc_terminating(struct aos_rpc *chan, char *name) 
+{
+	errval_t err;
+    uint32_t buffer[9];
+    size_t name_length = strlen(name);
+	
+    assert(name_length <= 32);
+
+    buffer[0] = AOS_RPC_TERMINATING;
+    memcpy(buffer + 1, name, name_length+1);
+
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 
+						  buffer[0], buffer[1],buffer[2],
+        	              buffer[3], buffer[4],buffer[5],
+        	              buffer[6], buffer[7],buffer[8]);
+    	if (err_is_fail(err)) {
+       		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
+       		return err_push(err, AOS_ERR_LMP_TERMINATING);
+    	}
+		else if (err_is_ok(err))
+			break;
+	}
+	
 	return SYS_ERR_OK;
 }
 

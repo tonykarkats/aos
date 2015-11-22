@@ -933,4 +933,5 @@ errors aos AOS_ERR_ {
     failure LMP_SPAWN_DOM     "Unknown message type for AOS LMP implementation",
 	failure LMP_GET_PIDS     "Unknown message type for AOS LMP implementation",
     failure LMP_GET_NAME     "Unknown message type for AOS LMP implementation",
+	failure LMP_TERMINATING     "Unknown message type for AOS LMP implementation",
 };

@@ -49,6 +49,8 @@ int main(int argc, char *argv[])
 	char command[1024];
 	const char space_token[2] = " ";
 	char *token;
+	char *next_token;
+
 	while(1) {
 		printf("$>");
 		fflush(stdout);
@@ -73,10 +75,14 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("spawn", token)) {
 			token = strtok(NULL, space_token);
-			domainid_t pid;
+			next_token = strtok(NULL, space_token);
+			if (next_token != NULL)
+				token = strcat(token, " &");
 			
+			domainid_t pid;
 			err = aos_rpc_process_spawn(get_init_chan(), token, &pid);
-			if (err_is_fail(err) || (pid == 1))
+			
+			if (err_is_fail(err) || (pid == 0))
 				printf("Could not spawn domain [%s]\n", token);
 			else 
 				printf("Domain spawned with pid = %d\n", pid);
@@ -98,6 +104,10 @@ int main(int argc, char *argv[])
 					printf("PID: %d NAME: %s\n", pids[i], name); 
 			}
 			
+		}
+		else if (!strcmp("kill", token)) {
+
+
 		}
 	}		
 			

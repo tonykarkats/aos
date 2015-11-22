@@ -42,6 +42,7 @@
 #define AOS_RPC_PROC_GET_PIDS	 7
 #define AOS_RPC_GET_DEV_CAP	 8
 #define AOS_RPC_TERMINATING	 9
+#define AOS_RPC_KILL	 10
 
 struct aos_rpc {
 	struct lmp_chan rpc_channel;
@@ -53,6 +54,9 @@ struct aos_rpc {
 	uint32_t words[9];
 	struct capref cap;
 };
+
+
+errval_t aos_rpc_process_kill_process(struct aos_rpc *chan, domainid_t pid);
 
 /**
  * \brief send a string over the given channel
@@ -193,5 +197,9 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path);
  * TODO: you may want to change the inteface of your init function
  */
 errval_t aos_rpc_init(int slot_number);
+
+
+// This RPC call is called by the domain in order to signal that it is terminating
+errval_t aos_rpc_terminating(struct aos_rpc *chan, char *domain_name);
 
 #endif // _LIB_BARRELFISH_AOS_MESSAGES_H

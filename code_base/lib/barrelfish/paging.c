@@ -350,7 +350,7 @@ static void exception_handler(enum exception_type type,
 	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 	
 	if (type == EXCEPT_PAGEFAULT) {
-		// debug_printf("Pagefault exception at address %p\n", addr);
+		//debug_printf("Pagefault exception at address %p\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -358,7 +358,7 @@ static void exception_handler(enum exception_type type,
 		}
 
 		if ((lvaddr_t) addr < START_VADDR) {
-			debug_printf("exception_handler: Address outside of valid boundaries!\n");		
+			debug_printf("exception_handler: Address outside of valid boundaries ad addr %p!\n", addr);		
 			abort();
 		}		
 	

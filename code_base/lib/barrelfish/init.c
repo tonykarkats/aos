@@ -32,6 +32,8 @@
 #include <barrelfish/aos_rpc.h>
 
 /// Are we the init domain (and thus need to take some special paths)?
+
+static char domain_name[32];
 static bool init_domain;
 
 extern size_t (*_libc_terminal_read_func)(char *, size_t);
@@ -43,9 +45,17 @@ void libc_exit(int);
 
 void libc_exit(int status)
 {
+	errval_t err;
+
     // Use spawnd if spawned through spawnd
     if(disp_get_domain_id() == 0) {
-        errval_t err = cap_revoke(cap_dispatcher);
+   		// debug_printf("libc_exit: Process exiting!\n");
+		err = aos_rpc_terminating(get_init_chan(), domain_name);
+		if (err_is_fail(err)) {
+			sys_print("sending terminating signal to parent failed!\n", 100);
+		}
+	
+		err = cap_revoke(cap_dispatcher);
         if (err_is_fail(err)) {
             sys_print("revoking dispatcher failed in _Exit, spinning!", 100);
             while (1) {}
@@ -155,16 +165,12 @@ static size_t dummy_terminal_read(char *buf, size_t len)
 void barrelfish_libc_glue_init(void)
 {
     // TODO: change these to use the user-space serial driver if possible
-    //_libc_terminal_read_func = dummy_terminal_read;
-    
-
-	//_libc_terminal_write_func = syscall_terminal_write;
-	//_libc_terminal_read_func = dummy_terminal_read;
     _libc_terminal_read_func = user_space_driver_read;
 	_libc_terminal_write_func = user_space_driver_write;
     _libc_exit_func = libc_exit;
     _libc_assert_func = libc_assert;
-    /* morecore func is setup by morecore_init() */
+    
+	/* morecore func is setup by morecore_init() */
 
     // XXX: set a static buffer for stdout
     // this avoids an implicit call to malloc() on the first printf
@@ -193,12 +199,17 @@ static void init_recv_handler(struct aos_chan *ac, struct lmp_recv_msg *msg, str
 errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 {
     errval_t err;
-	
-    // do we have an environment?
+
+	// do we have an environment?
     if (params != NULL && params->envp[0] != NULL) {
         extern char **environ;
         environ = params->envp;
     }
+
+	// Get domain name from arguments
+	//char * token;
+	//char * token_2;
+	strcpy(domain_name, params->argv[0]);
 
     // Init default waitset for this dispatcher
     struct waitset *default_ws = get_default_waitset();
