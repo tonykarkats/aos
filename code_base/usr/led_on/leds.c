@@ -17,10 +17,8 @@ void led_initialize(uint32_t mapped_address) {
 
 void turn_on_led1(void) {
 	
-	debug_printf("content %x\n", *gpio1_do);
 	*gpio1_oe &= ~0x0100;
 	*gpio1_do &= 0x0100;
-	debug_printf("content %x\n", *gpio1_do);
 	return;
 } 
 

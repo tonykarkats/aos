@@ -513,7 +513,8 @@ void  __attribute__ ((noinline,noreturn))
 app_core_init(void *pointer)
 {
 
-//    serial_early_init(serial_console_port);
+    //serial_early_init(serial_console_port);
+	printk(LOG_NOTE,"Hello world!\n");
     printf("in core-1\n");
     printf("########################################################\n");
     while(true);
@@ -533,7 +534,8 @@ void arch_init(void *pointer)
 
     serial_early_init(serial_console_port);
 //    printk(LOG_NOTE, "hello world\n");
-
+	
+	//start_aps_arm_start(1 ,(lvaddr_t) app_core_start);
     if(hal_cpu_is_bsp())
     {
         struct multiboot_info *mb = (struct multiboot_info *)pointer;

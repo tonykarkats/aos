@@ -51,7 +51,7 @@ start:
         //prepare argument
         mov     r0, r2
         b       arch_init
-        b       halt
+		b       halt
 
 #if MILESTONE >= 5
 
@@ -67,8 +67,8 @@ app_core_start:
 
         ldr     PIC_REGISTER, =got_base
 
-        b       arch_init
-        //b       app_core_init
+        //b       arch_init
+        b       app_core_init
         b       halt
 
 #endif
