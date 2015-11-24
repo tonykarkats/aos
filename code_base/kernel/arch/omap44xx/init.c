@@ -535,7 +535,8 @@ void arch_init(void *pointer)
     serial_early_init(serial_console_port);
 //    printk(LOG_NOTE, "hello world\n");
 	
-	//start_aps_arm_start(1 ,(lvaddr_t) app_core_start);
+	start_aps_arm_start(1 ,(lvaddr_t) app_core_start);
+	while(1);
     if(hal_cpu_is_bsp())
     {
         struct multiboot_info *mb = (struct multiboot_info *)pointer;

@@ -53,11 +53,9 @@ int start_aps_arm_start(uint8_t core_id, lpaddr_t entry)
 {
     // TODO: you might want to implement this function
 
-	printk(LOG_NOTE,"%p\n", entry);
-    // printk(LOG_NOTE, "NYI!");
-	*(char *) AUX_CORE_BOOT_0 |= 0x00000004;
-	*(char *) AUX_CORE_BOOT_1 = entry;
-	//printk(LOG_NOTE, "%p\n", *AUX_CORE_BOOT_1);
+	*(uint32_t *) AUX_CORE_BOOT_0 |= 0x00000004;
+	*(uint32_t *) AUX_CORE_BOOT_1 = entry;
+	
 	send_event();
 
  	return SYS_ERR_OK;
