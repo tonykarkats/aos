@@ -391,10 +391,6 @@ int main(int argc, char *argv[])
 
     // First argument contains the bootinfo location
     bi = (struct bootinfo*)strtol(argv[1], NULL, 10);
-
-	print_modules(bi);
-	while(1);
-
     // setup memory serving
     err = initialize_ram_alloc();
     if (err_is_fail(err)) {
@@ -408,6 +404,11 @@ int main(int argc, char *argv[])
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
+
+	print_modules(bi);	
+	spawn_second_core(bi);
+
+	while(1);
 
 	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);
 	//pr_head = insert_process_node(pr_head, 2,"test2", 1, NULL_CAP, NULL_CAP);

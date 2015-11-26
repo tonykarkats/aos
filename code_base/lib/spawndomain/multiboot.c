@@ -215,7 +215,7 @@ struct mem_region *multiboot_find_module(struct bootinfo *bi, const char *name)
         struct mem_region *region = &bi->regions[i];
 
         const char *modname = multiboot_module_name(region);
-		debug_printf("Module name = %s\n", modname);
+		//debug_printf("Module name = %s\n", modname);
         if (modname != NULL &&
             strncmp(modname + strlen(modname) - strlen(name),
                     name, strlen(name)) == 0) {

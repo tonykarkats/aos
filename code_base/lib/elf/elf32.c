@@ -326,7 +326,7 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
     genvaddr_t tls_base = 0;
     size_t tls_init_len = 0, tls_total_len = 0;
 
-	//printf("elf32_load: p->p_vaddr = %p !\n", p->p_vaddr);
+	//debug_printf("elf32_load: p->p_vaddr = %p !\n", p->p_vaddr);
     // Process program headers to load file
     for (i = 0; i < head->e_phnum; i++) {
         struct Elf32_Phdr *p = &phead[i];
