@@ -5,6 +5,13 @@ struct monitor_allocate_state {
     genvaddr_t     elfbase; 
 }; 
 
+struct module_blob {
+    size_t             size;
+    lvaddr_t           vaddr;
+    genpaddr_t         paddr;
+    struct mem_region *mem_region;
+};      
+
 static errval_t monitor_elfload_allocate(void *state, genvaddr_t base,
                                          size_t size, uint32_t flags,
                                          void **retbase)
@@ -12,6 +19,27 @@ static errval_t monitor_elfload_allocate(void *state, genvaddr_t base,
     struct monitor_allocate_state *s = state;
 
     *retbase = (char *)s->vbase + base - s->elfbase;
+    return SYS_ERR_OK;
+}
+
+static errval_t
+spawn_memory_prepare(size_t size, struct capref *cap_ret,
+                     struct frame_identity *frameid)
+{
+    errval_t err;
+    struct capref cap;
+
+    err = frame_alloc(&cap, size, NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, LIB_ERR_FRAME_ALLOC);
+    }
+
+    err = invoke_frame_identify(cap, frameid);
+    if (err_is_fail(err)) {
+        USER_PANIC_ERR(err, "frame_identify failed");
+    }
+
+    *cap_ret = cap;
     return SYS_ERR_OK;
 }
 
@@ -94,7 +122,7 @@ elf_load_and_relocate(lvaddr_t blob_start, size_t blob_size,
 
 
 
-errval_t invoke_monitor_spawn_core(struct capref c_kernel, coreid_t core_id, enum cpu_type cpu_type, 
+errval_t invoke_monitor_spawn_core( coreid_t core_id, enum cpu_type cpu_type, 
                           forvaddr_t entry) 
 { 
     uint8_t invoke_bits = get_cap_valid_bits(cap_kernel); 
@@ -121,11 +149,12 @@ errval_t spawn_second_core(struct bootinfo *bi)
 			  module->mr_base, module->mrmod_size);
 
 	debug_printf("Mapping cpu module in our vspace... Returning the size and the location of the image.\n");
-    
+   
+	struct module_blob cpu_blob;
+	cpu_blob.mem_region = module;
+ 
 	/* Lookup and map the elf image */
-    lvaddr_t binary;
-    size_t binary_size;
-    err = spawn_map_module(module, &binary_size, &binary, NULL);
+    err = spawn_map_module(module, &cpu_blob.size, &cpu_blob.vaddr, &cpu_blob.paddr);
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_ELF_MAP);
     }
@@ -139,7 +168,7 @@ errval_t spawn_second_core(struct bootinfo *bi)
         void                  *buf;
     	struct frame_identity frameid;
 	} cpu_mem = {
-        .size = BASE_PAGE_SIZE + elf_virtual_size(binary)
+        .size = BASE_PAGE_SIZE + elf_virtual_size(cpu_blob.vaddr)
     };
 
 	// Allocating the memory NEEDED for the new kernel to boot up
@@ -156,8 +185,8 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	// Time to load the cput driver to the newly allocated memory 
 	// and perform the relocation! 
 	uintptr_t reloc_entry= 0;
-	err = elf_load_and_relocate(binary, 
-								binary_size, 
+	err = elf_load_and_relocate(cpu_blob.vaddr, 
+								cpu_blob.size, 
 								cpu_mem.buf + BASE_PAGE_SIZE,
 								cpu_mem.frameid.base + BASE_PAGE_SIZE,
 								&reloc_entry);	
@@ -165,30 +194,49 @@ errval_t spawn_second_core(struct bootinfo *bi)
 		DEBUG_ERR(err, "cpu_memory_prepare!\n");
 		return err;
 	}
-	
+
+	debug_printf("cpu_mem.frameid.base = %p , reloc_entry = %p\n", cpu_mem.frameid.base, reloc_entry);
+	// while(1);
+
+	struct capref spawn_mem_cap;
+	struct frame_identity spawn_mem_frameid;
+
+	err = spawn_memory_prepare(ARM_CORE_DATA_PAGES*BASE_PAGE_SIZE,
+						  	   &spawn_mem_cap,
+							   &spawn_mem_frameid);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"spawn_memory_prepare!\n");
+		return err;
+	}
+
     struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
 
-    struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *)binary;
+    struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *)cpu_blob.vaddr;
     core_data->elf.size = sizeof(struct Elf32_Shdr);
-    core_data->elf.addr = cpu_mem.frameid.base + (uintptr_t)head32->e_shoff;
+    core_data->elf.addr = cpu_blob.paddr + (uintptr_t)head32->e_shoff;
     core_data->elf.num  = head32->e_shnum;
 
-    core_data->module_start        = cpu_mem.frameid.base;
-    core_data->module_end          = cpu_mem.frameid.base + ;
+    core_data->module_start        = cpu_blob.paddr;
+    core_data->module_end          = cpu_blob.paddr + cpu_blob.size;
     //core_data->urpc_frame_base     = urpc_frame_id.base;
     //core_data->urpc_frame_bits     = urpc_frame_id.bits;
     //core_data->monitor_binary      = monitor_blob.paddr;
     //core_data->monitor_binary_size = monitor_blob.size;
-    //core_data->memory_base_start   = spawn_mem_frameid.base;
-    //core_data->memory_bits         = spawn_mem_frameid.bits;
+    core_data->memory_base_start   = spawn_mem_frameid.base;
+    core_data->memory_bits         = spawn_mem_frameid.bits;
     core_data->src_core_id         = 0;
-    core_data->src_arch_id         = my_arch_id;
+    //core_data->src_arch_id         = my_arch_id;
     core_data->dst_core_id         = 1;
-	
-	
 
+	/* Invoke kernel capability to boot new core */
+    // XXX: Confusion address translation about l/gen/addr
+    err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry);
+    if (err_is_fail(err)) {
+        return err_push(err, MON_ERR_SPAWN_CORE);
+    }
 	debug_printf("spawn_second_core returning...\n");
-	
+
+	while(1);	
 	return SYS_ERR_OK;
 }
 
