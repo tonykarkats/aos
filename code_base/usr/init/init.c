@@ -27,7 +27,7 @@
 #include <spawndomain/spawndomain.h>
 #include <barrelfish/thread_sync.h>
 #include "proc.h"
-
+#include "boot.h"
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
 #include "../../lib/spawndomain/arch.h"
@@ -391,6 +391,9 @@ int main(int argc, char *argv[])
 
     // First argument contains the bootinfo location
     bi = (struct bootinfo*)strtol(argv[1], NULL, 10);
+
+	print_modules(bi);
+	while(1);
 
     // setup memory serving
     err = initialize_ram_alloc();
