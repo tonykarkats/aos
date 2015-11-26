@@ -105,7 +105,7 @@ errval_t invoke_monitor_spawn_core(struct capref c_kernel, coreid_t core_id, enu
                     (uintptr_t)(entry >> 32), (uintptr_t) entry).error; 
 } 
  
-errval_t spawn_second_core(struct bootinfo *bi ) 
+errval_t spawn_second_core(struct bootinfo *bi) 
 {
 	errval_t err;
 
@@ -165,7 +165,27 @@ errval_t spawn_second_core(struct bootinfo *bi )
 		DEBUG_ERR(err, "cpu_memory_prepare!\n");
 		return err;
 	}
+	
+    struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
 
+    struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *)binary;
+    core_data->elf.size = sizeof(struct Elf32_Shdr);
+    core_data->elf.addr = cpu_mem.frameid.base + (uintptr_t)head32->e_shoff;
+    core_data->elf.num  = head32->e_shnum;
+
+    core_data->module_start        = cpu_mem.frameid.base;
+    core_data->module_end          = cpu_mem.frameid.base + ;
+    //core_data->urpc_frame_base     = urpc_frame_id.base;
+    //core_data->urpc_frame_bits     = urpc_frame_id.bits;
+    //core_data->monitor_binary      = monitor_blob.paddr;
+    //core_data->monitor_binary_size = monitor_blob.size;
+    //core_data->memory_base_start   = spawn_mem_frameid.base;
+    //core_data->memory_bits         = spawn_mem_frameid.bits;
+    core_data->src_core_id         = 0;
+    core_data->src_arch_id         = my_arch_id;
+    core_data->dst_core_id         = 1;
+	
+	
 
 	debug_printf("spawn_second_core returning...\n");
 	
