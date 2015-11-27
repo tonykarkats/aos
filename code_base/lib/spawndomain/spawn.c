@@ -844,7 +844,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     // unmap bootinfo module pages
     spawn_unmap_module(binary);
 
-	debug_printf("spawn with bootinfo returning!\n");
+	//debug_printf("spawn with bootinfo returning!\n");
 	return SYS_ERR_OK;
 }
 
