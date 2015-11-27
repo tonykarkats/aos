@@ -189,7 +189,7 @@ static void recv_handler(void *arg)
 				d_id = 0;	
 			}
 			else {
-				debug_printf("token %s address\n", token);
+			//	debug_printf("token %s address\n", token);
 				d_id = global_did;
 				global_did++;
 				pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);

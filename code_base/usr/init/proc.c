@@ -34,7 +34,7 @@ struct process_node* insert_process_node(struct process_node * head, domainid_t 
 	new_node->name = malloc(strlen(name)+1);
 	memcpy(new_node->name, name, strlen(name) + 1);
 	
-	debug_printf("inserted %s and name %s\n", new_node->name, name);
+//	debug_printf("inserted %s and name %s\n", new_node->name, name);
 	new_node->background = background;
 	new_node->client_endpoint = client_endpoint;
 	new_node->dispatcher_frame = dispatcher_frame;
@@ -85,6 +85,5 @@ errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct 
 	spawn_free(domain_si);
 	*dispatcher_frame = domain_si->dispframe;	
 
-	debug_printf("bootstrap_domain returning...\n");
 	return SYS_ERR_OK;
 }
