@@ -116,8 +116,23 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
         }
         assert(err_is_ok(err));
 
+		// Copy each module frame in order to be 
+		// able to spawn each process multiple times	
+		struct capref temp_frame;
+		err = slot_alloc(&temp_frame);
+		if (err_is_fail(err)) {
+			debug_printf("Can not copy module frame!\n");
+			return err;
+		}
+
+		err = cap_copy(temp_frame, frame);
+		if (err_is_fail(err)) {
+			debug_printf("Can not copy module frame!\n");
+			return err;
+		}
+
         // map frame to provide physical memory backing
-        err = paging_map_fixed_attr(get_current_paging_state(), vaddr, frame,
+        err = paging_map_fixed_attr(get_current_paging_state(), vaddr, temp_frame,
                 (1UL << id.bits), VREGION_FLAGS_READ);
                 // VREGION_FLAGS_READ_EXECUTE);
                 // FIXME: VREGION_FLAGS_READ_WRITE);

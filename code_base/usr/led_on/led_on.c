@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
 {
 	errval_t err;
 	
-	//printf("led_on: Should have turned led ON!\n");
 	struct capref dev_cap;
 	size_t ret_len;
 
@@ -23,8 +22,6 @@ int main(int argc, char *argv[])
 	if (capref_is_null(dev_cap))
 		printf("Got null dev?!\n");
 
-	//printf("led_on: Got the device moving on...\n");
-	//uint64_t ret_size;	
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0xA310000;
 	void * vbuf;	
