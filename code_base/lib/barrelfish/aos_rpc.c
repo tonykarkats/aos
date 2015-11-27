@@ -475,7 +475,7 @@ errval_t aos_rpc_init(int slot_number)
 		DEBUG_ERR(err, "Error in registering the channel for send_handler!\n");	
 		return LIB_ERR_NO_LMP_BIND_HANDLER;
 	}
-
+	
 	set_init_chan(&memory_channel);
 
   	return SYS_ERR_OK;

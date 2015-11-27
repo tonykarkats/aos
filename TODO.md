@@ -2,9 +2,7 @@
 
 - Handle better our page faults 
 
-- Better error checking 
-
-- Maybe fix malloc (?)
+- Maybe fix malloc (?). Flag for using malloc instead of SafeMalloc in our paging structs 
 
 - Lock on paging struct for each thread
 
@@ -19,3 +17,9 @@
 - Separate exception stack for each thread
 
 - Fix map_page to handle arbitary user frames for consecutive l2 tables
+
+- Use mm functionality for splitting devices
+
+- Fix background processes ?
+
+- Fix exit status and domain id - better process termination

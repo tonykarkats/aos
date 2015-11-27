@@ -120,6 +120,7 @@ int poll_serial_thread(void * arg) {
 	struct thread_cond * char_cond = ( (struct ring_arguments *) arg )->char_wait_cond;
  
 	while(1) {
+		thread_yield();
 		c = serial_getchar();
 		//debug_printf("poll_serial_thread: Got input from user c = %c will put it at tail %d\n", c, ring->tail);
 		bool ret = write_to_ring(ring, &c);

@@ -289,11 +289,13 @@ static void recv_handler(void *arg)
 				debug_printf("recv_handler: Received message from unknown process?!\n");
 				return;
 			}
-
-			err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-			}	
+		
+			//if (!terminated_process->background) {
+				err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+				}	
+			//}
 
 			cap_destroy(terminated_process->client_endpoint);
 			cap_destroy(terminated_process->dispatcher_frame);
