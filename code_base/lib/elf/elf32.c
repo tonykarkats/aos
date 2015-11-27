@@ -232,10 +232,12 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
                     genvaddr_t *ret_tlsbase, size_t *ret_tlsinitlen,
                     size_t *ret_tlstotallen)
 {
+	//debug_printf("HELLLOOOO!\n");
     struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)base;
     errval_t err;
     int i;
 
+	printf("elf32_load: Will load file of size %zu\n", size);
     // Check for valid file size
     if (size < sizeof(struct Elf32_Ehdr)) {
         return ELF_ERR_FILESZ;
@@ -326,11 +328,12 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
     genvaddr_t tls_base = 0;
     size_t tls_init_len = 0, tls_total_len = 0;
 
-	//debug_printf("elf32_load: p->p_vaddr = %p !\n", p->p_vaddr);
+
     // Process program headers to load file
     for (i = 0; i < head->e_phnum; i++) {
         struct Elf32_Phdr *p = &phead[i];
 
+		printf("elf32_load: p->p_vaddr = 0x%lx !\n", p->p_vaddr);
         if (p->p_type == PT_LOAD) {
             // Map segment in user-space memory
             void *dest = NULL;
@@ -339,9 +342,16 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
                 return err_push(err, ELF_ERR_ALLOCATE);
             }
             assert(dest != NULL);
-
+			printf("elf_load: Destination that was given to us is %x\n", (char *) dest);
+			printf("elf_load: Will copy %"PRIu32"\n" , p->p_filesz);
+			
             // Copy file segment into memory
-            memcpy(dest, (void *)(base + (uintptr_t)p->p_offset), p->p_filesz);
+	        memcpy(dest, (void *)(base + (uintptr_t)p->p_offset), p->p_filesz);
+
+			printf("elf_load: Asserting that values are the same! \n");
+			// assertions :)
+			//for (int byte = 0; byte < p->p_filesz; byte++)
+			//	assert( (*( (char *)dest + byte)) == (*( (char *) (void *)(base + (uintptr_t)p->p_offset) + byte)));
 
             // Initialize rest of memory segment (ie. BSS) with all zeroes
             memset((char *)dest + p->p_filesz, 0, p->p_memsz - p->p_filesz);

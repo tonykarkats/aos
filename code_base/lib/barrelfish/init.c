@@ -110,6 +110,8 @@ static size_t custom_printf(const char *buf, int len) {
 	//return printed;
 }
 
+static bool RPC_PRINT = 0;
+
 static size_t custom_scanf(char *buf, size_t len) {
 
 	errval_t err;
@@ -127,25 +129,6 @@ static size_t custom_scanf(char *buf, size_t len) {
 }
 
 
-static size_t user_space_driver_write(const char *buf, size_t len) {
-
-	if (len) {
-		return custom_printf(buf, len);		
-	}
-
-	return 0;
-}
-
-static size_t user_space_driver_read(char *buf, size_t len) {
-	
-	if (len) {
-		return custom_scanf(buf, len);
-	}
-
-	return 0;
-}
-
-/*
 static size_t syscall_terminal_write(const char *buf, size_t len)
 {
     if (len) {
@@ -159,7 +142,34 @@ static size_t dummy_terminal_read(char *buf, size_t len)
     debug_printf("terminal read NYI! returning %d characters read\n", len);
     return len;
 }
-*/
+
+
+static size_t user_space_driver_write(const char *buf, size_t len) {
+
+	if (!RPC_PRINT) {
+		return syscall_terminal_write( buf, len); 
+	}
+	
+	if (len) {
+		return custom_printf(buf, len);		
+	}
+
+	return 0;
+}
+
+static size_t user_space_driver_read(char *buf, size_t len) {
+
+	if (!RPC_PRINT) {
+		return dummy_terminal_read(buf, len);
+	}	
+	
+	if (len) {
+		return custom_scanf(buf, len);
+	}
+
+	return 0;
+}
+
 
 /* Set libc function pointers */
 void barrelfish_libc_glue_init(void)

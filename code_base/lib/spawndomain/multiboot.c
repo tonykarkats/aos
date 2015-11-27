@@ -115,7 +115,7 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
         }
         assert(err_is_ok(err));
 
-		debug_printf("%s %d size = %zu base=%p\n", __FILE__, __LINE__, size, id.base);
+		// debug_printf("%s %d size = %zu base=%p\n", __FILE__, __LINE__, size, id.base);
 
         // map frame to provide physical memory backing
         err = paging_map_fixed_attr(get_current_paging_state(), vaddr, frame,

@@ -100,18 +100,21 @@ elf_load_and_relocate(lvaddr_t blob_start,
 					  lvaddr_t reloc_dest,
                       uintptr_t *reloc_entry)
 {
-	debug_printf("elf_load_and_relocate starting. Reloc source = %x . Reloc_dest = %x\n", blob_start, reloc_dest);
+	debug_printf("elf_load_and_relocate starting. Reloc source = %x . *to = %x . reloc_dest = %x\n", blob_start, (lvaddr_t) to, reloc_dest);
 
     genvaddr_t entry; // entry poing of the loaded elf image
     struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)blob_start;
     struct Elf32_Shdr *symhead, *rel, *symtab;
     errval_t err;
 
-    //state.vbase = (void *)ROUND_UP(to, ARM_L1_ALIGN);
+   	debug_printf("elf_load_and_relocate: Remapped the module! Version = %" PRIu32 " Entry = %" PRIu32 " phoff %" PRIu32 "\n", head->e_version, head->e_entry, head->e_phoff);
+    
+	//state.vbase = (void *)ROUND_UP(to, ARM_L1_ALIGN);
     struct monitor_allocate_state state;
     state.vbase   = to;
     state.elfbase = elf_virtual_base(blob_start);
 
+	debug_printf("elf_load_and_relocate: Original module has state.elfbase = %x  and vbase = %x \n", state.elfbase, state.vbase); 
     err = elf_load(head->e_machine,
                    monitor_elfload_allocate,
                    &state,
@@ -122,8 +125,18 @@ elf_load_and_relocate(lvaddr_t blob_start,
         return err;
     }
 
-	debug_printf("elf_load_and_relcoate: entry point of the loaded elf image 0x%x\n", (lvaddr_t) entry);
+	struct Elf32_Ehdr *head_reloaded = (struct Elf32_Ehdr *)to;	
+   	//debug_printf("elf_load_and_relocate: Remapped module has Version = %" PRIu32 " Entry = %" PRIu32 " phoff %" PRIu32 "\n", head_reloaded->e_version, head_reloaded->e_entry, head_reloaded->e_phoff);
 
+	debug_printf("elf_load_and_relocate: Before assertions...\n");
+	for (int i = 0; i < blob_size; i++) {
+       debug_printf("Asserting value %b with value %b\n", *((char *) blob_start + i),  *((char *) to + i));
+	   break;	
+	   //assert(*((char *) blob_start + i) == *((char *) to + i)); 
+	}
+	
+	debug_printf("elf_load_and_relcoate: entry point of the loaded elf image %"  PRIu64 " \n", entry);
+	
     // Relocate to new physical base address
     debug_printf("Before elf32_relocate!\n");
     symhead = (struct Elf32_Shdr *)(blob_start + (uintptr_t)head->e_shoff);
@@ -168,8 +181,8 @@ errval_t spawn_second_core(struct bootinfo *bi)
         return SPAWN_ERR_FIND_MODULE;
     }
 	
-	debug_printf("Found cpu_omap44xx module. Base = %p and size = %zu \n",
-			  module->mr_base, module->mrmod_size);
+	//debug_printf("Found cpu_omap44xx module. Base = %x and size = %d \n",
+	//		  module->mr_base, (int) module->mrmod_size);
 
 	struct module_blob cpu_blob;
 	cpu_blob.mem_region = module;
@@ -180,8 +193,9 @@ errval_t spawn_second_core(struct bootinfo *bi)
         return err_push(err, SPAWN_ERR_ELF_MAP);
     }
 
-	debug_printf("spawn_second_core: Mapped cpu_module at our vspace at %x, module is at physical address %x \n", cpu_blob.vaddr, cpu_blob.paddr);
-
+	debug_printf("spawn_second_core: Mapped cpu_module at our vspace at 0x%x, module is at physical address 0x%x\n", cpu_blob.vaddr, cpu_blob.paddr);
+	debug_printf("spawn_second_core: Module size is %zu \n", cpu_blob.size);
+	
 	// Helping struct for keeping cpu info 
 	// Size of region will be BASE_PAGE_SIZE + binary_size
     assert(sizeof(struct arm_core_data) <= BASE_PAGE_SIZE);
