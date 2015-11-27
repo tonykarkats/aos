@@ -23,7 +23,7 @@
 #include <barrelfish_kpi/types.h>
 #include <errors/errno.h>
 #include <elf/elf.h>
-
+#include <barrelfish/debug.h>
 /**
  * \brief Load ELF binary image into memory
  *
@@ -45,6 +45,7 @@ errval_t elf_load_tls(uint16_t em_machine, elf_allocator_fn allocate_func,
                       genvaddr_t *ret_tlsbase, size_t *ret_tlsinitlen,
                       size_t *ret_tlstotallen)
 {
+//	debug_printf("elf load_tls beginning...\n");
     struct Elf64_Ehdr *head = (struct Elf64_Ehdr *)base;
 
     if(!IS_ELF(*head)) {
@@ -60,6 +61,7 @@ errval_t elf_load_tls(uint16_t em_machine, elf_allocator_fn allocate_func,
         return elf64_load(em_machine, allocate_func, state, base, size,
                           retentry, ret_tlsbase, ret_tlsinitlen, ret_tlstotallen);
     }
+
 
     return ELF_ERR_HEADER;
 }

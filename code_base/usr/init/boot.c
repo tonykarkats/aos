@@ -17,11 +17,14 @@ static errval_t monitor_elfload_allocate(void *state, genvaddr_t base,
                                          void **retbase)
 {
     struct monitor_allocate_state *s = state;
+	
+	debug_printf("Returning at retbase the address %p\n", (char *)s->vbase + base - s->elfbase);
 
+	
     *retbase = (char *)s->vbase + base - s->elfbase;
     return SYS_ERR_OK;
 }
-
+/*
 static errval_t
 spawn_memory_prepare(size_t size, struct capref *cap_ret,
                      struct frame_identity *frameid)
@@ -42,6 +45,7 @@ spawn_memory_prepare(size_t size, struct capref *cap_ret,
     *cap_ret = cap;
     return SYS_ERR_OK;
 }
+*/
 
 static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
 								   void ** buf_ret, struct frame_identity *frameid)
@@ -50,7 +54,8 @@ static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
 	struct capref cap;
 
 	// First we allocate the memory for the new core!	
-	debug_printf("cpu_memory_prepare: Allocating frame of size %zu..\n", *size);
+	//debug_printf("cpu_memory_prepare: Allocating frame of size %zu..\n", *size);
+
 	err = frame_alloc(&cap, *size, size);
 	if (err_is_fail(err)) {
 		USER_PANIC("Failed to allocate memory for the second core! Error = %s\n", err_getstring(err));
@@ -59,29 +64,43 @@ static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
 	// Now we should map the frame into OUR vspace !
 	// What flags? Ask ta.
 	void *buf;
+	//debug_printf("cpu_memory_prepare: Mapping the newly allocated frame into our memory!\n");
+
 	err = paging_map_frame_attr(get_current_paging_state(), &buf, *size, 
 								cap, FLAGS, NULL, NULL);
 	if (err_is_fail(err)) {
 		USER_PANIC("Failed to map core-frame into our vspace! Error = %s\n", err_getstring(err));
 	}
 	
-	debug_printf("Newly allocated frame for second core at %p\n", (char *)buf); 		
+	char * vb = (char *) buf;
+	//debug_printf("Mapped newly allocated frame for second core at %p. Lets check if it is mapped correctly\n", (char *)buf); 		
+	
+	for (int i = 0; i < *size; i++)
+		vb[i] = i%255;
+	for (int i = 0; i < *size; i++)
+		assert(vb[i] == i%255);
+	
 
 	invoke_frame_identify(cap, frameid);
 	if (err_is_fail(err)) {
 		return err_push(err, LIB_ERR_FRAME_IDENTIFY);
 	}
-	
+
+	debug_printf("cpu_memory_prepare: Allocated a frame at physical base %"PRIu64" / 0x%x and mapped it at virtual address\n", frameid->base, frameid->base);
+
 	*cap_ret = cap;
 	*buf_ret = buf;
 	return SYS_ERR_OK;
 }
 
 static errval_t
-elf_load_and_relocate(lvaddr_t blob_start, size_t blob_size,
-                      void *to, lvaddr_t reloc_dest,
+elf_load_and_relocate(lvaddr_t blob_start, 
+					  size_t blob_size,
+                      void *to, 
+					  lvaddr_t reloc_dest,
                       uintptr_t *reloc_entry)
 {
+	debug_printf("elf_load_and_relocate starting. Reloc source = %x . Reloc_dest = %x\n", blob_start, reloc_dest);
 
     genvaddr_t entry; // entry poing of the loaded elf image
     struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)blob_start;
@@ -96,13 +115,17 @@ elf_load_and_relocate(lvaddr_t blob_start, size_t blob_size,
     err = elf_load(head->e_machine,
                    monitor_elfload_allocate,
                    &state,
-                   blob_start, blob_size,
+                   blob_start, 
+				   blob_size,
                    &entry);
     if (err_is_fail(err)) {
         return err;
     }
 
+	debug_printf("elf_load_and_relcoate: entry point of the loaded elf image 0x%x\n", (lvaddr_t) entry);
+
     // Relocate to new physical base address
+    debug_printf("Before elf32_relocate!\n");
     symhead = (struct Elf32_Shdr *)(blob_start + (uintptr_t)head->e_shoff);
     rel = elf32_find_section_header_type(symhead, head->e_shnum, SHT_REL);
     symtab = elf32_find_section_header_type(symhead, head->e_shnum, SHT_DYNSYM);
@@ -148,8 +171,6 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	debug_printf("Found cpu_omap44xx module. Base = %p and size = %zu \n",
 			  module->mr_base, module->mrmod_size);
 
-	debug_printf("Mapping cpu module in our vspace... Returning the size and the location of the image.\n");
-   
 	struct module_blob cpu_blob;
 	cpu_blob.mem_region = module;
  
@@ -158,6 +179,8 @@ errval_t spawn_second_core(struct bootinfo *bi)
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_ELF_MAP);
     }
+
+	debug_printf("spawn_second_core: Mapped cpu_module at our vspace at %x, module is at physical address %x \n", cpu_blob.vaddr, cpu_blob.paddr);
 
 	// Helping struct for keeping cpu info 
 	// Size of region will be BASE_PAGE_SIZE + binary_size
@@ -181,6 +204,8 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	if (err_is_fail(err)) {
 		USER_PANIC("Error in cpu_memory_prepare! Error = %s\n", err_getstring(err));
 	}
+	debug_printf("spawn_second_core: Allocated a frame at physical base %"PRIu64" / 0x%x and mapped it at virtual address\n", cpu_mem.frameid.base, cpu_mem.frameid.base);
+	debug_printf("spawn_second_core: Virtual address is at %p\n",  cpu_mem.buf);
 
 	// Time to load the cput driver to the newly allocated memory 
 	// and perform the relocation! 
@@ -195,19 +220,7 @@ errval_t spawn_second_core(struct bootinfo *bi)
 		return err;
 	}
 
-	debug_printf("cpu_mem.frameid.base = %p , reloc_entry = %p\n", cpu_mem.frameid.base, reloc_entry);
-	// while(1);
-
-	struct capref spawn_mem_cap;
-	struct frame_identity spawn_mem_frameid;
-
-	err = spawn_memory_prepare(ARM_CORE_DATA_PAGES*BASE_PAGE_SIZE,
-						  	   &spawn_mem_cap,
-							   &spawn_mem_frameid);
-	if (err_is_fail(err)) {
-		DEBUG_ERR(err,"spawn_memory_prepare!\n");
-		return err;
-	}
+	while(1);
 
     struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
 
@@ -222,8 +235,8 @@ errval_t spawn_second_core(struct bootinfo *bi)
     //core_data->urpc_frame_bits     = urpc_frame_id.bits;
     //core_data->monitor_binary      = monitor_blob.paddr;
     //core_data->monitor_binary_size = monitor_blob.size;
-    core_data->memory_base_start   = spawn_mem_frameid.base;
-    core_data->memory_bits         = spawn_mem_frameid.bits;
+    //core_data->memory_base_start   = spawn_mem_frameid.base;
+    //core_data->memory_bits         = spawn_mem_frameid.bits;
     core_data->src_core_id         = 0;
     //core_data->src_arch_id         = my_arch_id;
     core_data->dst_core_id         = 1;

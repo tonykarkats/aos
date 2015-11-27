@@ -405,9 +405,10 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	print_modules(bi);	
+	// print_modules(bi);	
+	
 	spawn_second_core(bi);
-
+	
 	while(1);
 
 	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);

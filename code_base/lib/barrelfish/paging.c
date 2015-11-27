@@ -347,7 +347,7 @@ static void exception_handler(enum exception_type type,
 	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 	
 	if (type == EXCEPT_PAGEFAULT) {
-		//debug_printf("Pagefault exception at address %p\n", addr);
+		debug_printf("Pagefault exception at address %p\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");

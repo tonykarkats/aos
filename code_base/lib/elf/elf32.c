@@ -380,6 +380,7 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
     if (ret_tlstotallen != NULL) {
         *ret_tlstotallen = tls_total_len;
     }
-
+	
+	//debug_printf("load elf32 returning...\n");
     return SYS_ERR_OK;
 }

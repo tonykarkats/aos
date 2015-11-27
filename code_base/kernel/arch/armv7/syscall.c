@@ -45,7 +45,7 @@ struct sysret sys_monitor_spawn_core(coreid_t core_id, enum cpu_type cpu_type,
 	int r;
 	switch(cpu_type) {
 	case CPU_ARM:
-		r = start_aps_arm_start(core_id, (lvaddr_t)entry);
+		r = start_aps_arm_start(core_id, (lpaddr_t)entry);
 		if(r != 0)
 		{
 			return SYSRET(SYS_ERR_CORE_NOT_FOUND);
