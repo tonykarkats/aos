@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
 
-	size_t stress_size = 4096;//atoi(argv[1]);
+	size_t stress_size = 200000;
 	debug_printf("stress_paging: Initializing Stress Paging for %zu bytes!\n", stress_size);
 
 	errval_t err;

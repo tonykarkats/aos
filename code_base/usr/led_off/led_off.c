@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
 {
 	errval_t err;
 	
-	printf("led_off: Turning led OFF!\n");
 	struct capref dev_cap;
 	size_t ret_len;
 	
@@ -20,11 +19,10 @@ int main(int argc, char *argv[])
 		abort();
 	}
 	
-	uint64_t ret_size;	
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0xA310000;
 	void * vbuf;	
-	err = paging_map_frame(get_current_paging_state(),&vbuf, size, dev_cap, &offset, &ret_size);
+	err = paging_map_frame(get_current_paging_state(),&vbuf, size, dev_cap, &offset, &size);
 	if (err_is_fail(err)) {
 		debug_printf("CAN not map dev frame");
 		abort();
