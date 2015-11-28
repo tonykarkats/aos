@@ -193,7 +193,7 @@ void elf32_relocate(genvaddr_t dst, genvaddr_t src,
             break;
 
         default:
-            printf("elf_relocate: relocation %d type %"PRIu32"\n", i, type);
+            //printf("elf_relocate: relocation %d type %"PRIu32"\n", i, type);
             assert(!"Unimplemented: Cannot handle relocation type");
             break;
         }
@@ -237,7 +237,7 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
     errval_t err;
     int i;
 
-	printf("elf32_load: Will load file of size %zu\n", size);
+	//printf("elf32_load: Will load file of size %zu from base 0x%x\n", size, base);
     // Check for valid file size
     if (size < sizeof(struct Elf32_Ehdr)) {
         return ELF_ERR_FILESZ;
@@ -333,7 +333,7 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
     for (i = 0; i < head->e_phnum; i++) {
         struct Elf32_Phdr *p = &phead[i];
 
-		printf("elf32_load: p->p_vaddr = 0x%lx !\n", p->p_vaddr);
+		//printf("elf32_load: p->p_vaddr = 0x%lx !\n", p->p_vaddr);
         if (p->p_type == PT_LOAD) {
             // Map segment in user-space memory
             void *dest = NULL;
@@ -342,23 +342,19 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
                 return err_push(err, ELF_ERR_ALLOCATE);
             }
             assert(dest != NULL);
-			printf("elf_load: Destination that was given to us is %x\n", (char *) dest);
-			printf("elf_load: Will copy %"PRIu32"\n" , p->p_filesz);
+			//printf("elf_load: Destination that was given to us is %x\n", (char *) dest);
+			//printf("elf_load: Will copy %"PRIu32"\n" , p->p_filesz);
 			
             // Copy file segment into memory
 	        memcpy(dest, (void *)(base + (uintptr_t)p->p_offset), p->p_filesz);
-
-			printf("elf_load: Asserting that values are the same! \n");
-			// assertions :)
-			//for (int byte = 0; byte < p->p_filesz; byte++)
-			//	assert( (*( (char *)dest + byte)) == (*( (char *) (void *)(base + (uintptr_t)p->p_offset) + byte)));
 
             // Initialize rest of memory segment (ie. BSS) with all zeroes
             memset((char *)dest + p->p_filesz, 0, p->p_memsz - p->p_filesz);
 
             // Apply relocations
             if (rela != NULL && symtab != NULL) {
-                elf32_relocate(p->p_vaddr, p->p_vaddr,
+               	 //printf("elf32_load: Applying relocations! \n");
+				 elf32_relocate(p->p_vaddr, p->p_vaddr,
                                (struct Elf32_Rel *)
                                (base + (uintptr_t)rela->sh_offset),
                                rela_size,
@@ -391,6 +387,5 @@ errval_t elf32_load(uint16_t em_machine, elf_allocator_fn allocate_func,
         *ret_tlstotallen = tls_total_len;
     }
 	
-	//debug_printf("load elf32 returning...\n");
     return SYS_ERR_OK;
 }

@@ -347,7 +347,7 @@ static void exception_handler(enum exception_type type,
 	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
 	
 	if (type == EXCEPT_PAGEFAULT) {
-		debug_printf("Pagefault exception at address %p\n", addr);
+		//debug_printf("Pagefault exception at address 0%x\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -355,7 +355,7 @@ static void exception_handler(enum exception_type type,
 		}
 
 		if ((lvaddr_t) addr < START_VADDR) {
-			debug_printf("exception_handler: Address outside of valid boundaries ad addr %p!\n", addr);		
+			debug_printf("exception_handler: Address outside of valid boundaries ad addr 0x%x!\n", addr);		
 			abort();
 		}		
 	
@@ -633,7 +633,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		
 	*buf = (void *)vaddr;
 
-	//debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
+	debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
     return SYS_ERR_OK;
 }
 
@@ -645,7 +645,7 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
                                size_t bytes, struct capref frame,
                                int flags, void *arg1, void *arg2)
 {
-	//debug_printf("paging_map_frame_attr: Initiating...Will allocate region of = %d bytes\n", bytes);
+	debug_printf("paging_map_frame_attr: Initiating...Will allocate region of = %d bytes\n", bytes);
     errval_t err = paging_alloc(st, buf, bytes);
     if (err_is_fail(err)) {
         return err;

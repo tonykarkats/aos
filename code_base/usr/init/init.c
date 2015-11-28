@@ -408,9 +408,8 @@ int main(int argc, char *argv[])
 	// print_modules(bi);	
 	
 	spawn_second_core(bi);
-	
-	while(1);
 
+	debug_printf("SPAWNED THE CORE ========================================================================================================================================\n");	
 	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);
 	//pr_head = insert_process_node(pr_head, 2,"test2", 1, NULL_CAP, NULL_CAP);
 	//pr_head = insert_process_node(pr_head, 3,"test3", 1, NULL_CAP, NULL_CAP);

@@ -402,6 +402,11 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
         uint32_t omap_num_cores = scu_get_core_count();
         printk(LOG_NOTE, "Number of cores in system: %"PRIu32"\n",
                 omap_num_cores);
+        
+		volatile uint32_t *ap_wait =
+            (volatile uint32_t*)local_phys_to_mem(AP_WAIT_PHYS);
+        *ap_wait = AP_STARTING_UP;
+        cp15_invalidate_d_cache();
 
         // ARM Cortex A9 TRM section 2.1
         if (omap_num_cores > 4)
@@ -517,7 +522,7 @@ app_core_init(void *pointer)
 	printk(LOG_NOTE,"Hello world!\n");
     printf("in core-1\n");
     printf("########################################################\n");
-    while(true);
+	while(true);
 }
 
 extern uint8_t core_id;
@@ -533,11 +538,9 @@ void arch_init(void *pointer)
     core_id = hal_get_cpu_id();
 
     serial_early_init(serial_console_port);
-//    printk(LOG_NOTE, "hello world\n");
 	
-	//start_aps_arm_start(1 ,(lvaddr_t) app_core_start);
-	//while(1);
-    
+	//printf("HELLO WORLD!\n");
+	
 	if(hal_cpu_is_bsp())
     {
         struct multiboot_info *mb = (struct multiboot_info *)pointer;
@@ -570,24 +573,27 @@ void arch_init(void *pointer)
 
     	my_core_id = core_data->dst_core_id;
     	elf = &core_data->elf;
-        printk(LOG_NOTE, "|%s|\n", glbl_core_data->cmdline);
+	
+        printk(LOG_NOTE, "First byte of kernel 0x%x |%s|\n", &kernel_first_byte, glbl_core_data->cmdline);
     }
-
-
+  
     // XXX: print kernel address for debugging with gdb
     printk(LOG_NOTE, "Barrelfish OMAP44xx CPU driver starting at"
             "addr 0x%"PRIxLVADDR"\n",
 	   local_phys_to_mem((uint32_t)&kernel_first_byte));
-
+ 
     //start_another_core(); while(true); // works
-    print_system_identification();
-    size_ram();
+    
+	print_system_identification();
+ 
+	size_ram();
     set_leds();
     printk(LOG_NOTE, "before paging_init\n");
-    paging_init();
+ 
+ 	paging_init();
     printk(LOG_NOTE, "after paging_init\n");
     cp15_enable_mmu();
     printk(LOG_NOTE, "MMU enabled\n");
-    text_init();
+	text_init();
 }
 

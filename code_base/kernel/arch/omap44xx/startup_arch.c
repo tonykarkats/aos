@@ -737,11 +737,13 @@ void arm_kernel_startup(void)
 
     	my_core_id = core_data->dst_core_id;
 
+		printk(LOG_NOTE, " Came to TODO part!\n");
         // TODO (multicore milestone): setup init domain for core 1
 
     	uint32_t irq = gic_get_active_irq();
     	gic_ack_irq(irq);
-    }
+    	while(1);
+	}
 
     // Should not return
     printk(LOG_NOTE, "Calling dispatch from arm_kernel_startup, start address is=%"

@@ -54,9 +54,12 @@ int start_aps_arm_start(uint8_t core_id, lpaddr_t entry)
     // TODO: you might want to implement this function
 
 	printf("Sending address for core %d at %p\n", core_id, entry);
+	
 	*(uint32_t *) AUX_CORE_BOOT_0 |= 0x00000004;
 	*(uint32_t *) AUX_CORE_BOOT_1 = entry;
 	
+	printf("Address is set!\n");
+
 	send_event();
 
  	return SYS_ERR_OK;

@@ -110,7 +110,7 @@ static size_t custom_printf(const char *buf, int len) {
 	//return printed;
 }
 
-static bool RPC_PRINT = 0;
+static bool RPC_PRINT = 1;
 
 static size_t custom_scanf(char *buf, size_t len) {
 
