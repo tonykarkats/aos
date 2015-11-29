@@ -676,6 +676,8 @@ void arm_kernel_startup(void)
     	/* Initialize the location to allocate phys memory from */
         core_local_alloc_start = glbl_core_data->start_free_ram;
         core_local_alloc_end = PHYS_MEMORY_START + ram_size;
+		printk(LOG_NOTE, "------ start_free_ram = 0x%x with size %zu\n", core_local_alloc_start, ram_size);
+
 
 #if MILESTONE == 3
         // Bring up memory consuming process
@@ -734,15 +736,30 @@ void arm_kernel_startup(void)
     } else {
         debug(SUBSYS_STARTUP, "Doing non-BSP related bootup \n");
         init_dcb = NULL;
+		//panic("HALT");
+		
+		//while(1){;}
 
+        core_local_alloc_start = 0xC0000000;
+        core_local_alloc_end = 0xC0000000 + 0x40000000;
+	
     	my_core_id = core_data->dst_core_id;
 
 		printk(LOG_NOTE, " Came to TODO part!\n");
         // TODO (multicore milestone): setup init domain for core 1
 
+        // Bring up init
+        // struct spawn_state init_st;
+ 
+		struct spawn_state init_st;
+        memset(&init_st, 0, sizeof(struct spawn_state));
+        static struct cte init_rootcn; // gets put into mdb
+        init_dcb = spawn_bsp_init(BSP_INIT_MODULE_NAME, bsp_alloc_phys,
+                                  &init_rootcn, &init_st);
+
+
     	uint32_t irq = gic_get_active_irq();
     	gic_ack_irq(irq);
-    	while(1);
 	}
 
     // Should not return

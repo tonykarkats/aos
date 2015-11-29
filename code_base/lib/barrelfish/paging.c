@@ -633,7 +633,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 		
 	*buf = (void *)vaddr;
 
-	debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
+//	debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
     return SYS_ERR_OK;
 }
 

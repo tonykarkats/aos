@@ -228,7 +228,8 @@ errval_t spawn_second_core(struct bootinfo *bi)
 
     struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
 
-/*
+
+	/*
     struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *)cpu_blob.vaddr;
     core_data->elf.size = sizeof(struct Elf32_Shdr);
     core_data->elf.addr = cpu_blob.paddr + (uintptr_t)head32->e_shoff;
@@ -240,25 +241,23 @@ errval_t spawn_second_core(struct bootinfo *bi)
     //core_data->urpc_frame_bits     = urpc_frame_id.bits;
     core_data->src_core_id         = 0;
     core_data->dst_core_id         = 1;
-*/
+	*/
+
     struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *) cpu_blob.vaddr;
     core_data->elf.size = sizeof(struct Elf32_Shdr);
     core_data->elf.addr = cpu_mem.frameid.base + BASE_PAGE_SIZE + (uintptr_t)head32->e_shoff;
     core_data->elf.num  = head32->e_shnum;
+	
+	core_data->mods_addr = bi->mod_start;
+	core_data->mods_count = bi->mod_count;
+	core_data->mmap_addr = bi->mmap_addr;
+	core_data->mmap_length = bi->mmap_length;
 
     core_data->module_start          = cpu_mem.frameid.base + BASE_PAGE_SIZE; 
     core_data->module_end            = cpu_mem.frameid.base + cpu_mem.size; 
-    //core_data->urpc_frame_base     = urpc_frame_id.base;
-    //core_data->urpc_frame_bits     = urpc_frame_id.bits;
-    //core_data->monitor_binary      = monitor_blob.paddr;
-    //core_data->monitor_binary_size = monitor_blob.size;
-    //core_data->memory_base_start   = spawn_mem_frameid.base;
-    //core_data->memory_bits         = spawn_mem_frameid.bits;
     core_data->src_core_id         = 0;
-    //core_data->src_arch_id         = my_arch_id;
     core_data->dst_core_id         = 1;
 
-	/* Invoke kernel capability to boot new core */
     // XXX: Confusion address translation about l/gen/addr
     err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry); 
 	if (err_is_fail(err)) {
