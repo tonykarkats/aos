@@ -650,6 +650,7 @@ struct dcb *spawn_bsp_init(const char *name, alloc_phys_func alloc_phys_fn,
     bootinfo->mod_count = glbl_core_data->mods_count; // number of ELF modules
     bootinfo->mmap_addr = glbl_core_data->mmap_addr;
     bootinfo->mmap_length = glbl_core_data->mmap_length;
+	bootinfo->coreid = my_core_id;
 
     printk(LOG_NOTE, "spawn_bsp_init done!\n");
     return init_dcb;
@@ -675,7 +676,7 @@ void arm_kernel_startup(void)
 
     	/* Initialize the location to allocate phys memory from */
         core_local_alloc_start = glbl_core_data->start_free_ram;
-        core_local_alloc_end = PHYS_MEMORY_START + ram_size;
+        core_local_alloc_end = PHYS_MEMORY_START + ram_size / 2;
 		printk(LOG_NOTE, "------ start_free_ram = 0x%x with size %zu\n", core_local_alloc_start, ram_size);
 
 
@@ -740,8 +741,10 @@ void arm_kernel_startup(void)
 		
 		//while(1){;}
 
-        core_local_alloc_start = 0xC0000000;
-        core_local_alloc_end = 0xC0000000 + 0x40000000;
+        core_local_alloc_start = PHYS_MEMORY_START + ram_size / 2;
+        core_local_alloc_end = PHYS_MEMORY_START + ram_size;
+		//printk(LOG_NOTE, "core_local_alloc_start = 0x%x core_local_alloc_end = 0x%x\n", core_local_alloc_start, core_local_alloc_end);		
+
 	
     	my_core_id = core_data->dst_core_id;
 

@@ -158,6 +158,8 @@ struct mem_region {
  * allocate and manage its address space.
  */
 struct bootinfo {
+
+	int coreid;
     /// Number of entries in regions array
     size_t              regions_length;
     /// Amount of memory required to spawn another core
