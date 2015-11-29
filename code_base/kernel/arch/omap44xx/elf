@@ -1,0 +1,28 @@
+startup_arch.c:272:        (struct multiboot_modinfo *)local_phys_to_mem(glbl_core_data->mods_addr);
+startup_arch.c:274:    debug(SUBSYS_STARTUP, "glbl_core_data->mods_addr: 0x%"PRIxLPADDR" \n",
+startup_arch.c:275:            glbl_core_data->mods_addr);
+startup_arch.c:292:    for (int i = 0; i < glbl_core_data->mods_count; i++) {
+startup_arch.c:346:    char *mmap_addr = MBADDR_ASSTRING(glbl_core_data->mmap_addr);
+startup_arch.c:349:    for(char *m = mmap_addr; m < mmap_addr + glbl_core_data->mmap_length;)
+startup_arch.c:649:    bootinfo->mod_start = glbl_core_data->mods_addr; // ELF module list addr
+startup_arch.c:650:    bootinfo->mod_count = glbl_core_data->mods_count; // number of ELF modules
+startup_arch.c:651:    bootinfo->mmap_addr = glbl_core_data->mmap_addr;
+startup_arch.c:652:    bootinfo->mmap_length = glbl_core_data->mmap_length;
+startup_arch.c:677:        core_local_alloc_start = glbl_core_data->start_free_ram;
+startup_arch.c:738:    	my_core_id = core_data->dst_core_id;
+init.c:270:    cmdline = MBADDR_ASSTRING(glbl_core_data->cmdline);
+init.c:297:    if(glbl_core_data->multiboot_flags & MULTIBOOT_INFO_FLAG_HAS_MMAP)
+init.c:300://            local_phys_to_mem(glbl_core_data->mmap_addr);
+init.c:549:       glbl_core_data->start_free_ram = ROUND_UP(max(multiboot_end_addr(mb),
+init.c:552:        glbl_core_data->mods_addr = mb->mods_addr;
+init.c:553:        glbl_core_data->mods_count = mb->mods_count;
+init.c:554:        glbl_core_data->cmdline = mb->cmdline;
+init.c:555:        glbl_core_data->mmap_length = mb->mmap_length;
+init.c:556:        glbl_core_data->mmap_addr = mb->mmap_addr;
+init.c:557:        glbl_core_data->multiboot_flags = mb->flags;
+init.c:569:    	glbl_core_data->cmdline = (lpaddr_t)&core_data->kernel_cmdline;
+init.c:570:        glbl_core_data->multiboot_flags = 0; // clear mb flags
+init.c:571:    	glbl_core_data->start_free_ram = ROUND_UP(max(glbl_core_data->start_free_ram,
+init.c:574:    	my_core_id = core_data->dst_core_id;
+init.c:575:    	elf = &core_data->elf;
+init.c:577:        printk(LOG_NOTE, "First byte of kernel 0x%x |%s|\n", &kernel_first_byte, glbl_core_data->cmdline);
