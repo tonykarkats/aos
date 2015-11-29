@@ -1,5 +1,7 @@
 #include <barrelfish/misc.h>
 #include <barrelfish/debug.h>
+#include <stdlib.h>
+
 /***********************************************************************/
 /*  FUNCTION:  void Assert(int assertion, char* error)  */
 /**/
@@ -60,6 +62,7 @@ void * SafeMalloc(size_t size) {
 /*  NullFunction does nothing it is included so that it can be passed */
 /*  as a function to RBTreeCreate when no other suitable function has */
 /*  been defined */
+bool use_system_wide_malloc = false;
 
 #define BUFFER_SIZE 10UL*1024*1024
 static char memory_buffer[BUFFER_SIZE];
@@ -67,15 +70,26 @@ static int pointer = 0;
 
 void * SafeMalloc(size_t size) {
 
-	if ((pointer + size)>BUFFER_SIZE) {
-		debug_printf("OUT OF STATIC MEMORY!");
-		abort();
-	}
-	char* return_address = memory_buffer+pointer;
+	if (!use_system_wide_malloc) {
+		if ((pointer + size)>BUFFER_SIZE) {
+			debug_printf("OUT OF STATIC MEMORY!");
+			abort();
+		}
+		char* return_address = memory_buffer+pointer;
     
-    pointer += size;
-    
-    return (void *) return_address;  
+    	pointer += size;
+		return (void *) return_address;  
+    }
+	else {
+		char* return_address = malloc(size);
+		return return_address;
+	}	
+
+}
+
+void set_real_malloc(void) 
+{
+	use_system_wide_malloc = true;
 }
 
 void SafeFree(void* addr) {

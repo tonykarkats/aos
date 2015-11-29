@@ -21,7 +21,7 @@
 /*                variable name is gNewtonsConstant. */
 void * SafeMalloc(size_t size);
 void SafeFree(void*);
-
+void set_real_malloc(void);
 
 void Assert(int assertion, char* error);
 void NullFunction(void * junk);

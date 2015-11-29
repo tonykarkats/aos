@@ -30,7 +30,7 @@
 #include "threads_priv.h"
 #include "init.h"
 #include <barrelfish/aos_rpc.h>
-
+#include <barrelfish/misc.h>
 /// Are we the init domain (and thus need to take some special paths)?
 
 static char domain_name[32];
@@ -246,6 +246,9 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 
 	
     lmp_endpoint_init();
+	
+	//set_real_malloc();	
+	//debug_printf("seted real malloc for allocations :D");
 
 	// init domains only get partial init
     if (init_domain) {
