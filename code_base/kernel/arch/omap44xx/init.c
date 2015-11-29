@@ -439,6 +439,7 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
         volatile lvaddr_t *aux_core_boot_0 = (lpaddr_t*)(aux_core_boot_section +
                 (AUX_CORE_BOOT_0 & ARM_L1_SECTION_MASK));
         *aux_core_boot_0 = 2 << 2;
+		
 
 #if 0
         // FIXME: for debugging printf interleavings
@@ -462,6 +463,7 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
     // XXX NYI: See Section 27.4.4 in the OMAP44xx manual for how this
     // should work. 
 
+	
     arm_kernel_startup();
 }
 
@@ -600,6 +602,8 @@ void arch_init(void *pointer)
 
 	cp15_enable_mmu();
     printk(LOG_NOTE, "MMU enabled\n");
+
+
 	
 	text_init();
 }

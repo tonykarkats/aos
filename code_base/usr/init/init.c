@@ -22,13 +22,13 @@
 #include <barrelfish/sys_debug.h>
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
-#include "omap_uart.h"
+#include <barrelfish/omap_uart.h>
 #include <barrelfish/thread_sync.h>
 #include <spawndomain/spawndomain.h>
 #include <barrelfish/thread_sync.h>
-#include "proc.h"
-#include "boot.h"
-#include "cross_core.h"
+#include <barrelfish/proc.h>
+#include <barrelfish/boot.h>
+#include <barrelfish/cross_core.h>
 
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
@@ -417,6 +417,14 @@ int main(int argc, char *argv[])
 	 	poll_for_core();
 		
 		debug_printf("Core booted OK!\n");	
+	
+		void * buf;
+		err = map_shared_frame(&buf);
+
+		char * shared_buf = (char *) buf;
+		for (int i = 0 ; i < 4096; i++)
+			debug_printf("%d\n", shared_buf[i]);	
+
 		while(1);	
 	}
 	else {

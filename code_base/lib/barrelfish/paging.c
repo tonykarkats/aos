@@ -358,6 +358,8 @@ static void exception_handler(enum exception_type type,
 			debug_printf("exception_handler: Address outside of valid boundaries ad addr %p!\n", addr);		
 			abort();
 		}		
+
+
 	
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
 			debug_printf("exception_handler: Address not mapped!\n");
@@ -645,7 +647,7 @@ errval_t paging_map_frame_attr(struct paging_state *st, void **buf,
                                size_t bytes, struct capref frame,
                                int flags, void *arg1, void *arg2)
 {
-	//debug_printf("paging_map_frame_attr: Initiating...Will allocate region of = %d bytes\n", bytes);
+	debug_printf("paging_map_frame_attr: Initiating...Will allocate region of = %d bytes\n", bytes);
     errval_t err = paging_alloc(st, buf, bytes);
     if (err_is_fail(err)) {
         return err;

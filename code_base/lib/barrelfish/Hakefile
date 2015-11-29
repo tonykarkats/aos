@@ -11,7 +11,7 @@
 --------------------------------------------------------------------------
 
 [(let arch_dir = "arch" ./. archFamily arch
-      common_srcs = [ "aos_rpc.c", "capabilities.c", "init.c", "dispatch.c",
+      common_srcs = [ "boot.c" , "proc.c", "cross_core.c" , "omap_uart.c" , "aos_rpc.c", "capabilities.c", "init.c", "dispatch.c",
                       "threads.c", "thread_sync.c", "slab.c", "domain.c", "idc.c",
                       "waitset.c", "event_queue.c", "event_mutex.c",
                       "idc_export.c", "msgbuf.c",
@@ -45,6 +45,8 @@
                     architectures = [arch],
                     cFiles = arch_srcs arch ++ archfam_srcs (archFamily arch)
                              ++ common_srcs ++ idc_srcs,
+                     addLibraries = [ "mm", "getopt", "trace", "elf",
+                            "spawndomain", "elf" ],
                     assemblyFiles = arch_assembly (archFamily arch),
                     flounderBindings = [ "mem", "octopus", "serial",
                                          "interdisp", "spawn", "keyboard" ],

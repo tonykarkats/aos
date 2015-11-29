@@ -57,7 +57,10 @@ int start_aps_arm_start(uint8_t core_id, lpaddr_t entry)
 	
 	*(uint32_t *) AUX_CORE_BOOT_0 |= 0x00000004;
 	*(uint32_t *) AUX_CORE_BOOT_1 = entry;
-	
+
+	//*(uint32_t *) (0x82ad8000 + 0x81800) |= 0x00000004;
+	//*(uint32_t *) (0x82ad8000 + 0x81804)  = entry;
+
 	printf("Address is set!\n");
 
 	send_event();

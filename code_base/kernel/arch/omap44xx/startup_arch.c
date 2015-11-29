@@ -61,6 +61,7 @@ size_t ump_frame_bits;
 #endif
 #define ADDTITIONAL_MODULE_NAME "armv7/sbin/memeater"
 
+#define APP_INIT_MODULE_NAME "armv7/sbin/initapp"
 static union arm_l1_entry * init_l1;              // L1 page table for init
 static union arm_l2_entry * init_l2;              // L2 page tables for init
 
@@ -756,7 +757,7 @@ void arm_kernel_startup(void)
 		struct spawn_state init_st;
         memset(&init_st, 0, sizeof(struct spawn_state));
         static struct cte init_rootcn; // gets put into mdb
-        init_dcb = spawn_bsp_init(BSP_INIT_MODULE_NAME, bsp_alloc_phys,
+        init_dcb = spawn_bsp_init(APP_INIT_MODULE_NAME, bsp_alloc_phys,
                                   &init_rootcn, &init_st);
 
     	uint32_t irq = gic_get_active_irq();

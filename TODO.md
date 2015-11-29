@@ -26,4 +26,4 @@
 
 - Fix weird bug with send string acknowledgemnt back to client
 
-- Fix 1-1 mapping for aux core registers, use paging_alloc for them
+- Fix 1-1 mapping for aux core registers, use paging_alloc for them OR find another mapping!
