@@ -27,6 +27,8 @@
 #include <spawndomain/spawndomain.h>
 #include <barrelfish/thread_sync.h>
 #include "proc.h"
+#include "boot.h"
+#include "cross_core.h"
 
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
@@ -407,6 +409,12 @@ int main(int argc, char *argv[])
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();
     }
+
+	if (get_core_id(bi) == 0) {
+
+		spawn_second_core(bi);
+		while(1);	
+	}
 
 	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);
 	//pr_head = insert_process_node(pr_head, 2,"test2", 1, NULL_CAP, NULL_CAP);

@@ -164,6 +164,8 @@ struct bootinfo {
     size_t              mem_spawn_core;
     /// Following elements are there only to be passed to another core
     /// start of modules list (in kernel space)
+
+	int coreid;
     genpaddr_t          mod_start;
     genpaddr_t          mod_count;
     genpaddr_t          mmap_length;

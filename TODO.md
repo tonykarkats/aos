@@ -1,4 +1,4 @@
-- Allocate memory for paging book keeping struct with the use of slab allocator
+- Allocate memory for paging book keeping struct with the use of slab allocatorG
 
 - Handle better our page faults 
 
@@ -18,8 +18,10 @@
 
 - Fix map_page to handle arbitary user frames for consecutive l2 tables
 
-- Use mm functionality for splitting devices
+- Use mm functionality for splitting devices VERY IMPORTANT FOR FILESYSTEM MILESTONE
 
 - Fix background processes ?
 
 - Fix exit status and domain id - better process termination
+
+- Fix weird bug with send string acknowledgemnt back to client

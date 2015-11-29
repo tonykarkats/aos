@@ -402,6 +402,11 @@ static void  __attribute__ ((noinline,noreturn)) text_init(void)
         uint32_t omap_num_cores = scu_get_core_count();
         printk(LOG_NOTE, "Number of cores in system: %"PRIu32"\n",
                 omap_num_cores);
+        
+		volatile uint32_t *ap_wait =
+            (volatile uint32_t*)local_phys_to_mem(AP_WAIT_PHYS);
+        *ap_wait = AP_STARTING_UP;
+        cp15_invalidate_d_cache();
 
         // ARM Cortex A9 TRM section 2.1
         if (omap_num_cores > 4)
@@ -475,7 +480,7 @@ static void print_system_identification(void)
     printk(LOG_NOTE, "Device is a %s\n", buf);
 }
 
-
+/*
 static size_t bank_size(int bank, lpaddr_t base)
 {
     int rowbits;
@@ -484,20 +489,20 @@ static size_t bank_size(int bank, lpaddr_t base)
     omap44xx_emif_t emif;
     omap44xx_emif_initialize(&emif, (mackerel_addr_t)base);
     if (omap44xx_emif_status_phy_dll_ready_rdf(&emif)) {
-	rowbits = omap44xx_emif_sdram_config_rowsize_rdf(&emif) + 9;
-	colbits = omap44xx_emif_sdram_config_pagesize_rdf(&emif) + 9;
-	rowsize = omap44xx_emif_sdram_config2_rdbsize_rdf(&emif) + 5;
-	printk(LOG_NOTE, "EMIF%d: ready, %d-bit rows, %d-bit cols, %d-byte row buffer\n",
-	       bank, rowbits, colbits, 1<<rowsize);
-	return (1 << (rowbits + colbits + rowsize));
+		rowbits = omap44xx_emif_sdram_config_rowsize_rdf(&emif) + 9;
+		colbits = omap44xx_emif_sdram_config_pagesize_rdf(&emif) + 9;
+		rowsize = omap44xx_emif_sdram_config2_rdbsize_rdf(&emif) + 5;
+		printk(LOG_NOTE, "EMIF%d: ready, %d-bit rows, %d-bit cols, %d-byte row buffer\n",
+	    	   bank, rowbits, colbits, 1<<rowsize);
+		return (1 << (rowbits + colbits + rowsize));
     } else {
 	printk(LOG_NOTE, "EMIF%d doesn't seem to have any DDRAM attached.\n", bank);
 	return 0;
     }
 }
-
-size_t ram_size = 0;
-
+*/
+size_t ram_size = 0x40000000;
+/*
 static void size_ram(void)
 {
     size_t sz = 0;
@@ -506,17 +511,18 @@ static void size_ram(void)
 	   sz, sz == 0x40000000 ? "about right" : "unexpected" );
     ram_size = sz;
 }
-
+*/
 
 void app_core_init(void *pointer);
 void  __attribute__ ((noinline,noreturn))
 app_core_init(void *pointer)
 {
 
-//    serial_early_init(serial_console_port);
+    //serial_early_init(serial_console_port);
+	printk(LOG_NOTE,"Hello world!\n");
     printf("in core-1\n");
     printf("########################################################\n");
-    while(true);
+	while(true);
 }
 
 extern uint8_t core_id;
@@ -532,14 +538,15 @@ void arch_init(void *pointer)
     core_id = hal_get_cpu_id();
 
     serial_early_init(serial_console_port);
-//    printk(LOG_NOTE, "hello world\n");
-
-    if(hal_cpu_is_bsp())
+	printk(LOG_NOTE,"Hello world from core %d!\n", core_id);	
+	//printf("HELLO WORLD!\n");
+	
+	if(hal_cpu_is_bsp())
     {
         struct multiboot_info *mb = (struct multiboot_info *)pointer;
         elf = (struct arm_coredata_elf *)&mb->syms.elf;
     	memset(glbl_core_data, 0, sizeof(struct arm_core_data));
-       glbl_core_data->start_free_ram = ROUND_UP(max(multiboot_end_addr(mb),
+        glbl_core_data->start_free_ram = ROUND_UP(max(multiboot_end_addr(mb),
                     (uintptr_t)&kernel_final_byte), BASE_PAGE_SIZE);
 
         glbl_core_data->mods_addr = mb->mods_addr;
@@ -548,6 +555,8 @@ void arch_init(void *pointer)
         glbl_core_data->mmap_length = mb->mmap_length;
         glbl_core_data->mmap_addr = mb->mmap_addr;
         glbl_core_data->multiboot_flags = mb->flags;
+
+		printk(LOG_NOTE, "mods_addr = 0x%x mods_count = %zu mmap_addr = 0x%x mmap_length = %zu \n", glbl_core_data->mods_addr, glbl_core_data->mods_count, glbl_core_data->mmap_addr, glbl_core_data->mmap_length);
 
         memset(&global->locks, 0, sizeof(global->locks));
     }
@@ -558,32 +567,42 @@ void arch_init(void *pointer)
     	struct arm_core_data *core_data =
             (struct arm_core_data*)((lvaddr_t)&kernel_first_byte
                             - BASE_PAGE_SIZE);
-    	glbl_core_data = core_data;
+    
+     	glbl_core_data = core_data;
     	glbl_core_data->cmdline = (lpaddr_t)&core_data->kernel_cmdline;
         glbl_core_data->multiboot_flags = 0; // clear mb flags
     	glbl_core_data->start_free_ram = ROUND_UP(max(glbl_core_data->start_free_ram,
                     (uintptr_t)&kernel_final_byte), BASE_PAGE_SIZE);
 
+		printk(LOG_NOTE, "mods_addr = 0x%x mods_count = %zu mmap_addr = 0x%x mmap_length = %zu \n", glbl_core_data->mods_addr, glbl_core_data->mods_count, glbl_core_data->mmap_addr, glbl_core_data->mmap_length);
     	my_core_id = core_data->dst_core_id;
     	elf = &core_data->elf;
-        printk(LOG_NOTE, "|%s|\n", glbl_core_data->cmdline);
+	
+        printk(LOG_NOTE, "First byte of kernel 0x%x |%s|\n", &kernel_first_byte, glbl_core_data->cmdline);
     }
-
-
+  
     // XXX: print kernel address for debugging with gdb
     printk(LOG_NOTE, "Barrelfish OMAP44xx CPU driver starting at"
             "addr 0x%"PRIxLVADDR"\n",
 	   local_phys_to_mem((uint32_t)&kernel_first_byte));
-
+ 
     //start_another_core(); while(true); // works
-    print_system_identification();
-    size_ram();
-    set_leds();
+    
+	print_system_identification();
+ 
+	//size_ram();
+    
+	set_leds();
     printk(LOG_NOTE, "before paging_init\n");
-    paging_init();
+  	paging_init();
     printk(LOG_NOTE, "after paging_init\n");
-    cp15_enable_mmu();
+    
+	//if (!hal_cpu_is_bsp()) 	
+	//	while(1){;}
+
+	cp15_enable_mmu();
     printk(LOG_NOTE, "MMU enabled\n");
-    text_init();
+	
+	text_init();
 }
 

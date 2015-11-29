@@ -650,6 +650,7 @@ struct dcb *spawn_bsp_init(const char *name, alloc_phys_func alloc_phys_fn,
     bootinfo->mod_count = glbl_core_data->mods_count; // number of ELF modules
     bootinfo->mmap_addr = glbl_core_data->mmap_addr;
     bootinfo->mmap_length = glbl_core_data->mmap_length;
+	bootinfo->coreid = my_core_id;
 
     printk(LOG_NOTE, "spawn_bsp_init done!\n");
     return init_dcb;
@@ -675,7 +676,9 @@ void arm_kernel_startup(void)
 
     	/* Initialize the location to allocate phys memory from */
         core_local_alloc_start = glbl_core_data->start_free_ram;
-        core_local_alloc_end = PHYS_MEMORY_START + ram_size;
+        core_local_alloc_end = PHYS_MEMORY_START + ram_size / 2;
+		printk(LOG_NOTE, "------ start_free_ram = 0x%x with size %zu\n", core_local_alloc_start, ram_size);
+
 
 #if MILESTONE == 3
         // Bring up memory consuming process
@@ -734,14 +737,33 @@ void arm_kernel_startup(void)
     } else {
         debug(SUBSYS_STARTUP, "Doing non-BSP related bootup \n");
         init_dcb = NULL;
+		//panic("HALT");
+		
+		//while(1){;}
 
+        core_local_alloc_start = PHYS_MEMORY_START + ram_size / 2;
+        core_local_alloc_end = PHYS_MEMORY_START + ram_size;
+		//printk(LOG_NOTE, "core_local_alloc_start = 0x%x core_local_alloc_end = 0x%x\n", core_local_alloc_start, core_local_alloc_end);		
+
+	
     	my_core_id = core_data->dst_core_id;
 
+		printk(LOG_NOTE, " Came to TODO part!\n");
         // TODO (multicore milestone): setup init domain for core 1
+
+        // Bring up init
+        // struct spawn_state init_st;
+ 
+		struct spawn_state init_st;
+        memset(&init_st, 0, sizeof(struct spawn_state));
+        static struct cte init_rootcn; // gets put into mdb
+        init_dcb = spawn_bsp_init(BSP_INIT_MODULE_NAME, bsp_alloc_phys,
+                                  &init_rootcn, &init_st);
+
 
     	uint32_t irq = gic_get_active_irq();
     	gic_ack_irq(irq);
-    }
+	}
 
     // Should not return
     printk(LOG_NOTE, "Calling dispatch from arm_kernel_startup, start address is=%"

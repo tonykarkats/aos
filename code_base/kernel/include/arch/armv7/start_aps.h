@@ -37,6 +37,8 @@
 
 void send_event(void);
 
+void app_core_start(void); // defined in boot.S
+
 int start_aps_arm_start(uint8_t core_id, lvaddr_t entry);
 
 #endif // START_APS_H_
