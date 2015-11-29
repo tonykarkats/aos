@@ -412,8 +412,19 @@ int main(int argc, char *argv[])
 
 	if (get_core_id(bi) == 0) {
 
+		map_aux_core_registers();
 		spawn_second_core(bi);
-		while(1);	
+	 	poll_for_core();
+		
+		debug_printf("Core booted OK!\n");	
+		//while(1);	
+	}
+	else {
+		
+		debug_printf("Signaling core-0 that we are up!\n");
+		map_aux_core_registers();
+		signal_core_0();
+		while(1);		
 	}
 
 	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);

@@ -129,7 +129,34 @@ elf_load_and_relocate(lvaddr_t blob_start,
     return SYS_ERR_OK;
 }
 
+errval_t map_aux_core_registers(void) 
+{
+	errval_t err;
 
+	// FIX ME TO USE MM ALLOCATIONS
+	struct capref temp_cap_io;
+	err = slot_alloc(&temp_cap_io);
+	if (err_is_fail(err)) {
+		debug_printf("spawn_seconde_core: Can not copy device caref!\n");
+		abort();
+	}	
+
+	err = cap_copy(temp_cap_io, cap_io);
+	if (err_is_fail(err)) {
+		debug_printf("spawn_second_core: Can not copy from io \n");
+		return LIB_ERR_CAP_COPY;
+	}
+
+	uint64_t size = 0x1000;
+	uint64_t offset = 0x8281000;
+	err = paging_map_fixed_attr_args( get_current_paging_state(), 0x48281000, temp_cap_io, size, DEVICE_FLAGS, &offset, &size);
+	if (err_is_fail(err)) {
+		debug_printf("spawn_second_core: Can not copy from io \n");
+		return LIB_ERR_VNODE_MAP;
+	}
+
+	return SYS_ERR_OK;
+}
 
 errval_t invoke_monitor_spawn_core( coreid_t core_id, enum cpu_type cpu_type, 
                           forvaddr_t entry) 
@@ -145,23 +172,6 @@ errval_t invoke_monitor_spawn_core( coreid_t core_id, enum cpu_type cpu_type,
 errval_t spawn_second_core(struct bootinfo *bi) 
 {
 	errval_t err;
-
-	struct capref temp_cap_io;
-	err = slot_alloc(&temp_cap_io);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_seconde_core: Can not copy device caref!\n");
-		abort();
-	}	
-
-	err = cap_copy(temp_cap_io, cap_io);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_second_core: Can not copy from io \n");
-		abort();
-	}
-
-	uint64_t size = 0x1000;
-	uint64_t offset = 0x8281000;
-	err = paging_map_fixed_attr_args( get_current_paging_state(), 0x48281000, temp_cap_io, size, DEVICE_FLAGS, &offset, &size);
 
 	char name[100] = "armv7/sbin/cpu_omap44xx";
     struct mem_region *module = multiboot_find_module(bi, name);

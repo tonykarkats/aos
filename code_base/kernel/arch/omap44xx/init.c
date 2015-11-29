@@ -538,8 +538,6 @@ void arch_init(void *pointer)
     core_id = hal_get_cpu_id();
 
     serial_early_init(serial_console_port);
-	printk(LOG_NOTE,"Hello world from core %d!\n", core_id);	
-	//printf("HELLO WORLD!\n");
 	
 	if(hal_cpu_is_bsp())
     {
@@ -556,7 +554,7 @@ void arch_init(void *pointer)
         glbl_core_data->mmap_addr = mb->mmap_addr;
         glbl_core_data->multiboot_flags = mb->flags;
 
-		printk(LOG_NOTE, "mods_addr = 0x%x mods_count = %zu mmap_addr = 0x%x mmap_length = %zu \n", glbl_core_data->mods_addr, glbl_core_data->mods_count, glbl_core_data->mmap_addr, glbl_core_data->mmap_length);
+		//printk(LOG_NOTE, "mods_addr = 0x%x mods_count = %zu mmap_addr = 0x%x mmap_length = %zu \n", glbl_core_data->mods_addr, glbl_core_data->mods_count, glbl_core_data->mmap_addr, glbl_core_data->mmap_length);
 
         memset(&global->locks, 0, sizeof(global->locks));
     }
@@ -578,7 +576,7 @@ void arch_init(void *pointer)
     	my_core_id = core_data->dst_core_id;
     	elf = &core_data->elf;
 	
-        printk(LOG_NOTE, "First byte of kernel 0x%x |%s|\n", &kernel_first_byte, glbl_core_data->cmdline);
+        //printk(LOG_NOTE, "First byte of kernel 0x%x |%s|\n", &kernel_first_byte, glbl_core_data->cmdline);
     }
   
     // XXX: print kernel address for debugging with gdb
