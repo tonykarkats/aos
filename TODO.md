@@ -18,10 +18,12 @@
 
 - Fix map_page to handle arbitary user frames for consecutive l2 tables
 
-- Use mm functionality for splitting devices VERY IMPORTANT FOR FILESYSTEM MILESTONE
+- Use mm functionality for splitting devices VERY IMPORTANT FOR FILESYSTEM MILESTONE ****
 
-- Fix background processes ?
+- Fix background processes ? 
 
-- Fix exit status and domain id - better process termination
+- Fix exit status and domain id - better process termination ****
 
 - Fix weird bug with send string acknowledgemnt back to client
+
+- Fix 1-1 mapping for aux core registers, use paging_alloc for them

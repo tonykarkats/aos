@@ -417,7 +417,7 @@ int main(int argc, char *argv[])
 	 	poll_for_core();
 		
 		debug_printf("Core booted OK!\n");	
-		//while(1);	
+		while(1);	
 	}
 	else {
 		
@@ -426,11 +426,6 @@ int main(int argc, char *argv[])
 		signal_core_0();
 		while(1);		
 	}
-
-	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);
-	//pr_head = insert_process_node(pr_head, 2,"test2", 1, NULL_CAP, NULL_CAP);
-	//pr_head = insert_process_node(pr_head, 3,"test3", 1, NULL_CAP, NULL_CAP);
-	//pr_head = insert_process_node(pr_head, 4,"test4", 1, NULL_CAP, NULL_CAP);
 
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;

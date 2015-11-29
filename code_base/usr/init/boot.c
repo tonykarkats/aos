@@ -78,22 +78,22 @@ elf_load_and_relocate(lvaddr_t blob_start,
 					  lvaddr_t reloc_dest,
                       uintptr_t *reloc_entry)
 {
-	debug_printf("elf_load_and_relocate starting. Reloc source = %x . *to = %x . reloc_dest = %x\n", blob_start, (lvaddr_t) to, reloc_dest);
+	//debug_printf("elf_load_and_relocate starting. Reloc source = %x . *to = %x . reloc_dest = %x\n", blob_start, (lvaddr_t) to, reloc_dest);
 
     genvaddr_t entry; // entry poing of the loaded elf image
     struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)blob_start;
     struct Elf32_Shdr *symhead, *rel, *symtab;
     errval_t err;
 
-   	debug_printf("elf_load_and_relocate: Original module! Version = %" PRIu32 " Entry = %" PRIu32 " phoff %" PRIu32 "\n", head->e_version, head->e_entry, head->e_phoff);
+   	//debug_printf("elf_load_and_relocate: Original module! Version = %" PRIu32 " Entry = %" PRIu32 " phoff %" PRIu32 "\n", head->e_version, head->e_entry, head->e_phoff);
     
 	//state.vbase = (void *)ROUND_UP(to, ARM_L1_ALIGN);
     struct monitor_allocate_state state;
     state.vbase   = to;
     state.elfbase = elf_virtual_base(blob_start);
 
-	debug_printf("elf_load_and_relocate: state.elfbase = %" PRIu64 "\n", state.elfbase); 
-    debug_printf("elf_load_and_relocate: state.vbase = 0x%x\n", state.vbase); 
+	//debug_printf("elf_load_and_relocate: state.elfbase = %" PRIu64 "\n", state.elfbase); 
+    //debug_printf("elf_load_and_relocate: state.vbase = 0x%x\n", state.vbase); 
 	
 	err = elf_load(head->e_machine,
                    monitor_elfload_allocate,
@@ -110,7 +110,7 @@ elf_load_and_relocate(lvaddr_t blob_start,
 	//	debug_printf("%d  %d\n", ((char *)to)[i], ((char *)blob_start)[i] );
 	//}
 	// Relocate to new physical base address
-    debug_printf("Before elf32_relocate!\n");
+    //debug_printf("Before elf32_relocate!\n");
     symhead = (struct Elf32_Shdr *)(blob_start + (uintptr_t)head->e_shoff);
     rel = elf32_find_section_header_type(symhead, head->e_shnum, SHT_REL);
     symtab = elf32_find_section_header_type(symhead, head->e_shnum, SHT_DYNSYM);
@@ -125,7 +125,7 @@ elf_load_and_relocate(lvaddr_t blob_start,
 
     *reloc_entry = entry - state.elfbase + reloc_dest;
 	
-	debug_printf("elf_load_and_relocate: reloc entry returned is 0x%x \n", *reloc_entry);
+	//debug_printf("elf_load_and_relocate: reloc entry returned is 0x%x \n", *reloc_entry);
     return SYS_ERR_OK;
 }
 
@@ -190,13 +190,13 @@ errval_t spawn_second_core(struct bootinfo *bi)
         return err_push(err, SPAWN_ERR_ELF_MAP);
     }
 
-	debug_printf("spawn_second_core: Mapped cpu_module at our vspace at 0x%x, module is at physical address 0x%x\n", cpu_blob.vaddr, cpu_blob.paddr);
-	debug_printf("spawn_second_core: Module size is %zu \n", cpu_blob.size);
-	debug_printf("spawn_second_core: Is our elf mapped correctly?\n");
+	//debug_printf("spawn_second_core: Mapped cpu_module at our vspace at 0x%x, module is at physical address 0x%x\n", cpu_blob.vaddr, cpu_blob.paddr);
+	//debug_printf("spawn_second_core: Module size is %zu \n", cpu_blob.size);
+	//debug_printf("spawn_second_core: Is our elf mapped correctly?\n");
 		
- 	struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)cpu_blob.vaddr;
+ 	// struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)cpu_blob.vaddr;
 	
-	debug_printf("Magic number e_ident[1][2][3] = %c%c%c\n", head->e_ident[EI_MAG1], head->e_ident[EI_MAG2], head->e_ident[EI_MAG3]);
+	//debug_printf("Magic number e_ident[1][2][3] = %c%c%c\n", head->e_ident[EI_MAG1], head->e_ident[EI_MAG2], head->e_ident[EI_MAG3]);
 
 	// Helping struct for keeping cpu info 
 	// Size of region will be BASE_PAGE_SIZE + binary_size
@@ -220,8 +220,9 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	if (err_is_fail(err)) {
 		USER_PANIC("Error in cpu_memory_prepare! Error = %s\n", err_getstring(err));
 	}
-	debug_printf("spawn_second_core: Allocated a frame at physical base %"PRIu64" / 0x%x and mapped it at virtual address\n", cpu_mem.frameid.base, cpu_mem.frameid.base);
-	debug_printf("spawn_second_core: Virtual address is at %p\n",  cpu_mem.buf);
+	
+	//debug_printf("spawn_second_core: Allocated a frame at physical base %"PRIu64" / 0x%x and mapped it at virtual address\n", cpu_mem.frameid.base, cpu_mem.frameid.base);
+	//debug_printf("spawn_second_core: Virtual address is at %p\n",  cpu_mem.buf);
 
 	// Time to load the cput driver to the newly allocated memory 
 	// and perform the relocation! 
@@ -236,8 +237,24 @@ errval_t spawn_second_core(struct bootinfo *bi)
 		return err;
 	}
 
-    struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
+	// Allocate frame for urpc!
+	struct capref ump_frame;
+	struct frame_identity ump_id;
 
+	size_t ump_frame_size = 4096;
+	err = frame_alloc (&ump_frame, ump_frame_size, &ump_frame_size);
+	if (err_is_fail(err)) {
+		debug_printf("Can not allocate slot for urpc frame!\n");
+		abort();
+	}
+
+	err = invoke_frame_identify(ump_frame, &ump_id);
+	if (err_is_fail(err)) {
+		debug_printf("Can not identify frame for urpc cap!\n");
+		abort();
+	}
+
+    struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
 
 	/*
     struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *)cpu_blob.vaddr;
@@ -263,13 +280,16 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	core_data->mmap_addr = bi->mmap_addr;
 	core_data->mmap_length = bi->mmap_length;
 
-    core_data->module_start          = cpu_mem.frameid.base + BASE_PAGE_SIZE; 
-    core_data->module_end            = cpu_mem.frameid.base + cpu_mem.size; 
+    //core_data->module_start          = cpu_mem.frameid.base + BASE_PAGE_SIZE; 
+    //core_data->module_end            = cpu_mem.frameid.base + cpu_mem.size; 
     core_data->src_core_id         = 0;
     core_data->dst_core_id         = 1;
 
-    // XXX: Confusion address translation about l/gen/addr
-    err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry); 
+    // Pass frame for ump
+	core_data->ump_frame_addr = ump_id.base; 
+	core_data->ump_frame_len  = ump_id.bits;
+
+	err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry); 
 	if (err_is_fail(err)) {
         return err_push(err, MON_ERR_SPAWN_CORE);
     }

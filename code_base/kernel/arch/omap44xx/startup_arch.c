@@ -38,9 +38,8 @@
 #define TASKCN_SLOT_INITEP      (TASKCN_SLOTS_USER + 1)   ///< End Point to init
 #define TASKCN_SLOT_REMEP       (TASKCN_SLOTS_USER + 2)   ///< End Point to init
 
-
-
-
+lpaddr_t ump_frame_base;
+size_t ump_frame_bits;
 
 // first EP starts in dispatcher frame after dispatcher (33472 bytes)
 // and the value we use for the mint operation is the offset of the kernel
@@ -641,6 +640,15 @@ struct dcb *spawn_bsp_init(const char *name, alloc_phys_func alloc_phys_fn,
         struct cte *iocap = caps_locate_slot(CNODE(spawn_state->taskcn), TASKCN_SLOT_IO);
         errval_t  err = caps_create_new(ObjType_DevFrame, 0x40000000, 30, 30, iocap);
         assert(err_is_ok(err));
+		
+		// If not BSP core, create cap for UMP communication
+		if (!hal_cpu_is_bsp()) {
+			printk(LOG_NOTE, "create frame for ump communication at TASKCN_SLOT_UMPFRAME!\n");
+			struct cte *umpcap = caps_locate_slot(CNODE(spawn_state->taskcn), TASKCN_SLOT_UMPFRAME);
+        	err = caps_create_new(ObjType_Frame, ump_frame_base, ump_frame_bits, ump_frame_bits, umpcap);
+        	assert(err_is_ok(err));
+		}
+
     }
 
     /* Fill bootinfo struct */
@@ -742,7 +750,9 @@ void arm_kernel_startup(void)
         core_local_alloc_end = PHYS_MEMORY_START + ram_size;
 	
     	my_core_id = core_data->dst_core_id;
- 
+		ump_frame_base = core_data->ump_frame_addr;
+		ump_frame_bits = core_data->ump_frame_len;
+
 		struct spawn_state init_st;
         memset(&init_st, 0, sizeof(struct spawn_state));
         static struct cte init_rootcn; // gets put into mdb
