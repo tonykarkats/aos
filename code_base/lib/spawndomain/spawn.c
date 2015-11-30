@@ -727,7 +727,7 @@ errval_t spawn_load_with_args(struct spawninfo *si, struct mem_region *module,
  * Just monitor and memserv should be spawned using this.
  */
 errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
-                                  const char *name, coreid_t coreid)
+                                  const char *name, coreid_t coreid, domainid_t did)
 {
     errval_t err;
 	
@@ -800,7 +800,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     //   remaining are from the multiboot 
     // Name
     char args[1024];
-    strcpy(args, name);
+    
+	strcpy(args, name);
     strcat(args, " ");
 
     // bootinfo addr

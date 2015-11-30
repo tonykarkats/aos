@@ -48,25 +48,21 @@ void libc_exit(int status)
 	errval_t err;
 
     // Use spawnd if spawned through spawnd
-    if(disp_get_domain_id() == 0) {
-   		// debug_printf("libc_exit: Process exiting!\n");
-		err = aos_rpc_terminating(get_init_chan(), domain_name);
-		if (err_is_fail(err)) {
-			sys_print("sending terminating signal to parent failed!\n", 100);
-		}
+	// debug_printf("libc_exit: Process exiting!\n");
+	err = aos_rpc_terminating(get_init_chan(), disp_get_domain_id(), status);
+	if (err_is_fail(err)) {
+		sys_print("sending terminating signal to parent failed!\n", 100);
+	}
 	
-		err = cap_revoke(cap_dispatcher);
-        if (err_is_fail(err)) {
-            sys_print("revoking dispatcher failed in _Exit, spinning!", 100);
-            while (1) {}
-        }
-        err = cap_delete(cap_dispatcher);
-        sys_print("deleting dispatcher failed in _Exit, spinning!", 100);
-
-        // XXX: Leak all other domain allocations
-    } else {
-        debug_printf("libc_exit NYI!\n");
+	err = cap_revoke(cap_dispatcher);
+    if (err_is_fail(err)) {
+        sys_print("revoking dispatcher failed in _Exit, spinning!", 100);
+        while (1) {}
     }
+  
+    err = cap_delete(cap_dispatcher);
+    sys_print("deleting dispatcher failed in _Exit, spinning!", 100);
+
 
     // If we're not dead by now, we wait
     while (1) {}
@@ -263,12 +259,23 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 		return err_push(err, SYS_ERR_LRPC_SLOT_INVALID);
 	}
 
+	domainid_t own_did;
+	
+	err = aos_rpc_get_did(get_init_chan(), domain_name + 11, &own_did);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err,"Error in aos_rpc_init!\n");
+		return err_push(err, SYS_ERR_LRPC_SLOT_INVALID);
+	}
+
+	disp_set_domain_id(own_did);
+
 	//debug_printf("Setting our local ram allocator to talk with server!\n");
     err = ram_alloc_set(NULL);
     if (err_is_fail(err)) {
     	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
 	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
+
 
   	return SYS_ERR_OK;
 }

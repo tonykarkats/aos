@@ -3,14 +3,15 @@
 #include <barrelfish_kpi/init.h>
 
 enum request_type {
+	
 	SPAWN_PROCESS,
+	SERIAL_PUT_CHAR,
+	SERIAL_PUT_STRING,
 };
 
 enum response_type {
 
 	SPAWNED_PROCESS,
-	TERMINATED_PROCESS,
-	SERIAL_PUT_CHAR,
 };
 
 struct ump_request {

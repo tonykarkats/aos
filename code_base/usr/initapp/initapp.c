@@ -184,7 +184,7 @@ static void recv_handler(void *arg)
 		 	struct spawninfo si;	
 			struct capref disp_frame;
 			
-			err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame);
+			err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did + 1);
 			if (err_is_fail(err)) {
 				debug_printf("recv_handler: Can not spawn process for the client! \n");
 				debug_printf("address of lc = %p\n", &lc);
@@ -467,7 +467,8 @@ int main(int argc, char *argv[])
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
-	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame);
+	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame, global_did + 1);
+	global_did++;
 	assert(err_is_ok(err));
 
 	debug_printf("Entering main messaging loop...");	

@@ -112,7 +112,7 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 				return err_push(err, AOS_RPC_SEND_STRING);	
 		} while (err_no(err) == 17);
 				
-		event_dispatch(get_default_waitset());
+		// event_dispatch(get_default_waitset());
 	} 	
 	
 	return SYS_ERR_OK;
@@ -238,8 +238,8 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 						  buffer[0], buffer[1],buffer[2],
         	              buffer[3], buffer[4],buffer[5],
         	              buffer[6], buffer[7],buffer[8]);
-    	if (err_is_fail(err)) {
-       		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
+        if ((err_no(err) != 17)&&(err_is_fail(err))) {
+			debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
        		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
     	}
 		else if (err_is_ok(err))
@@ -258,7 +258,7 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 		return SYS_ERR_OK;
 	}
 	else {
-		// debug_printf("Waiting for process to finish!\n");
+		debug_printf("Waiting for process to finish!\n");
 		event_dispatch(get_default_waitset());
 	}
 	
@@ -272,8 +272,8 @@ errval_t aos_rpc_process_kill_process(struct aos_rpc *chan, domainid_t pid)
 	while(true) {
 		event_dispatch(&chan->s_waitset);
 		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_KILL, (uint32_t) pid);
-		if (err_is_fail(err)) {
-       		debug_printf("aos_rpc_process_spawn: Error in killing process!\n");
+       	if ((err_no(err) != 17)&&(err_is_fail(err))) {	
+			debug_printf("aos_rpc_process_spawn: Error in killing process!\n");
        		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
     	}
 		else if (err_is_ok(err))
@@ -297,7 +297,8 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
 	while(true) {
 		event_dispatch(&chan->s_waitset);
 		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_NAME, (uint32_t) pid);
-		if (err_is_fail(err)) {
+	
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_process_spawn: Error in getting process name!\n");
        		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
     	}
@@ -326,7 +327,8 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 	while(true) {
 		event_dispatch(&chan->s_waitset);
 		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_PIDS);
-		if (err_is_fail(err)) {
+		
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_process_spawn: Error in getting pids!\n");
        		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
     	}
@@ -358,24 +360,17 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 	return SYS_ERR_OK;
 }
 
-errval_t aos_rpc_terminating(struct aos_rpc *chan, char *name) 
+errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_status) 
 {
 	errval_t err;
-    uint32_t buffer[9];
-    size_t name_length = strlen(name);
+		
+	//debug_printf("Sending terminating to client with did %zu with status %d\n", did, exit_status);
 	
-    assert(name_length <= 32);
-
-    buffer[0] = AOS_RPC_TERMINATING;
-    memcpy(buffer + 1, name, name_length+1);
-
 	while(true) {
    		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 
-						  buffer[0], buffer[1],buffer[2],
-        	              buffer[3], buffer[4],buffer[5],
-        	              buffer[6], buffer[7],buffer[8]);
-    	if (err_is_fail(err)) {
+		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_TERMINATING, did, (uint32_t) exit_status);
+
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
        		return err_push(err, AOS_ERR_LMP_TERMINATING);
     	}
@@ -431,6 +426,43 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
     return SYS_ERR_OK;
 }
 
+errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did) 
+{
+	errval_t err;
+    uint32_t buffer[9];
+    size_t name_length = strlen(name);
+	
+    assert(name_length <= 32);
+
+    buffer[0] = AOS_RPC_GET_DID;
+    memcpy(buffer + 1, name, name_length+1);
+
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send9(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 
+						  buffer[0], buffer[1],buffer[2],
+        	              buffer[3], buffer[4],buffer[5],
+        	              buffer[6], buffer[7],buffer[8]);
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
+       		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
+       		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
+    	}
+		else if (err_is_ok(err))
+			break;
+	}
+
+    event_dispatch(get_default_waitset());
+
+	*did = chan->words[0];
+	if (*did == 0) {
+		debug_printf("spawn_domain: Can not fetch domain id!\n");
+		return AOS_ERR_LMP_SPAWN_DOM;
+	}
+	
+	// debug_printf("fetched did for domain %zu\n", *did);	
+    return SYS_ERR_OK;
+
+}
 errval_t aos_rpc_init(int slot_number)
 {
 	errval_t err;

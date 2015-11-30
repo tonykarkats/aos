@@ -8,13 +8,13 @@ struct process_node * delete_process_node(struct process_node ** head, domainid_
 	if (*head == NULL)
 		return NULL;
 	
-	while (((active->d_id != did)||(strcmp(name, active->name)))&&(active->next_pr != NULL)) {
+	while (((active->d_id != did)||(!strcmp(name, active->name)))&&(active->next_pr != NULL)) {
 		previous = active;
 		active = active->next_pr;
 	}
 
 	if (((active->d_id == did)||(!strcmp(name, active->name)))&&(active == *head)) {
-		*head = NULL;		
+		*head = active->next_pr;		
 		return active;
 	}
 
@@ -22,7 +22,7 @@ struct process_node * delete_process_node(struct process_node ** head, domainid_
 		previous->next_pr = active->next_pr;
 		return active;	
 	}
-
+	
 	return NULL;
 }
 
@@ -48,6 +48,20 @@ struct process_node* insert_process_node(struct process_node * head, domainid_t 
 	return new_node;
 }
 
+domainid_t get_did_by_name(struct process_node * head, const char * name) 
+{
+	struct process_node * node = head;
+
+	while (node != NULL) {
+		if (!strcmp(node->name, name)) 
+			return node->d_id;
+		node = node->next_pr;
+	}
+
+	return 0;
+	
+}
+
 char * get_name_by_did(struct process_node * head, domainid_t did) 
 {
 	struct process_node * node = head;
@@ -62,7 +76,17 @@ char * get_name_by_did(struct process_node * head, domainid_t did)
 	
 }
 
-errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame)
+void print_nodes( struct process_node *head) 
+{
+	struct process_node * node = head;
+
+	while (node != NULL) {
+		debug_printf("Node: Name %s Did %zu \n", node->name, node->d_id);
+		node = node->next_pr;
+	}	
+
+}
+errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did)
 {
 
 	errval_t err;
@@ -70,7 +94,7 @@ errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct 
 	
 	char * module_name = strcat(prefix, name);
 
-	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id);
+	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id, did);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
 		return SPAWN_ERR_LOAD;

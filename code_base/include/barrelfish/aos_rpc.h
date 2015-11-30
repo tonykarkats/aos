@@ -43,6 +43,7 @@
 #define AOS_RPC_GET_DEV_CAP	 8
 #define AOS_RPC_TERMINATING	 9
 #define AOS_RPC_KILL	 10
+#define AOS_RPC_GET_DID 11
 
 struct aos_rpc {
 	struct lmp_chan rpc_channel;
@@ -200,6 +201,7 @@ errval_t aos_rpc_init(int slot_number);
 
 
 // This RPC call is called by the domain in order to signal that it is terminating
-errval_t aos_rpc_terminating(struct aos_rpc *chan, char *domain_name);
+errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_status);
 
+errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did);
 #endif // _LIB_BARRELFISH_AOS_MESSAGES_H

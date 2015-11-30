@@ -29,6 +29,7 @@ struct waitset *get_default_waitset(void);
 void disp_set_core_id(coreid_t core_id);
 coreid_t disp_get_core_id(void);
 domainid_t disp_get_domain_id(void);
+void disp_set_domain_id(domainid_t did);
 coreid_t disp_handle_get_core_id(dispatcher_handle_t handle);
 void set_monitor_binding(struct monitor_binding *b);
 struct monitor_binding *get_monitor_binding(void);

@@ -60,7 +60,7 @@ errval_t spawn_get_cmdline_args(struct mem_region *module,
                                 char **retargs);
 int spawn_tokenize_cmdargs(char *args, char *argv[], size_t argv_len);
 errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
-                                  const char *name, coreid_t coreid);
+                                  const char *name, coreid_t coreid, domainid_t did);
 errval_t spawn_load_with_args(struct spawninfo *si, struct mem_region *module,
                               const char *name, coreid_t coreid,
                               char *const argv[], char *const envp[]);

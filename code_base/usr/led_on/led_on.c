@@ -22,13 +22,15 @@ int main(int argc, char *argv[])
 	if (capref_is_null(dev_cap))
 		printf("Got null dev?!\n");
 
+	// Map the frame for the uart!
+
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0xA310000;
 	void * vbuf;	
 	err = paging_map_frame(get_current_paging_state(),&vbuf, size, dev_cap, &offset, &size);
 	if (err_is_fail(err)) {
-		debug_printf("CAN not map dev frame");
-		abort();
+		printf("CAN not map dev frame");
+		return 1;
 	}
 	
 	led_initialize((lvaddr_t) vbuf);
