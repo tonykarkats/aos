@@ -418,7 +418,7 @@ int main(int argc, char *argv[])
 
 	char * shared_buf = (char *) buf;
 	for (int i = 0 ; i < 4096; i++)
-		shared_buf[i] = 66;	
+		shared_buf[i] = 123;	
 
 	signal_core_0();
 	while(1);		

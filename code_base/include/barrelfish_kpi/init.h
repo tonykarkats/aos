@@ -109,7 +109,8 @@
 #define TASKCN_SLOT_DISPFRAME2  15  ///< Copy of dispatcher frame cap (mapped into spawn vspace)
 #define TASKCN_SLOT_ARGSPAGE2   16  ///< Copy of environment cap (mapped into spawn vspace)
 #define TASKCN_SLOT_UMPFRAME    17  ///< cap for shared memory for communication
-#define TASKCN_SLOTS_USER       18  ///< First free slot in taskcn for user
+#define TASKCN_SLOT_SERIALFRAME 18  ///< cap for shared memory for communication
+#define TASKCN_SLOTS_USER       19  ///< First free slot in taskcn for user
 
 /// Address bits resolved for the standard CNodes (taskcn, supercn, base_page_cn)
 #define DEFAULT_CN_ADDR_BITS    (CPTR_BITS - DEFAULT_CNODE_BITS)

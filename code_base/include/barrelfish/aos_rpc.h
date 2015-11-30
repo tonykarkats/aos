@@ -94,7 +94,7 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
  * \arg newpid the process id of the newly spawned process
  */
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
-                               domainid_t *newpid);
+                               coreid_t core, domainid_t *newpid);
 
 /**
  * \brief Get name of process with id pid.

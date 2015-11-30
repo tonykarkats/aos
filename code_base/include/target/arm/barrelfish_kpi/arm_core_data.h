@@ -69,6 +69,9 @@ struct arm_core_data {
     // information about a frame which is shared between two init processes
     uint32_t    ump_frame_addr; ///< physical address of shared frame
     uint32_t    ump_frame_len;  ///< length of shared frame
+	
+	uint32_t 	ump_serial_frame_addr;
+	uint32_t	ump_serial_frame_len;
 
     uint32_t    start_free_ram;
 

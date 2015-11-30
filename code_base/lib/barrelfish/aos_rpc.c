@@ -13,6 +13,7 @@
  */
 
 #include <barrelfish/aos_rpc.h>
+#include <barrelfish_kpi/types.h>
 #include <string.h>
 #include <math.h>
 #define FIRSTEP_BUFLEN          21u
@@ -220,7 +221,7 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 }
 
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
-                               domainid_t *newpid)
+                               coreid_t core ,domainid_t *newpid)
 {
 	errval_t err;
     uint32_t buffer[9];

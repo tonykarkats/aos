@@ -379,6 +379,8 @@ int main(int argc, char *argv[])
     errval_t err;
 	struct lmp_chan channel;
 
+	debug_printf("size of request %d size of response %d\n", sizeof(struct ump_request), sizeof(struct ump_response));
+
     /* Set the core id in the disp_priv struct */
     err = invoke_kernel_get_core_id(cap_kernel, &my_core_id);
     assert(err_is_ok(err));

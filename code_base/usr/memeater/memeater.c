@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 				token = strcat(token, " &");
 			
 			domainid_t pid;
-			err = aos_rpc_process_spawn(get_init_chan(), token, &pid);
+			err = aos_rpc_process_spawn(get_init_chan(), token, 0, &pid);
 			
 			if (err_is_fail(err) || (pid == 0))
 				printf("Could not spawn domain [%s]\n", token);

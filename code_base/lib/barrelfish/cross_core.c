@@ -3,6 +3,15 @@
 
 volatile lvaddr_t start_of_ump_frame;
 
+volatile lvaddr_t start_of_core_0_section;
+volatile lvaddr_t start_of_core_1_section;
+
+volatile lvaddr_t core_0_ring_head;
+volatile lvaddr_t core_0_ring_tail;
+
+volatile lvaddr_t core_1_ring_head;
+volatile lvaddr_t core_1_ring_tail;
+
 static volatile lvaddr_t cross_core_register = 0x48281800;
 
 int get_core_id(struct bootinfo * bi) {
@@ -41,13 +50,39 @@ errval_t map_shared_frame(void **buf)
 	//uint64_t offset = 0;
 	//size_t size = 4096;
 
-	err = paging_map_frame_attr(get_current_paging_state(), buf, 4096, ump_frame, DEVICE_FLAGS, NULL, NULL);
+	err = paging_map_frame_attr(get_current_paging_state(), buf, 8198, ump_frame, DEVICE_FLAGS, NULL, NULL);
 	if (err_is_fail(err)) {
 		debug_printf("Can not allocate and map for UMP shared frame!\n");
 		return err;
 	}
 
  	start_of_ump_frame = (lvaddr_t) *buf;
+	
+	core_0_ring_head = (lvaddr_t) *buf;
+	core_0_ring_tail = (lvaddr_t) *buf + 1; 
 
+	
+	core_1_ring_head = (lvaddr_t) *buf + 4096 / 32;
+	core_1_ring_tail = (lvaddr_t) *buf + 4096 / 32 + 1;
+	
 	return SYS_ERR_OK;
 }
+
+/*
+int core_0_core_thread 
+{
+
+
+
+}
+
+
+int core_1_core_thread
+{
+
+
+
+
+}
+*/
+

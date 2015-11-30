@@ -2,9 +2,27 @@
 #include <barrelfish_kpi/types.h>
 #include <barrelfish_kpi/init.h>
 
+enum request_type {
+	SPAWN_PROCESS,
+};
 
+enum response_type {
 
-//#define AUX_CORE_BOOT_0 ((lpaddr_t)0x48281800)
+	SPAWNED_PROCESS,
+	TERMINATED_PROCESS,
+	SERIAL_PUT_CHAR,
+};
+
+struct ump_request {
+	enum request_type type;
+	char ump_chars[36];
+};
+
+struct ump_response {
+	enum response_type type;
+	char ump_chars[36];
+};
+
 
 int get_core_id(struct bootinfo * bi);
 void poll_for_core(void);
