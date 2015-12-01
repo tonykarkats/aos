@@ -71,6 +71,14 @@ static int cross_core_thread_1(void *arg)
 {
 	errval_t err;
 
+	struct bootinfo * thread_bi = (struct bootinfo *) arg;
+
+	void * buf;
+	err = map_shared_frame(&buf, true);
+	signal_core_0();
+
+	// Main loop of cross-core thread!
+	
 	while(1) 
 	{
 
@@ -90,25 +98,33 @@ static int cross_core_thread_1(void *arg)
 				
 				domainid_t spawned_domain = received_message.util_word;
 
-				debug_printf("Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
+				debug_printf("cross_core_thread_1: Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
 			 		
 				uint32_t util_word;
 				struct spawninfo si;	
 				struct capref disp_frame;	
-				err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame, spawned_domain);
+	
+				pr_head = insert_process_node(pr_head, spawned_domain, message_string, 0, NULL_CAP, NULL_CAP);
+			
+				err = bootstrap_domain(message_string, &si, thread_bi, my_core_id, &disp_frame, spawned_domain);
 				if (err_is_fail(err)) {
+					struct process_node * temp = delete_process_node( &pr_head, spawned_domain, "aaa");
+					temp = temp;
 					util_word = 0;	
 				}
 				else {
-					util_word = 1;
+					util_word = spawned_domain;
 				}
+			
+				// Write response to core-0 !
 				
 				struct ump_message returned_message;
 				returned_message.type      = SPAWNED_PROCESS_RESPONSE;
 				returned_message.util_word = util_word;
 
 				write_to_core_0(returned_message);					
-					
+				
+				
 				break;
 		}		
 	}	
@@ -170,21 +186,28 @@ static void recv_handler(void *arg)
 			cap_destroy(cap);
 			break;		
 		case AOS_RPC_SEND_STRING: ; // Send String
-			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
-	
+		
+			for (int i = 0; i<string_length; i++){
+				uint32_t * word = (uint32_t *) (message_string + i*4);
+				*word = msg.words[i+1];   
+			}	
+			debug_printf("Will send string message_string %s to core-0", message_string);
+
 			struct ump_message message_for_core_0;
 
 			message_for_core_0.type = SERIAL_PUT_STRING;
 			for (int i = 0 ; i < 8 ; i++) 
 				message_for_core_0.words[i] = msg.words[i];
 			
+			// Using cross core channel for writing characters and strings through UART
 			write_to_core_0(message_for_core_0);
 	
 			cap_destroy(cap);
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
-			// debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
+			
+			//debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 
@@ -204,6 +227,7 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_PUT_CHAR: ;
+			
 			// debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", cap.slot);
 
 			char out_c = (char) msg.words[1];
@@ -211,7 +235,8 @@ static void recv_handler(void *arg)
 			struct ump_message message;
 			message.type = SERIAL_PUT_CHAR;
 			message.words[0] = out_c;
-	
+
+			// Using cross core channel for writhing characters through UART
 			write_to_core_0(message);
 
 			cap_destroy(cap);
@@ -238,17 +263,23 @@ static void recv_handler(void *arg)
 		
 			cap_destroy(cap);
 			break;
+
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
 			int exit_status = msg.words[2];
+						
+			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
+			if (terminated_process == NULL) {
+				debug_printf("recv_handler: Received message from unknown process?!\n");
+				break;
+			}
 
-			struct ump_message returned_mess;
-		
+			// Inform core-0 that a process terminated ! 
+			struct ump_message returned_mess;	
 			returned_mess.type = SPAWNED_PROCESS_TERMINATED_RESPONSE;
-			return_mess.util_word = exiting_did;
-			return_mess.word[0] = exit_status;
-			
-			write_to_core_0(return_mess);
+			returned_mess.util_word = exiting_did;
+			returned_mess.words[0] = exit_status;
+			write_to_core_0(returned_mess);
 
 			break;
 	}
@@ -337,54 +368,18 @@ int main(int argc, char *argv[])
         abort();
     }
 
-
 	debug_printf("Signaling core-0 that we are up!\n");
+	
 	map_aux_core_registers();
-	void * buf;
-	
-	err = map_shared_frame(&buf, true);
 	signal_core_0();
-	
-	cross_core_thread_1(NULL);
-	
-	struct ump_message t;
-	t.type = SERIAL_PUT_CHAR;
-	*(char *) t.words = 'c';
 
-	write_to_core_0(t);
-	write_to_core_0(t);
-	write_to_core_0(t);
-	write_to_core_0(t);
-		
-	strcpy((char *) t.words, "abc");
-	t.type = SERIAL_PUT_STRING;
-	write_to_core_0(t);	
-	
-	//while(1);	
-	
-	initialize_ring(&ring_b);
-	initialize_capref_ring(&ring_c);
+	struct thread *cross_core_thread = thread_create( cross_core_thread_1, bi);
+	cross_core_thread = cross_core_thread;
 
-	struct ring_arguments args = {
-		.r_b = &ring_b,
-		.r_c = &ring_c,
-		.char_wait_cond = &char_cond,
-		.capref_wait_cond = &capref_cond,
-	};
-
-	thread_cond_init(&char_cond);
-	thread_cond_init(&capref_cond);
-
-	struct thread *serial_polling_thread = thread_create( poll_serial_thread, &args);
-	serial_polling_thread = serial_polling_thread;
-	
-	struct thread * serial_client_thread = thread_create( get_char_thread, &args);
-	serial_client_thread = serial_client_thread;
-	
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-	debug_printf("Entering main messaging loop...");	
+	// debug_printf("Entering main messaging loop...");	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {

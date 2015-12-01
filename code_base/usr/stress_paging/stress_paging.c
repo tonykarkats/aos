@@ -7,8 +7,8 @@
 int main(int argc, char *argv[])
 {
 
-	size_t stress_size = 200000;
-	debug_printf("stress_paging: Initializing Stress Paging for %zu bytes!\n", stress_size);
+	size_t stress_size = 300000;
+	// debug_printf("stress_paging: Initializing Stress Paging for %zu bytes!\n", stress_size);
 
 	errval_t err;
 	void *vbuff;
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < stress_size; i++) 
         assert(buf[i] == i%255);
 
-    printf("Memory test passed!\n"); 	
+    // printf("Memory test passed!\n"); 	
 
 	return 0;
 }

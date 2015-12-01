@@ -230,7 +230,9 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
     assert(name_length <= 32);
 
     buffer[0] = AOS_RPC_PROC_SPAWN;
-    memcpy(buffer + 1, name, name_length+1);
+	buffer[1] = core;
+
+    memcpy(buffer + 2, name, name_length+1);
 
 	while(true) {
    		event_dispatch(&chan->s_waitset);
@@ -253,6 +255,9 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 		debug_printf("spawn_domain: Can not spawn!\n");
 		return AOS_ERR_LMP_SPAWN_DOM;
 	}
+
+	if (core == 1)
+		return SYS_ERR_OK;
 	
 	if (strchr(name, '&') != NULL) {
 		return SYS_ERR_OK;

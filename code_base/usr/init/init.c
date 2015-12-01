@@ -48,6 +48,9 @@
 #define BLUE "\033[1m\033[31m"
 #define RESET "\033[0m"
 
+volatile int pseudo_lock;
+struct thread_mutex process_list_lock;
+
 struct bootinfo *bi;
 static coreid_t my_core_id;
 struct serial_ring_buffer ring_b;
@@ -69,6 +72,10 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 
 static int cross_core_thread_0(void *arg) 
 {
+	errval_t err;	
+	void * buf;
+	err = map_shared_frame(&buf, false);
+
 	while(1) 
 	{
 
@@ -80,15 +87,24 @@ static int cross_core_thread_0(void *arg)
 			case(SPAWNED_PROCESS_RESPONSE): ;
 				
 				// Remote core spawned a domain!
-				// int success_spawn = received_message.words[0];
-					
+				int success_spawn = received_message.util_word;
+
+				// debug_printf("core-1 returned to us spawned response with response %d!\n", success_spawn);
+
+				pseudo_lock = success_spawn;
+	
 				break;
 			case(SPAWNED_PROCESS_TERMINATED_RESPONSE): ;
 				// domainid_t remote_did;
 			
 				// Received that a remote domain terminated! Act...
-				// remote_did = received_message.words[0];
+				domainid_t remote_did = received_message.util_word;
+				// debug_printf("Domain with id %zu terminated! \n", remote_did);
 		
+				thread_mutex_lock(&process_list_lock);
+				delete_process_node( &pr_head, remote_did, "aaa");
+				thread_mutex_unlock(&process_list_lock);
+
 				break;
 			
 			case(SERIAL_PUT_CHAR): ;
@@ -104,7 +120,8 @@ static int cross_core_thread_0(void *arg)
 					uint32_t * word = (uint32_t *) (message_string + i*4);
 					*word = received_message.words[i];   
 				}		
-				
+
+				// debug_printf("Recevied a string over the cross core channel = %s\n", message_string);				
 				serial_putstring(message_string);
 	
 				break;
@@ -232,46 +249,86 @@ static void recv_handler(void *arg)
 			char *next_token;
 			bool background;
 
-			for (int i = 0; i<string_length; i++){
+			for (int i = 0; i < string_length-1 ; i++){
 				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
+				*word = msg.words[i+2];   
 			}	
-				
+
+			uint32_t core = msg.words[1];
+	
+			debug_printf("Will spawn %s at core %zu\n", message_string, core);
 			token = strtok(message_string, " ");
-			next_token = strtok(NULL, " ");
+			
+			if (core == 1) {
+				// Spawn domain at core-1					
+	
+				global_did ++;
+			
+				struct ump_message core_1_msg;
+				core_1_msg.type = SPAWNED_PROCESS_REQUEST;
+				core_1_msg.util_word = global_did;
+				strcpy((char *) core_1_msg.words, message_string);
 				
-			if (next_token == NULL)
-				background = false;
-			else if (strcmp(next_token, "&"))
-				background = false;
-			else 
-				background = true;
+				pseudo_lock = -1;
+
+				thread_mutex_lock(&process_list_lock);
+				pr_head = insert_process_node(pr_head, global_did, message_string, true, NULL_CAP, NULL_CAP);
+				thread_mutex_unlock(&process_list_lock);
 			
-		 	struct spawninfo si;	
-			struct capref disp_frame;
+				write_to_core_1(core_1_msg);				
+	
+				while(pseudo_lock == -1);	
+
+				// If remote spawn succeeded add it to the process list
+				if (pseudo_lock == 0) {
+					
+					thread_mutex_lock(&process_list_lock);
+					delete_process_node( &pr_head, global_did, "aaa");
+					thread_mutex_unlock(&process_list_lock);
 			
-			err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did + 1);
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not spawn process for the client! \n");
-				debug_printf("address of lc = %p\n", &lc);
-				d_id = 0;	
+				}
+				
+				// Report back to shell! 
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+				}	
 			}
 			else {
-			//	debug_printf("token %s address\n", token);
-				d_id = global_did;
-				global_did++;
-				pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
-			}
+				// Spawn domain at own core! 
 				
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-			}		
-
-			//print_nodes(pr_head);
-			//debug_printf("recv_handler: Id sent back to the client!\n");
-			// TODO why cap_destroy issues page fault?
+				next_token = strtok(NULL, " ");
+				
+				if (next_token == NULL)
+					background = false;
+				else if (strcmp(next_token, "&"))
+					background = false;
+				else 
+					background = true;
 			
+			 	struct spawninfo si;	
+				struct capref disp_frame;
+			
+				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did + 1);
+				if (err_is_fail(err)) {
+					debug_printf("recv_handler: Can not spawn process for the client! \n");
+					d_id = 0;	
+				}
+				else {
+					d_id = global_did;
+					global_did++;
+					
+					thread_mutex_lock(&process_list_lock);
+					pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
+					thread_mutex_unlock(&process_list_lock);
+				}
+				
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+				}		
+			}
+
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
 			
@@ -347,15 +404,18 @@ static void recv_handler(void *arg)
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
 			//int exit_status = (int) msg.words[2];		
-	
+
+					
+			thread_mutex_lock(&process_list_lock);
 			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
+			thread_mutex_unlock(&process_list_lock);
 			if (terminated_process == NULL) {
 				debug_printf("recv_handler: Received message from unknown process?!\n");
 				break;
 			}
 		
 			if (!terminated_process->background) {
-				debug_printf("Sending termination did and status back to the client!\n");
+				// debug_printf("Sending termination did and status back to the client!\n");
 				err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
 				if (err_is_fail(err)) {
 					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
@@ -475,15 +535,6 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	map_aux_core_registers();
-	spawn_second_core(bi);
- 	poll_for_core();
-		
-	//debug_printf("Core booted OK!\n");	
-	
-	void * buf;
-	err = map_shared_frame(&buf, false);
-
 	// map the uart !
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
@@ -497,16 +548,15 @@ int main(int argc, char *argv[])
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 
-	// cross_core_thread_0(NULL);
-	struct ump_message t;
-	t.type = SPAWNED_PROCESS_REQUEST;
-	strcpy((char *)t.words, "led_on");
-		
-	write_to_core_1(t);
-	
-	while(1);
+	map_aux_core_registers();
+	spawn_second_core(bi);
+ 	poll_for_core();
 
-	cross_core_thread_0(NULL);
+	thread_mutex_init(&process_list_lock);
+
+	struct thread *cross_core_thread = thread_create( cross_core_thread_0, NULL);
+	cross_core_thread = cross_core_thread;
+
 	initialize_ring(&ring_b);
 	initialize_capref_ring(&ring_c);
 

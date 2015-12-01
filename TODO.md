@@ -29,3 +29,7 @@
 - Fix weird bug with send string acknowledgemnt back to client - FIXED with no acnolwdgement in string rpc!
 
 - Fix 1-1 mapping for aux core registers, use paging_alloc for them OR find another mapping!
+
+- Fix weird bug in process list with name of processes!
+
+- Add lock to initapp for process list management!
