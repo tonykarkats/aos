@@ -241,7 +241,7 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	struct capref ump_frame;
 	struct frame_identity ump_id;
 
-	size_t ump_frame_size = 8198;
+	size_t ump_frame_size = 4096;
 	err = frame_alloc (&ump_frame, ump_frame_size, &ump_frame_size);
 	if (err_is_fail(err)) {
 		debug_printf("Can not allocate slot for urpc frame!\n");

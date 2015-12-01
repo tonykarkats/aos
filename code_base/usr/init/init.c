@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
     errval_t err;
 	struct lmp_chan channel;
 
-	debug_printf("size of request %d size of response %d\n", sizeof(struct ump_request), sizeof(struct ump_response));
+	debug_printf("size of ump_message %d\n", sizeof(struct ump_message));
 
     /* Set the core id in the disp_priv struct */
     err = invoke_kernel_get_core_id(cap_kernel, &my_core_id);
@@ -427,37 +427,35 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	/*
-	if (get_core_id(bi) == 0) {
-
-		map_aux_core_registers();
-		spawn_second_core(bi);
-	 	poll_for_core();
+	map_aux_core_registers();
+	spawn_second_core(bi);
+ 	poll_for_core();
 		
-		debug_printf("Core booted OK!\n");	
+	//debug_printf("Core booted OK!\n");	
 	
-		void * buf;
-		err = map_shared_frame(&buf);
+	void * buf;
+	err = map_shared_frame(&buf, false);
 
-		char * shared_buf = (char *) buf;
-		for (int i = 0 ; i < 4096; i++)
-			debug_printf("%d\n", shared_buf[i]);	
+	struct ump_message temp_message;
 
-		while(1);	
-	}
-	else {
-		
-		debug_printf("Signaling core-0 that we are up!\n");
-		map_aux_core_registers();
-		signal_core_0();
-		while(1);		
-	}
-	*/
+	temp_message.type = SPAWNED_PROCESS_REQUEST;	
+	temp_message.util_word = 66;
+
+	write_to_core_1(temp_message);
+
+	temp_message.type = SPAWNED_PROCESS_REQUEST;	
+	temp_message.util_word = 67;
+
+	write_to_core_1(temp_message);
+
+	temp_message = read_from_core_0();
+	assert(temp_message.type == SPAWNED_PROCESS_RESPONSE);
+	assert(temp_message.util_word = 100);
+
+	while(1);
 
 	// initialize mm for spliting the device frame
 	
-
-
 	// map the uart !
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
@@ -492,14 +490,6 @@ int main(int argc, char *argv[])
 	
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
-
-/*
-	debug_printf("Spawning led_on!\n");
-	struct capref disp_frame; 
-	struct spawninfo led_si;
-	err = bootstrap_domain("led_on", &led_si, bi, my_core_id, &disp_frame);
-	assert(err_is_ok(err));
-*/
 
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;

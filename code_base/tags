@@ -11762,7 +11762,8 @@ SEPARATE_OBJECTS	lib/newlib/newlib/libc/stdlib/pvallocr.c	307;"	d	file:
 SEPARATE_OBJECTS	lib/newlib/newlib/libc/stdlib/reallocr.c	307;"	d	file:
 SEPARATE_OBJECTS	lib/newlib/newlib/libc/stdlib/vallocr.c	307;"	d	file:
 SEQ	include/deputy/nodeputy.h	23;"	d
-SERIAL_PUT_CHAR	include/barrelfish/cross_core.h	/^	SERIAL_PUT_CHAR,$/;"	e	enum:response_type
+SERIAL_PUT_CHAR	include/barrelfish/cross_core.h	/^	SERIAL_PUT_CHAR,$/;"	e	enum:type
+SERIAL_PUT_STRING	include/barrelfish/cross_core.h	/^	SERIAL_PUT_STRING,$/;"	e	enum:type
 SET0	lib/newlib/newlib/libc/posix/regexec.c	114;"	d	file:
 SET0	lib/newlib/newlib/libc/posix/regexec.c	67;"	d	file:
 SET0	lib/newlib/newlib/libc/posix/regexec.c	93;"	d	file:
@@ -12430,12 +12431,12 @@ SP	lib/newlib/newlib/libc/posix/engine.c	122;"	d	file:
 SP	lib/newlib/newlib/libc/posix/engine.c	126;"	d	file:
 SPARES	lib/newlib/newlib/libc/search/hash.h	307;"	d
 SPAWNDOMAIN_H	include/spawndomain/spawndomain.h	16;"	d
-SPAWNED_PROCESS	include/barrelfish/cross_core.h	/^	SPAWNED_PROCESS,$/;"	e	enum:response_type
+SPAWNED_PROCESS_RESPONSE	include/barrelfish/cross_core.h	/^	SPAWNED_PROCESS_RESPONSE,$/;"	e	enum:type
+SPAWNED_PROCESS_TERMINATED_RESPONSE	include/barrelfish/cross_core.h	/^	SPAWNED_PROCESS_TERMINATED_RESPONSE,$/;"	e	enum:type
 SPAWN_ARCH_H	lib/spawndomain/arch.h	16;"	d
 SPAWN_DOMAIN_PARAMS_H	include/barrelfish_kpi/domain_params.h	16;"	d
 SPAWN_GETOPT_H	include/spawndomain/getopt.h	16;"	d
 SPAWN_H	lib/spawndomain/spawn.h	16;"	d
-SPAWN_PROCESS	include/barrelfish/cross_core.h	/^	SPAWN_PROCESS,$/;"	e	enum:request_type
 SPEC	lib/newlib/newlib/libc/stdio/local.h	/^  SPEC,   \/* format specifier *\/$/;"	e	enum:__anon198
 SPECNAMELEN	include/sys/param.h	54;"	d
 SPECTRUM	kernel/schedule_rbed.c	64;"	d	file:
@@ -13544,7 +13545,6 @@ TCSAFLUSH	include/termios.h	59;"	d
 TCSANOW	include/termios.h	57;"	d
 TCSASOFT	include/termios.h	61;"	d
 TEMP1	lib/newlib/newlib/libc/machine/hppa/memchr.S	/^#define TEMP1	r19$/;"	d
-TERMINATED_PROCESS	include/barrelfish/cross_core.h	/^	TERMINATED_PROCESS,$/;"	e	enum:response_type
 TEST	lib/newlib/newlib/testsuite/newlib.search/hsearchtest.c	50;"	d	file:
 TESTS	hake/symbolic_targets.mk	/^TESTS = $(addsuffix .txt,$(basename $(wildcard $(SRCDIR)\/tools\/schedsim\/*.cfg)))$/;"	m
 TEST_LOG_NAME	tools/harness/tests/webserver.py	/^TEST_LOG_NAME = 'testlog.txt'$/;"	v
@@ -22950,10 +22950,10 @@ copysignf	lib/newlib/newlib/libm/machine/spu/sf_copysign.c	/^float copysignf(flo
 copysignf	lib/oldc/msun/src/s_copysignf.c	/^copysignf(float x, float y)$/;"	f
 copysignl	lib/newlib/newlib/libm/common/copysignl.c	/^copysignl (long double x, long double y)$/;"	f
 copysignl	lib/oldc/msun/src/s_copysignl.c	/^copysignl(long double x, long double y)$/;"	f
-core_0_ring_head	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_0_ring_head;$/;"	v
-core_0_ring_tail	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_0_ring_tail;$/;"	v
-core_1_ring_head	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_1_ring_head;$/;"	v
-core_1_ring_tail	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_1_ring_tail;$/;"	v
+core_0_flag	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_0_flag;$/;"	v
+core_0_slot	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_0_slot;$/;"	v
+core_1_flag	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_1_flag;$/;"	v
+core_1_slot	lib/barrelfish/cross_core.c	/^volatile lvaddr_t core_1_slot;$/;"	v
 core_id	include/barrelfish/dispatcher.h	/^    coreid_t core_id;$/;"	m	struct:dispatcher_generic
 core_id	kernel/arch/arm/misc.c	/^uint8_t core_id = 0;  \/\/ core_id value so that all printk will have it$/;"	v
 core_id	lib/barrelfish/domain.c	/^    uint8_t core_id;                    \/\/\/< Id of the remote core$/;"	m	struct:span_domain_state	file:
@@ -28088,6 +28088,7 @@ is_page_aligned	lib/dmalloc/dmalloc.c	2667;"	d	file:
 is_page_aligned	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2672;"	d	file:
 is_ptrdiff	include/oldc/printf.h	/^	unsigned	is_ptrdiff;$/;"	m	struct:printf_info
 is_quad	include/oldc/printf.h	/^	unsigned	is_quad;$/;"	m	struct:printf_info
+is_request	include/barrelfish/cross_core.h	/^	uint32_t is_request;$/;"	m	struct:ump_message
 is_retypeable	kernel/capabilities.c	/^errval_t is_retypeable(struct cte *src_cte, enum objtype src_type,$/;"	f
 is_root_pt	kernel/include/arch/armv7/paging_kernel_arch.h	/^static inline bool is_root_pt(enum objtype type) {$/;"	f
 is_short	include/oldc/printf.h	/^	unsigned	is_short;$/;"	m	struct:printf_info
@@ -34890,6 +34891,8 @@ read_ea	lib/newlib/newlib/libc/machine/spu/read_ea.c	/^COMPAT_EA_ALIAS (read_ea)
 read_ea	lib/newlib/newlib/libc/machine/spu/read_ea.c	/^read_ea (int fd, __ea void *buf, size_ea_t count)$/;"	f
 read_fail	lib/newlib/newlib/libc/sys/barrelfish/posix_syscalls.c	/^static int read_fail(int fd, void *buf, size_t len)        { FAIL_FN(); }$/;"	f	file:
 read_fn	include/stdio_file.h	/^    size_t (*read_fn)(void *, long int, size_t, void *);$/;"	m	struct:__file
+read_from_core_0	lib/barrelfish/cross_core.c	/^struct ump_message read_from_core_0(void) $/;"	f
+read_from_core_1	lib/barrelfish/cross_core.c	/^struct ump_message read_from_core_1(void) $/;"	f
 read_from_ring	lib/barrelfish/omap_uart.c	/^char * read_from_ring(struct serial_ring_buffer * ring, char * c) {$/;"	f
 read_globals	lib/newlib/newlib/libc/stdlib/getopt.c	/^read_globals (struct getopt_data *data)$/;"	f	file:
 read_pt_entry	kernel/arch/omap44xx/paging.c	/^static inline void read_pt_entry(struct capability *pgtable, size_t slot, genpaddr_t *paddr)$/;"	f	file:
@@ -35194,7 +35197,6 @@ request2size	lib/newlib/newlib/libc/stdlib/vallocr.c	1415;"	d	file:
 request2size	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2231;"	d	file:
 request_done	include/barrelfish/core_state.h	/^    bool request_done;$/;"	m	struct:skb_state
 request_timeout	include/lwip/dhcp.h	/^        u16_t request_timeout;  \/* #ticks with period DHCP_FINE_TIMER_SECS for request timeout *\/$/;"	m	struct:dhcp
-request_type	include/barrelfish/cross_core.h	/^enum request_type {$/;"	g
 required_argument	lib/newlib/newlib/libc/include/getopt.h	95;"	d
 rerr	lib/newlib/newlib/libc/posix/regerror.c	/^static struct rerr {$/;"	s	file:
 rerrs	lib/newlib/newlib/libc/posix/regerror.c	/^} rerrs[] = {$/;"	v	typeref:struct:rerr	file:
@@ -35307,7 +35309,6 @@ response_latency	tools/arm_gem5/O3_ARM_v7a.py	/^    response_latency = '1'$/;"	v
 response_latency	tools/arm_gem5/O3_ARM_v7a.py	/^    response_latency = '12'$/;"	v	class:O3_ARM_v7aL2
 response_latency	tools/arm_gem5/O3_ARM_v7a.py	/^    response_latency = '2'$/;"	v	class:O3_ARM_v7a_DCache
 response_latency	tools/arm_gem5/O3_ARM_v7a.py	/^    response_latency = '4'$/;"	v	class:O3_ARM_v7aWalkCache
-response_type	include/barrelfish/cross_core.h	/^enum response_type {$/;"	g
 result	kernel/include/microbenchmarks.h	/^    uint64_t result;$/;"	m	struct:microbench
 result	lib/newlib/newlib/libc/stdio/fgetc.c	/^  int result;$/;"	m	struct:fp	file:
 result	lib/newlib/newlib/libc/stdio/fgetc.c	/^  result = __sgetc_r (ptr, fp);$/;"	m	struct:fp	file:
@@ -37639,8 +37640,6 @@ start_free_ram	include/target/x86/barrelfish_kpi/coredata_target.h	/^    uint32_
 start_free_ram	kernel/include/arch/armv7/arm_core_data.h	/^    uint32_t    start_free_ram;$/;"	m	struct:arm_core_data
 start_free_ram	kernel/include/diteinfo.h	/^    uint32_t    start_free_ram;$/;"	m	struct:diteinfo
 start_node	include/thc/thcinternal.h	/^  finish_list_t   start_node;$/;"	m	struct:finish_t
-start_of_core_0_section	lib/barrelfish/cross_core.c	/^volatile lvaddr_t start_of_core_0_section;$/;"	v
-start_of_core_1_section	lib/barrelfish/cross_core.c	/^volatile lvaddr_t start_of_core_1_section;$/;"	v
 start_of_ump_frame	lib/barrelfish/cross_core.c	/^volatile lvaddr_t start_of_ump_frame;$/;"	v
 start_trigger	include/trace/trace.h	/^    volatile uint64_t start_trigger;$/;"	m	struct:trace_buffer
 start_ts	include/net_queue_manager/net_queue_manager.h	/^    uint64_t start_ts;  \/\/ timestap of start of rx benchmark$/;"	m	struct:client_closure
@@ -39547,8 +39546,8 @@ tx_capnum	include/flounder/flounder_support_caps.h	/^    int tx_capnum;      \/\
 tx_filters	include/net_queue_manager/net_queue_manager.h	/^    struct filter* tx_filters;  \/\/ List of filters associated with this buf$/;"	m	struct:buffer_descriptor	typeref:struct:buffer_descriptor::filter
 tx_free_slots_fn_ptr	lib/net_queue_manager/queue_manager.c	/^static ether_get_tx_free_slots tx_free_slots_fn_ptr = NULL;$/;"	v	file:
 tx_index	include/net_queue_manager/net_queue_manager.h	/^    uint64_t tx_index;  \/\/ index of which is next slot to be sent$/;"	m	struct:client_closure
-type	include/barrelfish/cross_core.h	/^	enum request_type type;$/;"	m	struct:ump_request	typeref:enum:ump_request::request_type
-type	include/barrelfish/cross_core.h	/^	enum response_type type;$/;"	m	struct:ump_response	typeref:enum:ump_response::response_type
+type	include/barrelfish/cross_core.h	/^	enum type type;$/;"	m	struct:ump_message	typeref:enum:ump_message::type
+type	include/barrelfish/cross_core.h	/^enum type {$/;"	g
 type	include/barrelfish/memobj.h	/^    enum memobj_type type;    \/\/\/< Type of the memory object$/;"	m	struct:memobj	typeref:enum:memobj::memobj_type
 type	include/getopt/getopt.h	/^    enum argtype        type;$/;"	m	struct:cmdarg	typeref:enum:cmdarg::argtype
 type	include/hashtable/hashtable.h	/^    ENTRY_TYPE type;$/;"	m	struct:_ht_entry
@@ -40155,8 +40154,6 @@ ulongarg	lib/oldc/src/xprintf_int.c	/^	unsigned long			ulongarg;$/;"	m	union:arg
 ulp	lib/newlib/newlib/libc/stdlib/mprec.h	365;"	d
 ulp	lib/oldc/src/gdtoa/gdtoaimp.h	595;"	d
 ulp	lib/oldc/src/gdtoa/ulp.c	/^ulp$/;"	f
-ump_chars	include/barrelfish/cross_core.h	/^	char ump_chars[36];$/;"	m	struct:ump_request
-ump_chars	include/barrelfish/cross_core.h	/^	char ump_chars[36];$/;"	m	struct:ump_response
 ump_connect_callback	include/barrelfish/idc_export.h	/^    ump_connect_callback_fn *ump_connect_callback;$/;"	m	struct:idc_export
 ump_connect_callback_fn	include/barrelfish/idc_export.h	/^typedef errval_t ump_connect_callback_fn(void *st, struct monitor_binding *mb,$/;"	t
 ump_endpoint_poll	lib/barrelfish/waitset.c	/^static inline void ump_endpoint_poll(struct waitset_chanstate *chan)$/;"	f	file:
@@ -40166,8 +40163,7 @@ ump_frame_base	kernel/arch/omap44xx/startup_arch.c	/^lpaddr_t ump_frame_base;$/;
 ump_frame_bits	kernel/arch/omap44xx/startup_arch.c	/^size_t ump_frame_bits;$/;"	v
 ump_frame_len	include/target/arm/barrelfish_kpi/arm_core_data.h	/^    uint32_t    ump_frame_len;  \/\/\/< length of shared frame$/;"	m	struct:arm_core_data
 ump_frame_len	kernel/include/arch/armv7/arm_core_data.h	/^    uint32_t    ump_frame_len;  \/\/\/< length of shared frame$/;"	m	struct:arm_core_data
-ump_request	include/barrelfish/cross_core.h	/^struct ump_request {$/;"	s
-ump_response	include/barrelfish/cross_core.h	/^struct ump_response {$/;"	s
+ump_message	include/barrelfish/cross_core.h	/^struct ump_message {$/;"	s
 ump_serial_frame_addr	include/target/arm/barrelfish_kpi/arm_core_data.h	/^	uint32_t 	ump_serial_frame_addr;$/;"	m	struct:arm_core_data
 ump_serial_frame_len	include/target/arm/barrelfish_kpi/arm_core_data.h	/^	uint32_t	ump_serial_frame_len;$/;"	m	struct:arm_core_data
 unacked	include/lwip/tcp.h	/^        struct tcp_seg *unacked;        \/* Sent but unacknowledged segments. *\/$/;"	m	struct:tcp_pcb	typeref:struct:tcp_pcb::tcp_seg
@@ -40354,6 +40350,7 @@ usmblks	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  MALLINFO_FIELD_TYPE
 utcb	include/arch/powerpc64/arch/asm.h	75;"	d
 utf8	lib/newlib/newlib/testsuite/newlib.iconv/iconvjp.c	/^char utf8[] =$/;"	v
 utf8	lib/newlib/newlib/testsuite/newlib.iconv/iconvru.c	/^char utf8[] =$/;"	v
+util_word	include/barrelfish/cross_core.h	/^	uint32_t util_word;$/;"	m	struct:ump_message
 utimbuf	include/utime.h	/^struct utimbuf {$/;"	s
 utimbuf	lib/newlib/newlib/libc/include/sys/utime.h	/^struct utimbuf $/;"	s
 utimbuf	lib/newlib/newlib/libc/machine/spu/sys/utime.h	/^struct utimbuf$/;"	s
@@ -41134,6 +41131,7 @@ wordfree	lib/newlib/newlib/libc/posix/wordfree.c	/^wordfree(wordexp_t *pwordexp)
 wordloop	lib/newlib/newlib/libc/machine/h8300/memcpy.S	/^wordloop:$/;"	l
 wordloop	lib/newlib/newlib/libc/machine/h8300/memset.S	/^wordloop:$/;"	l
 words	include/barrelfish/aos_rpc.h	/^	uint32_t words[9];$/;"	m	struct:aos_rpc
+words	include/barrelfish/cross_core.h	/^ 	uint32_t words[9];$/;"	m	struct:ump_message
 words	include/barrelfish/lmp_endpoints.h	/^    uintptr_t words[0]; \/\/\/< Payload (variable length)$/;"	m	struct:lmp_recv_buf
 words	include/barrelfish/lmp_endpoints.h	/^    uintptr_t words[LMP_MSG_LENGTH]; \/\/\/< Payload (fixed length)$/;"	m	struct:lmp_recv_msg
 words	include/barrelfish_kpi/legacy_idc_buffer.h	/^        uintptr_t words[IDC_MSG_LENGTH];  \/\/\/< Message payload$/;"	m	struct:idc_send_msg_body::__anon5
@@ -41198,6 +41196,8 @@ write_through	kernel/include/target/x86_64/paging_kernel_target.h	/^        uint
 write_through	tools/elver/elver.c	/^        uint64_t        write_through   :1;$/;"	m	struct:pdir_entry::__anon309	file:
 write_through	tools/elver/elver.c	/^        uint64_t        write_through   :1;$/;"	m	struct:ptable_entry::__anon310	file:
 write_through	tools/elver/elver.c	/^        uint64_t        write_through   :1;$/;"	m	struct:ptable_entry::__anon311	file:
+write_to_core_0	lib/barrelfish/cross_core.c	/^void write_to_core_0(struct ump_message mess) $/;"	f
+write_to_core_1	lib/barrelfish/cross_core.c	/^void write_to_core_1(struct ump_message mess) $/;"	f
 write_to_ring	lib/barrelfish/omap_uart.c	/^bool write_to_ring (struct serial_ring_buffer * ring, char * c) {$/;"	f
 writeb	kernel/include/arch/armv7/io.h	/^static inline void writeb(unsigned char b, volatile void *addr)$/;"	f
 writefn	lib/newlib/newlib/libc/stdio/fopencookie.c	/^  cookie_write_function_t *writefn;$/;"	m	struct:fccookie	file:
