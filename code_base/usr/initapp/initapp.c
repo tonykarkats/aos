@@ -11,7 +11,6 @@
  * If you do not find this file, copies can be found by writing to:
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
-
 #include "initapp.h"
 #include <stdlib.h>
 #include <string.h>
@@ -22,43 +21,24 @@
 #include <barrelfish/sys_debug.h>
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
-#include <barrelfish/omap_uart.h>
 #include <barrelfish/thread_sync.h>
 #include <spawndomain/spawndomain.h>
 #include <barrelfish/thread_sync.h>
 #include <barrelfish/proc.h>
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
-
-#define UNUSED(x) (x) = (x)
-#define NAME_MEMEATER "armv7/sbin/memeater"
 #include "../../lib/spawndomain/arch.h"
-
 #include <elf/elf.h>
-#define INPUT_BUF_SIZE 4096
-#define MALLOC_BUFSIZE (1UL<<20)
-#define BUFSIZE 32L * 1024 * 1024
-#define SAFE_VADDR (1UL<<25)
-#define MAP_ADDR 0x6400000
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
-#define CLIENT_LIMIT 			(1<<26)*10			
-
-#define BLUE "\033[1m\033[31m"
-#define RESET "\033[0m"
 
 struct bootinfo *bi;
 static coreid_t my_core_id;
-struct serial_ring_buffer ring_b;
-struct serial_capref_ring_buffer ring_c;
 struct thread_cond char_cond;
 struct thread_cond capref_cond;
-
 struct process_node* pr_head;
-
 int global_did = 1;
-
 
 errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
 {
@@ -77,8 +57,7 @@ static int cross_core_thread_1(void *arg)
 	err = map_shared_frame(&buf, true);
 	signal_core_0();
 
-	// Main loop of cross-core thread!
-	
+	// Main loop of cross-core thread!	
 	while(1) 
 	{
 

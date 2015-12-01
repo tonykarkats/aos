@@ -22,7 +22,7 @@
 
 - Fix background processes ? FIXED
 
-- No acknowledgment in string rpc !
+- No acknowledgment in string rpc ! FIXED
 
 - Fix exit status and domain id - better process termination **** FIXED.
 
