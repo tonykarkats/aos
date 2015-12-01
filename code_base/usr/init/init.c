@@ -549,7 +549,9 @@ int main(int argc, char *argv[])
 	debug_printf("initialized uart!\n");
 
 	map_aux_core_registers();
+
 	spawn_second_core(bi);
+
  	poll_for_core();
 
 	thread_mutex_init(&process_list_lock);

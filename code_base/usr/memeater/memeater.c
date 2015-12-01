@@ -121,27 +121,12 @@ int main(int argc, char *argv[])
 			if ((core_id !=0 ) && (core_id != 1))	
 				continue;
 
-			debug_printf("Will spawn %s to core %d\n", next_token, core_id);		
+			// debug_printf("Will spawn %s to core %d\n", next_token, core_id);		
 
 			domainid_t pid;
 			err = aos_rpc_process_spawn(get_init_chan(), next_token, core_id, &pid);
 			if (err_is_fail(err) || (pid == 0))
 				printf("Could not spawn domain [%s]\n", next_token);
-			else 
-				printf("Domain spawned with pid = %d\n", pid);
-		}
-
-		else if (!strcmp("spawn", token)) {
-			token = strtok(NULL, space_token);
-			next_token = strtok(NULL, space_token);
-			if (next_token != NULL)
-				token = strcat(token, " &");
-			
-			domainid_t pid;
-			err = aos_rpc_process_spawn(get_init_chan(), token, 0, &pid);
-			
-			if (err_is_fail(err) || (pid == 0))
-				printf("Could not spawn domain [%s]\n", token);
 			else 
 				printf("Domain spawned with pid = %d\n", pid);
 		}
