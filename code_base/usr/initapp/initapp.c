@@ -33,6 +33,8 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
+struct thread_mutex process_list_lock;
+
 struct bootinfo *bi;
 static coreid_t my_core_id;
 struct thread_cond char_cond;
@@ -82,12 +84,18 @@ static int cross_core_thread_1(void *arg)
 				uint32_t util_word;
 				struct spawninfo si;	
 				struct capref disp_frame;	
-	
+
+				thread_mutex_lock(&process_list_lock);	
 				pr_head = insert_process_node(pr_head, spawned_domain, message_string, 0, NULL_CAP, NULL_CAP);
+				thread_mutex_unlock(&process_list_lock);	
 			
 				err = bootstrap_domain(message_string, &si, thread_bi, my_core_id, &disp_frame, spawned_domain);
 				if (err_is_fail(err)) {
+					
+					thread_mutex_lock(&process_list_lock);	
 					struct process_node * temp = delete_process_node( &pr_head, spawned_domain, "aaa");
+					thread_mutex_unlock(&process_list_lock);	
+					
 					temp = temp;
 					util_word = 0;	
 				}
@@ -245,8 +253,12 @@ static void recv_handler(void *arg)
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
 			int exit_status = msg.words[2];
-						
+					
+				
+			thread_mutex_lock(&process_list_lock);	
 			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+			
 			if (terminated_process == NULL) {
 				debug_printf("recv_handler: Received message from unknown process?!\n");
 				break;
@@ -347,6 +359,8 @@ int main(int argc, char *argv[])
     }
 
 	debug_printf("Signaling core-0 that we are up!\n");
+
+	thread_mutex_init( &process_list_lock);
 	
 	map_aux_core_registers();
 	signal_core_0();

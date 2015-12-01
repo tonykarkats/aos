@@ -33,3 +33,5 @@
 - Fix weird bug in process list with name of processes!
 
 - Add lock to initapp for process list management!
+
+= Fix background processes , does not work with oncore figure out why

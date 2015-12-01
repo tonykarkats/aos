@@ -130,6 +130,9 @@ int main(int argc, char *argv[])
 			else 
 				printf("Domain spawned with pid = %d\n", pid);
 		}
+		else if (!strcmp("exit", token)) {
+			return 0;
+		}
 	}		
 			
 	return 0;
