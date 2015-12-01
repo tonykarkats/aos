@@ -90,7 +90,6 @@ static int cross_core_thread_0(void *arg)
 				int success_spawn = received_message.util_word;
 
 				// debug_printf("core-1 returned to us spawned response with response %d!\n", success_spawn);
-
 				pseudo_lock = success_spawn;
 	
 				break;
@@ -116,12 +115,9 @@ static int cross_core_thread_0(void *arg)
 			case(SERIAL_PUT_STRING): ;
 				char message_string[36];
 
-				for (int i = 0; i<9; i++){
-					uint32_t * word = (uint32_t *) (message_string + i*4);
-					*word = received_message.words[i];   
-				}		
+				strcpy(message_string, (char *) received_message.words);
 
-				// debug_printf("Recevied a string over the cross core channel = %s\n", message_string);				
+				// debug_printf("Received a string over the cross core channel = %s\n", message_string);				
 				serial_putstring(message_string);
 	
 				break;

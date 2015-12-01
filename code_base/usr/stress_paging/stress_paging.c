@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < stress_size; i++) 
         assert(buf[i] == i%255);
 
-    // printf("Memory test passed!\n"); 	
+    printf("Memory test passed!\n"); 	
 
 	return 0;
 }

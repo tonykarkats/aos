@@ -252,7 +252,7 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 
 	*newpid = chan->words[0];
 	if (*newpid == 0) {
-		debug_printf("spawn_domain: Can not spawn!\n");
+		//debug_printf("spawn_domain: Can not spawn!\n");
 		return AOS_ERR_LMP_SPAWN_DOM;
 	}
 

@@ -98,7 +98,7 @@ static int cross_core_thread_1(void *arg)
 				
 				domainid_t spawned_domain = received_message.util_word;
 
-				debug_printf("cross_core_thread_1: Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
+				//debug_printf("cross_core_thread_1: Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
 			 		
 				uint32_t util_word;
 				struct spawninfo si;	
@@ -191,14 +191,13 @@ static void recv_handler(void *arg)
 				uint32_t * word = (uint32_t *) (message_string + i*4);
 				*word = msg.words[i+1];   
 			}	
-			debug_printf("Will send string message_string %s to core-0", message_string);
 
+			//debug_printf("Will send string message_string %s to core-0", message_string);
 			struct ump_message message_for_core_0;
-
-			message_for_core_0.type = SERIAL_PUT_STRING;
-			for (int i = 0 ; i < 8 ; i++) 
-				message_for_core_0.words[i] = msg.words[i];
+			strcpy((char *) message_for_core_0.words, message_string);
 			
+			message_for_core_0.type = SERIAL_PUT_STRING;
+		
 			// Using cross core channel for writing characters and strings through UART
 			write_to_core_0(message_for_core_0);
 	
