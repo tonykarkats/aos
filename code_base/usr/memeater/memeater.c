@@ -85,7 +85,9 @@ int main(int argc, char *argv[])
 				continue;
 			}
 
+			
 			for (int i = 0; i < pid_count; i++) {
+				//char domain_name[36];
 				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &name);	
 				if (err_is_ok(err)) 
 					printf("PID: %d NAME: %s\n", pids[i], name); 
