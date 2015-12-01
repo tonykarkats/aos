@@ -22,14 +22,12 @@
 #include <barrelfish/sys_debug.h>
 #include <math.h>
 #include <barrelfish/aos_rpc.h>
-#include <barrelfish/omap_uart.h>
+#include "omap_uart.h"
 #include <barrelfish/thread_sync.h>
 #include <spawndomain/spawndomain.h>
 #include <barrelfish/thread_sync.h>
-#include <barrelfish/proc.h>
-#include <barrelfish/boot.h>
-#include <barrelfish/cross_core.h>
-
+#include "proc.h"
+#include "boot.h"
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
 #include "../../lib/spawndomain/arch.h"
@@ -48,9 +46,6 @@
 #define BLUE "\033[1m\033[31m"
 #define RESET "\033[0m"
 
-volatile int pseudo_lock;
-struct thread_mutex process_list_lock;
-
 struct bootinfo *bi;
 static coreid_t my_core_id;
 struct serial_ring_buffer ring_b;
@@ -68,64 +63,6 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 	*ret = cap_io; 
 	*retlen = length;
 	return SYS_ERR_OK;
-}
-
-static int cross_core_thread_0(void *arg) 
-{
-	errval_t err;	
-	void * buf;
-	err = map_shared_frame(&buf, false);
-
-	while(1) 
-	{
-
-		struct ump_message received_message = read_from_core_0();
-		
-		int type = received_message.type;
-		
-		switch(type) {
-			case(SPAWNED_PROCESS_RESPONSE): ;
-				
-				// Remote core spawned a domain!
-				int success_spawn = received_message.util_word;
-
-				// debug_printf("core-1 returned to us spawned response with response %d!\n", success_spawn);
-				pseudo_lock = success_spawn;
-	
-				break;
-			case(SPAWNED_PROCESS_TERMINATED_RESPONSE): ;
-				// domainid_t remote_did;
-			
-				// Received that a remote domain terminated! Act...
-				domainid_t remote_did = received_message.util_word;
-				// debug_printf("Domain with id %zu terminated! \n", remote_did);
-		
-				thread_mutex_lock(&process_list_lock);
-				delete_process_node( &pr_head, remote_did, "aaa");
-				thread_mutex_unlock(&process_list_lock);
-
-				break;
-			
-			case(SERIAL_PUT_CHAR): ;
-				char received_char = received_message.words[0];
-			
-				serial_putchar(received_char);
-				break;
-
-			case(SERIAL_PUT_STRING): ;
-				char message_string[36];
-
-				strcpy(message_string, (char *) received_message.words);
-
-				// debug_printf("Received a string over the cross core channel = %s\n", message_string);				
-				serial_putstring(message_string);
-	
-				break;
-
-		}		
-	}	
-
-	return 0;
 }
 
 static void recv_handler(void *arg) 
@@ -165,23 +102,6 @@ static void recv_handler(void *arg)
 	uint32_t buffer[38];
 	
 	switch (rpc_operation) {
-		case AOS_RPC_GET_DID: ;
-			
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
-			
-			// debug_printf("Domain with name %s requested its id!\n", message_string); 
-			domainid_t requested_did;
-			requested_did = get_did_by_name(pr_head, message_string); 
-			
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) requested_did);
-			if (err_is_fail(err))
-				DEBUG_ERR(err,"recv_handler: Error in sending did back to the process!\n");	
-
-			cap_destroy(cap);
-			break;		
 		case AOS_RPC_SEND_STRING: ; // Send String
 			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
 	
@@ -193,10 +113,9 @@ static void recv_handler(void *arg)
 			serial_putstring(message_string);
 	
 		    // debug_printf("Message string = %s\n", message_string);	
-			//err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
-			//if (err_is_fail(err)) {
-			//	DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
-			//}	
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
+			if (err_is_fail(err))
+				DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
 			
 			cap_destroy(cap);
 			break;
@@ -245,86 +164,45 @@ static void recv_handler(void *arg)
 			char *next_token;
 			bool background;
 
-			for (int i = 0; i < string_length-1 ; i++){
+			for (int i = 0; i<string_length; i++){
 				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+2];   
+				*word = msg.words[i+1];   
 			}	
-
-			uint32_t core = msg.words[1];
-	
-			debug_printf("Will spawn %s at core %zu\n", message_string, core);
+				
 			token = strtok(message_string, " ");
-			
-			if (core == 1) {
-				// Spawn domain at core-1					
-	
-				global_did ++;
-			
-				struct ump_message core_1_msg;
-				core_1_msg.type = SPAWNED_PROCESS_REQUEST;
-				core_1_msg.util_word = global_did;
-				strcpy((char *) core_1_msg.words, message_string);
+			next_token = strtok(NULL, " ");
 				
-				pseudo_lock = -1;
-
-				thread_mutex_lock(&process_list_lock);
-				pr_head = insert_process_node(pr_head, global_did, message_string, true, NULL_CAP, NULL_CAP);
-				thread_mutex_unlock(&process_list_lock);
+			if (next_token == NULL)
+				background = false;
+			else if (strcmp(next_token, "&"))
+				background = false;
+			else 
+				background = true;
 			
-				write_to_core_1(core_1_msg);				
-	
-				while(pseudo_lock == -1);	
-
-				// If remote spawn succeeded add it to the process list
-				if (pseudo_lock == 0) {
-					
-					thread_mutex_lock(&process_list_lock);
-					delete_process_node( &pr_head, global_did, "aaa");
-					thread_mutex_unlock(&process_list_lock);
+		 	struct spawninfo si;	
+			struct capref disp_frame;
 			
-				}
-				
-				// Report back to shell! 
-				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
-				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-				}	
+			err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame);
+			if (err_is_fail(err)) {
+				debug_printf("recv_handler: Can not spawn process for the client! \n");
+				debug_printf("address of lc = %p\n", &lc);
+				d_id = 0;	
 			}
 			else {
-				// Spawn domain at own core! 
-				
-				next_token = strtok(NULL, " ");
-				
-				if (next_token == NULL)
-					background = false;
-				else if (strcmp(next_token, "&"))
-					background = false;
-				else 
-					background = true;
-			
-			 	struct spawninfo si;	
-				struct capref disp_frame;
-			
-				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did + 1);
-				if (err_is_fail(err)) {
-					debug_printf("recv_handler: Can not spawn process for the client! \n");
-					d_id = 0;	
-				}
-				else {
-					d_id = global_did;
-					global_did++;
-					
-					thread_mutex_lock(&process_list_lock);
-					pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
-					thread_mutex_unlock(&process_list_lock);
-				}
-				
-				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
-				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-				}		
+				debug_printf("token %s address\n", token);
+				d_id = global_did;
+				global_did++;
+				pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
 			}
+				
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+			}		
 
+			//debug_printf("recv_handler: Id sent back to the client!\n");
+			// TODO why cap_destroy issues page fault?
+			//cap_destroy(cap);
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
 			
@@ -398,25 +276,24 @@ static void recv_handler(void *arg)
 			cap_destroy(cap);
 			break;
 		case AOS_RPC_TERMINATING:;
-			domainid_t exiting_did = msg.words[1];
-			//int exit_status = (int) msg.words[2];		
-
-					
-			thread_mutex_lock(&process_list_lock);
-			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
-			thread_mutex_unlock(&process_list_lock);
+			for (int i = 0; i<string_length; i++){
+				uint32_t * word = (uint32_t *) (message_string + i*4);
+				*word = msg.words[i+1];   
+			}	
+	
+			char name[32];	
+			strcpy(name, message_string + 11); 	
+				
+			struct process_node * terminated_process = delete_process_node(&pr_head, 0, name);
 			if (terminated_process == NULL) {
 				debug_printf("recv_handler: Received message from unknown process?!\n");
-				break;
+				return;
 			}
-		
-			if (!terminated_process->background) {
-				// debug_printf("Sending termination did and status back to the client!\n");
-				err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
-				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-				}	
-			}
+
+			err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+			}	
 
 			cap_destroy(terminated_process->client_endpoint);
 			cap_destroy(terminated_process->dispatcher_frame);
@@ -498,8 +375,6 @@ int main(int argc, char *argv[])
     errval_t err;
 	struct lmp_chan channel;
 
-	debug_printf("size of ump_message %d\n", sizeof(struct ump_message));
-
     /* Set the core id in the disp_priv struct */
     err = invoke_kernel_get_core_id(cap_kernel, &my_core_id);
     assert(err_is_ok(err));
@@ -516,7 +391,6 @@ int main(int argc, char *argv[])
 
     // First argument contains the bootinfo location
     bi = (struct bootinfo*)strtol(argv[1], NULL, 10);
-
     // setup memory serving
     err = initialize_ram_alloc();
     if (err_is_fail(err)) {
@@ -531,7 +405,50 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	// map the uart !
+	// Memserver is initialized here
+ /* location where slot allocator will place its top-level cnode */
+    struct capref top_slot_cap = {
+        .cnode = cnode_root,
+        .slot = ROOTCN_SLOT_SLOT_ALLOCR,
+    };
+
+    struct capref mm mm_dev;
+
+    /* clear mm_ram struct */
+    memset(&mm_dev, 0, sizeof(mm_dev));
+
+    /* init slot allocator */
+    err = slot_prealloc_init(&ram_slot_alloc, top_slot_cap, MAXCHILDBITS,
+                           CNODE_BITS, cnode_start_cap,
+                           1UL << DEFAULT_CNODE_BITS, &mm_ram);
+    assert(err_is_ok(err));
+
+    err = mm_init(&mm_dev, ObjType_DevFrame, 0x40000000,
+                MAXSIZEBITS, MAXCHILDBITS, NULL, 
+                slot_alloc_prealloc, &ram_slot_alloc, true);
+    assert(err_is_ok(err));
+    
+    struct capref retcap;
+
+    err = mm_alloc_range(mm_dev, 12, 0x40000000, 0x80000000, &retcap, NULL);
+    assert(err_is_ok(err));
+	
+    
+    void * vbuf;	
+    err = paging_map_frame_attr(get_current_paging_state(), &vbuf, 0x1000, retcap);
+    assert(err_is_ok(err));
+
+	// print_modules(bi);	
+	
+	spawn_second_core(bi);
+	
+	while(1);
+
+	//pr_head = insert_process_node(pr_head, 1,"test1", 1, NULL_CAP, NULL_CAP);
+	//pr_head = insert_process_node(pr_head, 2,"test2", 1, NULL_CAP, NULL_CAP);
+	//pr_head = insert_process_node(pr_head, 3,"test3", 1, NULL_CAP, NULL_CAP);
+	//pr_head = insert_process_node(pr_head, 4,"test4", 1, NULL_CAP, NULL_CAP);
+
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
 	void * vbuf;	
@@ -543,17 +460,6 @@ int main(int argc, char *argv[])
 
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
-
-	map_aux_core_registers();
-
-	spawn_second_core(bi);
-
- 	poll_for_core();
-
-	thread_mutex_init(&process_list_lock);
-
-	struct thread *cross_core_thread = thread_create( cross_core_thread_0, NULL);
-	cross_core_thread = cross_core_thread;
 
 	initialize_ring(&ring_b);
 	initialize_capref_ring(&ring_c);
@@ -577,16 +483,17 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
+/*
+	debug_printf("Spawning led_on!\n");
+	struct capref disp_frame; 
+	struct spawninfo led_si;
+	err = bootstrap_domain("led_on", &led_si, bi, my_core_id, &disp_frame);
+	assert(err_is_ok(err));
+*/
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
-
-	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame, global_did);
-
-	pr_head = insert_process_node(pr_head, global_did, "memeater", false, NULL_CAP, disp_frame);
-	global_did++;
-	
-	print_nodes(pr_head);	
+	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame);
 	assert(err_is_ok(err));
 
 	debug_printf("Entering main messaging loop...");	
