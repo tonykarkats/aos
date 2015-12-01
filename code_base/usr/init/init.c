@@ -67,6 +67,54 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 	return SYS_ERR_OK;
 }
 
+static int cross_core_thread_0(void *arg) 
+{
+	while(1) 
+	{
+
+		struct ump_message received_message = read_from_core_0();
+		
+		int type = received_message.type;
+		
+		switch(type) {
+			case(SPAWNED_PROCESS_RESPONSE): ;
+				
+				// Remote core spawned a domain!
+				// int success_spawn = received_message.words[0];
+					
+				break;
+			case(SPAWNED_PROCESS_TERMINATED_RESPONSE): ;
+				// domainid_t remote_did;
+			
+				// Received that a remote domain terminated! Act...
+				// remote_did = received_message.words[0];
+		
+				break;
+			
+			case(SERIAL_PUT_CHAR): ;
+				char received_char = received_message.words[0];
+			
+				serial_putchar(received_char);
+				break;
+
+			case(SERIAL_PUT_STRING): ;
+				char message_string[36];
+
+				for (int i = 0; i<9; i++){
+					uint32_t * word = (uint32_t *) (message_string + i*4);
+					*word = received_message.words[i];   
+				}		
+				
+				serial_putstring(message_string);
+	
+				break;
+
+		}		
+	}	
+
+	return 0;
+}
+
 static void recv_handler(void *arg) 
 {
 		
@@ -436,26 +484,6 @@ int main(int argc, char *argv[])
 	void * buf;
 	err = map_shared_frame(&buf, false);
 
-	struct ump_message temp_message;
-
-	temp_message.type = SPAWNED_PROCESS_REQUEST;	
-	temp_message.util_word = 66;
-
-	write_to_core_1(temp_message);
-
-	temp_message.type = SPAWNED_PROCESS_REQUEST;	
-	temp_message.util_word = 67;
-
-	write_to_core_1(temp_message);
-
-	temp_message = read_from_core_0();
-	assert(temp_message.type == SPAWNED_PROCESS_RESPONSE);
-	assert(temp_message.util_word = 100);
-
-	while(1);
-
-	// initialize mm for spliting the device frame
-	
 	// map the uart !
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
@@ -469,6 +497,16 @@ int main(int argc, char *argv[])
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 
+	// cross_core_thread_0(NULL);
+	struct ump_message t;
+	t.type = SPAWNED_PROCESS_REQUEST;
+	strcpy((char *)t.words, "led_on");
+		
+	write_to_core_1(t);
+	
+	while(1);
+
+	cross_core_thread_0(NULL);
 	initialize_ring(&ring_b);
 	initialize_capref_ring(&ring_c);
 

@@ -76,7 +76,7 @@ void write_to_core_0(struct ump_message mess)
 
 struct ump_message read_from_core_0(void) 
 {
-	while(*(uint32_t *) core_0_flag == 0) {;}
+	while(*(uint32_t *) core_0_flag == 0) { thread_yield(); }
 
 	struct ump_message temp_message = * (struct ump_message *) core_0_slot;
 
@@ -96,7 +96,7 @@ void write_to_core_1(struct ump_message mess)
 
 struct ump_message read_from_core_1(void) 
 {
-	while(* (uint32_t *) core_1_flag == 0) { ; }
+	while(* (uint32_t *) core_1_flag == 0) { thread_yield(); }
 
 	struct ump_message temp_message = * (struct ump_message *) core_1_slot;
 

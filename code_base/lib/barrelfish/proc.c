@@ -96,13 +96,13 @@ errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct 
 
 	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id, did);
 	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
+		debug_printf("spawn_load_with_bootinfo: ERROR in loading module %s with error %s!\n", name);
 		return SPAWN_ERR_LOAD;
 	}
 
 	err = spawn_run(domain_si);
 	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR!\n");
+		debug_printf("spawn_load_with_bootinfo: ERROR in running module %s!\n", name);
 		return SPAWN_ERR_RUN;
 	}
 	

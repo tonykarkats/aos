@@ -67,6 +67,55 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 	return SYS_ERR_OK;
 }
 
+static int cross_core_thread_1(void *arg) 
+{
+	errval_t err;
+
+	while(1) 
+	{
+
+		struct ump_message received_message = read_from_core_1();
+		
+		int type = received_message.type;
+		
+		switch(type) {
+			case(SPAWNED_PROCESS_REQUEST): ;
+
+				char message_string[36];
+
+				for (int i = 0; i<9; i++){
+					uint32_t * word = (uint32_t *) (message_string + i*4);
+					*word = received_message.words[i];   
+				}		
+				
+				domainid_t spawned_domain = received_message.util_word;
+
+				debug_printf("Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
+			 		
+				uint32_t util_word;
+				struct spawninfo si;	
+				struct capref disp_frame;	
+				err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame, spawned_domain);
+				if (err_is_fail(err)) {
+					util_word = 0;	
+				}
+				else {
+					util_word = 1;
+				}
+				
+				struct ump_message returned_message;
+				returned_message.type      = SPAWNED_PROCESS_RESPONSE;
+				returned_message.util_word = util_word;
+
+				write_to_core_0(returned_message);					
+					
+				break;
+		}		
+	}	
+
+	return 0;	
+}
+
 static void recv_handler(void *arg) 
 {
 		
@@ -101,7 +150,6 @@ static void recv_handler(void *arg)
 	}	
 
 	//debug_printf("Entering switch!\n");	
-	uint32_t buffer[38];
 	
 	switch (rpc_operation) {
 		case AOS_RPC_GET_DID: ;
@@ -124,19 +172,14 @@ static void recv_handler(void *arg)
 		case AOS_RPC_SEND_STRING: ; // Send String
 			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
 	
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
+			struct ump_message message_for_core_0;
+
+			message_for_core_0.type = SERIAL_PUT_STRING;
+			for (int i = 0 ; i < 8 ; i++) 
+				message_for_core_0.words[i] = msg.words[i];
 			
-			serial_putstring(message_string);
+			write_to_core_0(message_for_core_0);
 	
-		    // debug_printf("Message string = %s\n", message_string);	
-			//err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
-			//if (err_is_fail(err)) {
-			//	DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
-			//}	
-			
 			cap_destroy(cap);
 			break;
 
@@ -165,116 +208,15 @@ static void recv_handler(void *arg)
 
 			char out_c = (char) msg.words[1];
 			
-			serial_putchar(out_c);
-
-			cap_destroy(cap);
-			break;
-
-		case AOS_RPC_GET_CHAR: ;
-			//debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
-			// serial_putstring(BLUE);
+			struct ump_message message;
+			message.type = SERIAL_PUT_CHAR;
+			message.words[0] = out_c;
 	
-			write_capref_to_ring(&ring_c, &cap);
-			thread_cond_signal(&capref_cond);
-			
-			break;
-		case AOS_RPC_PROC_SPAWN:;
-			domainid_t d_id;
-			char *token;
-			char *next_token;
-			bool background;
+			write_to_core_0(message);
 
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
-				
-			token = strtok(message_string, " ");
-			next_token = strtok(NULL, " ");
-				
-			if (next_token == NULL)
-				background = false;
-			else if (strcmp(next_token, "&"))
-				background = false;
-			else 
-				background = true;
-			
-		 	struct spawninfo si;	
-			struct capref disp_frame;
-			
-			err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did + 1);
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not spawn process for the client! \n");
-				debug_printf("address of lc = %p\n", &lc);
-				d_id = 0;	
-			}
-			else {
-			//	debug_printf("token %s address\n", token);
-				d_id = global_did;
-				global_did++;
-				pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
-			}
-				
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-			}		
-
-			//print_nodes(pr_head);
-			//debug_printf("recv_handler: Id sent back to the client!\n");
-			// TODO why cap_destroy issues page fault?
-			
-			break;
-		case AOS_RPC_PROC_GET_NAME:;
-			
-			//debug_printf("recv_handler: Request for domain name with d_Id = %d\n", msg.words[1]);
-			domainid_t did = msg.words[1];
-			char * d_name;
-
-			d_name = get_name_by_did (pr_head, did);
-			if (d_name == NULL) {
-				memcpy( buffer, "Not Found!", 11);
-			}
-			else if (strlen(d_name) > 39) {
-				memcpy( buffer, d_name, 39);
-				* (char *) (buffer + 35) = '\0';
-			}
-			else 
-				memcpy(buffer, d_name, strlen(d_name));
-
-			//debug_printf("Will send to client name %s\n", buffer);
-			
-			err = lmp_chan_send(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
-					  buffer[0] , buffer[1],buffer[2],
-					  buffer[3], buffer[4],buffer[5],
-					  buffer[6], buffer[7],buffer[8]);
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not send domain name back to the client!\n");
-			}	
-		
 			cap_destroy(cap);
 			break;
-		case AOS_RPC_PROC_GET_PIDS:;
-			
-			memset(buffer, 0, 36);
 
-			struct process_node * temp = pr_head;
-			size_t count = 0;
-			while (temp != NULL) {
-				//debug_printf("Added to list %d\n", temp->d_id);
-				buffer[count++] = temp->d_id;
-				temp = temp->next_pr;
-			}					
-
-			err = lmp_chan_send(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
-					  buffer[0] , buffer[1],buffer[2],
-					  buffer[3], buffer[4],buffer[5],
-					  buffer[6], buffer[7],buffer[8]);
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not send pids back to the client!\n");
-			}	
-
-			break;
 		case AOS_RPC_GET_DEV_CAP:;
 			 // debug_printf("recv_handler: Received request for device! \n");		
 
@@ -298,47 +240,17 @@ static void recv_handler(void *arg)
 			break;
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
-			//int exit_status = (int) msg.words[2];		
-	
-			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
-			if (terminated_process == NULL) {
-				debug_printf("recv_handler: Received message from unknown process?!\n");
-				break;
-			}
+			int exit_status = msg.words[2];
+
+			struct ump_message returned_mess;
 		
-			if (!terminated_process->background) {
-				debug_printf("Sending termination did and status back to the client!\n");
-				err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
-				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-				}	
-			}
-
-			cap_destroy(terminated_process->client_endpoint);
-			cap_destroy(terminated_process->dispatcher_frame);
-			break;
-		case AOS_RPC_KILL:;
-			debug_printf("Terminating node with pid = %d\n", msg.words[1]);
-
-			struct process_node * killed_process = delete_process_node(&pr_head, msg.words[1], "");
-			if (killed_process == NULL) {
-				debug_printf("Process to kill does not exist!\n");
-				return;
-			}
+			returned_mess.type = SPAWNED_PROCESS_TERMINATED_RESPONSE;
+			return_mess.util_word = exiting_did;
+			return_mess.word[0] = exit_status;
 			
-			err = cap_revoke(killed_process->dispatcher_frame);	
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not kill process!\n");
-				return ;
-			}
-		
-			err = cap_delete(killed_process->dispatcher_frame);	
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not destroy capability of domain...!\n");
-				return ;
-			}
+			write_to_core_0(return_mess);
 
-			break;	
+			break;
 	}
 }
 
@@ -394,8 +306,6 @@ int main(int argc, char *argv[])
     errval_t err;
 	struct lmp_chan channel;
 
-	debug_printf("size of ump_message %d\n", sizeof(struct ump_message));
-
     /* Set the core id in the disp_priv struct */
     err = invoke_kernel_get_core_id(cap_kernel, &my_core_id);
     assert(err_is_ok(err));
@@ -435,37 +345,23 @@ int main(int argc, char *argv[])
 	err = map_shared_frame(&buf, true);
 	signal_core_0();
 	
-	struct ump_message t = read_from_core_1();
-
-	debug_printf("Read a message!\n");
-	assert(t.type == SPAWNED_PROCESS_REQUEST);
-	assert(t.util_word == 66);
-
-	t = read_from_core_1();
-	assert(t.type == SPAWNED_PROCESS_REQUEST);
-	assert(t.util_word == 67);
+	cross_core_thread_1(NULL);
 	
-	t.type = SPAWNED_PROCESS_RESPONSE;
-	t.util_word = 99;
+	struct ump_message t;
+	t.type = SERIAL_PUT_CHAR;
+	*(char *) t.words = 'c';
+
 	write_to_core_0(t);
-
-	while(1);	
-
-	// initialize mm for spliting the device frame
+	write_to_core_0(t);
+	write_to_core_0(t);
+	write_to_core_0(t);
+		
+	strcpy((char *) t.words, "abc");
+	t.type = SERIAL_PUT_STRING;
+	write_to_core_0(t);	
 	
-	// map the uart !
-	uint64_t size   = 0x1000;
-	uint64_t offset = 0x8020000;
-	void * vbuf;	
-	err = paging_map_frame(get_current_paging_state(),&vbuf, size, cap_io, &offset, &size);
-	if (err_is_fail(err)) {
-		debug_printf("CAN not map dev frame");
-		abort();
-	}
-
-	uart_initialize((lvaddr_t)vbuf);
-	debug_printf("initialized uart!\n");
-
+	//while(1);	
+	
 	initialize_ring(&ring_b);
 	initialize_capref_ring(&ring_c);
 
@@ -487,26 +383,6 @@ int main(int argc, char *argv[])
 	
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
-
-/*
-	debug_printf("Spawning led_on!\n");
-	struct capref disp_frame; 
-	struct spawninfo led_si;
-	err = bootstrap_domain("led_on", &led_si, bi, my_core_id, &disp_frame);
-	assert(err_is_ok(err));
-*/
-
-	debug_printf("Spawning memeater!\n"); 
-	struct spawninfo mem_si;
-	struct capref disp_frame;
-
-	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame, global_did);
-
-	pr_head = insert_process_node(pr_head, global_did, "memeater", false, NULL_CAP, disp_frame);
-	global_did++;
-	
-	print_nodes(pr_head);	
-	assert(err_is_ok(err));
 
 	debug_printf("Entering main messaging loop...");	
 	while(true) {
