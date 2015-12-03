@@ -1248,6 +1248,7 @@ CMP_FUNC	lib/newlib/newlib/libc/string/strcasestr.c	86;"	d	file:
 CNAME	include/arch/x86_64/machine/asm.h	56;"	d
 CNODE	kernel/arch/omap44xx/startup_arch.c	32;"	d	file:
 CNODE	kernel/startup.c	29;"	d	file:
+CNODE_BITS	usr/init/dev_serv.c	31;"	d	file:
 CNODE_BITS	usr/init/mem_serv.c	31;"	d	file:
 CNODE_BITS	usr/initapp/mem_serv.c	31;"	d	file:
 CNT	lib/newlib/newlib/libc/machine/sh/memset.S	/^#define CNT r4$/;"	d
@@ -7275,9 +7276,11 @@ MAX	lib/newlib/newlib/libc/string/str-two-way.h	58;"	d
 MAX	lib/newlib/newlib/testsuite/newlib.string/memmove1.c	36;"	d	file:
 MAXAPICID	include/multicast.h	19;"	d
 MAXBSIZE	include/sys/param.h	167;"	d
+MAXCHILDBITS	usr/init/dev_serv.c	24;"	d	file:
 MAXCHILDBITS	usr/init/mem_serv.c	24;"	d	file:
 MAXCHILDBITS	usr/initapp/mem_serv.c	24;"	d	file:
 MAXCOMLEN	include/sys/param.h	49;"	d
+MAXDEPTH	usr/init/dev_serv.c	26;"	d	file:
 MAXDEPTH	usr/init/mem_serv.c	26;"	d	file:
 MAXDEPTH	usr/initapp/mem_serv.c	26;"	d	file:
 MAXDOUBLE	include/values.h	13;"	d
@@ -7313,6 +7316,7 @@ MAXPATHLEN	lib/newlib/newlib/libc/include/sys/unistd.h	499;"	d
 MAXPHYS	include/sys/param.h	88;"	d
 MAXSECRETLEN	include/lwip/opt.h	1516;"	d
 MAXSEG_64K	include/zconf.h	89;"	d
+MAXSIZEBITS	usr/init/dev_serv.c	21;"	d	file:
 MAXSIZEBITS	usr/init/mem_serv.c	21;"	d	file:
 MAXSIZEBITS	usr/initapp/mem_serv.c	21;"	d	file:
 MAXSYMLINKS	include/sys/param.h	181;"	d
@@ -7624,8 +7628,10 @@ MINSIZE	lib/newlib/newlib/libc/stdlib/msizer.c	1406;"	d	file:
 MINSIZE	lib/newlib/newlib/libc/stdlib/pvallocr.c	1406;"	d	file:
 MINSIZE	lib/newlib/newlib/libc/stdlib/reallocr.c	1406;"	d	file:
 MINSIZE	lib/newlib/newlib/libc/stdlib/vallocr.c	1406;"	d	file:
+MINSIZEBITS	usr/init/dev_serv.c	23;"	d	file:
 MINSIZEBITS	usr/init/mem_serv.c	23;"	d	file:
 MINSIZEBITS	usr/initapp/mem_serv.c	23;"	d	file:
+MINSPARENODES	usr/init/dev_serv.c	35;"	d	file:
 MINSPARENODES	usr/init/mem_serv.c	35;"	d	file:
 MINSPARENODES	usr/initapp/mem_serv.c	35;"	d	file:
 MINSPERHOUR	lib/newlib/newlib/libc/time/local.h	6;"	d
@@ -8286,6 +8292,7 @@ NBPW	include/sys/param.h	138;"	d
 NC	lib/newlib/newlib/libc/posix/utils.h	44;"	d
 NCACHED	lib/newlib/newlib/libc/search/hash.h	104;"	d
 NCCS	include/sys/_termios.h	89;"	d
+NCNODES	usr/init/dev_serv.c	32;"	d	file:
 NCNODES	usr/init/mem_serv.c	32;"	d	file:
 NCNODES	usr/initapp/mem_serv.c	32;"	d	file:
 NDEBUG	lib/newlib/newlib/libc/posix/utils.h	50;"	d
@@ -8479,6 +8486,7 @@ NL_ARGMAX	lib/newlib/newlib/libc/include/limits.h	14;"	d
 NL_CAT_LOCALE	include/nl_types.h	24;"	d
 NL_SETD	include/nl_types.h	23;"	d
 NN	lib/newlib/newlib/libc/machine/h8500/divhi3.S	/^NN:	neg.w	r4$/;"	l
+NNODES	usr/init/dev_serv.c	28;"	d	file:
 NNODES	usr/init/mem_serv.c	28;"	d	file:
 NNODES	usr/initapp/mem_serv.c	28;"	d	file:
 NNONCHAR	lib/newlib/newlib/libc/posix/engine.c	105;"	d	file:
@@ -11753,6 +11761,7 @@ SEPARATE_OBJECTS	lib/newlib/newlib/libc/stdlib/pvallocr.c	307;"	d	file:
 SEPARATE_OBJECTS	lib/newlib/newlib/libc/stdlib/reallocr.c	307;"	d	file:
 SEPARATE_OBJECTS	lib/newlib/newlib/libc/stdlib/vallocr.c	307;"	d	file:
 SEQ	include/deputy/nodeputy.h	23;"	d
+SERIAL_GET_CHAR	include/barrelfish/cross_core.h	/^	SERIAL_GET_CHAR,$/;"	e	enum:type
 SERIAL_PUT_CHAR	include/barrelfish/cross_core.h	/^	SERIAL_PUT_CHAR,$/;"	e	enum:type
 SERIAL_PUT_STRING	include/barrelfish/cross_core.h	/^	SERIAL_PUT_STRING,$/;"	e	enum:type
 SET0	lib/newlib/newlib/libc/posix/regexec.c	114;"	d	file:
@@ -24196,7 +24205,10 @@ dev	include/usb/usb_pipe.h	/^    uint8_t dev;$/;"	m	struct:usb_pipe_t
 dev	include/usb/usb_topology.h	/^    usb_device_t *dev;          \/\/ Corresponding USB device $/;"	m	struct:usb_node_t
 dev	lib/cpio/cpiobin.c	/^    uint8_t dev[2];$/;"	m	struct:__anon140	file:
 dev_attributes	include/nfs/nfs_rpc.h	/^    sattr3 dev_attributes;$/;"	m	struct:devicedata3
+dev_mem_avail	usr/init/dev_serv.c	/^size_t dev_mem_total = 0, dev_mem_avail = 0;$/;"	v
+dev_mem_total	usr/init/dev_serv.c	/^size_t dev_mem_total = 0, dev_mem_avail = 0;$/;"	v
 dev_nr	lib/pci/confspace/pci_confspace.c	/^         uint32_t dev_nr : 5;$/;"	m	struct:pci_config_address_word::__anon306	file:
+dev_slot_alloc	usr/init/dev_serv.c	/^static struct slot_prealloc dev_slot_alloc;$/;"	v	typeref:struct:slot_prealloc	file:
 dev_sz	include/usb/usb_device.h	/^    int dev_sz;$/;"	m	struct:usb_device_t
 dev_t	include/sys/types.h	/^typedef long dev_t;$/;"	t
 dev_t	lib/newlib/newlib/libc/include/sys/types.h	/^typedef __dev_t dev_t;$/;"	t
@@ -24213,6 +24225,7 @@ devicedata3	include/nfs/nfs_rpc.h	/^struct devicedata3 {$/;"	s
 devicedata3	include/nfs/nfs_rpc.h	/^typedef struct devicedata3 devicedata3;$/;"	t	typeref:struct:devicedata3
 devmajor	lib/cpio/cpiobin.c	/^    char devmajor[8];$/;"	m	struct:__anon141	file:
 devminor	lib/cpio/cpiobin.c	/^    char devminor[8];$/;"	m	struct:__anon141	file:
+devserv_alloc	usr/init/dev_serv.c	/^static errval_t devserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,$/;"	f	file:
 dfault	lib/newlib/newlib/libc/xdr/xdr.c	/^        xdrproc_t dfault)$/;"	s	file:
 dh	lib/newlib/newlib/libc/machine/i386/i386mach.h	56;"	d
 dh	lib/newlib/newlib/libc/machine/x86_64/x86_64mach.h	69;"	d
@@ -28046,6 +28059,7 @@ initial_top	lib/newlib/newlib/libc/stdlib/pvallocr.c	1590;"	d	file:
 initial_top	lib/newlib/newlib/libc/stdlib/reallocr.c	1590;"	d	file:
 initial_top	lib/newlib/newlib/libc/stdlib/vallocr.c	1590;"	d	file:
 initialize_capref_ring	lib/barrelfish/omap_uart.c	/^void initialize_capref_ring(struct serial_capref_ring_buffer * ring) {$/;"	f
+initialize_dev_serv	usr/init/dev_serv.c	/^errval_t initialize_dev_serv(void)$/;"	f
 initialize_mem_serv	usr/init/mem_serv.c	/^errval_t initialize_mem_serv(void)$/;"	f
 initialize_mem_serv	usr/initapp/mem_serv.c	/^errval_t initialize_mem_serv(void)$/;"	f
 initialize_ram_alloc	usr/init/mem_alloc.c	/^errval_t initialize_ram_alloc(void)$/;"	f
@@ -31305,6 +31319,7 @@ mm_debug_print	lib/mm/mm.c	/^void mm_debug_print(struct mmnode *mmnode, int spac
 mm_destroy	lib/mm/mm.c	/^void mm_destroy(struct mm *mm)$/;"	f
 mm_free	lib/mm/mm.c	/^errval_t mm_free(struct mm *mm, struct capref cap, genpaddr_t base,$/;"	f
 mm_init	lib/mm/mm.c	/^errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,$/;"	f
+mm_ram	usr/init/dev_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_ram	usr/init/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_ram	usr/initapp/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_realloc_range	lib/mm/mm.c	/^errval_t mm_realloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t base,$/;"	f
@@ -31614,6 +31629,7 @@ mrmod_data	include/barrelfish_kpi/init.h	/^    ptrdiff_t        mrmod_data;\/\/\
 mrmod_size	include/barrelfish_kpi/init.h	/^    size_t           mrmod_size;\/\/\/< Size in bytes (module type only)$/;"	m	struct:mem_region
 mrmod_slot	include/barrelfish_kpi/init.h	/^    int              mrmod_slot;\/\/\/< First slot containing caps (module only)$/;"	m	struct:mem_region
 mrp	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^mrp: .equ	r31	; millicode return pointer$/;"	l
+msa	usr/init/dev_serv.c	/^static struct multi_slot_allocator msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 msa	usr/init/mem_serv.c	/^static struct multi_slot_allocator msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 msa	usr/initapp/mem_serv.c	/^static struct multi_slot_allocator msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 msb	lib/newlib/newlib/libc/machine/h8500/cmpsi.c	/^    signed char msb;$/;"	m	struct:pu::__anon201	file:
@@ -35593,6 +35609,7 @@ ref	include/lwip/pbuf.h	/^        u16_t ref;$/;"	m	struct:pbuf
 refill_func	include/barrelfish/slab.h	/^    slab_refill_func_t refill_func;  \/\/\/< Refill function$/;"	m	struct:slab_alloc
 refill_slabs	include/target/x86/barrelfish/pmap_target.h	/^    errval_t (*refill_slabs)(struct pmap_x86 *); \/\/\/< Function to refill slabs$/;"	m	struct:pmap_x86
 refill_thread_slabs	lib/barrelfish/threads.c	/^static errval_t refill_thread_slabs(struct slab_alloc *slabs)$/;"	f	file:
+refilling	usr/init/dev_serv.c	/^static bool refilling = false;$/;"	v	file:
 refilling	usr/init/mem_serv.c	/^static bool refilling = false;$/;"	v	file:
 refilling	usr/initapp/mem_serv.c	/^static bool refilling = false;$/;"	v	file:
 refused_data	include/lwip/tcp.h	/^        struct pbuf *refused_data;      \/* Data previously received but not yet taken by upper layer *\/$/;"	m	struct:tcp_pcb	typeref:struct:tcp_pcb::pbuf

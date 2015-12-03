@@ -525,7 +525,14 @@ int main(int argc, char *argv[])
         abort();
     }
 
+	err = initialize_dev_serv();
+    if (err_is_fail(err)) {
+        DEBUG_ERR(err, "Failed to init device server module");
+        abort();
+    }
+	
 	// map the uart !
+	
 	uint64_t size   = 0x1000;
 	uint64_t offset = 0x8020000;
 	void * vbuf;	
@@ -534,7 +541,9 @@ int main(int argc, char *argv[])
 		debug_printf("CAN not map dev frame");
 		abort();
 	}
+	
 
+	
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 

@@ -476,18 +476,23 @@ errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,
 {
     /* init fields */
     assert(mm != NULL);
+	debug_printf("After first assert \n");
     mm->objtype = objtype;
+	debug_printf("Before assert with UNBITS\n");
     assert((base & (UNBITS_GENPA(sizebits) - 1)) == 0);
     mm->base = base;
     mm->sizebits = sizebits;
+	debug_printf("Before second assert \n");
     assert(maxchildbits > 0 && maxchildbits != FLAGBITS);
-    mm->maxchildbits = maxchildbits;
+    debug_printf("After second assert \n");
+	mm->maxchildbits = maxchildbits;
     mm->root = NULL;
     mm->slot_alloc = slot_alloc_func;
     mm->slot_alloc_inst = slot_alloc_inst;
     mm->delete_chunked = delete_chunked;
 
     /* init slab allocator */
+	debug_printf("mm_init: Before slab_init!\n");
     slab_init(&mm->slabs, MM_NODE_SIZE(maxchildbits), slab_refill_func);
 
     return SYS_ERR_OK;

@@ -86,7 +86,8 @@
 #define ROOTCN_SLOT_SLOT_ALLOC2  9   ///< Root of slot alloc2
 #define ROOTCN_SLOT_ARGCN        10  ///< Argcn slot in root cnode
 #define ROOTCN_SLOT_SLOT_ALLOCR  11  ///< Top-level slot alloc slot
-#define ROOTCN_SLOTS_USER        12  ///< First free slot in root cnode for user
+#define ROOTCN_SLOT_SLOT_ALLOCR_DEV  12  ///< Top-level slot alloc slot
+#define ROOTCN_SLOTS_USER        13  ///< First free slot in root cnode for user
 
 /* Size of CNodes in Root CNode if not the default size */
 #define SLOT_ALLOC_CNODE_BITS   (DEFAULT_CNODE_BITS * 2)

@@ -48,6 +48,7 @@ errval_t slot_prealloc_refill(struct slot_prealloc *this)
         this->top_used = 0;
     }
 
+	debug_printf("After checkign for initialized!");
     // Still enough slots in the top cnode
     assert(this->top_used < (1UL << this->cnode_size_bits));
 
