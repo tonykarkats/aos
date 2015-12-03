@@ -81,8 +81,10 @@ void * SafeMalloc(size_t size) {
 		return (void *) return_address;  
     }
 	else {
-		char* return_address = malloc(size);
-		return return_address;
+		debug_printf("Using real malloc!\n");
+		char* return_address = malloc(size);	
+		debug_printf("Used real malloc!\n");
+		return (void *) return_address;
 	}	
 
 }
@@ -94,7 +96,5 @@ void set_real_malloc(void)
 
 void SafeFree(void* addr) {
 }
-
-
 
 void NullFunction(void * junk) { ; }

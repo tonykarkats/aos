@@ -11,7 +11,6 @@ volatile lvaddr_t core_1_slot;
 
 static volatile lvaddr_t cross_core_register = 0x48281800;
 
-
 int get_core_id(struct bootinfo * bi) {
 
 	return bi->coreid;

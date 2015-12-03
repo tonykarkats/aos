@@ -9,6 +9,7 @@ enum type {
 	SPAWNED_PROCESS_TERMINATED_RESPONSE,
 	SERIAL_PUT_CHAR,
 	SERIAL_PUT_STRING,
+	SERIAL_GET_CHAR,
 };
 
 struct ump_message {

@@ -235,13 +235,12 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     }
 
 	// debug_printf("barrelfish_init_onthread: Initializing our morecore backend!\n");
-    err = morecore_init();
-    if (err_is_fail(err)) {
-        return err_push(err, LIB_ERR_MORECORE_INIT);
-    }
+	err = morecore_init();
+   	if (err_is_fail(err)) {
+   	    return err_push(err, LIB_ERR_MORECORE_INIT);
+   	}
 
-	
-    lmp_endpoint_init();
+	lmp_endpoint_init();
 	
 	//set_real_malloc();	
 	//debug_printf("seted real malloc for allocations :D");
@@ -275,8 +274,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
 	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
     }
-
-
+	
   	return SYS_ERR_OK;
 }
 

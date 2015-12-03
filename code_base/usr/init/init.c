@@ -94,8 +94,6 @@ static int cross_core_thread_0(void *arg)
 	
 				break;
 			case(SPAWNED_PROCESS_TERMINATED_RESPONSE): ;
-				// domainid_t remote_did;
-			
 				// Received that a remote domain terminated! Act...
 				domainid_t remote_did = received_message.util_word;
 				// debug_printf("Domain with id %zu terminated! \n", remote_did);
@@ -121,7 +119,6 @@ static int cross_core_thread_0(void *arg)
 				serial_putstring(message_string);
 	
 				break;
-
 		}		
 	}	
 
@@ -256,8 +253,8 @@ static void recv_handler(void *arg)
 			token = strtok(message_string, " ");
 			
 			if (core == 1) {
+				
 				// Spawn domain at core-1					
-	
 				global_did ++;
 			
 				struct ump_message core_1_msg;
@@ -276,23 +273,21 @@ static void recv_handler(void *arg)
 				while(pseudo_lock == -1);	
 
 				// If remote spawn succeeded add it to the process list
-				if (pseudo_lock == 0) {
-					
+				if (pseudo_lock == 0) {	
 					thread_mutex_lock(&process_list_lock);
 					delete_process_node( &pr_head, global_did, "aaa");
 					thread_mutex_unlock(&process_list_lock);
-			
 				}
 				
-				// Report back to shell! 
+				// Report back to shell that process was spawned
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
 				if (err_is_fail(err)) {
 					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 				}	
 			}
 			else {
+
 				// Spawn domain at own core! 
-				
 				next_token = strtok(NULL, " ");
 				
 				if (next_token == NULL)
@@ -343,8 +338,7 @@ static void recv_handler(void *arg)
 			else 
 				memcpy(buffer, d_name, strlen(d_name));
 
-			//debug_printf("Will send to client name %s\n", buffer);
-			
+			//debug_printf("Will send to client name %s\n", buffer);			
 			err = lmp_chan_send(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
 					  buffer[0] , buffer[1],buffer[2],
 					  buffer[3], buffer[4],buffer[5],
@@ -450,7 +444,7 @@ static errval_t setup_channel(struct lmp_chan *channel) {
 
 	errval_t err;
 	struct waitset* ws = get_default_waitset();  	
-	
+
 	lmp_chan_init(channel);
 
 	// Create our endpoint to self
