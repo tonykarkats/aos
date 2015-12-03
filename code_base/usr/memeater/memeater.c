@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 	char *token;
 	char *next_token;
 	char *ampersand;
+	char *domain_name = malloc(36); 
 
 	while(1) {
 		printf("$>");
@@ -76,7 +77,6 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("ps", token)) {
 			domainid_t * pids;
-			char * name;
 			pids = (domainid_t *) malloc(sizeof(domainid_t)*32);
 			size_t pid_count;
 			err = aos_rpc_process_get_all_pids(get_init_chan(), &pids, &pid_count);
@@ -87,10 +87,9 @@ int main(int argc, char *argv[])
 
 			
 			for (int i = 0; i < pid_count; i++) {
-				//char domain_name[36];
-				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &name);	
+				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &domain_name);	
 				if (err_is_ok(err)) 
-					printf("PID: %d NAME: %s\n", pids[i], name); 
+					printf("PID: %d NAME: %s\n", pids[i], domain_name); 
 			}
 			
 		}

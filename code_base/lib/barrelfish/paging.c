@@ -232,6 +232,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 	if (err_is_fail(err)) {
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
+
 	
     return SYS_ERR_OK;
 }

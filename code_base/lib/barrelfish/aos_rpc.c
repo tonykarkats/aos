@@ -263,7 +263,7 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 		return SYS_ERR_OK;
 	}
 	else {
-		debug_printf("Waiting for process to finish!\n");
+		//debug_printf("Waiting for process to finish!\n");
 		event_dispatch(get_default_waitset());
 	}
 	
@@ -293,11 +293,11 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
                                   char **name)
 {
     errval_t err;
-	char *domain_name;
+	//char *domain_name;
 	
 	//debug_printf("WIll request name of pid %d\n", pid);
 
-	domain_name = (char *) malloc(36);    
+	//domain_name = (char *) malloc(36);    
     
 	while(true) {
 		event_dispatch(&chan->s_waitset);
@@ -314,13 +314,13 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
     event_dispatch(get_default_waitset());
 
 	for (int i = 0; i< 9; i++) {
-		uint32_t * word = (uint32_t *) (domain_name + i*4);
+		uint32_t * word = (uint32_t *) (*name + i*4);
 		*word = chan->words[i];   
 	}
    
 	//debug_printf("Client: Process with %s\n", domain_name);
     	
-	*name = domain_name;
+	//*name = domain_name;
     return SYS_ERR_OK;
 }
 
