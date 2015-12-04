@@ -29,7 +29,7 @@
 #include <barrelfish/proc.h>
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
-
+#include <mm/mm.h>
 #define UNUSED(x) (x) = (x)
 #define NAME_MEMEATER "armv7/sbin/memeater"
 #include "../../lib/spawndomain/arch.h"
@@ -48,6 +48,8 @@
 #define BLUE "\033[1m\033[31m"
 #define RESET "\033[0m"
 
+static struct mm dev_mm;
+
 volatile int pseudo_lock;
 struct thread_mutex process_list_lock;
 
@@ -59,14 +61,22 @@ struct thread_cond char_cond;
 struct thread_cond capref_cond;
 
 struct process_node* pr_head;
-
-int global_did = 1;
-
+int global_did = 1000;
 
 errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
 {
-	*ret = cap_io; 
-	*retlen = length;
+	errval_t err;
+
+	err = mm_realloc_range( &dev_mm, length, start_addr,ret);
+	if (err_is_fail(err)) {
+		debug_printf("get_dev_frame: can not allocate range for device!\n");
+		return MM_ERR_DEVICE_ALLOC;
+	}
+
+	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
+
+	assert(err_is_ok(err));
+	
 	return SYS_ERR_OK;
 }
 
@@ -151,10 +161,10 @@ static void recv_handler(void *arg)
 	uint32_t rpc_operation = msg.words[0];
 	assert(message_length != 0);
 
-	lmp_chan_register_recv(lc, get_default_waitset(),
-			MKCLOSURE(recv_handler, arg));
+	lmp_chan_register_recv( lc, get_default_waitset(), MKCLOSURE(recv_handler, arg));
 	err = lmp_chan_alloc_recv_slot(lc);
-	if (err_is_fail(err)) {
+ 	if (err_is_fail(err))
+	{
 		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
 	}	
 
@@ -375,7 +385,8 @@ static void recv_handler(void *arg)
 
 			lpaddr_t paddr = msg.words[1];
 			size_t length = msg.words[2];
-			
+		
+			debug_printf("Received request for %p and %lu\n", paddr, length);	
 			struct capref dev_cap;
 			size_t retlen = 1;	
 			err = get_devframe(&dev_cap, &retlen, paddr, length);
@@ -525,24 +536,41 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	err = initialize_dev_serv();
+	static struct range_slot_allocator devframes_allocator;
+    err = range_slot_alloc_init(&devframes_allocator, 1024, NULL);
     if (err_is_fail(err)) {
-        DEBUG_ERR(err, "Failed to init device server module");
-        abort();
+        return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
     }
 	
-	// map the uart !
-	
-	uint64_t size   = 0x1000;
-	uint64_t offset = 0x8020000;
-	void * vbuf;	
-	err = paging_map_frame(get_current_paging_state(),&vbuf, size, cap_io, &offset, &size);
+	err = mm_init(&dev_mm, ObjType_DevFrame,
+                  0x40000000,  30,
+                  1, slab_default_refill, slot_alloc_dynamic,
+                  &devframes_allocator, false);
+    if (err_is_fail(err)) {
+        return err_push(err, MM_ERR_MM_INIT);
+    }
+
+	err = mm_add(&dev_mm, cap_io, 30, 0x40000000);
 	if (err_is_fail(err)) {
-		debug_printf("CAN not map dev frame");
+		debug_printf("Error in adding device frame to device memory manager!\n");
+		abort();
+	}
+
+	struct capref temp_cap;
+	size_t retlen;
+	err = get_devframe( &temp_cap, &retlen, 0x48020000, 12);
+	if (err_is_fail(err)) {
+		debug_printf("Can not get device frame for uart!\n");
 		abort();
 	}	
-
 	
+	void *vbuf;
+	err = paging_map_frame_attr(get_current_paging_state(), &vbuf, 0x1000, temp_cap, DEVICE_FLAGS, NULL,NULL);
+	if (err_is_fail(err)) {
+		debug_printf("Error in mapping uart exiting...\n");
+		abort();
+	}
+
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 
@@ -591,7 +619,6 @@ int main(int argc, char *argv[])
 	print_nodes(pr_head);	
 	assert(err_is_ok(err));
 
-	debug_printf("Entering main messaging loop...");	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {

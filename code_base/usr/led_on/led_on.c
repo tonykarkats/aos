@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	struct capref dev_cap;
 	size_t ret_len;
 
-	err = aos_rpc_get_dev_cap(get_init_chan(), 0, 0, &dev_cap, &ret_len);
+	err = aos_rpc_get_dev_cap(get_init_chan(), 0x4A310000, 12, &dev_cap, &ret_len);
 	if (err_is_fail(err)) {
 		debug_printf("Can not get device frame!\n");
 		abort();
@@ -22,12 +22,8 @@ int main(int argc, char *argv[])
 	if (capref_is_null(dev_cap))
 		printf("Got null dev?!\n");
 
-	// Map the frame for the uart!
-
-	uint64_t size   = 0x1000;
-	uint64_t offset = 0xA310000;
 	void * vbuf;	
-	err = paging_map_frame(get_current_paging_state(),&vbuf, size, dev_cap, &offset, &size);
+	err = paging_map_frame_attr(get_current_paging_state(), &vbuf, 4096, dev_cap, DEVICE_FLAGS, NULL, NULL);
 	if (err_is_fail(err)) {
 		printf("CAN not map dev frame");
 		return 1;

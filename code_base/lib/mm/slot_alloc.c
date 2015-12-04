@@ -31,6 +31,8 @@ errval_t slot_prealloc_refill(struct slot_prealloc *this)
     // When initializing, the cnode on the other point should be NULL
     if (this->top_used == -1UL) {
         // Allocate a ram cap
+       	//debug_printf("Check for initialized case...\n"); 
+        
         struct capref ram_cap;
         err = mm_alloc(this->mm, this->cnode_size_bits + OBJBITS_CTE, &ram_cap,
                        NULL);
@@ -48,7 +50,7 @@ errval_t slot_prealloc_refill(struct slot_prealloc *this)
         this->top_used = 0;
     }
 
-	debug_printf("After checkign for initialized!");
+	//debug_printf("After checkign for initialized!");
     // Still enough slots in the top cnode
     assert(this->top_used < (1UL << this->cnode_size_bits));
 

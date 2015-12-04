@@ -143,12 +143,14 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 		}
 	}
 
-	l2_index = ARM_L2_USER_OFFSET(start_address);	
+	l2_index = ARM_L2_USER_OFFSET(start_address);
+	//debug_printf("vnode_map starting! offset %"  PRIu64 " \n", offset);	
 	err = vnode_map( get_l2_table(start_address, st), usercap, l2_index, mapping_flags, offset, first_l2_total_pages);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Failed in mapping first l2 table %s\n", err_getstring(err));
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
+	//debug_printf("vnode_map ended!\n");
 	offset = first_l2_total_pages * 4096;
 	start_address += first_l2_total_pages * 4096;
 
@@ -210,7 +212,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	errval_t err;
 
-	// debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
+	//debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings

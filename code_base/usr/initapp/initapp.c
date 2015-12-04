@@ -29,10 +29,12 @@
 #include <barrelfish/cross_core.h>
 #include "../../lib/spawndomain/arch.h"
 #include <elf/elf.h>
+#include <mm/mm.h>
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
+static struct mm dev_mm;
 struct thread_mutex process_list_lock;
 
 struct bootinfo *bi;
@@ -44,8 +46,18 @@ int global_did = 1;
 
 errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
 {
-	*ret = cap_io; 
-	*retlen = length;
+	errval_t err;
+
+	err = mm_realloc_range( &dev_mm, length, start_addr,ret);
+	if (err_is_fail(err)) {
+		debug_printf("get_dev_frame: can not allocate range for device!\n");
+		return MM_ERR_DEVICE_ALLOC;
+	}
+
+	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
+
+	assert(err_is_ok(err));
+	
 	return SYS_ERR_OK;
 }
 
@@ -358,6 +370,28 @@ int main(int argc, char *argv[])
         abort();
     }
 
+
+	static struct range_slot_allocator devframes_allocator;
+    err = range_slot_alloc_init(&devframes_allocator, 1024, NULL);
+    if (err_is_fail(err)) {
+        return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
+    }
+	
+	err = mm_init(&dev_mm, ObjType_DevFrame,
+                  0x40000000,  30,
+                  1, slab_default_refill, slot_alloc_dynamic,
+                  &devframes_allocator, false);
+    if (err_is_fail(err)) {
+        return err_push(err, MM_ERR_MM_INIT);
+    }
+
+	err = mm_add(&dev_mm, cap_io, 30, 0x40000000);
+	if (err_is_fail(err)) {
+		debug_printf("Error in adding device frame to device memory manager!\n");
+		abort();
+	}
+
+
 	debug_printf("Signaling core-0 that we are up!\n");
 
 	thread_mutex_init( &process_list_lock);
@@ -371,7 +405,6 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-	// debug_printf("Entering main messaging loop...");	
 	while(true) {
 		err = event_dispatch(get_default_waitset());
 		if (err_is_fail(err)) {

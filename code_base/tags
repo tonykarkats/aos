@@ -1361,14 +1361,14 @@ CPSR_F_MASK	include/arch/arm/barrelfish_kpi/flags_arch.h	30;"	d
 CPSR_IF_MASK	include/arch/arm/barrelfish_kpi/flags_arch.h	28;"	d
 CPSR_I_MASK	include/arch/arm/barrelfish_kpi/flags_arch.h	29;"	d
 CPSR_REG	include/arch/arm/barrelfish_kpi/registers_arch.h	27;"	d
-CPTR_BASE_PAGE_CN_BASE	include/barrelfish_kpi/init.h	118;"	d
+CPTR_BASE_PAGE_CN_BASE	include/barrelfish_kpi/init.h	119;"	d
 CPTR_BITS	include/barrelfish_kpi/types.h	71;"	d
-CPTR_MODULECN_BASE	include/barrelfish_kpi/init.h	121;"	d
+CPTR_MODULECN_BASE	include/barrelfish_kpi/init.h	122;"	d
 CPTR_NULL	include/barrelfish_kpi/types.h	22;"	d
-CPTR_PHYADDRCN_BASE	include/barrelfish_kpi/init.h	120;"	d
-CPTR_PML4_BASE	include/barrelfish_kpi/init.h	122;"	d
+CPTR_PHYADDRCN_BASE	include/barrelfish_kpi/init.h	121;"	d
+CPTR_PML4_BASE	include/barrelfish_kpi/init.h	123;"	d
 CPTR_ROOTCN	include/barrelfish/cspace.h	28;"	d
-CPTR_SUPERCN_BASE	include/barrelfish_kpi/init.h	119;"	d
+CPTR_SUPERCN_BASE	include/barrelfish_kpi/init.h	120;"	d
 CPU driver interface	doc/016-serial-ports/Serial.tex	/^drivers and other console subsystems. $/;"	c
 CPUClass	tools/molly/m5script.py	/^CPUClass = AtomicSimpleCPU$/;"	v
 CPUID	include/cpuid/cpuid.h	13;"	d
@@ -1694,7 +1694,7 @@ DEFAULT_BOOT_TIMEOUT	tools/harness/tests/common.py	/^DEFAULT_BOOT_TIMEOUT = date
 DEFAULT_CHARACTER	lib/newlib/newlib/libc/iconv/lib/ucsconv.h	42;"	d
 DEFAULT_CNODE_BITS	include/barrelfish_kpi/init.h	62;"	d
 DEFAULT_CNODE_SLOTS	include/barrelfish_kpi/init.h	65;"	d
-DEFAULT_CN_ADDR_BITS	include/barrelfish_kpi/init.h	116;"	d
+DEFAULT_CN_ADDR_BITS	include/barrelfish_kpi/init.h	117;"	d
 DEFAULT_GRANULARITY	lib/dmalloc/dmalloc.c	645;"	d	file:
 DEFAULT_GRANULARITY	lib/dmalloc/dmalloc.c	647;"	d	file:
 DEFAULT_GRANULARITY	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	645;"	d	file:
@@ -7753,7 +7753,7 @@ MODE	lib/newlib/newlib/libc/machine/arm/setjmp.S	/^#define	MODE		.thumb_func$/;"
 MODE	lib/newlib/newlib/libc/machine/xscale/setjmp.S	/^#define	MODE		.code 32$/;"	d
 MODE	lib/newlib/newlib/libc/machine/xscale/setjmp.S	/^#define	MODE		.thumb_func$/;"	d
 MODFR	lib/newlib/newlib/libc/stdio/local.h	/^  MODFR,  \/* spec modifier *\/$/;"	e	enum:__anon251
-MODULECN_SIZE_BITS	include/barrelfish_kpi/init.h	123;"	d
+MODULECN_SIZE_BITS	include/barrelfish_kpi/init.h	124;"	d
 MODULES	hake/symbolic_targets.mk	/^MODULES=$(foreach a,$(HAKE_ARCHS),$(foreach m,$(MODULES_$(a)),$(a)\/$(m)) \\$/;"	m
 MODULES_COMMON	hake/symbolic_targets.mk	/^MODULES_COMMON= \\$/;"	m
 MODULES_GENERIC	hake/symbolic_targets.mk	/^MODULES_GENERIC= \\$/;"	m
@@ -10783,7 +10783,7 @@ RONECALL	lib/newlib/newlib/libc/stdlib/vallocr.c	356;"	d	file:
 ROOT3	lib/newlib/newlib/libm/mathfp/s_atangent.c	/^static const double ROOT3 = 1.73205080756887729353;$/;"	v	file:
 ROOT3	lib/newlib/newlib/libm/mathfp/sf_atangent.c	/^static const float ROOT3 = 1.732050807;$/;"	v	file:
 ROOTCN_FREE_EP_SLOTS	include/barrelfish/cspace.h	20;"	d
-ROOTCN_SLOTS_USER	include/barrelfish_kpi/init.h	89;"	d
+ROOTCN_SLOTS_USER	include/barrelfish_kpi/init.h	90;"	d
 ROOTCN_SLOT_ARGCN	include/barrelfish_kpi/init.h	87;"	d
 ROOTCN_SLOT_BASE_PAGE_CN	include/barrelfish_kpi/init.h	79;"	d
 ROOTCN_SLOT_MODULECN	include/barrelfish_kpi/init.h	83;"	d
@@ -10795,6 +10795,7 @@ ROOTCN_SLOT_SLOT_ALLOC0	include/barrelfish_kpi/init.h	84;"	d
 ROOTCN_SLOT_SLOT_ALLOC1	include/barrelfish_kpi/init.h	85;"	d
 ROOTCN_SLOT_SLOT_ALLOC2	include/barrelfish_kpi/init.h	86;"	d
 ROOTCN_SLOT_SLOT_ALLOCR	include/barrelfish_kpi/init.h	88;"	d
+ROOTCN_SLOT_SLOT_ALLOCR_DEV	include/barrelfish_kpi/init.h	89;"	d
 ROOTCN_SLOT_SUPERCN	include/barrelfish_kpi/init.h	80;"	d
 ROOTCN_SLOT_TASKCN	include/barrelfish_kpi/init.h	77;"	d
 ROOT_CNODE_INIT	lib/barrelfish/capabilities.c	112;"	d	file:
@@ -12257,8 +12258,8 @@ SLIST_INSERT_HEAD	lib/newlib/newlib/libc/include/sys/queue.h	143;"	d
 SLIST_NEXT	lib/newlib/newlib/libc/include/sys/queue.h	148;"	d
 SLIST_REMOVE	lib/newlib/newlib/libc/include/sys/queue.h	150;"	d
 SLIST_REMOVE_HEAD	lib/newlib/newlib/libc/include/sys/queue.h	163;"	d
-SLOT_ALLOC_CNODE_BITS	include/barrelfish_kpi/init.h	92;"	d
-SLOT_ALLOC_CNODE_SLOTS	include/barrelfish_kpi/init.h	93;"	d
+SLOT_ALLOC_CNODE_BITS	include/barrelfish_kpi/init.h	93;"	d
+SLOT_ALLOC_CNODE_SLOTS	include/barrelfish_kpi/init.h	94;"	d
 SLOT_ALLOC_H	include/barrelfish/slot_alloc.h	16;"	d
 SLOT_ALLOC_INTERNAL_H_	lib/barrelfish/slot_alloc/internal.h	16;"	d
 SLOT_PADDING	include/procon/procon.h	27;"	d
@@ -13328,30 +13329,30 @@ TARGET_X86_64_BARRELFISH_KPI_PAGING_H	include/target/x86_64/barrelfish_kpi/pagin
 TARGET_X86_64_BARRELFISH_KPI_REGISTERS_H	include/target/x86_64/barrelfish_kpi/registers_target.h	17;"	d
 TARGET_X86_64_BARRELFISH_PMAP_H	include/target/x86_64/barrelfish/pmap_target.h	16;"	d
 TARGET_X86_BARRELFISH_PMAP_H	include/target/x86/barrelfish/pmap_target.h	16;"	d
-TASKCN_SLOTS_USER	include/barrelfish_kpi/init.h	113;"	d
-TASKCN_SLOT_ARGSPAGE	include/barrelfish_kpi/init.h	104;"	d
-TASKCN_SLOT_ARGSPAGE2	include/barrelfish_kpi/init.h	110;"	d
-TASKCN_SLOT_BOOTINFO	include/barrelfish_kpi/init.h	101;"	d
-TASKCN_SLOT_DISPATCHER	include/barrelfish_kpi/init.h	96;"	d
-TASKCN_SLOT_DISPFRAME	include/barrelfish_kpi/init.h	98;"	d
-TASKCN_SLOT_DISPFRAME2	include/barrelfish_kpi/init.h	109;"	d
-TASKCN_SLOT_FDSPAGE	include/barrelfish_kpi/init.h	107;"	d
+TASKCN_SLOTS_USER	include/barrelfish_kpi/init.h	114;"	d
+TASKCN_SLOT_ARGSPAGE	include/barrelfish_kpi/init.h	105;"	d
+TASKCN_SLOT_ARGSPAGE2	include/barrelfish_kpi/init.h	111;"	d
+TASKCN_SLOT_BOOTINFO	include/barrelfish_kpi/init.h	102;"	d
+TASKCN_SLOT_DISPATCHER	include/barrelfish_kpi/init.h	97;"	d
+TASKCN_SLOT_DISPFRAME	include/barrelfish_kpi/init.h	99;"	d
+TASKCN_SLOT_DISPFRAME2	include/barrelfish_kpi/init.h	110;"	d
+TASKCN_SLOT_FDSPAGE	include/barrelfish_kpi/init.h	108;"	d
 TASKCN_SLOT_INITEP	include/barrelfish/cspace.h	24;"	d
 TASKCN_SLOT_INITEP	kernel/arch/omap44xx/startup_arch.c	38;"	d	file:
-TASKCN_SLOT_IO	include/barrelfish_kpi/init.h	100;"	d
-TASKCN_SLOT_IRQ	include/barrelfish_kpi/init.h	99;"	d
-TASKCN_SLOT_KERNELCAP	include/barrelfish_kpi/init.h	102;"	d
-TASKCN_SLOT_MON_URPC	include/barrelfish_kpi/init.h	105;"	d
-TASKCN_SLOT_PERF_MON	include/barrelfish_kpi/init.h	108;"	d
+TASKCN_SLOT_IO	include/barrelfish_kpi/init.h	101;"	d
+TASKCN_SLOT_IRQ	include/barrelfish_kpi/init.h	100;"	d
+TASKCN_SLOT_KERNELCAP	include/barrelfish_kpi/init.h	103;"	d
+TASKCN_SLOT_MON_URPC	include/barrelfish_kpi/init.h	106;"	d
+TASKCN_SLOT_PERF_MON	include/barrelfish_kpi/init.h	109;"	d
 TASKCN_SLOT_REMEP	include/barrelfish/cspace.h	25;"	d
 TASKCN_SLOT_REMEP	kernel/arch/omap44xx/startup_arch.c	39;"	d	file:
-TASKCN_SLOT_ROOTCN	include/barrelfish_kpi/init.h	97;"	d
+TASKCN_SLOT_ROOTCN	include/barrelfish_kpi/init.h	98;"	d
 TASKCN_SLOT_SELFEP	include/barrelfish/cspace.h	23;"	d
 TASKCN_SLOT_SELFEP	kernel/arch/omap44xx/startup_arch.c	37;"	d	file:
-TASKCN_SLOT_SERIALFRAME	include/barrelfish_kpi/init.h	112;"	d
-TASKCN_SLOT_SESSIONID	include/barrelfish_kpi/init.h	106;"	d
-TASKCN_SLOT_TRACEBUF	include/barrelfish_kpi/init.h	103;"	d
-TASKCN_SLOT_UMPFRAME	include/barrelfish_kpi/init.h	111;"	d
+TASKCN_SLOT_SERIALFRAME	include/barrelfish_kpi/init.h	113;"	d
+TASKCN_SLOT_SESSIONID	include/barrelfish_kpi/init.h	107;"	d
+TASKCN_SLOT_TRACEBUF	include/barrelfish_kpi/init.h	104;"	d
+TASKCN_SLOT_UMPFRAME	include/barrelfish_kpi/init.h	112;"	d
 TASK_CNODE_INIT	lib/barrelfish/capabilities.c	35;"	d	file:
 TASK_CNODE_INIT	lib/barrelfish/dispatch.c	152;"	d	file:
 TASK_TYPE_BEST_EFFORT	include/barrelfish_kpi/dispatcher_shared.h	/^    TASK_TYPE_BEST_EFFORT,$/;"	e	enum:task_type
@@ -24207,6 +24208,7 @@ dev	lib/cpio/cpiobin.c	/^    uint8_t dev[2];$/;"	m	struct:__anon140	file:
 dev_attributes	include/nfs/nfs_rpc.h	/^    sattr3 dev_attributes;$/;"	m	struct:devicedata3
 dev_mem_avail	usr/init/dev_serv.c	/^size_t dev_mem_total = 0, dev_mem_avail = 0;$/;"	v
 dev_mem_total	usr/init/dev_serv.c	/^size_t dev_mem_total = 0, dev_mem_avail = 0;$/;"	v
+dev_msa	usr/init/dev_serv.c	/^static struct multi_slot_allocator dev_msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 dev_nr	lib/pci/confspace/pci_confspace.c	/^         uint32_t dev_nr : 5;$/;"	m	struct:pci_config_address_word::__anon306	file:
 dev_slot_alloc	usr/init/dev_serv.c	/^static struct slot_prealloc dev_slot_alloc;$/;"	v	typeref:struct:slot_prealloc	file:
 dev_sz	include/usb/usb_device.h	/^    int dev_sz;$/;"	m	struct:usb_device_t
@@ -24225,7 +24227,7 @@ devicedata3	include/nfs/nfs_rpc.h	/^struct devicedata3 {$/;"	s
 devicedata3	include/nfs/nfs_rpc.h	/^typedef struct devicedata3 devicedata3;$/;"	t	typeref:struct:devicedata3
 devmajor	lib/cpio/cpiobin.c	/^    char devmajor[8];$/;"	m	struct:__anon141	file:
 devminor	lib/cpio/cpiobin.c	/^    char devminor[8];$/;"	m	struct:__anon141	file:
-devserv_alloc	usr/init/dev_serv.c	/^static errval_t devserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,$/;"	f	file:
+devserv_alloc	usr/init/dev_serv.c	/^errval_t devserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,$/;"	f
 dfault	lib/newlib/newlib/libc/xdr/xdr.c	/^        xdrproc_t dfault)$/;"	s	file:
 dh	lib/newlib/newlib/libc/machine/i386/i386mach.h	56;"	d
 dh	lib/newlib/newlib/libc/machine/x86_64/x86_64mach.h	69;"	d
@@ -31317,9 +31319,9 @@ mm_alloc	lib/mm/mm.c	/^errval_t mm_alloc(struct mm *mm, uint8_t sizebits, struct
 mm_alloc_range	lib/mm/mm.c	/^errval_t mm_alloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t minbase,$/;"	f
 mm_debug_print	lib/mm/mm.c	/^void mm_debug_print(struct mmnode *mmnode, int space)$/;"	f
 mm_destroy	lib/mm/mm.c	/^void mm_destroy(struct mm *mm)$/;"	f
+mm_dev	usr/init/dev_serv.c	/^static struct mm mm_dev;$/;"	v	typeref:struct:mm	file:
 mm_free	lib/mm/mm.c	/^errval_t mm_free(struct mm *mm, struct capref cap, genpaddr_t base,$/;"	f
 mm_init	lib/mm/mm.c	/^errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,$/;"	f
-mm_ram	usr/init/dev_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_ram	usr/init/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_ram	usr/initapp/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_realloc_range	lib/mm/mm.c	/^errval_t mm_realloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t base,$/;"	f
@@ -31629,7 +31631,6 @@ mrmod_data	include/barrelfish_kpi/init.h	/^    ptrdiff_t        mrmod_data;\/\/\
 mrmod_size	include/barrelfish_kpi/init.h	/^    size_t           mrmod_size;\/\/\/< Size in bytes (module type only)$/;"	m	struct:mem_region
 mrmod_slot	include/barrelfish_kpi/init.h	/^    int              mrmod_slot;\/\/\/< First slot containing caps (module only)$/;"	m	struct:mem_region
 mrp	lib/newlib/newlib/libc/machine/hppa/pcc_prefix.s	/^mrp: .equ	r31	; millicode return pointer$/;"	l
-msa	usr/init/dev_serv.c	/^static struct multi_slot_allocator msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 msa	usr/init/mem_serv.c	/^static struct multi_slot_allocator msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 msa	usr/initapp/mem_serv.c	/^static struct multi_slot_allocator msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
 msb	lib/newlib/newlib/libc/machine/h8500/cmpsi.c	/^    signed char msb;$/;"	m	struct:pu::__anon201	file:

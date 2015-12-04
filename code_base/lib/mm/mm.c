@@ -340,22 +340,21 @@ static errval_t chunk_node(struct mm *mm, uint8_t sizebits,
     assert(node->childbits == FLAGBITS);
     assert(*nodesizebits > sizebits);
 
-	debug_printf("Assertions OK\n");
     /* split up the source cap into at most maxchildbits sub-caps */
     uint8_t childbits = *nodesizebits - sizebits;
     if (childbits > mm->maxchildbits) {
         childbits = mm->maxchildbits;
     }
 
-    debug_printf("chunk_node %d %" PRIxGENPADDR "-%" PRIxGENPADDR " %" PRIxGENPADDR "-%"
-          PRIxGENPADDR " -> %" PRIuCSLOT "\n", sizebits, minbase,
-          maxlimit, *nodebase, *nodebase + UNBITS_GENPA(*nodesizebits),
-          UNBITS_CA(childbits));
+    //debug_printf("chunk_node %d %" PRIxGENPADDR "-%" PRIxGENPADDR " %" PRIxGENPADDR "-%"
+    //      PRIxGENPADDR " -> %" PRIuCSLOT "\n", sizebits, minbase,
+    //      maxlimit, *nodebase, *nodebase + UNBITS_GENPA(*nodesizebits),
+    //      UNBITS_CA(childbits));
 
     struct capref cap;
     err = mm->slot_alloc(mm->slot_alloc_inst, UNBITS_CA(childbits), &cap);
     if (err_is_fail(err)) {
-		debug_printf("Cannot Slot alloc!\n");
+		debug_printf("Cannot Slot alloc with err: %s!\n", err_getstring(err));
         return err_push(err, MM_ERR_CHUNK_SLOT_ALLOC);
     }
 
@@ -478,15 +477,15 @@ errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,
 {
     /* init fields */
     assert(mm != NULL);
-	debug_printf("After first assert \n");
+	//debug_printf("After first assert \n");
     mm->objtype = objtype;
-	debug_printf("Before assert with UNBITS\n");
+	//debug_printf("Before assert with UNBITS\n");
     assert((base & (UNBITS_GENPA(sizebits) - 1)) == 0);
     mm->base = base;
     mm->sizebits = sizebits;
-	debug_printf("Before second assert \n");
+	//debug_printf("Before second assert \n");
     assert(maxchildbits > 0 && maxchildbits != FLAGBITS);
-    debug_printf("After second assert \n");
+    //debug_printf("After second assert \n");
 	mm->maxchildbits = maxchildbits;
     mm->root = NULL;
     mm->slot_alloc = slot_alloc_func;
@@ -494,7 +493,8 @@ errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,
     mm->delete_chunked = delete_chunked;
 
     /* init slab allocator */
-	debug_printf("mm_init: Before slab_init!\n");
+	//debug_printf("mm_init: Before slab_init!\n");
+
     slab_init(&mm->slabs, MM_NODE_SIZE(maxchildbits), slab_refill_func);
 
     return SYS_ERR_OK;
@@ -624,7 +624,7 @@ errval_t mm_alloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t minbase,
     err = find_node(mm, false, sizebits, minbase, maxlimit, mm->root, mm->base,
                     mm->sizebits, &nodebase, &nodesizebits, &node);
     if (err_is_fail(err)) {
-		debug_printf("Node not found!\n");
+		//debug_printf("Node not found!\n");
         return err;
     }
 

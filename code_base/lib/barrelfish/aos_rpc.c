@@ -180,7 +180,6 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
 	}
 
 	return SYS_ERR_OK;
-
 }
 
 errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)

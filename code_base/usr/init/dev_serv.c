@@ -21,7 +21,7 @@ size_t dev_mem_total = 0, dev_mem_avail = 0;
 #define MAXSIZEBITS     31                 ///< Max size of each allocation
                                            ///  must be less than #bits of arch.
 #define MINSIZEBITS     OBJBITS_DISPATCHER ///< Min size of each allocation
-#define MAXCHILDBITS    4                  ///< Max branching of BTree nodes
+#define MAXCHILDBITS    10                  ///< Max branching of BTree nodes
 /// Maximum depth of the BTree, assuming only branching by two at each level
 #define MAXDEPTH        (MAXSIZEBITS - MINSIZEBITS + 1)
 /// Maximum number of BTree nodes
@@ -103,27 +103,27 @@ errval_t initialize_dev_serv(void)
 {
     errval_t err;
 
-	debug_printf("Started!\n");
     /* Step 1: Initialize slot allocator by passing a cnode cap for it to start with */
     struct capref cnode_cap;
     err = slot_alloc(&cnode_cap);
     assert(err_is_ok(err));
     struct capref cnode_start_cap = { .slot  = 0 };
 
-    struct capref dev;
-    err = ram_alloc_fixed(&dev, BASE_PAGE_BITS, 0, 0);
-    assert(err_is_ok(err));
-    err = cnode_create_from_mem(cnode_cap, dev, &cnode_start_cap.cnode,
+	struct capref ram;
+	err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0);
+	assert(err_is_ok(err));
+    err = cnode_create_from_mem(cnode_cap, ram, &cnode_start_cap.cnode,
                               DEFAULT_CNODE_BITS);
     assert(err_is_ok(err));
 
     /* location where slot allocator will place its top-level cnode */
-    struct capref top_slot_cap = {
-  	//err = slot_alloc(&top_slot_cap);
+    struct capref top_slot_cap ; //= {
+  	err = slot_alloc(&top_slot_cap);
+	
 	//assert(err_is_ok(err));
-	    .cnode = cnode_root,
-        .slot = ROOTCN_SLOT_SLOT_ALLOCR_DEV,
-    };
+	//    .cnode = cnode_root,
+    //    .slot = ROOTCN_SLOT_SLOT_ALLOCR_DEV,
+    //};
 
     /* clear mm_dev struct */
     memset(&mm_dev, 0, sizeof(mm_dev));
@@ -134,13 +134,14 @@ errval_t initialize_dev_serv(void)
     err = slot_prealloc_init(&dev_slot_alloc, top_slot_cap, MAXCHILDBITS,
                            CNODE_BITS, cnode_start_cap,
                            1UL << DEFAULT_CNODE_BITS, &mm_dev);
-    assert(err_is_ok(err));
+    
+	assert(err_is_ok(err));
 
 	debug_printf("Before mm_init!\n");
     // FIXME: remove magic constant for lowest valid RAM address
-    err = mm_init(&mm_dev, ObjType_DevFrame, 0x40000000,
-                30, MAXCHILDBITS, NULL,
-                slot_alloc_prealloc, &dev_slot_alloc, true);
+    //err = mm_init(&mm_dev, ObjType_DevFrame, 0x40000000,
+    //            30, MAXCHILDBITS, NULL,
+    //            &slot_alloc_prealloc, dev_slot_alloc, true);
     assert(err_is_ok(err));
 
     /* Step 2: give MM allocator static storage to get it started */
@@ -150,7 +151,6 @@ errval_t initialize_dev_serv(void)
 
 	err = mm_add( &mm_dev, cap_io, 30, 0x40000000);
 	assert(err_is_ok(err));
-
 	
 	debug_printf("Before slot_prealloc_refill!\n");
     err = slot_prealloc_refill(mm_dev.slot_alloc_inst);
