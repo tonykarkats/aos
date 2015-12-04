@@ -25,8 +25,7 @@ static void get_cap(lpaddr_t base, size_t size)
     size_t len;
 
     struct capref cap;
-    err = aos_rpc_get_dev_cap(get_init_rpc(),
-            base, size, &cap, &len);
+    err = aos_rpc_get_dev_cap(get_init_chan(), base, size, &cap, &len);
 
     if (err_is_fail(err)) {
         USER_PANIC_ERR(err, "get_dev_mem rpc failed\n");
