@@ -148,8 +148,11 @@ errval_t initialize_dev_serv(void)
     static char dev_nodebuf[SLAB_STATIC_SIZE(MINSPARENODES, MM_NODE_SIZE(MAXCHILDBITS))];
     slab_grow(&mm_dev.slabs, dev_nodebuf, sizeof(dev_nodebuf));
 
+	err = mm_add( &mm_dev, cap_io, 30, 0x40000000);
+	assert(err_is_ok(err));
+
 	
-	//debug_printf("Before slot_prealloc_refill!\n");
+	debug_printf("Before slot_prealloc_refill!\n");
     err = slot_prealloc_refill(mm_dev.slot_alloc_inst);
     if (err_is_fail(err)) {
         debug_printf("Fatal internal error in RAM allocator: failed to initialise "
@@ -158,17 +161,11 @@ errval_t initialize_dev_serv(void)
         abort();
     }
 
-    //debug_printf("RAM allocator initialised, %zd MB (of %zd MB) available\n",
-    //      dev_mem_avail / 1024 / 1024, dev_mem_total / 1024 / 1024);
-
-
     // setup proper multi slot alloc
-    //err = multi_slot_alloc_init(&dev_msa, DEFAULT_CNODE_SLOTS, NULL);
-    //if(err_is_fail(err)) {
-    //    USER_PANIC_ERR(err, "multi_slot_alloc_init");
-    //}
-    //debug_printf("MSA initialised\n");
-
+    err = multi_slot_alloc_init(&dev_msa, DEFAULT_CNODE_SLOTS, NULL);
+    if(err_is_fail(err)) {
+        USER_PANIC_ERR(err, "multi_slot_alloc_init");
+    }
 
     return SYS_ERR_OK;
 }

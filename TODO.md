@@ -35,3 +35,5 @@
 - Add lock to initapp for process list management! FIXED
 
 - Fix background processes , does not work with oncore figure out why
+
+- Enable functionality for spawning processes from processes in init1

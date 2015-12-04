@@ -340,13 +340,14 @@ static errval_t chunk_node(struct mm *mm, uint8_t sizebits,
     assert(node->childbits == FLAGBITS);
     assert(*nodesizebits > sizebits);
 
+	debug_printf("Assertions OK\n");
     /* split up the source cap into at most maxchildbits sub-caps */
     uint8_t childbits = *nodesizebits - sizebits;
     if (childbits > mm->maxchildbits) {
         childbits = mm->maxchildbits;
     }
 
-    DEBUG("chunk_node %d %" PRIxGENPADDR "-%" PRIxGENPADDR " %" PRIxGENPADDR "-%"
+    debug_printf("chunk_node %d %" PRIxGENPADDR "-%" PRIxGENPADDR " %" PRIxGENPADDR "-%"
           PRIxGENPADDR " -> %" PRIuCSLOT "\n", sizebits, minbase,
           maxlimit, *nodebase, *nodebase + UNBITS_GENPA(*nodesizebits),
           UNBITS_CA(childbits));
@@ -354,6 +355,7 @@ static errval_t chunk_node(struct mm *mm, uint8_t sizebits,
     struct capref cap;
     err = mm->slot_alloc(mm->slot_alloc_inst, UNBITS_CA(childbits), &cap);
     if (err_is_fail(err)) {
+		debug_printf("Cannot Slot alloc!\n");
         return err_push(err, MM_ERR_CHUNK_SLOT_ALLOC);
     }
 
@@ -609,6 +611,7 @@ errval_t mm_alloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t minbase,
     }
 
     if (mm->root == NULL) {
+		debug_printf("mm_alloc_range: mm->root == NULL \n");
         return MM_ERR_NOT_FOUND; // nothing added
     }
 
@@ -621,6 +624,7 @@ errval_t mm_alloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t minbase,
     err = find_node(mm, false, sizebits, minbase, maxlimit, mm->root, mm->base,
                     mm->sizebits, &nodebase, &nodesizebits, &node);
     if (err_is_fail(err)) {
+		debug_printf("Node not found!\n");
         return err;
     }
 
@@ -633,6 +637,7 @@ errval_t mm_alloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t minbase,
         err = chunk_node(mm, sizebits, minbase, maxlimit, node, &nodebase,
                           &nodesizebits, &node);
         if (err_is_fail(err)) {
+			debug_printf("Node does not fit!\n");
             return err;
         }
     }

@@ -540,8 +540,7 @@ int main(int argc, char *argv[])
 	if (err_is_fail(err)) {
 		debug_printf("CAN not map dev frame");
 		abort();
-	}
-	
+	}	
 
 	
 	uart_initialize((lvaddr_t)vbuf);
