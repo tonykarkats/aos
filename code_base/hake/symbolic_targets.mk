@@ -462,7 +462,7 @@ PANDABOARD_MODULES=\
 	armv7/sbin/led_on \
 	armv7/sbin/led_off \
 	armv7/sbin/stress_paging \
-	armv7/sbin/mmchs_driver
+	armv7/sbin/mmchs
 
 menu.lst.pandaboard: $(SRCDIR)/hake/menu.lst.pandaboard
 	cp $< $@

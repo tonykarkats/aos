@@ -67,6 +67,8 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 {
 	errval_t err;
 
+	//genpaddr_t ret_base;
+	//err = mm_alloc_range(&dev_mm, length, start_addr, 0x8000000, ret, &ret_base);
 	err = mm_realloc_range( &dev_mm, length, start_addr,ret);
 	if (err_is_fail(err)) {
 		debug_printf("get_dev_frame: can not allocate range for device!\n");
@@ -74,8 +76,6 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 	}
 
 	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
-
-	assert(err_is_ok(err));
 	
 	return SYS_ERR_OK;
 }

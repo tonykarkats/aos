@@ -40,21 +40,32 @@ errval_t map_device_register(lpaddr_t address, size_t size, lvaddr_t *return_add
         .slot = 0
     };
 
+	struct frame_identity fid2;
+    err = invoke_frame_identify(device_cap_iter, &fid2);
+    if (err_is_fail(err)) {
+        DEBUG_ERR(err, "Failure in invoke_frame_identify");
+        return err;
+    }
+    assert(err_is_ok(err));
+	debug_printf("Before loop!\n");
+
     for (; device_cap_iter.slot < (((capaddr_t)1) << device_cap_iter.cnode.size_bits);
          device_cap_iter.slot++) {
         // Get cap data
-
-        /*struct capability cap;
-        err = debug_cap_identify(device_cap_iter, &cap);
+		struct frame_identity fid;
+		debug_printf("IN LOOP\n");
+		/*
+        err = invoke_frame_identify(device_cap_iter, &fid);
         // If cap type was Null, kernel returns error
         if (err_no(err) == SYS_ERR_IDENTIFY_LOOKUP ||
             err_no(err) == SYS_ERR_CAP_NOT_FOUND ||
             err_no(err) == SYS_ERR_LMP_CAPTRANSFER_SRC_LOOKUP) {
             continue;
-        }*/
+        }
+		*/
 
-        struct frame_identity fid;
         err = invoke_frame_identify(device_cap_iter, &fid);
+		debug_printf("address is 0x%x\n", fid.base, address);
         if (err_is_fail(err)) {
             DEBUG_ERR(err, "Failure in invoke_frame_identify");
             return err;
@@ -68,6 +79,7 @@ errval_t map_device_register(lpaddr_t address, size_t size, lvaddr_t *return_add
         if (address_base >= fid.base &&
                 (address_base + size) <= (fid.base + UNBITS_GENPA(fid.bits))) {
             void* frame_base;
+			debug_printf("Mapping the device!\n");
             err = paging_map_frame_attr(get_current_paging_state(),
                                         &frame_base, size,
                                             device_cap_iter, VREGION_FLAGS_READ_WRITE_NOCACHE,
