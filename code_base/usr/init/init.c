@@ -75,6 +75,10 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 		return MM_ERR_DEVICE_ALLOC;
 	}
 
+	struct frame_identity fid;
+	err = invoke_frame_identify( *ret, &fid);
+	debug_printf("Base x%x and bits = %" PRIu8 "\n", fid.base, fid.bits);
+
 	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
 	
 	return SYS_ERR_OK;

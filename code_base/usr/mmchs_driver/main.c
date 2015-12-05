@@ -44,17 +44,13 @@ static void get_cap(lpaddr_t base, size_t size)
     static size_t current_slot = 0;
     device_cap_iter.slot = current_slot++;
 	debug_printf("Slot = %zu \n", device_cap_iter.slot);
-	
+		
     err = cap_copy(device_cap_iter, cap);
     if (err_is_fail(err)) {
         USER_PANIC_ERR(err, "cap_copy failed.");
     }
 
-	struct frame_identity f;
-	err = invoke_frame_identify(device_cap_iter, &f);
-	debug_printf("Base = 0x%x \n", f.base);	
 	assert(err_is_ok(err));
-	assert(!capref_is_null(device_cap_iter));
 }
 
 int main(int argc, char **argv)
@@ -81,20 +77,11 @@ int main(int argc, char **argv)
     get_cap(OMAP44XX_MMCHS1 & ~0xFFF, 0x1000);
 
     // Initializing the necessary subsystem and the mmchs controlelr
-
-	struct capref device_cap_iter = {
-        .cnode = build_cnoderef(argcn, 8),
-        .slot = 0
-    };
-	struct frame_identity fid;
-	err = invoke_frame_identify( device_cap_iter, &fid);
-	assert(err_is_ok(err));
-
-    cm2_init();
-    //ti_twl6030_init();
-    //ctrlmod_init();
-    //cm2_enable_hsmmc1();
-    //sdmmc1_enable_power();
+	cm2_init();
+    ti_twl6030_init();
+    ctrlmod_init();
+    cm2_enable_hsmmc1();
+    sdmmc1_enable_power();
 
     mmchs_init();
 

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	struct capref dev_cap;
 	size_t ret_len;
 
-	err = aos_rpc_get_dev_cap(get_init_chan(), 0x4A310000, 12, &dev_cap, &ret_len);
+	err = aos_rpc_get_dev_cap(get_init_chan(), 0x4A310000, 4096, &dev_cap, &ret_len);
 	if (err_is_fail(err)) {
 		debug_printf("Can not get device frame!\n");
 		abort();

@@ -157,10 +157,12 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
                              size_t *retlen)
 {	
 	errval_t err;
+
+	size_t size_in_bits = log2ceil(length);
 	
 	while (true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_DEV_CAP, (uint32_t) paddr, (uint32_t) length);	
+		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_DEV_CAP, (uint32_t) paddr, (uint32_t) size_in_bits);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_GET_CAP);	
 		else if (!err_is_fail(err)) 

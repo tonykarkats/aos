@@ -39,9 +39,7 @@ void cm2_enable_i2c(size_t i2c_index)
 void cm2_init(void)
 {
     lvaddr_t l3init_vaddr;
-	debug_printf("Will search for device with address 0x%x\n", OMAP44XX_CM2);
    	errval_t err = map_device_register(OMAP44XX_CM2, 0x1000, &l3init_vaddr);
-   	debug_printf("After first map_device_register\n");
 	assert(err_is_ok(err));
     omap44xx_l3init_cm2_initialize(&l3init_cm2, (mackerel_addr_t)l3init_vaddr);
 
