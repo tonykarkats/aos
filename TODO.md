@@ -1,24 +1,14 @@
-- Allocate memory for paging book keeping struct with the use of slab allocator - how ?
-
 - Handle better our page faults 
 
-- Maybe fix malloc (?). Flag for using malloc instead of SafeMalloc in our paging structs 
+- Fix SafeMalloc usage somehow. Idea: Use heap struct provided by barrelfish core with a start buffer and then when full allocate from standar malloc().
 
 - Lock on paging struct for each thread - FIXED
-
-- Move omap functionality outside of init.c
-
-- Use dsl mac... for device access
-
-- Move device driver and memory server to other domains with the use of an init server
-
-- Ask if it is safe to perform channel and all other initialization on main 
 
 - Separate exception stack for each thread
 
 - Fix map_page to handle arbitary user frames for consecutive l2 tables FIXED
 
-- Use mm functionality for splitting devices VERY IMPORTANT FOR FILESYSTEM MILESTONE ****
+- Use mm functionality for splitting devices VERY IMPORTANT FOR FILESYSTEM MILESTONE FIXED
 
 - Fix background processes
 
@@ -30,7 +20,7 @@
 
 - Fix 1-1 mapping for aux core registers, use paging_alloc for them OR find another mapping!
 
-- Fix weird bug in process list with name of processes!
+- Fix weird bug in process list with name of processes FIXED
 
 - Add lock to initapp for process list management! FIXED
 
@@ -38,9 +28,9 @@
 
 - Enable functionality for spawning processes from processes in init1 - FIXED, domains at init-1 can only spawn at core-1 processes 
 
-- We should really mm_free the frames for each spawned process ******
+- We should really mm_free the frames for each spawned process 				******
 
-- Put limit at client requested memory 						   ******
+- Put limit at client requested memory 						   				******
 
 - Fix input for processes that are spawned at forground
 

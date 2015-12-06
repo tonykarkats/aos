@@ -1,0 +1,580 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.10.17)  6 DEC 2015 13:30
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**Overview.tex
+(./Overview.tex
+LaTeX2e <2011/06/27>
+Babel <3.9k> and hyphenation patterns for 3 languages loaded.
+(/usr/share/texlive/texmf-dist/tex/latex/base/report.cls
+Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@chapter=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+
+! LaTeX Error: File `bftn.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
+
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package color Info: Driver file: pdftex.def on input line 130.
+
+(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
+\Gread@gobject=\count88
+))
+(/usr/share/texlive/texmf-dist/tex/latex/subfig/subfig.sty
+Package: subfig 2005/06/28 ver: 1.3 subfig package
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2013/05/02 v3.3-89 Customizing captions (AR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2013/05/02 v1.6-88 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 57.
+\captionmargin=\dimen103
+\captionmargin@=\dimen104
+\captionwidth=\dimen105
+\caption@tempdima=\dimen106
+\caption@indent=\dimen107
+\caption@parindent=\dimen108
+\caption@hangindent=\dimen109
+)
+\c@ContinuedFloat=\count89
+)
+\c@KVtest=\count90
+\sf@farskip=\skip43
+\sf@captopadj=\dimen110
+\sf@capskip=\skip44
+\sf@nearskip=\skip45
+\c@subfigure=\count91
+\c@subfigure@save=\count92
+\c@lofdepth=\count93
+\c@subtable=\count94
+\c@subtable@save=\count95
+\c@lotdepth=\count96
+\sf@top=\skip46
+\sf@bottom=\skip47
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count97
+\lst@gtempboxa=\box26
+\lst@token=\toks15
+\lst@length=\count98
+\lst@currlwidth=\dimen111
+\lst@column=\count99
+\lst@pos=\count100
+\lst@lostspace=\dimen112
+\lst@width=\dimen113
+\lst@newlines=\count101
+\lst@lineno=\count102
+\lst@maxwidth=\dimen114
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2014/03/04 1.5c (Carsten Heinz)
+\c@lstnumber=\count103
+\lst@skipnumbers=\count104
+\lst@framebox=\box27
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2014/03/04 1.5c listings configuration
+))
+Package: listings 2014/03/04 1.5c (Carsten Heinz)
+
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty
+Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks16
+\verbatim@line=\toks17
+\verbatim@in@stream=\read1
+)
+! Undefined control sequence.
+l.19 \tnnumber
+              {000}  % give the number of the tech report
+? 
+
+! LaTeX Error: Missing \begin{document}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.19 \tnnumber{0
+                00}  % give the number of the tech report
+? 
+! Undefined control sequence.
+l.20 \tnkey
+           {Barrelfish Overview} % Short title, will appear in footer
+? 
+No file Overview.aux.
+\openout1 = `Overview.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count105
+\scratchdimen=\dimen115
+\scratchbox=\box28
+\nofMPsegments=\count106
+\nofMParguments=\count107
+\everyMPshowfont=\toks18
+\MPscratchCnt=\count108
+\MPscratchDim=\dimen116
+\MPnumerator=\count109
+\makeMPintoPDFobject=\count110
+\everyMPtoPDFconversion=\toks19
+)
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: subfig package v1.3 is loaded.
+Package caption Info: listings package is loaded.
+Package caption Info: End \AtBeginDocument code.
+\c@lstlisting=\count111
+ [1
+
+{/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 28.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 28.
+
+[1]
+
+! LaTeX Error: Environment versionhistory undefined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.33 \begin{versionhistory}
+                           
+? 
+! Undefined control sequence.
+l.34 \vhEntry
+             {1.0}{24.06.2010}{ikuz, amarp}{Initial version}
+? 
+
+! LaTeX Error: \begin{document} ended by \end{versionhistory}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.35 \end{versionhistory}
+                         
+? 
+[2]
+Chapter 1.
+
+LaTeX Warning: Reference `fig:os-arch' on page 3 undefined on input line 52.
+
+! Undefined control sequence.
+l.70  \includegraphics
+                      [width=0.5\columnwidth]{os-arch.pdf}
+? 
+! Missing number, treated as zero.
+<to be read again> 
+                   ]
+l.70  \includegraphics[width=0.5\columnwidth]
+                                             {os-arch.pdf}
+? 
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   ]
+l.70  \includegraphics[width=0.5\columnwidth]
+                                             {os-arch.pdf}
+? 
+! Undefined control sequence.
+l.82  \includegraphics
+                      [width=0.5\columnwidth]{dcb.pdf}
+? 
+! Missing number, treated as zero.
+<to be read again> 
+                   ]
+l.82  \includegraphics[width=0.5\columnwidth]
+                                             {dcb.pdf}
+? 
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   ]
+l.82  \includegraphics[width=0.5\columnwidth]
+                                             {dcb.pdf}
+? 
+
+LaTeX Warning: Reference `fig:dcb' on page 3 undefined on input line 88.
+
+[3
+
+]
+
+LaTeX Warning: Reference `fig:cap_translation' on page 4 undefined on input lin
+e 130.
+
+! Undefined control sequence.
+<argument> ...ig:cap_translation}\includegraphics 
+                                                  [width=0.4\textwidth ]{cap...
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Missing number, treated as zero.
+<to be read again> 
+                   ]
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   ]
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 139.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 139.
+! Extra }, or forgotten $.
+<argument> ...0.4\textwidth ]{cap_translation.pdf}
+                                                  
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Extra }, or forgotten $.
+\sf@@@subfloat ...de \setbox \@tempboxa \hbox {#4}
+                                                  \@tempdima =\wd \@tempboxa...
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+
+Overfull \hbox (10.86127pt too wide) in paragraph at lines 139--139
+[]\OT1/cmr/m/n/8 (a)
+ []
+
+
+Overfull \hbox (22.43782pt too wide) in paragraph at lines 139--139
+|\OT1/cmr/m/n/8 capref
+ []
+
+
+Overfull \hbox (7.55566pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 to
+ []
+
+
+Overfull \hbox (10.86127pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 ca-
+ []
+
+
+Overfull \hbox (11.80573pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 pa-
+ []
+
+
+Overfull \hbox (12.27795pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 bil-
+ []
+
+
+Overfull \hbox (9.91681pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 ity
+ []
+
+
+Overfull \hbox (21.7767pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 trans-
+ []
+
+
+Overfull \hbox (9.44458pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 la-
+ []
+
+
+Overfull \hbox (17.00024pt too wide) in paragraph at lines 139--139
+\OT1/cmr/m/n/8 tion.| 
+ []
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.139 ...idth=0.4\textwidth]{cap_translation.pdf}}
+                                                  
+? 
+! Undefined control sequence.
+<argument> ...{fig:cap_hierarchy}\includegraphics 
+                                                  [width=0.5\textwidth ]{cap...
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Missing number, treated as zero.
+<to be read again> 
+                   ]
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   ]
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Extra }, or forgotten $.
+<argument> ...h=0.5\textwidth ]{cap_heirarchy.pdf}
+                                                  
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Extra }, or forgotten $.
+\sf@@@subfloat ...de \setbox \@tempboxa \hbox {#4}
+                                                  \@tempdima =\wd \@tempboxa...
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+
+Overfull \hbox (11.3335pt too wide) in paragraph at lines 141--141
+[]\OT1/cmr/m/n/8 (b)
+ []
+
+
+Overfull \hbox (13.22241pt too wide) in paragraph at lines 141--141
+|\OT1/cmr/m/n/8 Ca-
+ []
+
+
+Overfull \hbox (11.80573pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 pa-
+ []
+
+
+Overfull \hbox (12.27795pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 bil-
+ []
+
+
+Overfull \hbox (9.91681pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 ity
+ []
+
+
+Overfull \hbox (11.56128pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 Hi-
+ []
+
+
+Overfull \hbox (9.92375pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 er-
+ []
+
+
+Overfull \hbox (10.39598pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 ar-
+ []
+
+
+Overfull \hbox (12.51407pt too wide) in paragraph at lines 141--141
+\OT1/cmr/m/n/8 chy| 
+ []
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.141 ...[width=0.5\textwidth]{cap_heirarchy.pdf}}
+                                                  
+? 
+
+LaTeX Warning: Reference `fig:cap_hierarchy' on page 4 undefined on input line 
+148.
+
+[4]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 181.
+
+ (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 181.
+ [5]
+Chapter 2.
+[6
+
+]
+
+LaTeX Warning: Characters dropped after `\end{verbatim}' on input line 256.
+
+[7]
+No file myapp/if/myappif.if.
+No file myapp/usr/myapp/myapp.c.
+No file myapp/usr/myapp/Hakefile.
+[8]
+Chapter 3.
+
+Overfull \hbox (0.3084pt too wide) in paragraph at lines 357--358
+[]\OT1/cmr/m/n/10 The generic bind-ing struct is: \OT1/cmtt/m/n/10 struct myapp
+if[]binding (myappif[]defs.h) 
+ []
+
+[9
+
+]
+! Undefined control sequence.
+l.408     \includegraphics
+                          [width=0.5\columnwidth]{LMP.pdf}
+? 
+! Missing number, treated as zero.
+<to be read again> 
+                   ]
+l.408     \includegraphics[width=0.5\columnwidth]
+                                                 {LMP.pdf}
+? 
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   ]
+l.408     \includegraphics[width=0.5\columnwidth]
+                                                 {LMP.pdf}
+? 
+
+Overfull \hbox (54.86922pt too wide) in paragraph at lines 430--432
+[]\OT1/cmr/m/n/10 Receiver: \OT1/cmtt/m/n/10 disp[]run (dispatch.c) lmp[]endpoi
+nts[]poll[]disabled (lmp[]endpoints.c) 
+ []
+
+
+Overfull \hbox (2.75885pt too wide) in paragraph at lines 433--434
+[]\OT1/cmr/m/n/10 Event han-dler: \OT1/cmtt/m/n/10 myappif[]lmp[]rx[]handler (m
+yappif[]flounder[]bindings.c) 
+ []
+
+
+Overfull \hbox (23.24152pt too wide) in paragraph at lines 446--446
+[]\OT1/cmr/bx/n/14.4 IDC---UMP: Inter-core User-level Mes-sage Pass-
+ []
+
+! Undefined control sequence.
+l.453     \includegraphics
+                          [width=0.5\columnwidth]{UMP.pdf}
+? 
+! Missing number, treated as zero.
+<to be read again> 
+                   ]
+l.453     \includegraphics[width=0.5\columnwidth]
+                                                 {UMP.pdf}
+? 
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   ]
+l.453     \includegraphics[width=0.5\columnwidth]
+                                                 {UMP.pdf}
+? 
+[10]
+
+LaTeX Warning: Reference `fig:ump' on page 11 undefined on input line 461.
+
+No file Overview.bbl.
+[11] (./Overview.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 3478 strings out of 494990
+ 53269 string characters out of 6180638
+ 110171 words of memory out of 5000000
+ 6708 multiletter control sequences out of 15000+600000
+ 8976 words of font info for 32 fonts, out of 8000000 for 9000
+ 34 hyphenation exceptions out of 8191
+ 44i,12n,47p,218b,390s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on Overview.pdf (12 pages, 117221 bytes).
+PDF statistics:
+ 71 PDF objects out of 1000 (max. 8388607)
+ 49 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
