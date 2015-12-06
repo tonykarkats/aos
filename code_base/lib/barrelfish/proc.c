@@ -1,5 +1,24 @@
 #include <barrelfish/proc.h>
 
+
+struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name) 
+{
+	struct process_node * active = *head;
+	struct process_node * previous = *head;
+	
+	if (*head == NULL)
+		return NULL;
+	
+	while (((active->d_id != did)||(!strcmp(name, active->name)))&&(active->next_pr != NULL)) {
+		previous = active;
+		active = active->next_pr;
+	}
+
+	return active;
+}
+
+
+
 struct process_node * delete_process_node(struct process_node ** head, domainid_t did, char * name) 
 {
 	struct process_node * active = *head;

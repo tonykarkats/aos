@@ -54,6 +54,8 @@ struct aos_rpc {
 	size_t message_length;	
 	uint32_t words[9];
 	struct capref cap;
+
+	char * shared_buffer;
 };
 
 
@@ -203,5 +205,5 @@ errval_t aos_rpc_init(int slot_number);
 // This RPC call is called by the domain in order to signal that it is terminating
 errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_status);
 
-errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did);
+errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did, struct capref * shared_frame);
 #endif // _LIB_BARRELFISH_AOS_MESSAGES_H

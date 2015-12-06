@@ -250,8 +250,7 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
         return SYS_ERR_OK;
     }
 
-	//debug_printf("Initializing our endpoint with init!\n");
-
+	debug_printf("Initializing our endpoint with init!\n");
 	err = aos_rpc_init(TASKCN_SLOT_REMEP);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Error in aos_rpc_init!\n");
@@ -259,8 +258,9 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 	}
 
 	domainid_t own_did;
+	struct capref shared_frame;
 	
-	err = aos_rpc_get_did(get_init_chan(), domain_name + 11, &own_did);
+	err = aos_rpc_get_did(get_init_chan(), domain_name + 11, &own_did, &shared_frame);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Error in aos_rpc_init!\n");
 		return err_push(err, SYS_ERR_LRPC_SLOT_INVALID);
@@ -268,13 +268,26 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 
 	disp_set_domain_id(own_did);
 
-	//debug_printf("Setting our local ram allocator to talk with server!\n");
+	debug_printf("Setting our local ram allocator to talk with server!\n");
     err = ram_alloc_set(NULL);
     if (err_is_fail(err)) {
     	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
 	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
-    }
+    }	
 	
+	debug_printf("Mapping shared frame between init to our vspace!\n");
+	err = paging_map_frame( get_current_paging_state(), (void **) &get_init_chan()->shared_buffer, 4096, shared_frame, NULL, NULL);
+	if (err_is_fail(err)) {
+		DEBUG_ERR(err, "Error in maping the shared frame to our vspace!\n");
+		return err_push(err, LIB_ERR_SHARED_BUFFER_NOT_SET);
+	}
+
+	// Sanity check that shared frame has been shared properly, and shared buffer has been mapepd properly!	
+	for (int byte = 0; byte < 4096; byte++) {	
+		if (*(get_init_chan()->shared_buffer) != 'M') {
+			return err_push(err, LIB_ERR_SHARED_BUFFER_NOT_SET);
+		}
+	}
   	return SYS_ERR_OK;
 }
 

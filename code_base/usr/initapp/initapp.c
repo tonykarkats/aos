@@ -185,8 +185,37 @@ static void recv_handler(void *arg)
 			// debug_printf("Domain with name %s requested its id!\n", message_string); 
 			domainid_t requested_did;
 			requested_did = get_did_by_name(pr_head, message_string); 
+
+			// Create frame to share with child as shared memory region
+			struct capref shared_frame;
+			err = get_frame(4096, &shared_frame);
+			if (err_is_fail(err)) {
+				debug_printf("Can not allocate shared frame!\n");
+				shared_frame = NULL_CAP;
+			}
+		
+			thread_mutex_lock(&process_list_lock);	
+			struct process_node * process = get_process_node(&pr_head, requested_did, "aa");
+			// Map shared frame at child process node
+			debug_printf("Mapping shared frame for client!\n");
+			err = paging_map_frame( get_current_paging_state(), 
+										(void **) &(process->buffer),
+										4096, shared_frame, NULL, NULL);
+
+			// Assert some magic value that the other side expects. Sanity check
+			for (int byte = 0; byte < 4096; byte++)
+				*(process->buffer) = 'M';
 			
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) requested_did);
+			if (err_is_fail(err)) {
+				debug_printf("Error in mapping the shared frame in our side!\n");
+				shared_frame = NULL_CAP;
+			}
+
+			process->shared_frame = shared_frame;	
+			thread_mutex_unlock(&process_list_lock);
+								
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, shared_frame, (uint32_t) requested_did);
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending did back to the process!\n");	
 

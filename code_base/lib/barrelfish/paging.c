@@ -212,7 +212,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	errval_t err;
 
-	//debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
+	// debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings
@@ -581,11 +581,9 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 		debug_printf("get_frame: error in cap_destroy!\n");
 		return err_push(err,LIB_ERR_CAP_DESTROY);
 	}
- 
-    return SYS_ERR_OK;
+
+	return SYS_ERR_OK;
 }
-
-
 
 errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 {

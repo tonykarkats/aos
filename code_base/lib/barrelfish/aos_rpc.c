@@ -432,7 +432,7 @@ errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
     return SYS_ERR_OK;
 }
 
-errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did) 
+errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did, struct capref *shared_frame) 
 {
 	errval_t err;
     uint32_t buffer[9];
@@ -460,6 +460,7 @@ errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * d
     event_dispatch(get_default_waitset());
 
 	*did = chan->words[0];
+	*shared_frame = chan->cap;
 	if (*did == 0) {
 		debug_printf("spawn_domain: Can not fetch domain id!\n");
 		return AOS_ERR_LMP_SPAWN_DOM;
@@ -513,8 +514,8 @@ errval_t aos_rpc_init(int slot_number)
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err, "Error in registering the channel for send_handler!\n");	
 		return LIB_ERR_NO_LMP_BIND_HANDLER;
-	}
-	
+	}	
+
 	set_init_chan(&memory_channel);
 
   	return SYS_ERR_OK;

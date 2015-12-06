@@ -11,10 +11,14 @@ struct process_node {
 	struct capref client_endpoint;
 	struct capref dispatcher_frame;
 
+	// Shared memory between init process and spawned process
+	char * buffer;
+	struct capref shared_frame;
+
 	struct process_node * next_pr;
 };
 
-
+struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name);
 void print_nodes( struct process_node *head);
 domainid_t get_did_by_name(struct process_node * head, const char * name);
 errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo * bi, coreid_t coreid, struct capref* dispatcher_frame, domainid_t did);

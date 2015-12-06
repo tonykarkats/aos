@@ -98,7 +98,6 @@ static char *endp;
 
 static void *morecore_alloc(size_t bytes, size_t *retbytes)
 {
-//	debug_printf("morecore_alloc: Initiating...\n");
     struct morecore_state *state = get_morecore_state();
 
     char *freep = state->freep;
@@ -115,8 +114,6 @@ static void *morecore_alloc(size_t bytes, size_t *retbytes)
     }
     *retbytes = aligned_bytes;
 
-
-	//debug_printf("morecore_alloc: Returning...%d \n", ret);
     return ret;
 }
 

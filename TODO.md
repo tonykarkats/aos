@@ -16,17 +16,17 @@
 
 - Fix exit status and domain id - better process termination **** FIXED.
 
-- Fix weird bug with send string acknowledgemnt back to client - FIXED with no acnolwdgement in string rpc!
+- Fix weird bug with send string acknowledgemnt back to client - FIXED with no acnolwdgement in string rpc! FIXED - no acknowledgment sent in rpc send string.
 
 - Fix 1-1 mapping for aux core registers, use paging_alloc for them OR find another mapping FIXED - mapped the registers at each vspace and used those values
 
 - Fix weird bug in process list with name of processes FIXED
 
-- Add lock to initapp for process list management! FIXED
+- Add lock to initapp for process list management FIXED
 
-- Fix background processes , does not work with oncore figure out why
+- Fix background processes , does not work with oncore figure out why.
 
-- Enable functionality for spawning processes from processes in init1 - FIXED, domains at init-1 can only spawn at core-1 processes 
+- Enable functionality for spawning processes from processes in init1. FIXED, domains at init-1 can only spawn at core-1 processes 
 
 - We should really mm_free the frames for each spawned process 				******
 
