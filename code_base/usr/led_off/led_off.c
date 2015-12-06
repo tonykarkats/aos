@@ -33,6 +33,5 @@ int main(int argc, char *argv[])
 
 	turn_off_led1();	
 
-	while(1);
 	return 0;
 }

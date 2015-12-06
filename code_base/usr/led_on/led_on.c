@@ -34,11 +34,5 @@ int main(int argc, char *argv[])
 
 	turn_on_led1();	
 
-	err = aos_rpc_process_spawn( get_init_chan(), "led_off", 1, &did);
-	if (err_is_fail(err)) {
-		debug_printf("could not spawn!\n");
-	}	
-	
-	while(1);
 	return 0;
 }
