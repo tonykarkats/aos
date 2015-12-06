@@ -174,14 +174,30 @@ int main(int argc, char **argv)
 	// Print Root Directory
 	
     err = mmchs_read_block(FirstSectorofRootDir, buffer);
-    debug_printf("\nPrinting Root dir\n");
-    for (int i = 1; i <= 12; ++i)
-    {
-        printf("%c", ((uint8_t*) buffer)[i]);
-       	fflush(stdout); 
-    }
+//    debug_printf("\nPrinting Root dir\n");   for (int i = 1; i <= 12; ++i)
+//    {
+//        printf("%c", ((uint8_t*) buffer)[i]);
+//       	fflush(stdout); 
+//    }
     assert(err_is_ok(err));
+
+	// Some form of ls
 	
+	//char ls_arg[12] = {"dir1"};
+
+	// Check in root directory first	
+	
+		uint8_t name[53];
+		name[0] = ((uint8_t *)buffer)[1];
+		name[1] = ((uint8_t *)buffer)[2];
+		name[2] = ((uint8_t *)buffer)[3];
+		name[3] = ((uint8_t *)buffer)[4];
+		name[4] = '\0';
+		//strcpy(name, (char *)buffer+1);
+        printf("\n %s \n", name);
+		fflush(stdout);
+	
+
 	while(1);
     return 0;
 }
