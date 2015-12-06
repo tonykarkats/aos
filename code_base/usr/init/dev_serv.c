@@ -139,9 +139,9 @@ errval_t initialize_dev_serv(void)
 
 	debug_printf("Before mm_init!\n");
     // FIXME: remove magic constant for lowest valid RAM address
-    //err = mm_init(&mm_dev, ObjType_DevFrame, 0x40000000,
-    //            30, MAXCHILDBITS, NULL,
-    //            &slot_alloc_prealloc, dev_slot_alloc, true);
+    err = mm_init(&mm_dev, ObjType_DevFrame, 0x40000000,
+                30, MAXCHILDBITS, NULL,
+                slot_alloc_prealloc, dev_slot_alloc, true);
     assert(err_is_ok(err));
 
     /* Step 2: give MM allocator static storage to get it started */

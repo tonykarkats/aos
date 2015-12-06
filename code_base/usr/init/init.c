@@ -98,7 +98,7 @@ static int cross_core_thread_0(void *arg)
 		
 				char spawned_process_requested[36];
 				
-				strcpy( spawned_process_requested, (char *) received_message.words);
+				strcpy(spawned_process_requested, (char *) received_message.words);
 
 				// Always grant permission to remote core for spawning a process locally
 				struct ump_message permission_message;
@@ -121,7 +121,7 @@ static int cross_core_thread_0(void *arg)
 					thread_mutex_unlock(&process_list_lock);
 				}
 					
-			    debug_printf("core-1 returned to us spawned response with response %d and name %s!\n", success_spawn, spawned_process);
+			    // debug_printf("core-1 returned to us spawned response with response %d and name %s!\n", success_spawn, spawned_process);
 				pseudo_lock = success_spawn;
 	
 				break;
@@ -172,7 +172,6 @@ static void recv_handler(void *arg)
 	}
 
 	// debug_printf("recv_handler initiating! With slot = %zu\n", cap.slot);
-
 	//struct frame_identity fid;
 	//err = invoke_frame_identify( cap, &fid);
 	//assert(err_is_ok(err));
@@ -284,7 +283,8 @@ static void recv_handler(void *arg)
 
 			uint32_t core = msg.words[1];
 	
-			debug_printf("Will spawn %s at core %zu\n", message_string, core);
+			//debug_printf("Will spawn %s at core %zu\n", message_string, core);
+			
 			token = strtok(message_string, " ");
 			
 			if (core == 1) {
