@@ -160,6 +160,13 @@ int main(int argc, char *argv[])
 			else 
 				printf("Domain spawned with pid = %d\n", pid);
 		}
+		else if (!strcmp("ls", token)) {
+			debug_printf("ls NYI!\n");
+	
+		}
+		else if (!strcmp("cat", token)) {	
+			debug_printf("cat NYI!\n");
+		}
 		else if (!strcmp("exit", token)) {
 			return 0;
 		}

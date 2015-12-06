@@ -129,35 +129,6 @@ elf_load_and_relocate(lvaddr_t blob_start,
     return SYS_ERR_OK;
 }
 
-errval_t map_aux_core_registers(void) 
-{
-	errval_t err;
-
-	// FIX ME TO USE MM ALLOCATIONS
-	struct capref temp_cap_io;
-	err = slot_alloc(&temp_cap_io);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_seconde_core: Can not copy device caref!\n");
-		abort();
-	}	
-
-	err = cap_copy(temp_cap_io, cap_io);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_second_core: Can not copy from io \n");
-		return LIB_ERR_CAP_COPY;
-	}
-
-	uint64_t size = 0x1000;
-	uint64_t offset = 0x8281000;
-	err = paging_map_fixed_attr_args( get_current_paging_state(), 0x48281000, temp_cap_io, size, DEVICE_FLAGS, &offset, &size);
-	if (err_is_fail(err)) {
-		debug_printf("spawn_second_core: Can not copy from io \n");
-		return LIB_ERR_VNODE_MAP;
-	}
-
-	return SYS_ERR_OK;
-}
-
 errval_t invoke_monitor_spawn_core( coreid_t core_id, enum cpu_type cpu_type, 
                           forvaddr_t entry) 
 { 
@@ -168,8 +139,8 @@ errval_t invoke_monitor_spawn_core( coreid_t core_id, enum cpu_type cpu_type,
                     | SYSCALL_INVOKE, invoke_cptr, core_id, cpu_type, 
                     (uintptr_t)(entry >> 32), (uintptr_t) entry).error; 
 } 
- 
-errval_t spawn_second_core(struct bootinfo *bi) 
+
+errval_t spawn_second_core(struct bootinfo *bi, lvaddr_t aux_core_0, lvaddr_t aux_core_1) 
 {
 	errval_t err;
 
@@ -190,16 +161,6 @@ errval_t spawn_second_core(struct bootinfo *bi)
         return err_push(err, SPAWN_ERR_ELF_MAP);
     }
 
-	//debug_printf("spawn_second_core: Mapped cpu_module at our vspace at 0x%x, module is at physical address 0x%x\n", cpu_blob.vaddr, cpu_blob.paddr);
-	//debug_printf("spawn_second_core: Module size is %zu \n", cpu_blob.size);
-	//debug_printf("spawn_second_core: Is our elf mapped correctly?\n");
-		
- 	// struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)cpu_blob.vaddr;
-	
-	//debug_printf("Magic number e_ident[1][2][3] = %c%c%c\n", head->e_ident[EI_MAG1], head->e_ident[EI_MAG2], head->e_ident[EI_MAG3]);
-
-	// Helping struct for keeping cpu info 
-	// Size of region will be BASE_PAGE_SIZE + binary_size
     assert(sizeof(struct arm_core_data) <= BASE_PAGE_SIZE);
     struct {
         size_t                size;
@@ -221,9 +182,6 @@ errval_t spawn_second_core(struct bootinfo *bi)
 		USER_PANIC("Error in cpu_memory_prepare! Error = %s\n", err_getstring(err));
 	}
 	
-	//debug_printf("spawn_second_core: Allocated a frame at physical base %"PRIu64" / 0x%x and mapped it at virtual address\n", cpu_mem.frameid.base, cpu_mem.frameid.base);
-	//debug_printf("spawn_second_core: Virtual address is at %p\n",  cpu_mem.buf);
-
 	// Time to load the cput driver to the newly allocated memory 
 	// and perform the relocation! 
 	uintptr_t reloc_entry= 0;
@@ -269,20 +227,6 @@ errval_t spawn_second_core(struct bootinfo *bi)
 
     struct arm_core_data *core_data = (struct arm_core_data *)cpu_mem.buf;
 
-	/*
-    struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *)cpu_blob.vaddr;
-    core_data->elf.size = sizeof(struct Elf32_Shdr);
-    core_data->elf.addr = cpu_blob.paddr + (uintptr_t)head32->e_shoff;
-    core_data->elf.num  = head32->e_shnum;
-
-    core_data->module_start        = cpu_blob.paddr;
-    core_data->module_end          = cpu_blob.paddr + cpu_blob.size;
-    //core_data->urpc_frame_base     = urpc_frame_id.base;
-    //core_data->urpc_frame_bits     = urpc_frame_id.bits;
-    core_data->src_core_id         = 0;
-    core_data->dst_core_id         = 1;
-	*/
-
     struct Elf32_Ehdr *head32 = (struct Elf32_Ehdr *) cpu_blob.vaddr;
     core_data->elf.size = sizeof(struct Elf32_Shdr);
     core_data->elf.addr = cpu_mem.frameid.base + BASE_PAGE_SIZE + (uintptr_t)head32->e_shoff;
@@ -293,8 +237,6 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	core_data->mmap_addr = bi->mmap_addr;
 	core_data->mmap_length = bi->mmap_length;
 
-    //core_data->module_start          = cpu_mem.frameid.base + BASE_PAGE_SIZE; 
-    //core_data->module_end            = cpu_mem.frameid.base + cpu_mem.size; 
     core_data->src_core_id         = 0;
     core_data->dst_core_id         = 1;
 
@@ -302,10 +244,14 @@ errval_t spawn_second_core(struct bootinfo *bi)
 	core_data->ump_frame_addr = ump_id.base; 
 	core_data->ump_frame_len  = ump_id.bits;
 
-	err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry); 
-	if (err_is_fail(err)) {
-        return err_push(err, MON_ERR_SPAWN_CORE);
-    }
+	*(lvaddr_t *) aux_core_1 = reloc_entry;
+	*(lvaddr_t *) aux_core_0 |= 0x00000004;
+
+	
+	//err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry); 
+	//if (err_is_fail(err)) {
+    //    return err_push(err, MON_ERR_SPAWN_CORE);
+    //}
 
 	cap_destroy(ump_frame);
 

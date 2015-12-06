@@ -565,11 +565,26 @@ int main(int argc, char *argv[])
 	uart_initialize((lvaddr_t)vbuf);
 	debug_printf("initialized uart!\n");
 
-	map_aux_core_registers();
+	err = get_devframe( &temp_cap, &retlen, 0x48281000, 12);
+	if (err_is_fail(err)) {
+		debug_printf("Can not get device frame for aux core registers!\n");
+		abort();
+	}	
 
-	spawn_second_core(bi);
+	err = paging_map_frame_attr(get_current_paging_state(), &vbuf, 0x1000, temp_cap, DEVICE_FLAGS, NULL,NULL);
+	if (err_is_fail(err)) {
+		debug_printf("Error in mapping uart exiting...\n");
+		abort();
+	}
 
- 	poll_for_core();
+	lvaddr_t aux_core_0 = (lvaddr_t) vbuf + 0x800;
+	lvaddr_t aux_core_1 = (lvaddr_t) vbuf + 0x804;
+
+	// map_aux_core_registers();
+
+	spawn_second_core(bi, aux_core_0, aux_core_1);
+
+ 	poll_for_core(aux_core_0);
 
 	thread_mutex_init(&process_list_lock);
 

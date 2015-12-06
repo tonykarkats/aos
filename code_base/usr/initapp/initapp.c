@@ -70,7 +70,6 @@ static int cross_core_thread_1(void *arg)
 
 	void * buf;
 	err = map_shared_frame(&buf, true);
-	signal_core_0();
 
 	// Main loop of cross-core thread!	
 	while(1) 
@@ -477,13 +476,28 @@ int main(int argc, char *argv[])
 	}
 
 
-	debug_printf("Signaling core-0 that we are up!\n");
+	debug_printf("Mapping aux core registers and signaling core-0 that we are up!\n");
+
+	void *vbuf;	
+	struct capref temp_cap;
+	size_t retlen;
+	err = get_devframe( &temp_cap, &retlen, 0x48281000, 12);
+	if (err_is_fail(err)) {
+		debug_printf("Can not get device frame for aux core registers!\n");
+		abort();
+	}	
+
+	err = paging_map_frame_attr(get_current_paging_state(), &vbuf, 0x1000, temp_cap, DEVICE_FLAGS, NULL,NULL);
+	if (err_is_fail(err)) {
+		debug_printf("Error in mapping uart exiting...\n");
+		abort();
+	}
+
+	lvaddr_t aux_core_0 = (lvaddr_t) vbuf + 0x800;
+	signal_core_0(aux_core_0);
+
 
 	thread_mutex_init( &process_list_lock);
-	
-	map_aux_core_registers();
-	signal_core_0();
-
 	struct thread *cross_core_thread = thread_create( cross_core_thread_1, bi);
 	cross_core_thread = cross_core_thread;
 

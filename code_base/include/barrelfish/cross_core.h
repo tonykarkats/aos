@@ -29,6 +29,6 @@ struct ump_message read_from_core_0(void);
 struct ump_message read_from_core_1(void);
 
 int get_core_id(struct bootinfo * bi);
-void poll_for_core(void);
-void signal_core_0(void);
+void poll_for_core(lvaddr_t cross_core_register);
+void signal_core_0(lvaddr_t cross_core_register);
 errval_t map_shared_frame(void **buf, bool init_frame);
