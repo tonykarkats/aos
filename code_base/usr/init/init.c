@@ -121,7 +121,7 @@ static int cross_core_thread_0(void *arg)
 					thread_mutex_unlock(&process_list_lock);
 				}
 					
-			    debug_printf("core-1 returned to us spawned response with response %d!\n", success_spawn);
+			    debug_printf("core-1 returned to us spawned response with response %d and name %s!\n", success_spawn, spawned_process);
 				pseudo_lock = success_spawn;
 	
 				break;
@@ -310,7 +310,6 @@ static void recv_handler(void *arg)
 				}	
 			}
 			else {
-
 				// Spawn domain at own core! 
 				next_token = strtok(NULL, " ");
 				
@@ -350,16 +349,12 @@ static void recv_handler(void *arg)
 			domainid_t did = msg.words[1];
 			char * d_name;
 
-			d_name = get_name_by_did (pr_head, did);
+			d_name = get_name_by_did(pr_head, did);
 			if (d_name == NULL) {
-				memcpy( buffer, "Not Found!", 11);
-			}
-			else if (strlen(d_name) > 39) {
-				memcpy( buffer, d_name, 39);
-				* (char *) (buffer + 35) = '\0';
+				strcpy( (char *) buffer, "Not Found!");
 			}
 			else 
-				memcpy(buffer, d_name, strlen(d_name));
+				strcpy((char*) buffer, d_name);
 
 			//debug_printf("Will send to client name %s\n", buffer);			
 			err = lmp_chan_send(lc , LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 9,
@@ -435,32 +430,15 @@ static void recv_handler(void *arg)
 					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 				}	
 			}
-
+	
 			cap_destroy(terminated_process->client_endpoint);
 			cap_destroy(terminated_process->dispatcher_frame);
-			break;
-		case AOS_RPC_KILL:;
-			debug_printf("Terminating node with pid = %d\n", msg.words[1]);
-
-			struct process_node * killed_process = delete_process_node(&pr_head, msg.words[1], "");
-			if (killed_process == NULL) {
-				debug_printf("Process to kill does not exist!\n");
-				return;
-			}
 			
-			err = cap_revoke(killed_process->dispatcher_frame);	
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not kill process!\n");
-				return ;
-			}
-		
-			err = cap_delete(killed_process->dispatcher_frame);	
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Can not destroy capability of domain...!\n");
-				return ;
-			}
+			free(terminated_process->name);
+			free(terminated_process);
 
-			break;	
+			break;
+
 	}
 }
 

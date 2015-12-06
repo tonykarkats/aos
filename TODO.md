@@ -20,7 +20,7 @@
 
 - Use mm functionality for splitting devices VERY IMPORTANT FOR FILESYSTEM MILESTONE ****
 
-- Fix background processes ? FIXED
+- Fix background processes
 
 - No acknowledgment in string rpc ! FIXED
 
@@ -36,8 +36,12 @@
 
 - Fix background processes , does not work with oncore figure out why
 
-- Enable functionality for spawning processes from processes in init1
+- Enable functionality for spawning processes from processes in init1 - FIXED, domains at init-1 can only spawn at core-1 processes 
 
-- We should really mm_free the frames for each spawned process!
+- We should really mm_free the frames for each spawned process ******
 
-- Put limit at client requested memory!
+- Put limit at client requested memory 						   ******
+
+- Fix input for processes that are spawned at forground
+
+- Enable functionality for domains in core-1 to spawn domains at core-0

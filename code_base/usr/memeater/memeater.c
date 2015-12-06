@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &domain_name);	
 				if (err_is_ok(err)) 
 					printf("PID: %d NAME: %s\n", pids[i], domain_name); 
+				memset(domain_name, 0, 36);
 			}
 			
 		}
