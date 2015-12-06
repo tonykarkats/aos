@@ -91,7 +91,6 @@ int main(int argc, char **argv)
     // This should be the same information you get with
     // dd when reading the first block on linux...
     //
-
     void *buffer = malloc(512);
     assert(buffer != NULL);
 

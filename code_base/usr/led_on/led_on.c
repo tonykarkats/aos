@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
 	
 	struct capref dev_cap;
 	size_t ret_len;
+	domainid_t did;
 
 	err = aos_rpc_get_dev_cap(get_init_chan(), 0x4A310000, 4096, &dev_cap, &ret_len);
 	if (err_is_fail(err)) {
@@ -32,6 +33,12 @@ int main(int argc, char *argv[])
 	led_initialize((lvaddr_t) vbuf);
 
 	turn_on_led1();	
+
+	err = aos_rpc_process_spawn( get_init_chan(), "led_off", 1, &did);
+	if (err_is_fail(err)) {
+		debug_printf("could not spawn!\n");
+	}	
 	
+	while(1);
 	return 0;
 }

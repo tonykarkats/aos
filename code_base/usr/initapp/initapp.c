@@ -34,6 +34,7 @@
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
+static volatile int pseudo_lock;
 static struct mm dev_mm;
 struct thread_mutex process_list_lock;
 
@@ -106,26 +107,34 @@ static int cross_core_thread_1(void *arg)
 					
 					thread_mutex_lock(&process_list_lock);	
 					struct process_node * temp = delete_process_node( &pr_head, spawned_domain, "aaa");
-					thread_mutex_unlock(&process_list_lock);	
-					
+					thread_mutex_unlock(&process_list_lock);		
 					temp = temp;
+
 					util_word = 0;	
 				}
 				else {
 					util_word = spawned_domain;
 				}
 			
-				// Write response to core-0 !
-				
+				// Write response to core-0 !				
 				struct ump_message returned_message;
 				returned_message.type      = SPAWNED_PROCESS_RESPONSE;
 				returned_message.util_word = util_word;
-
+				strcpy( (char *) returned_message.words, message_string);
+				
 				write_to_core_0(returned_message);					
-				
-				
 				break;
-		}		
+		
+		case(SPAWNED_PROCESS_RESPONSE_PERMISSION_FOR_SPAWN): ;
+			
+				int permission = received_message.util_word;
+				
+				pseudo_lock = permission;
+				break;
+
+		
+		}
+				
 	}	
 
 	return 0;	
@@ -261,7 +270,82 @@ static void recv_handler(void *arg)
 		
 			cap_destroy(cap);
 			break;
+		case AOS_RPC_PROC_SPAWN:;
 
+			for (int i = 0; i < string_length-1 ; i++){
+				uint32_t * word = (uint32_t *) (message_string + i*4);
+				*word = msg.words[i+2];   
+			}	
+
+			debug_printf("Received request for spawn for %s\n", message_string);
+			uint32_t core = msg.words[1];
+			if (core != 1) {
+				// Domains at core-1 are not allowed to spawn domains at core-0!
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+				}
+			}
+			else {
+				struct ump_message request_for_spawn;
+				request_for_spawn.type = SPAWNED_PROCESS_REQUEST_PERMISSION_FOR_SPAWN;
+				strcpy( (char *) request_for_spawn.words, message_string);
+
+				write_to_core_0( request_for_spawn);
+				
+				pseudo_lock = -1;
+
+				while(pseudo_lock == -1) ;				
+				
+				if (pseudo_lock == 0) {
+					// Remote core rejected our request for spawning!
+					err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
+					if (err_is_fail(err)) {
+						DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+					}
+				}
+				else {
+					// Remote core accepted our request for spawning! Value of pseud_lock is the returned domain-id
+					uint32_t util_word;
+					struct spawninfo si;	
+					struct capref disp_frame;	
+
+					thread_mutex_lock(&process_list_lock);	
+					pr_head = insert_process_node(pr_head, pseudo_lock, message_string, 0, cap, NULL_CAP);
+					thread_mutex_unlock(&process_list_lock);	
+					
+					err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame, pseudo_lock);
+					if (err_is_fail(err)) {
+						
+						thread_mutex_lock(&process_list_lock);	
+						struct process_node * temp = delete_process_node( &pr_head, pseudo_lock, "aaa");
+						thread_mutex_unlock(&process_list_lock);		
+						temp = temp;
+
+						util_word = 0;	
+					}
+					else {
+						util_word = pseudo_lock;
+					}
+			
+					// Write response to core-0 !				
+					struct ump_message returned_message;
+					returned_message.type      = SPAWNED_PROCESS_RESPONSE;
+					returned_message.util_word = util_word;
+					strcpy( (char *) returned_message.words, message_string);
+				
+					write_to_core_0(returned_message);					
+
+					err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, util_word);
+					if (err_is_fail(err)) {
+						DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+					}
+			
+				}
+				
+			}
+			
+			break;
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
 			int exit_status = msg.words[2];

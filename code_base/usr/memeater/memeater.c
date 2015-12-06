@@ -53,6 +53,34 @@ int main(int argc, char *argv[])
 	char *ampersand;
 	char *domain_name = malloc(36); 
 
+	//int l = 0;	
+	/*
+	while (1) {
+		
+		debug_printf("--------------------------- SPAWNED TOTAL = %d\n", l);
+		domainid_t pid;
+		err = aos_rpc_process_spawn(get_init_chan(), "led_on", 1, &pid);
+		if (err_is_fail(err) || (pid == 0))
+			printf("Could not spawn domain [%s]\n", "led_on");
+		else 
+			printf("Domain spawned with pid = %d\n", pid);
+		
+		err = aos_rpc_process_spawn(get_init_chan(), "led_off", 0, &pid);
+		if (err_is_fail(err) || (pid == 0))
+			printf("Could not spawn domain [%s]\n", "led_off");
+		else 
+			printf("Domain spawned with pid = %d\n", pid);
+		
+		err = aos_rpc_process_spawn(get_init_chan(), "stress_paging", 0, &pid);
+		if (err_is_fail(err) || (pid == 0))
+			printf("Could not spawn domain [%s]\n", "stress_paging");
+		else 
+			printf("Domain spawned with pid = %d\n", pid);
+		
+
+		l = l+3;
+	}
+	*/
 	while(1) {
 		printf("$>");
 		fflush(stdout);

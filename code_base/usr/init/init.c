@@ -74,13 +74,8 @@ errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr,
 		debug_printf("get_dev_frame: can not allocate range for device!\n");
 		return MM_ERR_DEVICE_ALLOC;
 	}
-
-	struct frame_identity fid;
-	err = invoke_frame_identify( *ret, &fid);
-	debug_printf("Base x%x and bits = %" PRIu8 "\n", fid.base, fid.bits);
-
 	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
-	
+
 	return SYS_ERR_OK;
 }
 
@@ -98,12 +93,35 @@ static int cross_core_thread_0(void *arg)
 		int type = received_message.type;
 		
 		switch(type) {
-			case(SPAWNED_PROCESS_RESPONSE): ;
+			case (SPAWNED_PROCESS_REQUEST_PERMISSION_FOR_SPAWN): ;
+				// Remote core requests permission to spawn a process!
+		
+				char spawned_process_requested[36];
 				
+				strcpy( spawned_process_requested, (char *) received_message.words);
+
+				// Always grant permission to remote core for spawning a process locally
+				struct ump_message permission_message;
+				permission_message.util_word = global_did;
+				permission_message.type = SPAWNED_PROCESS_RESPONSE_PERMISSION_FOR_SPAWN;
+				global_did++;
+				write_to_core_1(permission_message);
+						
+			case(SPAWNED_PROCESS_RESPONSE): ;				
 				// Remote core spawned a domain!
+				
+				char spawned_process[36];
 				int success_spawn = received_message.util_word;
 
-				// debug_printf("core-1 returned to us spawned response with response %d!\n", success_spawn);
+				strcpy(spawned_process, (char *) received_message.words);
+				
+				if (success_spawn != 0) {
+					thread_mutex_lock(&process_list_lock);
+					pr_head = insert_process_node(pr_head, global_did, spawned_process, true, NULL_CAP, NULL_CAP);
+					thread_mutex_unlock(&process_list_lock);
+				}
+					
+			    debug_printf("core-1 returned to us spawned response with response %d!\n", success_spawn);
 				pseudo_lock = success_spawn;
 	
 				break;
@@ -147,14 +165,18 @@ static void recv_handler(void *arg)
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
 
-	//debug_printf("recv_handler initiating!\n");
-
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
 		lmp_chan_register_recv(lc,get_default_waitset(),
 							MKCLOSURE(recv_handler, arg));
 	}
 
+	// debug_printf("recv_handler initiating! With slot = %zu\n", cap.slot);
+
+	//struct frame_identity fid;
+	//err = invoke_frame_identify( cap, &fid);
+	//assert(err_is_ok(err));
+	
 	lc->remote_cap = cap;
 
 	int message_length = msg.buf.msglen;
@@ -213,7 +235,6 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
-			// debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
 
@@ -278,20 +299,9 @@ static void recv_handler(void *arg)
 				
 				pseudo_lock = -1;
 
-				thread_mutex_lock(&process_list_lock);
-				pr_head = insert_process_node(pr_head, global_did, message_string, true, NULL_CAP, NULL_CAP);
-				thread_mutex_unlock(&process_list_lock);
-			
 				write_to_core_1(core_1_msg);				
 	
 				while(pseudo_lock == -1);	
-
-				// If remote spawn succeeded add it to the process list
-				if (pseudo_lock == 0) {	
-					thread_mutex_lock(&process_list_lock);
-					delete_process_node( &pr_head, global_did, "aaa");
-					thread_mutex_unlock(&process_list_lock);
-				}
 				
 				// Report back to shell that process was spawned
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);

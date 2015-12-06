@@ -37,3 +37,7 @@
 - Fix background processes , does not work with oncore figure out why
 
 - Enable functionality for spawning processes from processes in init1
+
+- We should really mm_free the frames for each spawned process!
+
+- Put limit at client requested memory!
