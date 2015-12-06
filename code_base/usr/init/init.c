@@ -102,11 +102,11 @@ static int cross_core_thread_0(void *arg)
 
 				// Always grant permission to remote core for spawning a process locally
 				struct ump_message permission_message;
-				permission_message.util_word = global_did;
+				permission_message.util_word = ++global_did;
 				permission_message.type = SPAWNED_PROCESS_RESPONSE_PERMISSION_FOR_SPAWN;
-				global_did++;
 				write_to_core_1(permission_message);
-						
+				
+				break;			
 			case(SPAWNED_PROCESS_RESPONSE): ;				
 				// Remote core spawned a domain!
 				
@@ -117,7 +117,7 @@ static int cross_core_thread_0(void *arg)
 				
 				if (success_spawn != 0) {
 					thread_mutex_lock(&process_list_lock);
-					pr_head = insert_process_node(pr_head, global_did, spawned_process, true, NULL_CAP, NULL_CAP);
+					pr_head = insert_process_node(pr_head, success_spawn, spawned_process, true, NULL_CAP, NULL_CAP);
 					thread_mutex_unlock(&process_list_lock);
 				}
 					
@@ -290,7 +290,7 @@ static void recv_handler(void *arg)
 			if (core == 1) {
 				
 				// Spawn domain at core-1					
-				global_did ++;
+				global_did++;
 			
 				struct ump_message core_1_msg;
 				core_1_msg.type = SPAWNED_PROCESS_REQUEST;
@@ -323,16 +323,15 @@ static void recv_handler(void *arg)
 			
 			 	struct spawninfo si;	
 				struct capref disp_frame;
-			
-				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did + 1);
+				global_did++;
+	
+				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did);
 				if (err_is_fail(err)) {
 					debug_printf("recv_handler: Can not spawn process for the client! \n");
 					d_id = 0;	
 				}
 				else {
-					d_id = global_did;
-					global_did++;
-					
+					d_id = global_did;	
 					thread_mutex_lock(&process_list_lock);
 					pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
 					thread_mutex_unlock(&process_list_lock);

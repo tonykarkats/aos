@@ -305,7 +305,8 @@ static void recv_handler(void *arg)
 					}
 				}
 				else {
-					// Remote core accepted our request for spawning! Value of pseud_lock is the returned domain-id
+					// Remote core accepted our request for spawning! Value of pseudo_lock is the returned domain-id
+					debug_printf("Core-0 responded with did %zu\n", pseudo_lock);
 					uint32_t util_word;
 					struct spawninfo si;	
 					struct capref disp_frame;	
