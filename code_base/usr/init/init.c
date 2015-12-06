@@ -394,7 +394,7 @@ static void recv_handler(void *arg)
 			lpaddr_t paddr = msg.words[1];
 			size_t length = msg.words[2];
 		
-			debug_printf("Received request for %p and %lu\n", paddr, length);	
+		//	debug_printf("Received request for %p and %lu\n", paddr, length);	
 			struct capref dev_cap;
 			size_t retlen = 1;	
 			err = get_devframe(&dev_cap, &retlen, paddr, length);
@@ -598,6 +598,7 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
+/*
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
@@ -609,6 +610,16 @@ int main(int argc, char *argv[])
 	
 	print_nodes(pr_head);	
 	assert(err_is_ok(err));
+*/
+
+	debug_printf("Spawning mmchs!\n"); 
+	struct spawninfo mem_si;
+	struct capref disp_frame;
+
+	err = bootstrap_domain("mmchs", &mem_si, bi, my_core_id, &disp_frame, global_did);
+
+	pr_head = insert_process_node(pr_head, global_did, "mmchs", false, NULL_CAP, disp_frame);
+	global_did++;
 
 	while(true) {
 		err = event_dispatch(get_default_waitset());

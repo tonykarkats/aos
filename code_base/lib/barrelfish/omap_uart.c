@@ -71,7 +71,7 @@ int get_char_thread(void *arg)
 	struct thread_cond * char_cond = r->char_wait_cond;
 	struct thread_cond * capref_cond = r->capref_wait_cond;
 	
-	debug_printf("get_char_thread: Initiating...\n");
+	//debug_printf("get_char_thread: Initiating...\n");
 	char in_c;
 
 	while(true) {	
