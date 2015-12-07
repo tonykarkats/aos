@@ -107,21 +107,87 @@ void print_nodes( struct process_node *head)
 
 }
 
-void clear_process_node(struct process_node *node) {
+void clear_process_node(struct process_node *node, struct mm mm_ram) 
+{
+	errval_t err;
 
+	struct frame_node* head_frame = node->consumed_frame;
+	struct frame_node* temp;
+
+	debug_printf("Clearing up for client that requested total memory %d\n", node->memory_consumed);
+	// First free ALL allocated frames and also 
+	// free regions in mm_ram allocator
+	while (head_frame != NULL) {
+		
+		struct frame_identity fid;
+		err = cap_revoke(head_frame->frame);
+		if (err_is_fail(err)) {
+			debug_printf("Can not revoke frame of mm_ram allcoator!\n");
+		}
+		
+		struct capref current_frame;
+		err = slot_alloc(&current_frame);
+		if (err_is_fail(err)) {
+			debug_printf("Can not allocate frame for bookkeeping!\n");
+			cap_destroy(head_frame->frame);
+			continue;
+		}
+
+		err = cap_retype(current_frame, head_frame->frame, ObjType_Frame, head_frame->bits);
+    	if (err_is_fail(err)) {
+			debug_printf("error in cap_retype!\n");
+			cap_destroy(head_frame->frame);
+			cap_destroy(current_frame);
+			continue;	
+		}
+		err = invoke_frame_identify( current_frame, &fid);
+		if (err_is_fail(err)) {
+			debug_printf("Can not identify frame of domain!\n");
+			cap_destroy(head_frame->frame);
+			cap_destroy(current_frame);
+			continue;
+		}
+		else {
+			err = mm_free(&mm_ram, head_frame->frame, fid.base, fid.bits);
+			if (err_is_fail(err)) {
+				debug_printf("Can not free frame in mm_ram allocator!\n");	
+			}	
+
+			cap_destroy(current_frame);
+			// cap_destroy(head_frame->frame);
+		}
+	
+		temp = head_frame;
+		head_frame = head_frame->next_frame;		
+		free(temp);
+	}
+
+	// Then free everything else in the node	
+	free(node->name);
+
+	err = paging_unmap(get_current_paging_state(), NULL);
+	if (err_is_fail(err)) {
+		debug_printf("Can not unmap for terminated process!\n");
+	}
+
+	err = paging_free(get_current_paging_state(), node->buffer);
+	if (err_is_fail(err)) {
+		debug_printf("Can not free memory region of terminated process!\n");
+	}
 	return;
 }
 
-void update_frame_list(struct process_node *node, struct capref ram) {
-
+void update_frame_list(struct process_node *node, struct capref ram, size_t bits) 
+{
+	//debug_printf("update_frame_list starting!\n");
+		
 	struct frame_node* new_frame_node = (struct frame_node *) malloc(sizeof(struct frame_node));
-	
-	new_frame_node->next_frame = node->consumed_frame;
+	new_frame_node->bits = bits;
 	new_frame_node->frame = ram;
-
+	new_frame_node->next_frame = node->consumed_frame;
 	node->consumed_frame = new_frame_node;
 
-
+	//debug_printf("update_frame_list ending!\n");
 	return;
 }
 

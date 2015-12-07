@@ -1,4 +1,5 @@
 #include <barrelfish/barrelfish.h>
+#include <mm/mm.h>
 #include <spawndomain/spawndomain.h>
 #include <string.h>
 
@@ -9,6 +10,7 @@
 // domain and the init server etc...
 struct frame_node {
 	struct capref frame;
+	size_t bits;
 	struct frame_node * next_frame;
 };
 	
@@ -32,8 +34,8 @@ struct process_node {
 	struct process_node * next_pr;
 };
 
-void clear_process_node(struct process_node *node);
-void update_frame_list(struct process_node *node, struct capref ram);
+void clear_process_node(struct process_node *node, struct mm mm_ram);
+void update_frame_list(struct process_node *node, struct capref ram, size_t bits);
 
 struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name);
 void print_nodes( struct process_node *head);

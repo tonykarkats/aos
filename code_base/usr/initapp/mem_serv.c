@@ -37,7 +37,7 @@ size_t mem_total = 0, mem_avail = 0;
 /// General-purpose slot allocator
 static struct multi_slot_allocator msa;
 /// MM allocator instance data
-static struct mm mm_ram;
+struct mm mm_ram;
 /// Slot allocator for MM
 static struct slot_prealloc ram_slot_alloc;
 

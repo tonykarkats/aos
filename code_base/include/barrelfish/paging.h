@@ -111,6 +111,8 @@ errval_t paging_region_unmap(struct paging_region *pr, lvaddr_t base, size_t byt
  */
 errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes);
 
+
+errval_t paging_free(struct paging_state *st, void *buf);
 /**
  * Functions to map a user provided frame.
  */

@@ -640,6 +640,12 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     return SYS_ERR_OK;
 }
 
+errval_t paging_free(struct paging_state *st, void *buf) 
+{
+	// TODO: Please fill me if you want to
+	// pass the stress tests :D
+	return SYS_ERR_OK;
+}
 /**
  * \brief map a user provided frame, and return the VA of the mapped
  *        frame in `buf`.

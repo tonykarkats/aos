@@ -35,6 +35,7 @@
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
 static struct mm dev_mm;
+extern struct mm mm_ram;
 
 // shared variable between cross-core thread and recv handler
 volatile int pseudo_lock;
@@ -255,7 +256,7 @@ static void recv_handler(void *arg)
 					returned_cap = NULL_CAP;	
 				}
 					
-				update_frame_list(process, returned_cap);	
+				// update_frame_list(process, returned_cap, size_requested);	
 			}	
 
 			thread_mutex_unlock(&process_list_lock);
@@ -425,7 +426,7 @@ static void recv_handler(void *arg)
 
 			thread_mutex_lock(&process_list_lock);
 			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
-			thread_mutex_unlock(&process_list_lock);
+
 			if (terminated_process == NULL) {
 				debug_printf("recv_handler: Received message from unknown process?!\n");
 				break;
@@ -438,13 +439,13 @@ static void recv_handler(void *arg)
 					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
 				}	
 			}
-	
-			cap_destroy(terminated_process->client_endpoint);
-			cap_destroy(terminated_process->dispatcher_frame);
-			
-			free(terminated_process->name);
-			free(terminated_process);
 
+			// Clears the process node and released the ram used
+			// by this child. 
+			// clear_process_node(terminated_process, mm_ram);
+			free(terminated_process);
+	
+			thread_mutex_unlock(&process_list_lock);
 			break;
 
 	}

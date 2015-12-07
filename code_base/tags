@@ -23184,7 +23184,7 @@ clear_last_remainder	lib/newlib/newlib/libc/stdlib/reallocr.c	1967;"	d	file:
 clear_last_remainder	lib/newlib/newlib/libc/stdlib/vallocr.c	1967;"	d	file:
 clear_pinuse	lib/dmalloc/dmalloc.c	2257;"	d	file:
 clear_pinuse	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2262;"	d	file:
-clear_process_node	lib/barrelfish/proc.c	/^void clear_process_node(struct process_node *node) {$/;"	f
+clear_process_node	lib/barrelfish/proc.c	/^void clear_process_node(struct process_node *node, struct mm mm_ram) $/;"	f
 clear_smallmap	lib/dmalloc/dmalloc.c	2900;"	d	file:
 clear_smallmap	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2905;"	d	file:
 clear_treemap	lib/dmalloc/dmalloc.c	2904;"	d	file:
@@ -31324,7 +31324,7 @@ mm_destroy	lib/mm/mm.c	/^void mm_destroy(struct mm *mm)$/;"	f
 mm_dev	usr/init/dev_serv.c	/^static struct mm mm_dev;$/;"	v	typeref:struct:mm	file:
 mm_free	lib/mm/mm.c	/^errval_t mm_free(struct mm *mm, struct capref cap, genpaddr_t base,$/;"	f
 mm_init	lib/mm/mm.c	/^errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,$/;"	f
-mm_ram	usr/init/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
+mm_ram	usr/init/mem_serv.c	/^struct mm mm_ram;$/;"	v	typeref:struct:mm
 mm_ram	usr/initapp/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
 mm_realloc_range	lib/mm/mm.c	/^errval_t mm_realloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t base,$/;"	f
 mm_relinquish_all	lib/mm/mm.c	/^size_t mm_relinquish_all(struct mm *mm, struct mem_cap *ret, size_t retlen)$/;"	f
@@ -40832,6 +40832,7 @@ uordblks	lib/newlib/newlib/libc/stdlib/vallocr.c	/^  int uordblks; \/* total all
 uordblks	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  MALLINFO_FIELD_TYPE uordblks; \/* total allocated space *\/$/;"	m	struct:mallinfo	file:
 upcall_state	kernel/arch/arm/exec.c	/^static arch_registers_state_t upcall_state;$/;"	v	file:
 update_arp_entry	lib/lwip/src/netif/etharp.c	/^update_arp_entry(struct netif *netif, struct ip_addr *ipaddr,$/;"	f	file:
+update_frame_list	lib/barrelfish/proc.c	/^void update_frame_list(struct process_node *node, struct capref ram) {$/;"	f
 update_sched_timer	kernel/timer.c	/^void update_sched_timer(systime_t t)$/;"	f
 update_timer	kernel/timer.c	/^static void update_timer(void)$/;"	f	file:
 update_wakeup_disabled	lib/barrelfish/deferred.c	/^static void update_wakeup_disabled(dispatcher_handle_t dh)$/;"	f	file:

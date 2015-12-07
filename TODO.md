@@ -28,9 +28,9 @@
 
 - Enable functionality for spawning processes from processes in init1. FIXED, domains at init-1 can only spawn at core-1 processes 
 
-- We should really mm_free the frames for each spawned process 				******i
+- We should really mm_free the frames for each spawned process 				****** infrastrucure is up need to ask the tas or someone about that.
 
-- Put limit at client requested memory 						   				******
+- Put limit at client requested memory 						   				****** FIXED.
 
 - Fix input for processes that are spawned at forground
 
@@ -38,6 +38,6 @@
 
 - Check if it is needed to allocate again slot for incoming capabilty in server side and in client side.
 
-- How to discern between different clients talking to us. Renlord suggested to use the channel 
+- How to discern between different clients talking to us. Renlord suggested to use the channel. FIXED by sending domain id across with the rpc call.
 
 - Maybe put init channel initialization before all other initializations on barrelfish_init_on_thread ?

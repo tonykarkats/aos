@@ -36,6 +36,8 @@
 
 static volatile int pseudo_lock;
 static struct mm dev_mm;
+extern struct mm mm_ram;
+
 struct thread_mutex process_list_lock;
 
 struct bootinfo *bi;
@@ -170,7 +172,7 @@ static void recv_handler(void *arg)
 	// talking to them (process list in our implementation) that keeps all book keeping information regarding the processes.
 	char message_string[38];	
 	uint32_t rpc_operation = msg.words[0] >> 24;
-	//uint32_t domain_id = msg.words[0] & 0x00FFFFFF;
+	uint32_t domain_id = msg.words[0] & 0x00FFFFFF;
 	
 	switch (rpc_operation) {
 		case AOS_RPC_GET_DID: ;
@@ -232,18 +234,31 @@ static void recv_handler(void *arg)
 			break;
 
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
-			
-			//debug_printf("recv_handler: AOS_RPC_GET_RAM_CAP from endpoint %d\n", cap.slot);
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
-
-			// debug_printf("recv_handler: Requested for size %d\n", size_requested );	
-		
-			err = ram_alloc(&returned_cap, size_requested); 
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
-				returned_cap = NULL_CAP;	
+	
+			// debug_printf("Request for memory from client with %"PRIu32"\n", domain_id);
+			// Check if client has exceeded it's memory limit
+			// and keep track of the frames allocated from this client.
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			if ((process->memory_consumed + pow(2, size_requested)) > CLIENT_MEMORY_LIMIT) {
+				// Client has exceeded its memory limit do not give more memory.
+				returned_cap = NULL_CAP;
 			}
+			else {
+				// Allocate memory for the client and keep the frame...
+				process->memory_consumed += pow(2, size_requested);
+				err = ram_alloc(&returned_cap, size_requested); 
+				if (err_is_fail(err)) {
+					debug_printf("recv_handler: Failed to allocate ram capability for client\n");
+					returned_cap = NULL_CAP;	
+				}
+					
+				// update_frame_list(process, returned_cap, size_requested);	
+			}	
+
+			thread_mutex_unlock(&process_list_lock);
 				
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap, (uint32_t) size_requested);	 
 		    if (err_is_fail(err))
@@ -251,7 +266,6 @@ static void recv_handler(void *arg)
 			
 			cap_destroy(cap);
 			break;
-
 		case AOS_RPC_PUT_CHAR: ;
 			
 			// debug_printf("recv_handler: AOS_RPC_PUT_CHAR from endpoint %d\n", cap.slot);
@@ -377,6 +391,11 @@ static void recv_handler(void *arg)
 				break;
 			}
 
+			// Clears the process node and released the ram used
+			// by this child. 
+			// clear_process_node(terminated_process, mm_ram);
+			free(terminated_process);
+	
 			// Inform core-0 that a process terminated ! 
 			struct ump_message returned_mess;	
 			returned_mess.type = SPAWNED_PROCESS_TERMINATED_RESPONSE;
