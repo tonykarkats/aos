@@ -38,6 +38,7 @@ static void send_handler(void *arg) {
 static void recv_handler(void *arg) 
 {
 //	debug_printf("recv_handler: Got a message or a cap!");
+	
 	errval_t err;
 	struct lmp_chan *lc = arg;
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
