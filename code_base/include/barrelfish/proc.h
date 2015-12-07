@@ -15,6 +15,8 @@ struct process_node {
 	char * buffer;
 	struct capref shared_frame;
 
+	// Used to discern between different processes
+	struct lmp_chan * client_channel;
 	struct process_node * next_pr;
 };
 

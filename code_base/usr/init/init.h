@@ -21,6 +21,9 @@
 
 extern struct bootinfo *bi;
 
+#define FIRSTEP_BUFLEN          21u
+#define FIRSTEP_OFFSET          (33472u + 56u)
+
 errval_t initialize_ram_alloc(void);
 errval_t initialize_mem_serv(void);
 errval_t initialize_dev_serv(void);
