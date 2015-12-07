@@ -2,7 +2,16 @@
 #include <spawndomain/spawndomain.h>
 #include <string.h>
 
+#define CLIENT_MEMORY_LIMIT 50*1024*1024
 
+// Process node. It keeps all information regarding
+// memory consumed by a process, the shared frame between the 
+// domain and the init server etc...
+struct frame_node {
+	struct capref frame;
+	struct frame_node * next_frame;
+};
+	
 struct process_node {
 	domainid_t d_id;
 	char * name;
@@ -15,10 +24,16 @@ struct process_node {
 	char * buffer;
 	struct capref shared_frame;
 
-	// Used to discern between different processes
-	struct lmp_chan * client_channel;
+	// Memory frames used by this domain
+	uint32_t memory_consumed; 	
+	struct frame_node *consumed_frame;
+	
+	// Next process node 
 	struct process_node * next_pr;
 };
+
+void clear_process_node(struct process_node *node);
+void update_frame_list(struct process_node *node, struct capref ram);
 
 struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name);
 void print_nodes( struct process_node *head);

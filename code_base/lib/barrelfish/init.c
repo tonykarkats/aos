@@ -261,7 +261,8 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 
 	domainid_t own_did;
 	struct capref shared_frame;
-	
+
+	debug_printf("Getting did from the init!\n");	
 	err = aos_rpc_get_did(get_init_chan(), domain_name + 11, &own_did, &shared_frame);
 	if (err_is_fail(err)) {
 		DEBUG_ERR(err,"Error in aos_rpc_init!\n");

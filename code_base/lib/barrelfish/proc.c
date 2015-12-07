@@ -106,6 +106,25 @@ void print_nodes( struct process_node *head)
 	}	
 
 }
+
+void clear_process_node(struct process_node *node) {
+
+	return;
+}
+
+void update_frame_list(struct process_node *node, struct capref ram) {
+
+	struct frame_node* new_frame_node = (struct frame_node *) malloc(sizeof(struct frame_node));
+	
+	new_frame_node->next_frame = node->consumed_frame;
+	new_frame_node->frame = ram;
+
+	node->consumed_frame = new_frame_node;
+
+
+	return;
+}
+
 errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did)
 {
 

@@ -39,3 +39,5 @@
 - Check if it is needed to allocate again slot for incoming capabilty in server side and in client side.
 
 - How to discern between different clients talking to us. Renlord suggested to use the channel 
+
+- Maybe put init channel initialization before all other initializations on barrelfish_init_on_thread ?

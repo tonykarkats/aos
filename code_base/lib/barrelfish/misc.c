@@ -86,7 +86,6 @@ void * SafeMalloc(size_t size) {
 		debug_printf("Used real malloc!\n");
 		return (void *) return_address;
 	}	
-
 }
 
 void set_real_malloc(void) 

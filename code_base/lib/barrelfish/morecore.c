@@ -30,7 +30,6 @@ extern morecore_free_func_t sys_morecore_free;
 // #define USE_STATIC_HEAP
 
 #define HEAP_SIZE (32*1024*1024)
-
 #ifdef USE_STATIC_HEAP
 
 static char *endp;

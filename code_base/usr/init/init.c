@@ -11,7 +11,6 @@
  * If you do not find this file, copies can be found by writing to:
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
-
 #include "init.h"
 #include <stdlib.h>
 #include <string.h>
@@ -152,7 +151,6 @@ static void recv_handler(void *arg)
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
 
-	//debug_printf("recv_handler: Iref = %"PRIu32" Address of lc->endpoint 0%x\n", lc->iref ,lc->endpoint);
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
 		lmp_chan_register_recv(lc,get_default_waitset(),
@@ -173,10 +171,16 @@ static void recv_handler(void *arg)
 
 	lc->remote_cap = cap;
 	
+	// msg.words[0][24-31] holds the rpc operation, msg.words[0][0-24] holds the domain-id from the process talking to us
+	// init channel only has channel that all the clients communicate with. Each client is a domain and for each operation
+	// transmits each domain-id as mentioned before. The servers (only init in our implementation) hold a list of domains
+	// talking to them (process list in our implementation) that keeps all book keeping information regarding the processes.
 	char message_string[38];	
-	uint32_t rpc_operation = msg.words[0];
-	uint32_t buffer[38];
-	
+	uint32_t buffer[38];	
+	uint32_t rpc_operation = msg.words[0] >> 24;
+	domainid_t domain_id = (domainid_t) msg.words[0] & 0x00FFFFFF;
+	struct process_node * process;
+		
 	switch (rpc_operation) {
 		case AOS_RPC_GET_DID: ;
 			
@@ -195,7 +199,7 @@ static void recv_handler(void *arg)
 			}
 		
 			thread_mutex_lock(&process_list_lock);	
-			struct process_node * process = get_process_node(&pr_head, requested_did, "aa");
+			process = get_process_node(&pr_head, requested_did, "aa");
 			// Map shared frame at child process node
 			debug_printf("Mapping shared frame for client!\n");
 			err = paging_map_frame( get_current_paging_state(), 
@@ -223,8 +227,7 @@ static void recv_handler(void *arg)
 		case AOS_RPC_SEND_STRING: ; // Send String
 			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
 	
-			strncpy( message_string, (char *) msg.words + 4, 32);	
-	
+			strncpy( message_string, (char *) msg.words + 4, 32);		
 			serial_putstring(message_string);
 	
 			cap_destroy(cap);
@@ -233,13 +236,29 @@ static void recv_handler(void *arg)
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
-
-			// debug_printf("recv_handler: Requested for size %d\n", size_requested );		
-			err = ram_alloc(&returned_cap, size_requested); 
-			if (err_is_fail(err)) {
-				debug_printf("recv_handler: Failed to allocate ram capability for client\n");
-				returned_cap = NULL_CAP;	
+	
+			// debug_printf("Request for memory from client with %"PRIu32"\n", domain_id);
+			// Check if client has exceeded it's memory limit
+			// and keep track of the frames allocated from this client.
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			if ((process->memory_consumed + pow(2, size_requested)) > CLIENT_MEMORY_LIMIT) {
+				// Client has exceeded its memory limit do not give more memory.
+				returned_cap = NULL_CAP;
 			}
+			else {
+				// Allocate memory for the client and keep the frame...
+				process->memory_consumed += pow(2, size_requested);
+				err = ram_alloc(&returned_cap, size_requested); 
+				if (err_is_fail(err)) {
+					debug_printf("recv_handler: Failed to allocate ram capability for client\n");
+					returned_cap = NULL_CAP;	
+				}
+					
+				update_frame_list(process, returned_cap);	
+			}	
+
+			thread_mutex_unlock(&process_list_lock);
 				
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, returned_cap, (uint32_t) size_requested);	 
 		    if (err_is_fail(err))

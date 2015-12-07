@@ -97,7 +97,7 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 		//debug_printf("Sending chunk %d from %d \n", s_chunk, s_chunk * 32);
 		memset(buffer, 0, 36);		
 
-		buffer[0] = AOS_RPC_SEND_STRING;
+		buffer[0] = ((AOS_RPC_SEND_STRING << 24) | (0x00FFFFFFF & disp_get_domain_id()));
 		
 		if (s_chunk == string_chunks - 1)	
 			memcpy(buffer + 1, string + 32*s_chunk , last_chunk);
@@ -130,7 +130,7 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 
 	while (true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_RAM_CAP, request_bits);	
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, ((AOS_RPC_GET_RAM_CAP << 24) | (0x00FFFFFF & disp_get_domain_id())), request_bits);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_GET_CAP);	
 		else if (!err_is_fail(err)) 
@@ -163,7 +163,9 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
 	
 	while (true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_DEV_CAP, (uint32_t) paddr, (uint32_t) size_in_bits);	
+		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, ((AOS_RPC_GET_DEV_CAP << 24) | (0x00FFFFFF & disp_get_domain_id())) , 
+							 (uint32_t) paddr, (uint32_t) size_in_bits);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_GET_CAP);	
 		else if (!err_is_fail(err)) 
@@ -191,7 +193,9 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 		
 	while(true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_GET_CHAR);	
+		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_GET_CHAR << 24) | (0x00FFFFFF & disp_get_domain_id())));	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_GET_CHAR);	
 		else if (!err_is_fail(err))
@@ -212,7 +216,10 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 	
 	while(true) {
 		event_dispatch(&chan->s_waitset);	
-		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PUT_CHAR, c & 0x000000FF);	
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_PUT_CHAR  << 24) | (0x00FFFFFF & disp_get_domain_id())), 
+							 c & 0x000000FF);	
 		if ((err_no(err) != 17)&&(err_is_fail(err)))
 			return err_push(err, AOS_ERR_LMP_PUT_CHAR);	
 		else if (!err_is_fail(err))
@@ -231,7 +238,7 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 	
     assert(name_length <= 32);
 
-    buffer[0] = AOS_RPC_PROC_SPAWN;
+    buffer[0] = ((AOS_RPC_PROC_SPAWN << 24) | (0x00FFFFFF & disp_get_domain_id()));
 	buffer[1] = core;
 
     memcpy(buffer + 2, name, name_length+1);
@@ -303,7 +310,10 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
     
 	while(true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_NAME, (uint32_t) pid);
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_PROC_GET_NAME << 24) | (0x00FFFFFF & disp_get_domain_id())) , 
+							 (uint32_t) pid);
 	
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_process_spawn: Error in getting process name!\n");
@@ -333,7 +343,8 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 
 	while(true) {
 		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_PROC_GET_PIDS);
+		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_PROC_GET_PIDS  << 24) | (0x00FFFFFF & disp_get_domain_id())));
 		
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_process_spawn: Error in getting pids!\n");
@@ -375,7 +386,10 @@ errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_stat
 	
 	while(true) {
    		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_TERMINATING, did, (uint32_t) exit_status);
+		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_TERMINATING  << 24) | (0x00FFFFFF & disp_get_domain_id())), 
+							 did, (uint32_t) exit_status);
 
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_process_spawn: Error in spawning domain\n");
@@ -441,7 +455,7 @@ errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * d
 	
     assert(name_length <= 32);
 
-    buffer[0] = AOS_RPC_GET_DID;
+    buffer[0] = ((AOS_RPC_GET_DID  << 24) & (0xFF000000)) ;
     memcpy(buffer + 1, name, name_length+1);
 
 	while(true) {

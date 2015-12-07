@@ -155,15 +155,6 @@ static void recv_handler(void *arg)
 							MKCLOSURE(recv_handler, arg));
 	}
 
-	lc->remote_cap = cap;
-
-	int message_length = msg.buf.msglen;
-	
-	char message_string[32];
-		
-	uint32_t rpc_operation = msg.words[0];
-	assert(message_length != 0);
-
 	lmp_chan_register_recv(lc, get_default_waitset(),
 			MKCLOSURE(recv_handler, arg));
 	err = lmp_chan_alloc_recv_slot(lc);
@@ -171,7 +162,15 @@ static void recv_handler(void *arg)
 		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
 	}	
 
-	//debug_printf("Entering switch!\n");	
+	lc->remote_cap = cap;
+
+		// msg.words[0][24-31] holds the rpc operation, msg.words[0][0-24] holds the domain-id from the process talking to us
+	// init channel only has channel that all the clients communicate with. Each client is a domain and for each operation
+	// transmits each domain-id as mentioned before. The servers (only init in our implementation) hold a list of domains
+	// talking to them (process list in our implementation) that keeps all book keeping information regarding the processes.
+	char message_string[38];	
+	uint32_t rpc_operation = msg.words[0] >> 24;
+	//uint32_t domain_id = msg.words[0] & 0x00FFFFFF;
 	
 	switch (rpc_operation) {
 		case AOS_RPC_GET_DID: ;
