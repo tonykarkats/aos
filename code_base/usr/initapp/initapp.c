@@ -159,7 +159,6 @@ static void recv_handler(void *arg)
 
 	int message_length = msg.buf.msglen;
 	
-	int string_length = message_length - 1;
 	char message_string[32];
 		
 	uint32_t rpc_operation = msg.words[0];
@@ -176,12 +175,8 @@ static void recv_handler(void *arg)
 	
 	switch (rpc_operation) {
 		case AOS_RPC_GET_DID: ;
-			
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
-			
+				
+			strncpy(message_string, (char *) msg.words + 4, 32);	
 			// debug_printf("Domain with name %s requested its id!\n", message_string); 
 			domainid_t requested_did;
 			requested_did = get_did_by_name(pr_head, message_string); 
@@ -223,10 +218,7 @@ static void recv_handler(void *arg)
 			break;		
 		case AOS_RPC_SEND_STRING: ; // Send String
 		
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
+			strncpy( message_string, (char *) msg.words + 4, 32);	
 
 			//debug_printf("Will send string message_string %s to core-0", message_string);
 			struct ump_message message_for_core_0;
@@ -299,11 +291,8 @@ static void recv_handler(void *arg)
 			cap_destroy(cap);
 			break;
 		case AOS_RPC_PROC_SPAWN:;
-
-			for (int i = 0; i < string_length-1 ; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+2];   
-			}	
+			
+			strncpy(message_string, (char *) msg.words + 8, 28);
 
 			debug_printf("Received request for spawn for %s\n", message_string);
 			uint32_t core = msg.words[1];
