@@ -16,6 +16,7 @@
 #include <arch/arm/omap44xx/device_registers.h>
 
 #include "mmchs.h"
+#include "fat32.h"
 
 static struct cnoderef cnode;
 
@@ -91,62 +92,62 @@ int main(int argc, char **argv)
     // This should be the same information you get with
     // dd when reading the first block on linux...
     //
-    void *buffer = malloc(512);
-    assert(buffer != NULL);
-
-    err = mmchs_read_block(0, buffer);
-    assert(err_is_ok(err));
-
-	debug_printf("Boot Block Info\n");
-	debug_printf("--------------\n");
-
-	debug_printf("Manufacturer: ");
-	for (int i=3; i<=10; ++i) {
-		debug_printf("%c", ((uint8_t*) buffer)[i]);
-
-	}
-	debug_printf("\n");
-
-	uint16_t BPB_BytsPerSec = (((uint8_t*) buffer)[12] <<  8) +
-				   			  ((uint8_t*) buffer)[11];
-
-	debug_printf("Bytes Per Sector: %d\n", BPB_BytsPerSec);
-
-
-	uint8_t BPB_SecPerClus =  ((uint8_t*) buffer)[13];
-	debug_printf("Number of Sectors per Cluster: %d\n", BPB_SecPerClus);
-
-	uint8_t BPB_NumFATs =  ((uint8_t*) buffer)[16];
-	debug_printf("Number of FATs: %d\n", BPB_NumFATs);
-
-	uint32_t FATSz = 	(((uint8_t*) buffer)[39] << 24) +
-				   		(((uint8_t*) buffer)[38] << 16) +
-				   		(((uint8_t*) buffer)[37] <<  8) +
-				   		((uint8_t*) buffer)[36];
-	debug_printf("Size of FAT: %d\n", FATSz);
-
-	uint16_t BPB_RsvdSecCnt = (((uint8_t*) buffer)[15] <<  8) +
-				   			  ((uint8_t*) buffer)[14];
-
-	debug_printf("Number of reserved sectors: %d\n", BPB_RsvdSecCnt);
-
-	// Calculate the start of the data region
-	uint32_t FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs*FATSz);
-	debug_printf("First Data Sector: %d\n", FirstDataSector);
-
-	// Calculate first cluster of root directory
-		
-	uint32_t BPB_RootClus = 	(((uint8_t*) buffer)[47] << 24) +
-				   				(((uint8_t*) buffer)[46] << 16) +
-				   				(((uint8_t*) buffer)[45] <<  8) +
-				   				((uint8_t*) buffer)[44];
-	debug_printf("First cluster of Root Directory: %d\n", BPB_RootClus);
-
-
-	// Now we have to find the sector number of the root directory
-	
-	uint32_t FirstSectorofRootDir = ((BPB_RootClus-2)*BPB_SecPerClus + FirstDataSector);
-	debug_printf("First sector of Root Directory : %d", FirstSectorofRootDir); 
+//    void *buffer = malloc(512);
+//    assert(buffer != NULL);
+//
+//    err = mmchs_read_block(0, buffer);
+//    assert(err_is_ok(err));
+//
+//	debug_printf("Boot Block Info\n");
+//	debug_printf("--------------\n");
+//
+//	debug_printf("Manufacturer: ");
+//	for (int i=3; i<=10; ++i) {
+//		debug_printf("%c", ((uint8_t*) buffer)[i]);
+//
+//	}
+//	debug_printf("\n");
+//
+//	uint16_t BPB_BytsPerSec = (((uint8_t*) buffer)[12] <<  8) +
+//				   			  ((uint8_t*) buffer)[11];
+//
+//	debug_printf("Bytes Per Sector: %d\n", BPB_BytsPerSec);
+//
+//
+//	uint8_t BPB_SecPerClus =  ((uint8_t*) buffer)[13];
+//	debug_printf("Number of Sectors per Cluster: %d\n", BPB_SecPerClus);
+//
+//	uint8_t BPB_NumFATs =  ((uint8_t*) buffer)[16];
+//	debug_printf("Number of FATs: %d\n", BPB_NumFATs);
+//
+//	uint32_t FATSz = 	(((uint8_t*) buffer)[39] << 24) +
+//				   		(((uint8_t*) buffer)[38] << 16) +
+//				   		(((uint8_t*) buffer)[37] <<  8) +
+//				   		((uint8_t*) buffer)[36];
+//	debug_printf("Size of FAT: %d\n", FATSz);
+//
+//	uint16_t BPB_RsvdSecCnt = (((uint8_t*) buffer)[15] <<  8) +
+//				   			  ((uint8_t*) buffer)[14];
+//
+//	debug_printf("Number of reserved sectors: %d\n", BPB_RsvdSecCnt);
+//
+//	// Calculate the start of the data region
+//	uint32_t FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs*FATSz);
+//	debug_printf("First Data Sector: %d\n", FirstDataSector);
+//
+//	// Calculate first cluster of root directory
+//		
+//	uint32_t BPB_RootClus = 	(((uint8_t*) buffer)[47] << 24) +
+//				   				(((uint8_t*) buffer)[46] << 16) +
+//				   				(((uint8_t*) buffer)[45] <<  8) +
+//				   				((uint8_t*) buffer)[44];
+//	debug_printf("First cluster of Root Directory: %d\n", BPB_RootClus);
+//
+//
+//	// Now we have to find the sector number of the root directory
+//	
+//	uint32_t FirstSectorofRootDir = ((BPB_RootClus-2)*BPB_SecPerClus + FirstDataSector);
+//	debug_printf("First sector of Root Directory : %d", FirstSectorofRootDir); 
 
 /*
     debug_printf("Printing BOOT BLOCK block\n");
@@ -173,31 +174,37 @@ int main(int argc, char **argv)
 
 	// Print Root Directory
 	
-    err = mmchs_read_block(FirstSectorofRootDir, buffer);
-//    debug_printf("\nPrinting Root dir\n");   for (int i = 1; i <= 12; ++i)
-//    {
-//        printf("%c", ((uint8_t*) buffer)[i]);
-//       	fflush(stdout); 
-//    }
-    assert(err_is_ok(err));
+//    err = mmchs_read_block(FirstSectorofRootDir, buffer);
+ //   debug_printf("\nPrinting Root dir\n");
+  // for (int i = 32; i <= 128; ++i)
+ //   {
+ //       printf("%d: %c\n", i , ((uint8_t*) buffer)[i]);
+  //     	fflush(stdout); 
+  // }
 
 	// Some form of ls
 	
 	//char ls_arg[12] = {"dir1"};
 
-	// Check in root directory first	
-	
-		uint8_t name[53];
-		name[0] = ((uint8_t *)buffer)[1];
-		name[1] = ((uint8_t *)buffer)[2];
-		name[2] = ((uint8_t *)buffer)[3];
-		name[3] = ((uint8_t *)buffer)[4];
-		name[4] = '\0';
-		//strcpy(name, (char *)buffer+1);
-        printf("\n %s \n", name);
-		fflush(stdout);
-	
+	err = fat32_init();
 
+	// Check in root directory first	
+//	struct dirent * dirtable = NULL;
+//	uint32_t size;
+	//err = get_dirents(FirstSectorofRootDir, &dirtable, &size);
+	//printf("Size of Directory = %d\n", size);	
+
+	struct dirent * dirtable = NULL;
+	uint32_t size;
+	list("/DIR1/DIR12", &dirtable, &size);
+	
+	printf("Found %" PRIu32 "\n", size);
+	for (int i=0; i<size; i++) {
+		struct dirent dirent;
+		dirent = dirtable[i];
+		printf("%s\n", dirent.name);	
+	}
+	
 	while(1);
     return 0;
 }

@@ -14,7 +14,7 @@
     build application { target = "mmchs",
                         cFiles = [
                             "main.c", "cm2.c", "ctrlmod.c",
-                            "i2c.c", "mmchs.c", "twl6030.c"
+                            "i2c.c", "mmchs.c", "twl6030.c", "fat32.c"
                         ],
                         mackerelDevices = [
                             "ti_i2c",
