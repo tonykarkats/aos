@@ -31,7 +31,6 @@
 
 
 /* Defined here are the operation ids for the different RPC calls */
-
 #define AOS_RPC_CONNECT		 0
 #define AOS_RPC_SEND_STRING  1
 #define AOS_RPC_GET_RAM_CAP  2
@@ -44,6 +43,7 @@
 #define AOS_RPC_TERMINATING	 9
 #define AOS_RPC_KILL	 10
 #define AOS_RPC_GET_DID 11
+#define AOS_RPC_READ_DIR    12
 
 struct aos_rpc {
 	struct lmp_chan rpc_channel;

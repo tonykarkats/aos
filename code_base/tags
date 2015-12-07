@@ -227,18 +227,19 @@ ANSI	lib/oldc/src/gdtoa/gdtoa.h	50;"	d
 ANSI	lib/oldc/src/gdtoa/gdtoa.h	53;"	d
 ANSIC	lib/newlib/newlib/libc/machine/powerpc/simdldtoa.c	371;"	d	file:
 ANSIC	lib/newlib/newlib/libc/stdlib/ldtoa.c	377;"	d	file:
-AOS_RPC_CONNECT	include/barrelfish/aos_rpc.h	35;"	d
-AOS_RPC_GET_CHAR	include/barrelfish/aos_rpc.h	39;"	d
-AOS_RPC_GET_DEV_CAP	include/barrelfish/aos_rpc.h	43;"	d
-AOS_RPC_GET_DID	include/barrelfish/aos_rpc.h	46;"	d
-AOS_RPC_GET_RAM_CAP	include/barrelfish/aos_rpc.h	37;"	d
-AOS_RPC_KILL	include/barrelfish/aos_rpc.h	45;"	d
-AOS_RPC_PROC_GET_NAME	include/barrelfish/aos_rpc.h	41;"	d
-AOS_RPC_PROC_GET_PIDS	include/barrelfish/aos_rpc.h	42;"	d
-AOS_RPC_PROC_SPAWN	include/barrelfish/aos_rpc.h	40;"	d
-AOS_RPC_PUT_CHAR	include/barrelfish/aos_rpc.h	38;"	d
-AOS_RPC_SEND_STRING	include/barrelfish/aos_rpc.h	36;"	d
-AOS_RPC_TERMINATING	include/barrelfish/aos_rpc.h	44;"	d
+AOS_RPC_CONNECT	include/barrelfish/aos_rpc.h	34;"	d
+AOS_RPC_GET_CHAR	include/barrelfish/aos_rpc.h	38;"	d
+AOS_RPC_GET_DEV_CAP	include/barrelfish/aos_rpc.h	42;"	d
+AOS_RPC_GET_DID	include/barrelfish/aos_rpc.h	45;"	d
+AOS_RPC_GET_RAM_CAP	include/barrelfish/aos_rpc.h	36;"	d
+AOS_RPC_KILL	include/barrelfish/aos_rpc.h	44;"	d
+AOS_RPC_PROC_GET_NAME	include/barrelfish/aos_rpc.h	40;"	d
+AOS_RPC_PROC_GET_PIDS	include/barrelfish/aos_rpc.h	41;"	d
+AOS_RPC_PROC_SPAWN	include/barrelfish/aos_rpc.h	39;"	d
+AOS_RPC_PUT_CHAR	include/barrelfish/aos_rpc.h	37;"	d
+AOS_RPC_READ_DIR	include/barrelfish/aos_rpc.h	46;"	d
+AOS_RPC_SEND_STRING	include/barrelfish/aos_rpc.h	35;"	d
+AOS_RPC_TERMINATING	include/barrelfish/aos_rpc.h	43;"	d
 API_EVENT	include/lwip/api.h	163;"	d
 API_LIB_DEBUG	include/lwip/opt.h	1614;"	d
 API_MSG_DEBUG	include/lwip/opt.h	1621;"	d
@@ -1212,7 +1213,7 @@ CLEAN_OPTIONS_FLAGS	lib/net_queue_manager/frag.c	99;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	113;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	66;"	d	file:
 CLEAR	lib/newlib/newlib/libc/posix/regexec.c	92;"	d	file:
-CLIENT_MEMORY_LIMIT	include/barrelfish/proc.h	5;"	d
+CLIENT_MEMORY_LIMIT	include/barrelfish/proc.h	6;"	d
 CLK_TCK	lib/newlib/newlib/libc/include/time.h	25;"	d
 CLOCAL	include/sys/_termios.h	143;"	d
 CLOCKDRIFT_TIMEOUT	tools/harness/tests/clockdrift.py	/^CLOCKDRIFT_TIMEOUT = datetime.timedelta(hours=13)$/;"	v
@@ -22217,6 +22218,7 @@ bitor	include/oldc/iso646.h	92;"	d
 bits	include/arch/arm/_fpmath.h	/^	} bits;$/;"	m	union:IEEEl2bits	typeref:struct:IEEEl2bits::__anon1
 bits	include/arch/x86_32/_fpmath.h	/^	} bits;$/;"	m	union:IEEEl2bits	typeref:struct:IEEEl2bits::__anon2
 bits	include/arch/x86_64/_fpmath.h	/^	} bits;$/;"	m	union:IEEEl2bits	typeref:struct:IEEEl2bits::__anon5
+bits	include/barrelfish/proc.h	/^	size_t bits;$/;"	m	struct:frame_node
 bits	include/barrelfish/types.h	/^    _coremask_word_t bits[_COREMASK_WORDS];$/;"	m	struct:__anon12
 bits	include/barrelfish_kpi/capabilities.h	/^    uint8_t bits;      \/\/\/< Size of frame, in bits$/;"	m	struct:frame_identity
 bits	include/net_queue_manager/net_queue_manager.h	/^    uint64_t bits;  \/\/ Size of buffer (encoded in bits)$/;"	m	struct:buffer_descriptor
@@ -31325,7 +31327,7 @@ mm_dev	usr/init/dev_serv.c	/^static struct mm mm_dev;$/;"	v	typeref:struct:mm	fi
 mm_free	lib/mm/mm.c	/^errval_t mm_free(struct mm *mm, struct capref cap, genpaddr_t base,$/;"	f
 mm_init	lib/mm/mm.c	/^errval_t mm_init(struct mm *mm, enum objtype objtype, genpaddr_t base,$/;"	f
 mm_ram	usr/init/mem_serv.c	/^struct mm mm_ram;$/;"	v	typeref:struct:mm
-mm_ram	usr/initapp/mem_serv.c	/^static struct mm mm_ram;$/;"	v	typeref:struct:mm	file:
+mm_ram	usr/initapp/mem_serv.c	/^struct mm mm_ram;$/;"	v	typeref:struct:mm
 mm_realloc_range	lib/mm/mm.c	/^errval_t mm_realloc_range(struct mm *mm, uint8_t sizebits, genpaddr_t base,$/;"	f
 mm_relinquish_all	lib/mm/mm.c	/^size_t mm_relinquish_all(struct mm *mm, struct mem_cap *ret, size_t retlen)$/;"	f
 mm_relinquish_range	lib/mm/mm.c	/^size_t mm_relinquish_range(struct mm *mm, genpaddr_t base, genpaddr_t limit,$/;"	f
@@ -33402,6 +33404,7 @@ paging_arm_reset	kernel/arch/omap44xx/paging.c	/^void paging_arm_reset(lpaddr_t 
 paging_context_switch	kernel/arch/omap44xx/paging.c	/^void paging_context_switch(lpaddr_t ttbr)$/;"	f
 paging_dump_tables	kernel/arch/omap44xx/paging.c	/^void paging_dump_tables(struct dcb *dispatcher)$/;"	f
 paging_flags_t	include/barrelfish/paging.h	/^typedef int paging_flags_t;$/;"	t
+paging_free	lib/barrelfish/paging.c	/^errval_t paging_free(struct paging_state *st, void *buf) $/;"	f
 paging_genvaddr_to_lvaddr	include/barrelfish/paging.h	/^static inline lvaddr_t paging_genvaddr_to_lvaddr(genvaddr_t genvaddr) {$/;"	f
 paging_init	kernel/arch/omap44xx/init.c	/^static void paging_init(void)$/;"	f	file:
 paging_init	lib/barrelfish/paging.c	/^errval_t paging_init(void)$/;"	f
@@ -40832,7 +40835,7 @@ uordblks	lib/newlib/newlib/libc/stdlib/vallocr.c	/^  int uordblks; \/* total all
 uordblks	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  MALLINFO_FIELD_TYPE uordblks; \/* total allocated space *\/$/;"	m	struct:mallinfo	file:
 upcall_state	kernel/arch/arm/exec.c	/^static arch_registers_state_t upcall_state;$/;"	v	file:
 update_arp_entry	lib/lwip/src/netif/etharp.c	/^update_arp_entry(struct netif *netif, struct ip_addr *ipaddr,$/;"	f	file:
-update_frame_list	lib/barrelfish/proc.c	/^void update_frame_list(struct process_node *node, struct capref ram) {$/;"	f
+update_frame_list	lib/barrelfish/proc.c	/^void update_frame_list(struct process_node *node, struct capref ram, size_t bits) $/;"	f
 update_sched_timer	kernel/timer.c	/^void update_sched_timer(systime_t t)$/;"	f
 update_timer	kernel/timer.c	/^static void update_timer(void)$/;"	f	file:
 update_wakeup_disabled	lib/barrelfish/deferred.c	/^static void update_wakeup_disabled(dispatcher_handle_t dh)$/;"	f	file:

@@ -420,6 +420,20 @@ static void recv_handler(void *arg)
 		
 			cap_destroy(cap);
 			break;
+		case AOS_RPC_READ_DIR: ;
+			
+			char path[512];
+	
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+			
+			strcpy( path, process->buffer);
+
+			debug_printf("Client requests for path %s\n", path);
+		
+			break;	
+
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
 			//int exit_status = (int) msg.words[2];		

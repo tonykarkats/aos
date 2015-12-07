@@ -166,7 +166,7 @@ static void recv_handler(void *arg)
 
 	lc->remote_cap = cap;
 
-		// msg.words[0][24-31] holds the rpc operation, msg.words[0][0-24] holds the domain-id from the process talking to us
+	// msg.words[0][24-31] holds the rpc operation, msg.words[0][0-24] holds the domain-id from the process talking to us
 	// init channel only has channel that all the clients communicate with. Each client is a domain and for each operation
 	// transmits each domain-id as mentioned before. The servers (only init in our implementation) hold a list of domains
 	// talking to them (process list in our implementation) that keeps all book keeping information regarding the processes.
@@ -255,7 +255,7 @@ static void recv_handler(void *arg)
 					returned_cap = NULL_CAP;	
 				}
 					
-				// update_frame_list(process, returned_cap, size_requested);	
+				//update_frame_list(process, returned_cap, size_requested);	
 			}	
 
 			thread_mutex_unlock(&process_list_lock);

@@ -41,3 +41,5 @@
 - How to discern between different clients talking to us. Renlord suggested to use the channel. FIXED by sending domain id across with the rpc call.
 
 - Maybe put init channel initialization before all other initializations on barrelfish_init_on_thread ?
+
+- Fix proper erros in barrelfish/init.c for shared frame

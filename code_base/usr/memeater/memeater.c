@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 	char *next_token;
 	char *ampersand;
 	char *domain_name = malloc(36); 
+	size_t dir_entries;
 
 	//int l = 0;	
 	/*
@@ -162,8 +163,13 @@ int main(int argc, char *argv[])
 				printf("Domain spawned with pid = %d\n", pid);
 		}
 		else if (!strcmp("ls", token)) {
-			debug_printf("ls NYI!\n");
-	
+			token = strtok(NULL, space_token);
+			debug_printf("Will ls path %s\n", token);
+			
+			err = aos_rpc_readdir( get_init_chan(), token, NULL, &dir_entries);
+
+			
+				
 		}
 		else if (!strcmp("cat", token)) {	
 			debug_printf("cat NYI!\n");
