@@ -257,6 +257,13 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 		return err_push(err, SYS_ERR_LRPC_SLOT_INVALID);
 	}
 
+	debug_printf("Setting our local ram allocator to talk with server!\n");
+    err = ram_alloc_set(NULL);
+    if (err_is_fail(err)) {
+    	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
+	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
+    }	
+
 	domainid_t own_did;
 	struct capref shared_frame;
 	
@@ -267,13 +274,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 	}
 
 	disp_set_domain_id(own_did);
-
-	debug_printf("Setting our local ram allocator to talk with server!\n");
-    err = ram_alloc_set(NULL);
-    if (err_is_fail(err)) {
-    	DEBUG_ERR(err,"Error in ram_alloc_set with server!\n");
-	    return err_push(err, LIB_ERR_RAM_ALLOC_SET);
-    }	
 	
 	debug_printf("Mapping shared frame between init to our vspace!\n");
 	err = paging_map_frame( get_current_paging_state(), (void **) &get_init_chan()->shared_buffer, 4096, shared_frame, NULL, NULL);

@@ -32,8 +32,6 @@ static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
 	struct capref cap;
 
 	// First we allocate the memory for the new core!	
-	//debug_printf("cpu_memory_prepare: Allocating frame of size %zu..\n", *size);
-
 	err = frame_alloc(&cap, *size, size);
 	if (err_is_fail(err)) {
 		USER_PANIC("Failed to allocate memory for the second core! Error = %s\n", err_getstring(err));
@@ -42,22 +40,12 @@ static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
 	// Now we should map the frame into OUR vspace !
 	// What flags? Ask ta.
 	void *buf;
-	//debug_printf("cpu_memory_prepare: Mapping the newly allocated frame into our memory!\n");
 
 	err = paging_map_frame_attr(get_current_paging_state(), &buf, *size, 
 								cap, DEVICE_FLAGS, NULL, NULL);
 	if (err_is_fail(err)) {
 		USER_PANIC("Failed to map core-frame into our vspace! Error = %s\n", err_getstring(err));
 	}
-	
-	//char * vb = (char *) buf;
-	//debug_printf("Mapped newly allocated frame for second core at %p. Lets check if it is mapped correctly\n", (char *)buf); 		
-	
-//	for (int i = 0; i < *size; i++)
-//		vb[i] = i%255;
-//	for (int i = 0; i < *size; i++)
-//		assert(vb[i] == i%255);
-	
 
 	invoke_frame_identify(cap, frameid);
 	if (err_is_fail(err)) {
@@ -78,23 +66,17 @@ elf_load_and_relocate(lvaddr_t blob_start,
 					  lvaddr_t reloc_dest,
                       uintptr_t *reloc_entry)
 {
-	//debug_printf("elf_load_and_relocate starting. Reloc source = %x . *to = %x . reloc_dest = %x\n", blob_start, (lvaddr_t) to, reloc_dest);
 
     genvaddr_t entry; // entry poing of the loaded elf image
     struct Elf32_Ehdr *head = (struct Elf32_Ehdr *)blob_start;
     struct Elf32_Shdr *symhead, *rel, *symtab;
     errval_t err;
 
-   	//debug_printf("elf_load_and_relocate: Original module! Version = %" PRIu32 " Entry = %" PRIu32 " phoff %" PRIu32 "\n", head->e_version, head->e_entry, head->e_phoff);
     
-	//state.vbase = (void *)ROUND_UP(to, ARM_L1_ALIGN);
     struct monitor_allocate_state state;
     state.vbase   = to;
     state.elfbase = elf_virtual_base(blob_start);
 
-	//debug_printf("elf_load_and_relocate: state.elfbase = %" PRIu64 "\n", state.elfbase); 
-    //debug_printf("elf_load_and_relocate: state.vbase = 0x%x\n", state.vbase); 
-	
 	err = elf_load(head->e_machine,
                    monitor_elfload_allocate,
                    &state,
@@ -106,11 +88,6 @@ elf_load_and_relocate(lvaddr_t blob_start,
     }
 
 		
-	//for (int i = 0; i < blob_size ; i++) {
-	//	debug_printf("%d  %d\n", ((char *)to)[i], ((char *)blob_start)[i] );
-	//}
-	// Relocate to new physical base address
-    //debug_printf("Before elf32_relocate!\n");
     symhead = (struct Elf32_Shdr *)(blob_start + (uintptr_t)head->e_shoff);
     rel = elf32_find_section_header_type(symhead, head->e_shnum, SHT_REL);
     symtab = elf32_find_section_header_type(symhead, head->e_shnum, SHT_DYNSYM);
@@ -125,20 +102,8 @@ elf_load_and_relocate(lvaddr_t blob_start,
 
     *reloc_entry = entry - state.elfbase + reloc_dest;
 	
-	//debug_printf("elf_load_and_relocate: reloc entry returned is 0x%x \n", *reloc_entry);
     return SYS_ERR_OK;
 }
-
-errval_t invoke_monitor_spawn_core( coreid_t core_id, enum cpu_type cpu_type, 
-                          forvaddr_t entry) 
-{ 
-    uint8_t invoke_bits = get_cap_valid_bits(cap_kernel); 
-    capaddr_t invoke_cptr = get_cap_addr(cap_kernel) >> (CPTR_BITS - invoke_bits); 
- 
-    return syscall6((invoke_bits << 16) | (KernelCmd_Spawn_core << 8) 
-                    | SYSCALL_INVOKE, invoke_cptr, core_id, cpu_type, 
-                    (uintptr_t)(entry >> 32), (uintptr_t) entry).error; 
-} 
 
 errval_t spawn_second_core(struct bootinfo *bi, lvaddr_t aux_core_0, lvaddr_t aux_core_1) 
 {
@@ -246,12 +211,6 @@ errval_t spawn_second_core(struct bootinfo *bi, lvaddr_t aux_core_0, lvaddr_t au
 
 	*(lvaddr_t *) aux_core_1 = reloc_entry;
 	*(lvaddr_t *) aux_core_0 |= 0x00000004;
-
-	
-	//err = invoke_monitor_spawn_core(1, CPU_ARM, (forvaddr_t)reloc_entry); 
-	//if (err_is_fail(err)) {
-    //    return err_push(err, MON_ERR_SPAWN_CORE);
-    //}
 
 	cap_destroy(ump_frame);
 

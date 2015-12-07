@@ -152,22 +152,13 @@ static void recv_handler(void *arg)
 	struct lmp_recv_msg msg = LMP_RECV_MSG_INIT;
 	struct capref cap;
 
+	//debug_printf("recv_handler: Iref = %"PRIu32" Address of lc->endpoint 0%x\n", lc->iref ,lc->endpoint);
 	err = lmp_chan_recv(lc, &msg, &cap);
 	if (err_is_fail(err) && lmp_err_is_transient(err)) {
 		lmp_chan_register_recv(lc,get_default_waitset(),
 							MKCLOSURE(recv_handler, arg));
 	}
 	
-	lc->remote_cap = cap;
-
-	int message_length = msg.buf.msglen;
-	
-	int string_length = message_length - 1;
-	char message_string[32];
-		
-	uint32_t rpc_operation = msg.words[0];
-	assert(message_length != 0);
-
 	lmp_chan_register_recv( lc, get_default_waitset(), MKCLOSURE(recv_handler, arg));
 	err = lmp_chan_alloc_recv_slot(lc);
  	if (err_is_fail(err))
@@ -175,18 +166,23 @@ static void recv_handler(void *arg)
 		DEBUG_ERR(err,"Failed in new receiving slot allocation!\n");
 	}	
 
-	//debug_printf("Entering switch!\n");	
+	if (msg.buf.msglen == 0)  {
+		debug_printf("Received an empty message!\n");
+		return;
+	}
+
+	lc->remote_cap = cap;
+	
+	char message_string[38];	
+	uint32_t rpc_operation = msg.words[0];
 	uint32_t buffer[38];
 	
 	switch (rpc_operation) {
 		case AOS_RPC_GET_DID: ;
 			
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
-			
-			// debug_printf("Domain with name %s requested its id!\n", message_string); 
+			strncpy(message_string, (char *) msg.words + 4, 32);	
+	
+			debug_printf("Domain with name %s requested its id!\n", message_string); 
 			domainid_t requested_did;
 			requested_did = get_did_by_name(pr_head, message_string); 
 		
@@ -227,19 +223,10 @@ static void recv_handler(void *arg)
 		case AOS_RPC_SEND_STRING: ; // Send String
 			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
 	
-			for (int i = 0; i<string_length; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+1];   
-			}	
-			
+			strncpy( message_string, (char *) msg.words + 4, 32);	
+	
 			serial_putstring(message_string);
 	
-		    // debug_printf("Message string = %s\n", message_string);	
-			//err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
-			//if (err_is_fail(err)) {
-			//	DEBUG_ERR(err,"recv_handler: Error in sending acknowledgment of send string back to client!\n");	
-			//}	
-			
 			cap_destroy(cap);
 			break;
 
@@ -271,7 +258,7 @@ static void recv_handler(void *arg)
 		case AOS_RPC_GET_CHAR: ;
 			//debug_printf("recv_handler: AOS_RPC_GET_CHAR from endpoint %d\n", lc->remote_cap.slot);
 			// serial_putstring(BLUE);
-	
+
 			write_capref_to_ring(&ring_c, &cap);
 			thread_cond_signal(&capref_cond);
 			
@@ -282,11 +269,7 @@ static void recv_handler(void *arg)
 			char *next_token;
 			bool background;
 
-			for (int i = 0; i < string_length-1 ; i++){
-				uint32_t * word = (uint32_t *) (message_string + i*4);
-				*word = msg.words[i+2];   
-			}	
-
+			strncpy(message_string, (char *) msg.words + 8, 28);
 			uint32_t core = msg.words[1];
 	
 			//debug_printf("Will spawn %s at core %zu\n", message_string, core);
