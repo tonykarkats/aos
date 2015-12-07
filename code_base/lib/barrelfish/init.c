@@ -203,8 +203,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
     }
 
 	// Get domain name from arguments
-	//char * token;
-	//char * token_2;
 	strcpy(domain_name, params->argv[0]);
 
     // Init default waitset for this dispatcher
@@ -242,9 +240,6 @@ errval_t barrelfish_init_onthread(struct spawn_domain_params *params)
 
 	lmp_endpoint_init();
 	
-	//set_real_malloc();	
-	//debug_printf("seted real malloc for allocations :D");
-
 	// init domains only get partial init
     if (init_domain) {
         return SYS_ERR_OK;
