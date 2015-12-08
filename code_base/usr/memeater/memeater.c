@@ -164,6 +164,8 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("ls", token)) {
 			token = strtok(NULL, space_token);
+			if (token == NULL)
+				continue;
 			//debug_printf("Will ls path %s\n", token);
 			
 			err = aos_rpc_readdir( get_init_chan(), token, NULL, &dir_entries);

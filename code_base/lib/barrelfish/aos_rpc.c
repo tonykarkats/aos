@@ -72,50 +72,24 @@ static void recv_handler(void *arg)
 errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 {
 	errval_t err;
-	uint32_t buffer[9];
-	int i, length, string_chunks, last_chunk;
+	
+	// Copy path to the shared buffer with init!
+	memcpy(chan->shared_buffer, string, strlen(string) + 1);
+	
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_SEND_STRING  << 24) | (0x00FFFFFF & disp_get_domain_id())));
 
-	for (i=0; i < 2000; i++)
-		if (string[i] == '\0')
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
+       		debug_printf("aos_rpc_readdir: Error in sending string to server!\n");
+       		return err_push(err, AOS_ERR_LMP_DIR_NOT_FOUND);
+    	}
+		else if (err_is_ok(err))
 			break;
-
-	if (i == 2000) {
-		debug_printf("Can not send string!\n");
-		return AOS_ERR_LMP_SEND_FAILURE;
 	}
-	length = i + 1;
-    string_chunks = (int) ceil(length / 32.0);
-	
-	if (length % 32 != 0)
-		last_chunk = length % 32;
-	else 
-		last_chunk = 32;
 
-	 //debug_printf("%s    length = %d , cunks = %d , last chunk = %d\n", string, length, string_chunks, last_chunk);
-
-	for (int s_chunk = 0; s_chunk < string_chunks; s_chunk++) { 	
-		//debug_printf("Sending chunk %d from %d \n", s_chunk, s_chunk * 32);
-		memset(buffer, 0, 36);		
-
-		buffer[0] = ((AOS_RPC_SEND_STRING << 24) | (0x00FFFFFFF & disp_get_domain_id()));
-		
-		if (s_chunk == string_chunks - 1)	
-			memcpy(buffer + 1, string + 32*s_chunk , last_chunk);
-		else 
-			memcpy(buffer + 1, string + 32*s_chunk, 32);
-
-		do {	
-			err = lmp_chan_send(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, 9,
-					  buffer[0] , buffer[1],buffer[2],
-					  buffer[3], buffer[4],buffer[5],
-					  buffer[6], buffer[7],buffer[8]);
-			if ((err_no(err) != 17)&&(err_is_fail(err)))
-				return err_push(err, AOS_RPC_SEND_STRING);	
-		} while (err_no(err) == 17);
-				
-		// event_dispatch(get_default_waitset());
-	} 	
-	
 	return SYS_ERR_OK;
 }
 

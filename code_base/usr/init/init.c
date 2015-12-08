@@ -226,10 +226,15 @@ static void recv_handler(void *arg)
 			cap_destroy(cap);
 			break;		
 		case AOS_RPC_SEND_STRING: ; // Send String
-			// debug_printf("recv_handler: AOS_RPC_SEND_STRING from endpoint %d\n", cap.slot);
-	
-			strncpy( message_string, (char *) msg.words + 4, 32);		
-			serial_putstring(message_string);
+			char received_string[4096];
+				
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+
+			strncpy(received_string, process->buffer, 4096);		
+
+			serial_putstring(received_string);
 	
 			cap_destroy(cap);
 			break;
@@ -460,8 +465,12 @@ static void recv_handler(void *arg)
 			thread_mutex_unlock(&process_list_lock);	
 			
 			strcpy(read_file_name, process->buffer);
-
 			debug_printf("Client requests to read file %s\n", read_file_name);
+	
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send response for read file back to the client!\n");
+			}
 		
 			break;
 		case AOS_RPC_CLOSE_FILE: ;
@@ -472,6 +481,12 @@ static void recv_handler(void *arg)
 			thread_mutex_unlock(&process_list_lock);	
 		
 			debug_printf("Client requests to close file with fd %d\n", fd);	
+			
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send response for closing file back to the client!\n");
+			}
+		
 			break;	
 
 		case AOS_RPC_TERMINATING:;
