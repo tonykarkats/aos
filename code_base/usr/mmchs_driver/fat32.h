@@ -23,7 +23,7 @@ errval_t read_file(const char *filepath, char *buf);
 
 errval_t fat32_init(void);
 
-
+uint32_t get_fat_entry(uint32_t cluster_nr);
 
 
 

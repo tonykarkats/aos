@@ -235,4 +235,24 @@ errval_t list(const char *path, struct dirent **dirtable, uint32_t *size) {
 	return SYS_ERR_OK;
 }
 
+/* Returns the contents of the FAT32 entry for the given cluster_nr */
+
+uint32_t get_fat_entry(uint32_t cluster_nr) {
+
+	uint32_t FATOffset = cluster_nr * 4;
+
+	// ThisFATSecNum is the sector number of the FAT sector that contains the entry
+	// for cluster_nr in the first FAT table.
+
+	uint8_t ThisFATSecNum = BPB_RsvdSecCnt + (FATOffset / BPB_BytsPerSec);
+	uint32_t ThisFATEntOffset = FATOffset % BPB_BytsPerSec;
+
+	// We now read sector number ThisFATSecNum into a buffer
+	
+
+	// We can now calculate the FAT Entry value
+	uint32_t FAT32ClusEntryVal = (* ((uint16_t *) &SecBuff[ThisFATEntOffset]) ) & 0x0FFFFFFF;
+
+	return FAT32ClusEntryVal;
+}
 
