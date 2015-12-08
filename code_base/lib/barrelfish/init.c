@@ -89,11 +89,14 @@ static size_t custom_printf(const char *buf, int len) {
 	char new_buf[len+1];	
 	memcpy(new_buf, buf, len);
 	new_buf[len] = '\0';
-
-	err = aos_rpc_send_string( get_init_chan(), new_buf);
-	if (err_is_fail(err)) 
-		debug_printf("Error in custom printf in sending string to serial driver!\n");
-
+	
+	int chunks = len / 4096 + 1;
+	
+	for (int i = 0; i < chunks; i++) {
+		err = aos_rpc_send_string(get_init_chan(), new_buf + i*4096);
+		if (err_is_fail(err)) 
+			debug_printf("Error in custom printf in sending string to serial driver!\n");
+	}
 	
 	return len;	
 }

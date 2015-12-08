@@ -45,3 +45,7 @@
 - Fix proper erros in barrelfish/init.c for shared frame
 
 - Fix rpc calls so that they malloc each time the requested memory in each call. Freeing is the users responsiblity.
+
+- Everything that gets fixed in core-0 should get fixed also in core-1.
+
+- Fix printf to handle string printing in chunks of 4096 bytes.

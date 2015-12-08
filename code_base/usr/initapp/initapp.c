@@ -132,8 +132,6 @@ static int cross_core_thread_1(void *arg)
 				
 				pseudo_lock = permission;
 				break;
-
-		
 		}
 				
 	}	
@@ -210,25 +208,33 @@ static void recv_handler(void *arg)
 			process->shared_frame = shared_frame;	
 			thread_mutex_unlock(&process_list_lock);
 								
-
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, shared_frame, (uint32_t) requested_did);
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending did back to the process!\n");	
 
 			cap_destroy(cap);
 			break;		
-		case AOS_RPC_SEND_STRING: ; // Send String
 		
-			strncpy( message_string, (char *) msg.words + 4, 32);	
+	case AOS_RPC_SEND_STRING: ; // Send String
+			char received_string[4096];
+				
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+	
+			strncpy(received_string, process->buffer, 4096);		
 
-			//debug_printf("Will send string message_string %s to core-0", message_string);
+			// FIX ME to send the data over a dedicated uart frame
 			struct ump_message message_for_core_0;
-			strcpy((char *) message_for_core_0.words, message_string);
-			
+			strncpy((char *) message_for_core_0.words, received_string, 38);		
 			message_for_core_0.type = SERIAL_PUT_STRING;
-		
+	
 			// Using cross core channel for writing characters and strings through UART
 			write_to_core_0(message_for_core_0);
+		
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
+			if (err_is_fail(err))
+				DEBUG_ERR(err,"recv_handler: Error in sending string acknowledgement back to client!\n");	
 	
 			cap_destroy(cap);
 			break;

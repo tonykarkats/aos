@@ -482,7 +482,8 @@ static void recv_handler(void *arg)
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
-		
+
+			strcpy(read_file_name, process->buffer);
 			debug_printf("Client requests to close file with fd %d\n", fd);	
 			
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
