@@ -114,7 +114,6 @@ int main(int argc, char *argv[])
 				printf("Could not fetch pids from server!\n");
 				continue;
 			}
-
 			
 			for (int i = 0; i < pid_count; i++) {
 				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &domain_name);	

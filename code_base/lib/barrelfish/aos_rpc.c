@@ -74,6 +74,7 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 	errval_t err;
 	
 	// Copy path to the shared buffer with init!
+	memset(chan->shared_buffer, 0, 4096);
 	memcpy(chan->shared_buffer, string, strlen(string) + 1);
 	
 	while(true) {
@@ -81,15 +82,16 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
 							 chan->rpc_channel.local_cap, 
 							 ((AOS_RPC_SEND_STRING  << 24) | (0x00FFFFFF & disp_get_domain_id())));
-
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_readdir: Error in sending string to server!\n");
-       		return err_push(err, AOS_ERR_LMP_DIR_NOT_FOUND);
+       		return err_push(err, AOS_ERR_LMP_SEND_STRING);
     	}
 		else if (err_is_ok(err))
 			break;
 	}
 
+	event_dispatch(get_default_waitset());
+	
 	return SYS_ERR_OK;
 }
 
@@ -329,9 +331,7 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 	}
 
     event_dispatch(get_default_waitset());
-	
-	//debug_printf("Returned!\n");
-	
+		
 	// Count valid pids
 	size_t count = 0;
 	while(true) {
@@ -341,7 +341,6 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 	}
 
 	//debug_printf("Returned! Count = %d\n", count);
-	
 	for (int i = 0; i<count; i++) {
 		//debug_printf("Returned pid %d\n", chan->words[i]);
 		(*pids_returned)[i] = (domainid_t) chan->words[i];

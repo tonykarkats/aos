@@ -231,10 +231,14 @@ static void recv_handler(void *arg)
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
-
+	
 			strncpy(received_string, process->buffer, 4096);		
 
 			serial_putstring(received_string);
+			
+			err = lmp_chan_send0(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP);
+			if (err_is_fail(err))
+				DEBUG_ERR(err,"recv_handler: Error in sending string acknowledgement back to client!\n");	
 	
 			cap_destroy(cap);
 			break;
@@ -389,7 +393,6 @@ static void recv_handler(void *arg)
 			struct process_node * temp = pr_head;
 			size_t count = 0;
 			while (temp != NULL) {
-				//debug_printf("Added to list %d\n", temp->d_id);
 				buffer[count++] = temp->d_id;
 				temp = temp->next_pr;
 			}					

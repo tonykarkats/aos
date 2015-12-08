@@ -81,29 +81,21 @@ static void libc_assert(const char *expression, const char *file,
                    disp_name(), expression, function, file, line);
     sys_print(buf, len < sizeof(buf) ? len : sizeof(buf));
 }
+
 static size_t custom_printf(const char *buf, int len) {
 
 	errval_t err;
-    //size_t printed = 0;
+	
 	char new_buf[len+1];	
-
 	memcpy(new_buf, buf, len);
-	
 	new_buf[len] = '\0';
-	
-	struct aos_rpc * init_chan = get_init_chan();
-  	
-	err = aos_rpc_send_string( init_chan, new_buf);
+
+	err = aos_rpc_send_string( get_init_chan(), new_buf);
 	if (err_is_fail(err)) 
 		debug_printf("Error in custom printf in sending string to serial driver!\n");
-	
-	
-	//for (int i = 0; i < len; i++)
-	//	err = aos_rpc_putchar( init_chan, buf[i]);
-	
 
+	
 	return len;	
-	//return printed;
 }
 
 static size_t custom_scanf(char *buf, size_t len) {
