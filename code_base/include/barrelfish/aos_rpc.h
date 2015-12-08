@@ -44,6 +44,9 @@
 #define AOS_RPC_KILL	 10
 #define AOS_RPC_GET_DID 11
 #define AOS_RPC_READ_DIR    12
+#define AOS_RPC_OPEN_FILE	13
+#define AOS_RPC_READ_FILE	14
+#define AOS_RPC_CLOSE_FILE	15
 
 struct aos_rpc {
 	struct lmp_chan rpc_channel;

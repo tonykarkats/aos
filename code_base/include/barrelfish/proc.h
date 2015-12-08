@@ -13,7 +13,14 @@ struct frame_node {
 	size_t bits;
 	struct frame_node * next_frame;
 };
+
+struct file_descriptor_node {
+	int fd;
+	int possition_in_file;
 	
+	struct file_descriptor_node * next_file_descrptor;
+};
+
 struct process_node {
 	domainid_t d_id;
 	char * name;
@@ -29,6 +36,9 @@ struct process_node {
 	// Memory frames used by this domain
 	uint32_t memory_consumed; 	
 	struct frame_node *consumed_frame;
+
+	// Open file descriptors used by that process
+	
 	
 	// Next process node 
 	struct process_node * next_pr;

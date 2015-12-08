@@ -420,18 +420,58 @@ static void recv_handler(void *arg)
 		
 			cap_destroy(cap);
 			break;
-		case AOS_RPC_READ_DIR: ;
-			
+		case AOS_RPC_READ_DIR: ;	
 			char path[512];
 	
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
-			
-			strcpy( path, process->buffer);
 
-			debug_printf("Client requests for path %s\n", path);
+			strcpy(path, process->buffer);
+			// debug_printf("Client requests for path %s\n", path);
+			
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
+			}
+	
+			break;	
+		case AOS_RPC_OPEN_FILE: ;
+			char open_file_name[512];
+
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+			
+			strcpy(open_file_name, process->buffer);
+			// debug_printf("Client requests to open file %s\n", open_file_name);
 		
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
+			}
+	
+			break;
+		case AOS_RPC_READ_FILE: ;
+			char read_file_name[512];
+
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+			
+			strcpy(read_file_name, process->buffer);
+
+			debug_printf("Client requests to read file %s\n", read_file_name);
+		
+			break;
+		case AOS_RPC_CLOSE_FILE: ;
+			int fd = msg.words[1];
+
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+		
+			debug_printf("Client requests to close file with fd %d\n", fd);	
 			break;	
 
 		case AOS_RPC_TERMINATING:;
@@ -461,7 +501,6 @@ static void recv_handler(void *arg)
 	
 			thread_mutex_unlock(&process_list_lock);
 			break;
-
 	}
 }
 

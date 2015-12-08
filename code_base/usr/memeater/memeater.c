@@ -164,15 +164,24 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("ls", token)) {
 			token = strtok(NULL, space_token);
-			debug_printf("Will ls path %s\n", token);
+			//debug_printf("Will ls path %s\n", token);
 			
 			err = aos_rpc_readdir( get_init_chan(), token, NULL, &dir_entries);
-
-			
-				
+			if (err_is_fail(err)) {
+				printf("%s not found!\n", token);
+			}
+			else {
+				;
+			}
 		}
 		else if (!strcmp("cat", token)) {	
-			debug_printf("cat NYI!\n");
+			token = strtok(NULL, space_token);
+			int fd;
+
+			err = aos_rpc_open(get_init_chan(), token, &fd);
+			if (err_is_fail(err)) {
+				printf("Can not open file %s\n", token);
+			}
 		}
 		else if (!strcmp("exit", token)) {
 			return 0;

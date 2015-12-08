@@ -399,13 +399,42 @@ errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_stat
 			break;
 	}
 
-	event_dispatch(get_default_waitset());
 	return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd)
 {
-    // TODO (milestone 7): implement file open
+	errval_t err;
+	
+	// Copy path to the shared buffer with init!
+	memcpy(chan->shared_buffer, path, strlen(path) + 1);
+
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send1(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_OPEN_FILE  << 24) | (0x00FFFFFF & disp_get_domain_id())));
+
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
+       		debug_printf("aos_rpc_readdir: Error in reading dir!\n");
+       		return err_push(err, AOS_ERR_LMP_CAN_NOT_OPEN_FILE);
+    	}
+		else if (err_is_ok(err))
+			break;
+	}
+
+	event_dispatch(get_default_waitset());	
+
+	int returned_value = (int) chan->words[0];	
+
+	if (returned_value == -1) {
+		// debug_printf("aos_rpc_readdir: File not found!\n");
+		return AOS_ERR_LMP_CAN_NOT_OPEN_FILE;
+	}
+
+	// Return fd to the caller
+	*fd = returned_value;
+
     return SYS_ERR_OK;
 }
 
@@ -413,7 +442,8 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
                          struct aos_dirent **dir, size_t *elem_count)
 {
 	errval_t err;
-	// Copy path to the shared buffer!
+	
+	// Copy path to the shared buffer with init!
 	memcpy(chan->shared_buffer, path, strlen(path) + 1);
 	
 	while(true) {
@@ -423,13 +453,27 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
 							 ((AOS_RPC_READ_DIR  << 24) | (0x00FFFFFF & disp_get_domain_id())));
 
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
-       		debug_printf("aos_rpc_process_spawn: Error in reading dir!\n");
-       		return err_push(err, AOS_ERR_LMP_TERMINATING);
+       		debug_printf("aos_rpc_readdir: Error in reading dir!\n");
+       		return err_push(err, AOS_ERR_LMP_DIR_NOT_FOUND);
     	}
 		else if (err_is_ok(err))
 			break;
 	}
 
+	event_dispatch(get_default_waitset());	
+
+	int returned_value = (int) chan->words[0];
+	
+	if (returned_value == -1) {
+		// debug_printf("aos_rpc_readdir: Directory not found!\n");
+		return AOS_ERR_LMP_DIR_NOT_FOUND;
+	}
+	
+	// Returned dir entries in the shared buffer	
+	*elem_count = returned_value;
+
+	// Malloc and fill in with data from the shared buffer and return to user!
+	*dir = (struct aos_dirent *) malloc(sizeof(struct aos_dirent) * *elem_count);
 	
     return SYS_ERR_OK;
 }

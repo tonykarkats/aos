@@ -43,3 +43,5 @@
 - Maybe put init channel initialization before all other initializations on barrelfish_init_on_thread ?
 
 - Fix proper erros in barrelfish/init.c for shared frame
+
+- Fix rpc calls so that they malloc each time the requested memory in each call. Freeing is the users responsiblity.

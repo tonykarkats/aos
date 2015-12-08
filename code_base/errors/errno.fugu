@@ -936,4 +936,7 @@ errors aos AOS_ERR_ {
 	failure LMP_GET_PIDS     "Unknown message type for AOS LMP implementation",
     failure LMP_GET_NAME     "Unknown message type for AOS LMP implementation",
 	failure LMP_TERMINATING     "Unknown message type for AOS LMP implementation",
+	failure LMP_DIR_NOT_FOUND	"Directory entry not found",
+	failure LMP_CAN_NOT_OPEN_FILE	"Can not open file over lmp channel!",
+	failure LMP_NON_EXISTED_FD	"File descriptor for process does not exist",
 };
