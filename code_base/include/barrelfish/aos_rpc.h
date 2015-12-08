@@ -131,12 +131,20 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd);
 
 #define MAXNAMELEN 255
+
+enum filetype {
+	typeFile,
+	typeDir
+};
+
 struct aos_dirent {
     /// name of the directory entry
     char name[MAXNAMELEN];
     /// size of the item referenced
     size_t size;
     /// Optional: add more information about a directory entry here
+    enum filetype type;
+	uint32_t firstCluster;
 };
 
 /**

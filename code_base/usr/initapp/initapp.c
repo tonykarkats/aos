@@ -100,7 +100,7 @@ static int cross_core_thread_1(void *arg)
 				struct capref disp_frame;	
 
 				thread_mutex_lock(&process_list_lock);	
-				pr_head = insert_process_node(pr_head, spawned_domain, message_string, 0, NULL_CAP, NULL_CAP);
+				pr_head = insert_process_node(pr_head, spawned_domain, message_string, true, NULL_CAP, NULL_CAP);
 				thread_mutex_unlock(&process_list_lock);	
 			
 				err = bootstrap_domain(message_string, &si, thread_bi, my_core_id, &disp_frame, spawned_domain);
@@ -314,6 +314,7 @@ static void recv_handler(void *arg)
 			strncpy(message_string, (char *) msg.words + 8, 28);
 
 			debug_printf("Received request for spawn for %s\n", message_string);
+
 			uint32_t core = msg.words[1];
 			if (core != 1) {
 				// Domains at core-1 are not allowed to spawn domains at core-0!
@@ -342,30 +343,33 @@ static void recv_handler(void *arg)
 				}
 				else {
 					// Remote core accepted our request for spawning! Value of pseudo_lock is the returned domain-id
-					debug_printf("Core-0 responded with did %zu\n", pseudo_lock);
+					//debug_printf("Core-0 responded with did %zu\n", pseudo_lock);
 					uint32_t util_word;
 					struct spawninfo si;	
 					struct capref disp_frame;	
 
 					thread_mutex_lock(&process_list_lock);	
-					pr_head = insert_process_node(pr_head, pseudo_lock, message_string, 0, cap, NULL_CAP);
-					thread_mutex_unlock(&process_list_lock);	
+					//debug_printf("1\n");
+					pr_head = insert_process_node(pr_head, pseudo_lock, message_string, false, cap, NULL_CAP);
 					
+					//debug_printf("2 %s\n", message_string);
 					err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame, pseudo_lock);
+					//debug_printf("2.5\n");
 					if (err_is_fail(err)) {
 						
-						thread_mutex_lock(&process_list_lock);	
-						struct process_node * temp = delete_process_node( &pr_head, pseudo_lock, "aaa");
-						thread_mutex_unlock(&process_list_lock);		
-						temp = temp;
-
+						//debug_printf("3\n");
+						delete_process_node( &pr_head, pseudo_lock, "aaa");
 						util_word = 0;	
 					}
 					else {
 						util_word = pseudo_lock;
 					}
-			
-					// Write response to core-0 !				
+	
+						
+					thread_mutex_unlock(&process_list_lock);		
+						
+					//debug_printf("4\n");
+					// Write response to core-0 ! if domain was spawned sucesfully
 					struct ump_message returned_message;
 					returned_message.type      = SPAWNED_PROCESS_RESPONSE;
 					returned_message.util_word = util_word;
@@ -373,6 +377,7 @@ static void recv_handler(void *arg)
 				
 					write_to_core_0(returned_message);					
 
+					debug_printf("Sending back to the client!\n");
 					err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, util_word);
 					if (err_is_fail(err)) {
 						DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
@@ -397,8 +402,19 @@ static void recv_handler(void *arg)
 				break;
 			}
 
+			// Only for processes spawned by processes running on core-1 this evaluates to true :)
+			if (!terminated_process->background) {
+				// debug_printf("Sending termination did and status back to the client!\n");
+				err = lmp_ep_send1(terminated_process->client_endpoint, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, terminated_process->d_id);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
+				}	
+
+			}
+	
 			// Clears the process node and released the ram used
 			// by this child. 
+
 			// clear_process_node(terminated_process, mm_ram);
 			free(terminated_process);
 	

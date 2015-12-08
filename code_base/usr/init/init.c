@@ -86,7 +86,7 @@ static int cross_core_thread_0(void *arg)
 				// Remote core requests permission to spawn a process!		
 				char spawned_process_requested[36];
 				
-				strcpy(spawned_process_requested, (char *) received_message.words);
+				strncpy(spawned_process_requested, (char *) received_message.words, 36);
 
 				// Always grant permission to remote core for spawning a process locally
 				struct ump_message permission_message;
@@ -100,7 +100,7 @@ static int cross_core_thread_0(void *arg)
 				char spawned_process[36];
 				int success_spawn = received_message.util_word;
 
-				strcpy(spawned_process, (char *) received_message.words);
+				strncpy(spawned_process, (char *) received_message.words, 36);
 				
 				if (success_spawn != 0) {
 					thread_mutex_lock(&process_list_lock);
@@ -132,11 +132,10 @@ static int cross_core_thread_0(void *arg)
 			case(SERIAL_PUT_STRING): ;
 				char message_string[36];
 
-				strcpy(message_string, (char *) received_message.words);
+				strncpy(message_string, (char *) received_message.words, 36);
 
 				// debug_printf("Received a string over the cross core channel = %s\n", message_string);				
-				serial_putstring(message_string);
-	
+				serial_putstring(message_string);	
 				break;
 		}		
 	}	
@@ -295,18 +294,15 @@ static void recv_handler(void *arg)
 		case AOS_RPC_PROC_SPAWN:;
 			domainid_t d_id;
 			char *token;
-			char *next_token;
 			bool background;
 
 			strncpy(message_string, (char *) msg.words + 8, 28);
 			uint32_t core = msg.words[1];
 	
-			//debug_printf("Will spawn %s at core %zu\n", message_string, core);
-			
+			//debug_printf("Will spawn %s at core %zu\n", message_string, core);	
 			token = strtok(message_string, " ");
 			
-			if (core == 1) {
-				
+			if (core == 1) {	
 				// Spawn domain at core-1					
 				global_did++;
 			
@@ -321,24 +317,24 @@ static void recv_handler(void *arg)
 
 				// Wait on pseudo lock, pseudo lock has the domain-id of the domain spawned	
 				while(pseudo_lock == -1);	
-				
+					
 				// Report back to shell that process was spawned with the domain-id of the domain
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
 				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-				}	
+					DEBUG_ERR(err,"recv_handler: Can not report process creation back to client!\n");
+				}
+
+				if (pseudo_lock != 0) {
+					err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
+					if (err_is_fail(err)) {
+						DEBUG_ERR(err,"recv_handler: Can not report back to client!\n");
+					}
+				}			
 			}
 			else {
-				// Spawn domain at own core! 
-				next_token = strtok(NULL, " ");
-				
-				if (next_token == NULL)
-					background = false;
-				else if (strcmp(next_token, "&"))
-					background = false;
-				else 
-					background = true;
-			
+				// Spawn domain at own core! 	
+				background = false;	
+	
 			 	struct spawninfo si;	
 				struct capref disp_frame;
 				global_did++;
@@ -446,6 +442,7 @@ static void recv_handler(void *arg)
 			break;	
 		case AOS_RPC_OPEN_FILE: ;
 			char open_file_name[512];
+			// FILL ME IN
 
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
@@ -462,7 +459,7 @@ static void recv_handler(void *arg)
 			break;
 		case AOS_RPC_READ_FILE: ;
 			char read_file_name[512];
-
+			// FILL ME IN
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
@@ -478,7 +475,7 @@ static void recv_handler(void *arg)
 			break;
 		case AOS_RPC_CLOSE_FILE: ;
 			int fd = msg.words[1];
-
+			// FILL ME IN
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
@@ -499,7 +496,8 @@ static void recv_handler(void *arg)
 
 			thread_mutex_lock(&process_list_lock);
 			struct process_node * terminated_process = delete_process_node(&pr_head, exiting_did, "aa");
-
+			thread_mutex_unlock(&process_list_lock);
+			
 			if (terminated_process == NULL) {
 				debug_printf("recv_handler: Received message from unknown process?!\n");
 				break;
@@ -517,8 +515,7 @@ static void recv_handler(void *arg)
 			// by this child. 
 			// clear_process_node(terminated_process, mm_ram);
 			free(terminated_process);
-	
-			thread_mutex_unlock(&process_list_lock);
+			
 			break;
 	}
 }

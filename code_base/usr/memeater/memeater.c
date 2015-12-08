@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
 	const char space_token[2] = " ";
 	char *token;
 	char *next_token;
-	char *ampersand;
 	char *domain_name = malloc(36); 
 	size_t dir_entries;
 
@@ -141,12 +140,6 @@ int main(int argc, char *argv[])
 			next_token = strtok(NULL, space_token);
 			if (next_token == NULL)
 				continue;
-
-			ampersand = strtok(NULL, space_token);
-			if (ampersand != NULL) {
-				if (!strcmp(ampersand, " &"))
-					next_token = strtok(next_token, " &");
-			}		
 
 			int core_id = atoi(token);
 			if ((core_id !=0 ) && (core_id != 1))	

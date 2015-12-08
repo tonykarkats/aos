@@ -234,23 +234,14 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 	}
 
     event_dispatch(get_default_waitset());
-
 	*newpid = chan->words[0];
+	
 	if (*newpid == 0) {
-		//debug_printf("spawn_domain: Can not spawn!\n");
 		return AOS_ERR_LMP_SPAWN_DOM;
 	}
-
-	if (core == 1)
-		return SYS_ERR_OK;
 	
-	if (strchr(name, '&') != NULL) {
-		return SYS_ERR_OK;
-	}
-	else {
-		//debug_printf("Waiting for process to finish!\n");
-		event_dispatch(get_default_waitset());
-	}
+	// Wait for the process to finish!
+ 	event_dispatch(get_default_waitset());
 	
     return SYS_ERR_OK;
 }
@@ -389,7 +380,7 @@ errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd)
 							 ((AOS_RPC_OPEN_FILE  << 24) | (0x00FFFFFF & disp_get_domain_id())));
 
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
-       		debug_printf("aos_rpc_readdir: Error in reading dir!\n");
+       		debug_printf("aos_rpc_readdir: Error in opening file!\n");
        		return err_push(err, AOS_ERR_LMP_CAN_NOT_OPEN_FILE);
     	}
 		else if (err_is_ok(err))
@@ -454,14 +445,66 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
 errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size,
                       void** buf, size_t *buflen)
 {
-    // TODO (milestone 7): implement file read
-    return SYS_ERR_OK;
+    errval_t err;
+	
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_READ_FILE  << 24) | (0x00FFFFFF & disp_get_domain_id())), fd, position);
+
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
+       		debug_printf("aos_rpc_readdir: Error in reading dir!\n");
+       		return err_push(err, AOS_ERR_LMP_DIR_NOT_FOUND);
+    	}
+		else if (err_is_ok(err))
+			break;
+	}
+
+	event_dispatch(get_default_waitset());	
+
+	/*  0  -> end of file
+ 	 * -1  -> non existent fd
+ 	 */
+	int returned_value = (int) chan->words[0];
+	
+	if (returned_value == -1) {
+		*buflen = 0;
+		return AOS_ERR_LMP_NON_EXISTED_FD;
+	}
+	
+	// Create a buffer of 4096 bytes and copy stuff in it.
+
+	return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_close(struct aos_rpc *chan, int fd)
 {
-    // TODO (milestone 7): implement file close
-    return SYS_ERR_OK;
+   	errval_t err;
+
+	while(true) {
+   		event_dispatch(&chan->s_waitset);
+		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+							 chan->rpc_channel.local_cap, 
+							 ((AOS_RPC_CLOSE_FILE  << 24) | (0x00FFFFFF & disp_get_domain_id())), fd);
+
+    	if ((err_no(err) != 17)&&(err_is_fail(err))) {
+       		debug_printf("aos_rpc_readdir: Error in reading dir!\n");
+       		return err_push(err, AOS_ERR_LMP_CAN_NOT_CLOSE_FILE);
+    	}
+		else if (err_is_ok(err))
+			break;
+	}
+
+	event_dispatch(get_default_waitset());	
+
+	int returned_value = (int) chan->words[0];	
+
+	if (returned_value == -1) {
+		return AOS_ERR_LMP_NON_EXISTED_FD;
+	}
+
+	return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_write(struct aos_rpc *chan, int fd, size_t position, size_t *size,

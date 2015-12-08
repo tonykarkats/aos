@@ -227,17 +227,20 @@ ANSI	lib/oldc/src/gdtoa/gdtoa.h	50;"	d
 ANSI	lib/oldc/src/gdtoa/gdtoa.h	53;"	d
 ANSIC	lib/newlib/newlib/libc/machine/powerpc/simdldtoa.c	371;"	d	file:
 ANSIC	lib/newlib/newlib/libc/stdlib/ldtoa.c	377;"	d	file:
+AOS_RPC_CLOSE_FILE	include/barrelfish/aos_rpc.h	49;"	d
 AOS_RPC_CONNECT	include/barrelfish/aos_rpc.h	34;"	d
 AOS_RPC_GET_CHAR	include/barrelfish/aos_rpc.h	38;"	d
 AOS_RPC_GET_DEV_CAP	include/barrelfish/aos_rpc.h	42;"	d
 AOS_RPC_GET_DID	include/barrelfish/aos_rpc.h	45;"	d
 AOS_RPC_GET_RAM_CAP	include/barrelfish/aos_rpc.h	36;"	d
 AOS_RPC_KILL	include/barrelfish/aos_rpc.h	44;"	d
+AOS_RPC_OPEN_FILE	include/barrelfish/aos_rpc.h	47;"	d
 AOS_RPC_PROC_GET_NAME	include/barrelfish/aos_rpc.h	40;"	d
 AOS_RPC_PROC_GET_PIDS	include/barrelfish/aos_rpc.h	41;"	d
 AOS_RPC_PROC_SPAWN	include/barrelfish/aos_rpc.h	39;"	d
 AOS_RPC_PUT_CHAR	include/barrelfish/aos_rpc.h	37;"	d
 AOS_RPC_READ_DIR	include/barrelfish/aos_rpc.h	46;"	d
+AOS_RPC_READ_FILE	include/barrelfish/aos_rpc.h	48;"	d
 AOS_RPC_SEND_STRING	include/barrelfish/aos_rpc.h	35;"	d
 AOS_RPC_TERMINATING	include/barrelfish/aos_rpc.h	43;"	d
 API_EVENT	include/lwip/api.h	163;"	d
@@ -7302,7 +7305,7 @@ MAXINT	kernel/printf.c	218;"	d	file:
 MAXINTERP	include/sys/param.h	50;"	d
 MAXLINELEN	lib/newlib/newlib/libc/posix/wordexp.c	24;"	d	file:
 MAXLOGNAME	include/sys/param.h	51;"	d
-MAXNAMELEN	include/barrelfish/aos_rpc.h	130;"	d
+MAXNAMELEN	include/barrelfish/aos_rpc.h	133;"	d
 MAXNAMELEN	include/lwip/opt.h	1515;"	d
 MAXNAMLEN	include/oldc/dirent.h	9;"	d
 MAXNAMLEN	lib/newlib/newlib/libc/include/dirent.h	9;"	d
@@ -25738,6 +25741,7 @@ fcntl	lib/newlib/newlib/libc/posix/namespace.h	60;"	d
 fcntl	lib/newlib/newlib/libc/posix/un-namespace.h	45;"	d
 fcntl	lib/oldc/src/locale/namespace.h	64;"	d
 fcntl	lib/oldc/src/locale/un-namespace.h	45;"	d
+fd	include/barrelfish/proc.h	/^	int fd;$/;"	m	struct:file_descriptor_node
 fd	include/vfs/fdtab.h	/^        int             fd;$/;"	m	struct:fdtab_entry
 fd	lib/dmalloc/dmalloc.c	/^  struct malloc_chunk* fd;         \/* double links -- used only if free. *\/$/;"	m	struct:malloc_chunk	typeref:struct:malloc_chunk::malloc_chunk	file:
 fd	lib/dmalloc/dmalloc.c	/^  struct malloc_tree_chunk* fd;$/;"	m	struct:malloc_tree_chunk	typeref:struct:malloc_tree_chunk::malloc_tree_chunk	file:
@@ -25868,6 +25872,7 @@ file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	
 file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	struct:LINK3resok
 file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	struct:READ3resfail
 file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	struct:READ3resok
+file_descriptor_node	include/barrelfish/proc.h	/^struct file_descriptor_node {$/;"	s
 file_wcc	include/nfs/nfs_rpc.h	/^    wcc_data file_wcc;$/;"	m	struct:COMMIT3resfail
 file_wcc	include/nfs/nfs_rpc.h	/^    wcc_data file_wcc;$/;"	m	struct:COMMIT3resok
 file_wcc	include/nfs/nfs_rpc.h	/^    wcc_data file_wcc;$/;"	m	struct:WRITE3resfail
@@ -25884,6 +25889,7 @@ fileops	include/sys/file.h	/^struct fileops {$/;"	s
 filesize	include/vfs/mmap.h	/^    size_t filesize; \/\/ size to read from file (rest is zero-filled)$/;"	m	struct:memobj_vfs
 filesize	lib/cpio/cpiobin.c	/^    char filesize[8];$/;"	m	struct:__anon141	file:
 filesize	lib/cpio/cpiobin.c	/^    uint8_t filesize[4];$/;"	m	struct:__anon140	file:
+filetype	include/barrelfish/aos_rpc.h	/^enum filetype {$/;"	g
 fill	include/barrelfish/memobj.h	/^    errval_t (*fill)(struct memobj *memobj, genvaddr_t offset, struct capref frame,$/;"	m	struct:memobj_funcs
 fill	lib/newlib/newlib/testsuite/newlib.string/memmove1.c	/^fill (unsigned char dest[MAX*3])$/;"	f
 fill_diteinfo	tools/dite/dite.c	/^    void (*fill_diteinfo)(char *fbuf, genvaddr_t elfbase);$/;"	m	struct:elf_funcs	file:
@@ -25960,6 +25966,7 @@ first	lib/newlib/newlib/libc/stdlib/reallocr.c	1624;"	d	file:
 first	lib/newlib/newlib/libc/stdlib/vallocr.c	1624;"	d	file:
 first	lib/newlib/newlib/libc/string/wcwidth.c	/^  int first;$/;"	m	struct:interval	file:
 first	lib/newlib/newlib/testsuite/newlib.locale/UTF-8.c	/^char first[6][6] = {$/;"	v
+firstCluster	include/barrelfish/aos_rpc.h	/^	uint32_t firstCluster;$/;"	m	struct:aos_dirent
 first_app_b	lib/net_queue_manager/queue_manager.c	/^static struct buffer_descriptor *first_app_b = NULL;$/;"	v	typeref:struct:buffer_descriptor	file:
 first_day	lib/newlib/newlib/libc/time/strptime.c	/^first_day (int year)$/;"	f	file:
 first_free	lib/newlib/newlib/libc/search/hash_page.c	/^first_free(map)$/;"	f	file:
@@ -32370,6 +32377,7 @@ next_chunk	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2269;"	d	file:
 next_entry	lib/newlib/newlib/libc/iconv/ces/mkdeps.pl	/^sub next_entry($$$)$/;"	s
 next_event	lib/barrelfish/event_queue.c	/^static struct event_queue_node *next_event(struct event_queue *q)$/;"	f	file:
 next_event	lib/newlib/newlib/libc/machine/spu/spu_timer_flih.S	/^next_event:$/;"	l
+next_file_descrptor	include/barrelfish/proc.h	/^	struct file_descriptor_node * next_file_descrptor;$/;"	m	struct:file_descriptor_node	typeref:struct:file_descriptor_node::file_descriptor_node
 next_frame	include/barrelfish/proc.h	/^	struct frame_node * next_frame;$/;"	m	struct:frame_node	typeref:struct:frame_node::frame_node
 next_free	include/red_black_tree.h	/^  struct rb_red_blk_node* next_free;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 next_id	include/flounder/flounder_support_ump.h	/^    ump_index_t next_id;   \/\/\/< Sequence number of next message to be sent$/;"	m	struct:flounder_ump_state
@@ -33850,6 +33858,7 @@ positive_sign	lib/oldc/src/locale/lmonetary.h	/^	const char	*positive_sign;$/;"	
 posix_memalign_ea	lib/newlib/newlib/libc/machine/spu/posix_memalign_ea.c	/^COMPAT_EA_ALIAS (posix_memalign_ea);$/;"	v
 posix_memalign_ea	lib/newlib/newlib/libc/machine/spu/posix_memalign_ea.c	/^posix_memalign_ea (__ea void **memptr, size_ea_t align, size_ea_t size)$/;"	f
 posix_semaphore	include/semaphore.h	/^struct posix_semaphore {$/;"	s
+possition_in_file	include/barrelfish/proc.h	/^	int possition_in_file;$/;"	m	struct:file_descriptor_node
 post_op_attr	include/nfs/nfs_rpc.h	/^struct post_op_attr {$/;"	s
 post_op_attr	include/nfs/nfs_rpc.h	/^typedef struct post_op_attr post_op_attr;$/;"	t	typeref:struct:post_op_attr
 post_op_attr_u	include/nfs/nfs_rpc.h	/^    } post_op_attr_u;$/;"	m	struct:post_op_attr	typeref:union:post_op_attr::__anon53
@@ -40150,6 +40159,7 @@ tx_capnum	include/flounder/flounder_support_caps.h	/^    int tx_capnum;      \/\
 tx_filters	include/net_queue_manager/net_queue_manager.h	/^    struct filter* tx_filters;  \/\/ List of filters associated with this buf$/;"	m	struct:buffer_descriptor	typeref:struct:buffer_descriptor::filter
 tx_free_slots_fn_ptr	lib/net_queue_manager/queue_manager.c	/^static ether_get_tx_free_slots tx_free_slots_fn_ptr = NULL;$/;"	v	file:
 tx_index	include/net_queue_manager/net_queue_manager.h	/^    uint64_t tx_index;  \/\/ index of which is next slot to be sent$/;"	m	struct:client_closure
+type	include/barrelfish/aos_rpc.h	/^    enum filetype type;$/;"	m	struct:aos_dirent	typeref:enum:aos_dirent::filetype
 type	include/barrelfish/cross_core.h	/^	enum type type;$/;"	m	struct:ump_message	typeref:enum:ump_message::type
 type	include/barrelfish/cross_core.h	/^enum type {$/;"	g
 type	include/barrelfish/memobj.h	/^    enum memobj_type type;    \/\/\/< Type of the memory object$/;"	m	struct:memobj	typeref:enum:memobj::memobj_type
@@ -40221,6 +40231,8 @@ type	tools/arm_gem5/RealView.py	/^    type = 'RealViewCtrl'$/;"	v	class:RealView
 type	tools/arm_gem5/RealView.py	/^    type = 'Sp804'$/;"	v	class:Sp804
 type	tools/schedsim/simulator.c	/^    enum objtype        type;$/;"	m	struct:capability	typeref:enum:capability::objtype	file:
 type	tools/schedsim/simulator.c	/^    enum task_type      type;$/;"	m	struct:dcb	typeref:enum:dcb::task_type	file:
+typeDir	include/barrelfish/aos_rpc.h	/^	typeDir$/;"	e	enum:filetype
+typeFile	include/barrelfish/aos_rpc.h	/^	typeFile,$/;"	e	enum:filetype
 type_is_vnode	include/barrelfish_kpi/capabilities.h	/^static inline bool type_is_vnode(enum objtype type)$/;"	f
 typechar	tools/schedsim/simulator.c	/^static inline char typechar(enum task_type type)$/;"	f	file:
 types	lib/newlib/newlib/libc/posix/runetype.h	/^	unsigned long	*types;		\/* Array of types in range *\/$/;"	m	struct:__anon241
