@@ -11,6 +11,7 @@
 struct frame_node {
 	struct capref frame;
 	size_t bits;
+	genpaddr_t base;
 	struct frame_node * next_frame;
 };
 
@@ -38,7 +39,7 @@ struct process_node {
 	struct frame_node *consumed_frame;
 
 	// Open file descriptors used by that process
-	
+	struct file_descriptor_node *fd_node;	
 	
 	// Next process node 
 	struct process_node * next_pr;
