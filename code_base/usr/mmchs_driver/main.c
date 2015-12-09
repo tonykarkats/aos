@@ -86,160 +86,28 @@ int main(int argc, char **argv)
 
     mmchs_init();
 
-
-    //
-    // Reading the first block from the SD-Card
-    // This should be the same information you get with
-    // dd when reading the first block on linux...
-    //
-    void *buffer = malloc(512);
-    assert(buffer != NULL);
-	void *data = NULL;
-    err = mmchs_read_block(0, buffer);
-    assert(err_is_ok(err));
-
-	debug_printf("Boot Block Info\n");
-	debug_printf("--------------\n");
-
-//	debug_printf("Manufacturer: ");
-//	for (int i=3; i<=10; ++i) {
-//		debug_printf("%c", ((uint8_t*) buffer)[i]);
-//
-//	}
-//	debug_printf("\n");
-//
-//	uint16_t BPB_BytsPerSec = (((uint8_t*) buffer)[12] <<  8) +
-//				   			  ((uint8_t*) buffer)[11];
-//
-//	debug_printf("Bytes Per Sector: %d\n", BPB_BytsPerSec);
-//
-//
-//	uint8_t BPB_SecPerClus =  ((uint8_t*) buffer)[13];
-//	debug_printf("Number of Sectors per Cluster: %d\n", BPB_SecPerClus);
-//
-//	uint8_t BPB_NumFATs =  ((uint8_t*) buffer)[16];
-//	debug_printf("Number of FATs: %d\n", BPB_NumFATs);
-//
-//	uint32_t FATSz = 	(((uint8_t*) buffer)[39] << 24) +
-//				   		(((uint8_t*) buffer)[38] << 16) +
-//				   		(((uint8_t*) buffer)[37] <<  8) +
-//				   		((uint8_t*) buffer)[36];
-//	debug_printf("Size of FAT: %d\n", FATSz);
-//
-//	uint16_t BPB_RsvdSecCnt = (((uint8_t*) buffer)[15] <<  8) +
-//				   			  ((uint8_t*) buffer)[14];
-//
-//	debug_printf("Number of reserved sectors: %d\n", BPB_RsvdSecCnt);
-//
-//	// Calculate the start of the data region
-//	uint32_t FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs*FATSz);
-//	debug_printf("First Data Sector: %d\n", FirstDataSector);
-//
-//	// Calculate first cluster of root directory
-//		
-//	uint32_t BPB_RootClus = 	(((uint8_t*) buffer)[47] << 24) +
-//				   				(((uint8_t*) buffer)[46] << 16) +
-//				   				(((uint8_t*) buffer)[45] <<  8) +
-//				   				((uint8_t*) buffer)[44];
-//	debug_printf("First cluster of Root Directory: %d\n", BPB_RootClus);
-//
-//
-//	// Now we have to find the sector number of the root directory
-//	
-//	uint32_t FirstSectorofRootDir = ((BPB_RootClus-2)*BPB_SecPerClus + FirstDataSector);
-//	debug_printf("First sector of Root Directory : %d", FirstSectorofRootDir); 
-
-/*
-    debug_printf("Printing BOOT BLOCK block\n");
-    for (int i = 1; i <= 512; ++i)
-    {
-        debug_printf("%x\t", ((uint8_t*) buffer)[i-1]);
-        if (i % 4 == 0) {
-            printf("\n");
-        }
-    }
-*/
-/*
-	// Read FAT
-    err = mmchs_read_block(1, buffer);
-    debug_printf("\nPrinting FAT\n");
-    for (int i = 1; i <= 512; ++i)
-    {
-        debug_printf("%x\t", ((uint8_t*) buffer)[i-1]);
-        if (i % 4 == 0) {
-            debug_printf("\n");
-        }
-    }
-    assert(err_is_ok(err));
-*/
-
-	// Print Root Directory
-	
-//    err = mmchs_read_block(FirstSectorofRootDir, buffer);
- //   debug_printf("\nPrinting Root dir\n");
-  // for (int i = 32; i <= 128; ++i)
- //   {
- //       printf("%d: %c\n", i , ((uint8_t*) buffer)[i]);
-  //     	fflush(stdout); 
-  // }
-
-	// Some form of ls
-	
-	//char ls_arg[12] = {"dir1"};
-
 	err = fat32_init();
+	assert(err_is_ok(err));
 
 
-//	struct dirent * dirtable = NULL;
-//	uint32_t size;
-//	list("/DIR1/DIR12/F121", &dirtable, &size);
-	
-//	printf("Found %" PRIu32 "\n", size);
-//	for (int i=0; i<size; i++) {
-//		struct dirent dirent;
-//		dirent = dirtable[i];
-//		printf("%s\n", dirent.name);	
-//		printf("Starting cluster at %"PRIu32"\n", dirent.firstCluster);
-//	}
-
-
-//	err = read_file(15, data, 1);
-
-//	uint32_t fat_entry = get_fat_entry(408);
-//	debug_printf("FAT Entry contents: 0x%x\n", fat_entry);
-
-/*	void *data = malloc(512);
-	//void *data_2 = malloc(512);
-	char *vdata;
-
-	for (int i=15; i<100; i++) {
-		debug_printf("Printing cluster == %d\n", i);
-		get_data(i, data);	
-	}
-*/
-/*	vdata = (char *) data;
-	for (int i = 0; i < 512; i = i + 4) {
-		uint32_t entry = (vdata[i+3] << 24) + (vdata[i+2] << 16) + (vdata[i+1] << 8) + (vdata[i]);
-		debug_printf("FAT TABLE ENTRY = %d 0x%x\n", i/4, entry);
-		if (entry < 50)
-			mmchs_read_block(entry, data_2);
-	
-		if (*((char *)data_2) == 'n') {
-			debug_printf("SUCCESS\n");
-			break;
-		}
-	}	
-*/
+	// This is how list() is used!
 /*
-	debug_printf("--------\n");
-	data = malloc(512);
-	mmchs_read_block(32, data);
-	char * vdata = (char *) data;
-	for (int i = 0; i < 512; i = i + 4) {
-		uint32_t entry = (vdata[i+3] << 24) + (vdata[i+2] << 16) + (vdata[i+1] << 8) + (vdata[i]);
-		debug_printf("FAT TABLE ENTRY = %d %" PRIu32 "\n", i/4, entry);
-	}	
+	struct dirent * dirtable = NULL;
+	uint32_t size;
+	list("/DIR1/DIR12/F121", &dirtable, &size);
+  
+	printf("Found %" PRIu32 "\n", size);
+	for (int i=0; i<size; i++) {
+		struct dirent dirent;
+		dirent = dirtable[i];
+		printf("%s\n", dirent.name);	
+		printf("Starting cluster at %"PRIu32"\n", dirent.firstCluster);
+	}
+
 */
+
+	// This is how read_file() is used!
+
 	uint32_t retsize;
 	err = read_file("/DIR1/TEST1", &data, 0, 0, &retsize);
 	if (err_is_fail(err)) {
