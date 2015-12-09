@@ -720,6 +720,21 @@ BOOT_TIMEOUT_LINE_FAIL	tools/harness/tests/common.py	/^BOOT_TIMEOUT_LINE_FAIL = 
 BOOT_TIMEOUT_LINE_RETRY	tools/harness/tests/common.py	/^BOOT_TIMEOUT_LINE_RETRY = '[Error: boot timed out, retrying...]\\n'$/;"	v
 BOUNT	include/deputy/nodeputy.h	17;"	d
 BOW	lib/newlib/newlib/libc/posix/engine.c	101;"	d	file:
+BPB_BytsPerSec	lib/barrelfish/fat32.c	/^static uint16_t BPB_BytsPerSec;$/;"	v	file:
+BPB_BytsPerSec	usr/init/fat32.c	/^static uint16_t BPB_BytsPerSec;$/;"	v	file:
+BPB_BytsPerSec	usr/mmchs_driver/fat32.c	/^static uint16_t BPB_BytsPerSec;$/;"	v	file:
+BPB_NumFATs	lib/barrelfish/fat32.c	/^static uint8_t BPB_NumFATs;$/;"	v	file:
+BPB_NumFATs	usr/init/fat32.c	/^static uint8_t BPB_NumFATs;$/;"	v	file:
+BPB_NumFATs	usr/mmchs_driver/fat32.c	/^static uint8_t BPB_NumFATs;$/;"	v	file:
+BPB_RootClus	lib/barrelfish/fat32.c	/^static uint32_t BPB_RootClus;$/;"	v	file:
+BPB_RootClus	usr/init/fat32.c	/^static uint32_t BPB_RootClus;$/;"	v	file:
+BPB_RootClus	usr/mmchs_driver/fat32.c	/^static uint32_t BPB_RootClus;$/;"	v	file:
+BPB_RsvdSecCnt	lib/barrelfish/fat32.c	/^static uint16_t BPB_RsvdSecCnt;$/;"	v	file:
+BPB_RsvdSecCnt	usr/init/fat32.c	/^static uint16_t BPB_RsvdSecCnt;$/;"	v	file:
+BPB_RsvdSecCnt	usr/mmchs_driver/fat32.c	/^static uint16_t BPB_RsvdSecCnt;$/;"	v	file:
+BPB_SecPerClus	lib/barrelfish/fat32.c	/^static uint8_t BPB_SecPerClus;$/;"	v	file:
+BPB_SecPerClus	usr/init/fat32.c	/^static uint8_t BPB_SecPerClus;$/;"	v	file:
+BPB_SecPerClus	usr/mmchs_driver/fat32.c	/^static uint8_t BPB_SecPerClus;$/;"	v	file:
 BRACKET	lib/newlib/newlib/libc/stdlib/mbtowc_r.c	/^typedef enum { ESCAPE, DOLLAR, BRACKET, AT, B, J, $/;"	e	enum:__anon259	file:
 BRKINT	include/sys/_termios.h	97;"	d
 BSD conv Functions	doc/015-disk-driver-arch/fat.tex	/^and does not support opening files with non-\\acs{ascii} filenames.$/;"	b
@@ -1409,6 +1424,10 @@ CSTOPB	include/sys/_termios.h	138;"	d
 CT	include/deputy/nodeputy.h	20;"	d
 CTLOCBUFLEN	lib/newlib/newlib/libc/time/strftime.c	309;"	d	file:
 CTL_SERVICE_SUFFIX	include/barrelfish/net_constants.h	43;"	d
+CTRLMOD_DEBUG	lib/barrelfish/ctrlmod.c	23;"	d	file:
+CTRLMOD_DEBUG	lib/barrelfish/ctrlmod.c	25;"	d	file:
+CTRLMOD_DEBUG	usr/init/ctrlmod.c	23;"	d	file:
+CTRLMOD_DEBUG	usr/init/ctrlmod.c	25;"	d	file:
 CTRLMOD_DEBUG	usr/mmchs_driver/ctrlmod.c	23;"	d	file:
 CTRLMOD_DEBUG	usr/mmchs_driver/ctrlmod.c	25;"	d	file:
 CT_CCL	lib/newlib/newlib/libc/machine/powerpc/vfscanf.c	187;"	d	file:
@@ -1605,6 +1624,8 @@ DBL_MIN_EXP	include/arch/x86_32/float.h	66;"	d
 DBL_MIN_EXP	include/arch/x86_64/float.h	66;"	d
 DBT	lib/newlib/newlib/libc/search/db_local.h	/^} DBT;$/;"	t	typeref:struct:__anon244
 DBTYPE	lib/newlib/newlib/libc/search/db_local.h	/^typedef enum { DB_BTREE, DB_HASH, DB_RECNO } DBTYPE;$/;"	t	typeref:enum:__anon245
+DBUF_SIZE	lib/barrelfish/mmchs.c	25;"	d	file:
+DBUF_SIZE	usr/init/mmchs.c	25;"	d	file:
 DBUF_SIZE	usr/mmchs_driver/mmchs.c	25;"	d	file:
 DB_BIG_ENDIAN	lib/newlib/newlib/libc/search/hash.h	51;"	d
 DB_BTREE	lib/newlib/newlib/libc/search/db_local.h	/^typedef enum { DB_BTREE, DB_HASH, DB_RECNO } DBTYPE;$/;"	e	enum:__anon245
@@ -1752,6 +1773,8 @@ DEFAULT_TEST_TIMEOUT	tools/harness/tests/common.py	/^DEFAULT_TEST_TIMEOUT = date
 DEFAULT_THREAD_NAME	include/lwip/opt.h	1099;"	d
 DEFAULT_THREAD_PRIO	include/lwip/opt.h	1117;"	d
 DEFAULT_THREAD_STACKSIZE	include/lwip/opt.h	1108;"	d
+DEFAULT_TIMEOUT	lib/barrelfish/i2c.c	39;"	d	file:
+DEFAULT_TIMEOUT	usr/init/i2c.c	39;"	d	file:
 DEFAULT_TIMEOUT	usr/mmchs_driver/i2c.c	39;"	d	file:
 DEFAULT_TOP_PAD	lib/newlib/newlib/libc/stdlib/callocr.c	814;"	d	file:
 DEFAULT_TOP_PAD	lib/newlib/newlib/libc/stdlib/cfreer.c	814;"	d	file:
@@ -3899,6 +3922,9 @@ FASYNC	include/fcntl.h	150;"	d
 FASYNC	lib/newlib/newlib/libc/include/sys/_default_fcntl.h	78;"	d
 FASYNC	lib/newlib/newlib/libc/machine/cris/sys/fcntl.h	56;"	d
 FAT Filesystem	doc/015-disk-driver-arch/disk-driver-report.tex	/^\\input{blockdevfs}$/;"	c
+FATSz	lib/barrelfish/fat32.c	/^static uint32_t FATSz;$/;"	v	file:
+FATSz	usr/init/fat32.c	/^static uint32_t FATSz;$/;"	v	file:
+FATSz	usr/mmchs_driver/fat32.c	/^static uint32_t FATSz;$/;"	v	file:
 FB_KIND_FINISH	lib/thc/thc.c	15;"	d	file:
 FB_KIND_TOP_FINISH	lib/thc/thc.c	16;"	d	file:
 FCNTLFLAGS	include/fcntl.h	127;"	d
@@ -4056,13 +4082,13 @@ FIONREAD	include/lwip/sockets.h	251;"	d
 FIRSTEP_BUFLEN	kernel/arch/omap44xx/startup_arch.c	52;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/aos_rpc.c	19;"	d	file:
 FIRSTEP_BUFLEN	lib/barrelfish/lmp_endpoints.c	507;"	d	file:
-FIRSTEP_BUFLEN	usr/init/init.c	34;"	d	file:
+FIRSTEP_BUFLEN	usr/init/init.c	35;"	d	file:
 FIRSTEP_BUFLEN	usr/init/init.h	24;"	d
 FIRSTEP_BUFLEN	usr/initapp/initapp.c	34;"	d	file:
 FIRSTEP_BUFLEN	usr/memeater/memeater.c	19;"	d	file:
 FIRSTEP_OFFSET	kernel/arch/omap44xx/startup_arch.c	48;"	d	file:
 FIRSTEP_OFFSET	lib/barrelfish/aos_rpc.c	20;"	d	file:
-FIRSTEP_OFFSET	usr/init/init.c	35;"	d	file:
+FIRSTEP_OFFSET	usr/init/init.c	36;"	d	file:
 FIRSTEP_OFFSET	usr/init/init.h	25;"	d
 FIRSTEP_OFFSET	usr/initapp/initapp.c	35;"	d	file:
 FIRSTEP_OFFSET	usr/memeater/memeater.c	20;"	d	file:
@@ -4452,6 +4478,12 @@ FileSave_Click	tools/demo/Aquarium/Window1.xaml.cs	/^        private void FileSa
 Filename	tools/demo/Aquarium/Window1.xaml.cs	/^        private string Filename;$/;"	f	class:Aquarium.Window1	file:
 Finished	kernel/arch/armv7/cp15.S	/^Finished:$/;"	l
 Finished11	kernel/arch/armv7/cp15.S	/^Finished11:$/;"	l
+FirstDataSector	lib/barrelfish/fat32.c	/^static uint32_t FirstDataSector;$/;"	v	file:
+FirstDataSector	usr/init/fat32.c	/^static uint32_t FirstDataSector;$/;"	v	file:
+FirstDataSector	usr/mmchs_driver/fat32.c	/^static uint32_t FirstDataSector;$/;"	v	file:
+FirstSectorofRootDir	lib/barrelfish/fat32.c	/^static uint32_t FirstSectorofRootDir;$/;"	v	file:
+FirstSectorofRootDir	usr/init/fat32.c	/^static uint32_t FirstSectorofRootDir;$/;"	v	file:
+FirstSectorofRootDir	usr/mmchs_driver/fat32.c	/^static uint32_t FirstSectorofRootDir;$/;"	v	file:
 Fixed size array	doc/011-idc/IDC.tex	/^This declares a compound type, akin to a structure in C.$/;"	b
 Flounder AHCI Backend	doc/015-disk-driver-arch/disk-driver-report.tex	/^\\input{libahci}$/;"	c
 Flounder Backend	doc/015-disk-driver-arch/design.tex	/^waitsets.$/;"	s
@@ -4921,15 +4953,29 @@ I	lib/newlib/newlib/libc/include/complex.h	13;"	d
 I0	lib/newlib/newlib/libc/machine/bfin/longjmp.S	/^	I0 = R0;$/;"	d
 I1	lib/newlib/newlib/libc/machine/bfin/longjmp.S	/^	I1 = R0;$/;"	d
 I2	lib/newlib/newlib/libc/machine/bfin/longjmp.S	/^	I2 = R0;$/;"	d
+I2C_COUNT	lib/barrelfish/i2c.c	27;"	d	file:
+I2C_COUNT	usr/init/i2c.c	27;"	d	file:
 I2C_COUNT	usr/mmchs_driver/i2c.c	27;"	d	file:
+I2C_DEBUG	lib/barrelfish/i2c.c	19;"	d	file:
+I2C_DEBUG	lib/barrelfish/i2c.c	23;"	d	file:
+I2C_DEBUG	usr/init/i2c.c	19;"	d	file:
+I2C_DEBUG	usr/init/i2c.c	23;"	d	file:
 I2C_DEBUG	usr/mmchs_driver/i2c.c	19;"	d	file:
 I2C_DEBUG	usr/mmchs_driver/i2c.c	23;"	d	file:
+I2C_HC	lib/barrelfish/twl6030.c	20;"	d	file:
+I2C_HC	usr/init/twl6030.c	20;"	d	file:
 I2C_HC	usr/mmchs_driver/twl6030.c	20;"	d	file:
+I2C_NOSTOP	include/barrelfish/i2c.h	/^    I2C_NOSTOP = 0x4,$/;"	e	enum:i2c_flags
 I2C_NOSTOP	kernel/include/arch/armv7/ti_i2c.h	/^    I2C_NOSTOP = 0x4,$/;"	e	enum:i2c_flags
+I2C_NOSTOP	usr/init/i2c.h	/^    I2C_NOSTOP = 0x4,$/;"	e	enum:i2c_flags
 I2C_NOSTOP	usr/mmchs_driver/i2c.h	/^    I2C_NOSTOP = 0x4,$/;"	e	enum:i2c_flags
+I2C_RD	include/barrelfish/i2c.h	/^    I2C_RD     = 0x1,$/;"	e	enum:i2c_flags
 I2C_RD	kernel/include/arch/armv7/ti_i2c.h	/^    I2C_RD     = 0x1,$/;"	e	enum:i2c_flags
+I2C_RD	usr/init/i2c.h	/^    I2C_RD     = 0x1,$/;"	e	enum:i2c_flags
 I2C_RD	usr/mmchs_driver/i2c.h	/^    I2C_RD     = 0x1,$/;"	e	enum:i2c_flags
+I2C_WR	include/barrelfish/i2c.h	/^    I2C_WR     = 0x2,$/;"	e	enum:i2c_flags
 I2C_WR	kernel/include/arch/armv7/ti_i2c.h	/^    I2C_WR     = 0x2,$/;"	e	enum:i2c_flags
+I2C_WR	usr/init/i2c.h	/^    I2C_WR     = 0x2,$/;"	e	enum:i2c_flags
 I2C_WR	usr/mmchs_driver/i2c.h	/^    I2C_WR     = 0x2,$/;"	e	enum:i2c_flags
 I3	lib/newlib/newlib/libc/machine/bfin/longjmp.S	/^	I3 = R0;$/;"	d
 IAV	lib/newlib/newlib/libc/stdlib/callocr.c	1594;"	d	file:
@@ -5222,6 +5268,8 @@ ICONV_TO_UCS_CES_UTF_8	lib/newlib/newlib/libc/iconv/ces/cesbi.h	163;"	d
 ICONV_ZERO_MB_STATE_T	lib/newlib/newlib/libc/iconv/lib/local.h	45;"	d
 ICONV_ZERO_MB_STATE_T	lib/newlib/newlib/libc/iconv/lib/local.h	47;"	d
 ICRNL	include/sys/_termios.h	104;"	d
+ID1_I2C_ADDR	lib/barrelfish/twl6030.c	22;"	d	file:
+ID1_I2C_ADDR	usr/init/twl6030.c	22;"	d	file:
 ID1_I2C_ADDR	usr/mmchs_driver/twl6030.c	22;"	d	file:
 IDC Endpoint	doc/013-capability-mgmt/type_system.tex	/^  invocations in the code that we have not discussed yet.}$/;"	b
 IDC_BARRELFISH_H_	lib/lwip/src/barrelfish/idc_barrelfish.h	18;"	d
@@ -7709,8 +7757,16 @@ MMAP_FOOT_PAD	lib/dmalloc/dmalloc.c	2205;"	d	file:
 MMAP_FOOT_PAD	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2210;"	d	file:
 MMAP_PROT	lib/dmalloc/dmalloc.c	1523;"	d	file:
 MMAP_PROT	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	1528;"	d	file:
+MMCHS2_DEBUG_H	include/barrelfish/mmchs_debug.h	11;"	d
+MMCHS2_DEBUG_H	usr/init/mmchs_debug.h	11;"	d
 MMCHS2_DEBUG_H	usr/mmchs_driver/mmchs_debug.h	11;"	d
+MMCHS2_H	include/barrelfish/mmchs.h	11;"	d
+MMCHS2_H	usr/init/mmchs.h	11;"	d
 MMCHS2_H	usr/mmchs_driver/mmchs.h	11;"	d
+MMCHS_DEBUG	include/barrelfish/mmchs_debug.h	21;"	d
+MMCHS_DEBUG	include/barrelfish/mmchs_debug.h	23;"	d
+MMCHS_DEBUG	usr/init/mmchs_debug.h	21;"	d
+MMCHS_DEBUG	usr/init/mmchs_debug.h	23;"	d
 MMCHS_DEBUG	usr/mmchs_driver/mmchs_debug.h	21;"	d
 MMCHS_DEBUG	usr/mmchs_driver/mmchs_debug.h	23;"	d
 MM_MAXCHILDBITS	usr/init/mem_alloc.c	22;"	d	file:
@@ -9403,7 +9459,11 @@ PA_STRING	include/oldc/printf.h	/^	PA_STRING	= (1 << 3),	\/* const char * (with 
 PA_WCHAR	include/oldc/printf.h	/^	PA_WCHAR	= (1 << 2),	\/* wide char *\/$/;"	e	enum:__anon92
 PA_WSTRING	include/oldc/printf.h	/^	PA_WSTRING	= (1 << 4),	\/* const wchar_t * *\/$/;"	e	enum:__anon92
 PBDRY	include/sys/param.h	133;"	d
+PBIAS_IRQ	include/barrelfish/omap44xx_ctrlmod.h	18;"	d
+PBIAS_IRQ	usr/init/omap44xx_ctrlmod.h	18;"	d
 PBIAS_IRQ	usr/mmchs_driver/omap44xx_ctrlmod.h	18;"	d
+PBS	lib/barrelfish/twl6030.c	24;"	d	file:
+PBS	usr/init/twl6030.c	24;"	d	file:
 PBS	usr/mmchs_driver/twl6030.c	24;"	d	file:
 PBUF_DEBUG	include/lwip/opt.h	1607;"	d
 PBUF_FIXED_SIZE	lib/lwip/src/core/pbuf.c	129;"	d	file:
@@ -9628,7 +9688,11 @@ PPP_SUPPORT	include/lwip/opt.h	1368;"	d
 PPP_THREAD_NAME	include/lwip/opt.h	1074;"	d
 PPP_THREAD_PRIO	include/lwip/opt.h	1092;"	d
 PPP_THREAD_STACKSIZE	include/lwip/opt.h	1083;"	d
+PRBUF	lib/barrelfish/twl6030.c	/^static char PRBUF[PBS];$/;"	v	file:
+PRBUF	usr/init/twl6030.c	/^static char PRBUF[PBS];$/;"	v	file:
 PRBUF	usr/mmchs_driver/twl6030.c	/^static char PRBUF[PBS];$/;"	v	file:
+PRBUFL	lib/barrelfish/twl6030.c	26;"	d	file:
+PRBUFL	usr/init/twl6030.c	26;"	d	file:
 PRBUFL	usr/mmchs_driver/twl6030.c	26;"	d	file:
 PREACTION	lib/dmalloc/dmalloc.c	2723;"	d	file:
 PREACTION	lib/dmalloc/dmalloc.c	2728;"	d	file:
@@ -11726,7 +11790,11 @@ SDOT	lib/newlib/newlib/libc/stdio/local.h	/^  SDOT,   \/* seen dot *\/$/;"	e	enu
 SECSPERDAY	lib/newlib/newlib/libc/time/local.h	9;"	d
 SECSPERHOUR	lib/newlib/newlib/libc/time/local.h	8;"	d
 SECSPERMIN	lib/newlib/newlib/libc/time/local.h	5;"	d
+SECTION_ROUND_UP	lib/barrelfish/service.c	31;"	d	file:
+SECTION_ROUND_UP	usr/init/service.c	31;"	d	file:
 SECTION_ROUND_UP	usr/mmchs_driver/service.c	31;"	d	file:
+SECTION_SIZE	lib/barrelfish/service.c	30;"	d	file:
+SECTION_SIZE	usr/init/service.c	30;"	d	file:
 SECTION_SIZE	usr/mmchs_driver/service.c	30;"	d	file:
 SEE	lib/newlib/newlib/libc/posix/regcomp.c	144;"	d	file:
 SEEK_CUR	include/oldc/stdio.h	105;"	d
@@ -13021,6 +13089,8 @@ SYSCALL_SCAN	include/barrelfish_kpi/syscalls.h	53;"	d
 SYSCALL_X86_FPU_TRAP_ON	include/barrelfish_kpi/syscalls.h	50;"	d
 SYSCALL_X86_RELOAD_LDT	include/barrelfish_kpi/syscalls.h	51;"	d
 SYSCALL_YIELD	include/barrelfish_kpi/syscalls.h	39;"	d
+SYSCTRL_PADCONF_CORE	lib/barrelfish/ctrlmod.c	28;"	d	file:
+SYSCTRL_PADCONF_CORE	usr/init/ctrlmod.c	28;"	d	file:
 SYSCTRL_PADCONF_CORE	usr/mmchs_driver/ctrlmod.c	28;"	d	file:
 SYSRET	include/barrelfish_kpi/syscalls.h	27;"	d
 SYSTEM_MODE_STACK_BYTES	kernel/arch/armv7/exceptions.S	/^#define SYSTEM_MODE_STACK_BYTES         8192$/;"	d
@@ -13898,6 +13968,10 @@ TUREAD	lib/newlib/newlib/libc/include/tar.h	29;"	d
 TUWRITE	lib/newlib/newlib/libc/include/tar.h	30;"	d
 TVERSION	lib/newlib/newlib/libc/include/tar.h	11;"	d
 TVERSLEN	lib/newlib/newlib/libc/include/tar.h	12;"	d
+TWL_DEBUG	lib/barrelfish/twl6030.c	30;"	d	file:
+TWL_DEBUG	lib/barrelfish/twl6030.c	32;"	d	file:
+TWL_DEBUG	usr/init/twl6030.c	30;"	d	file:
+TWL_DEBUG	usr/init/twl6030.c	32;"	d	file:
 TWL_DEBUG	usr/mmchs_driver/twl6030.c	30;"	d	file:
 TWL_DEBUG	usr/mmchs_driver/twl6030.c	32;"	d	file:
 TWO23	lib/newlib/newlib/libm/common/sf_llrint.c	/^TWO23[2]={$/;"	v	file:
@@ -14363,7 +14437,7 @@ UNSIGNED	lib/oldc/src/vfscanf.c	65;"	d	file:
 UNSTABLE	include/nfs/nfs_rpc.h	/^    UNSTABLE = 0,$/;"	e	enum:stable_how
 UNUSED	kernel/arch/omap44xx/startup_arch.c	34;"	d	file:
 UNUSED	usr/init/boot_strap.c	5;"	d	file:
-UNUSED	usr/init/init.c	32;"	d	file:
+UNUSED	usr/init/init.c	33;"	d	file:
 UNUSED	usr/init_memtest/init.c	20;"	d	file:
 UPAP_DEFREQTIME	include/lwip/opt.h	1467;"	d
 UPAP_DEFTIMEOUT	include/lwip/opt.h	1463;"	d
@@ -17854,7 +17928,11 @@ __OFF_MAX	include/arch/x86_64/machine/_limits.h	75;"	d
 __OFF_MIN	include/arch/arm/machine/_limits.h	83;"	d
 __OFF_MIN	include/arch/x86_32/machine/_limits.h	83;"	d
 __OFF_MIN	include/arch/x86_64/machine/_limits.h	76;"	d
+__OMAP44XX_CM2_H__	include/barrelfish/omap44xx_cm2.h	11;"	d
+__OMAP44XX_CM2_H__	usr/init/omap44xx_cm2.h	11;"	d
 __OMAP44XX_CM2_H__	usr/mmchs_driver/omap44xx_cm2.h	11;"	d
+__OMAP44XX_CTRLMOD_H__	include/barrelfish/omap44xx_ctrlmod.h	11;"	d
+__OMAP44XX_CTRLMOD_H__	usr/init/omap44xx_ctrlmod.h	11;"	d
 __OMAP44XX_CTRLMOD_H__	usr/mmchs_driver/omap44xx_ctrlmod.h	11;"	d
 __OMAP_TIMER_H	include/omap_timer/timer.h	16;"	d
 __OPDEFS_H__	lib/bfdmuxtools/opdefs.h	16;"	d
@@ -18126,8 +18204,12 @@ __THROW	lib/newlib/newlib/libc/machine/cris/include/pthread.h	41;"	d
 __THROW	lib/newlib/newlib/libc/machine/cris/include/pthread.h	45;"	d
 __THROW	lib/newlib/newlib/libc/machine/cris/include/pthread.h	91;"	d
 __TIMER_H	kernel/include/timer.h	16;"	d
+__TI_I2C_H__	include/barrelfish/i2c.h	10;"	d
 __TI_I2C_H__	kernel/include/arch/armv7/ti_i2c.h	10;"	d
+__TI_I2C_H__	usr/init/i2c.h	10;"	d
 __TI_I2C_H__	usr/mmchs_driver/i2c.h	10;"	d
+__TI_TWL6030_H__	include/barrelfish/twl6030.h	10;"	d
+__TI_TWL6030_H__	usr/init/twl6030.h	10;"	d
 __TI_TWL6030_H__	usr/mmchs_driver/twl6030.h	10;"	d
 __TOOLS_H__	include/bfdmuxtools/tools.h	15;"	d
 __UCHAR_MAX	include/arch/arm/machine/_limits.h	52;"	d
@@ -20499,7 +20581,11 @@ _thc_schedulecont	lib/thc/thc.c	/^int _thc_schedulecont(void *cont) {$/;"	f
 _thc_schedulecont_c	lib/thc/thc.c	/^void _thc_schedulecont_c(awe_t *awe) {$/;"	f
 _thc_startasync	lib/thc/thc.c	/^void _thc_startasync(void *f, void *stack) {$/;"	f
 _thc_startfinishblock	lib/thc/thc.c	/^void _thc_startfinishblock(finish_t *fb, int fb_kind) {$/;"	f
+_ti_twl6030_id1_read_8	lib/barrelfish/twl6030.c	/^static inline uint8_t _ti_twl6030_id1_read_8(void *d, size_t off)$/;"	f	file:
+_ti_twl6030_id1_read_8	usr/init/twl6030.c	/^static inline uint8_t _ti_twl6030_id1_read_8(void *d, size_t off)$/;"	f	file:
 _ti_twl6030_id1_read_8	usr/mmchs_driver/twl6030.c	/^static inline uint8_t _ti_twl6030_id1_read_8(void *d, size_t off)$/;"	f	file:
+_ti_twl6030_id1_write_8	lib/barrelfish/twl6030.c	/^static inline void _ti_twl6030_id1_write_8(void *d, size_t off, uint8_t regval)$/;"	f	file:
+_ti_twl6030_id1_write_8	usr/init/twl6030.c	/^static inline void _ti_twl6030_id1_write_8(void *d, size_t off, uint8_t regval)$/;"	f	file:
 _ti_twl6030_id1_write_8	usr/mmchs_driver/twl6030.c	/^static inline void _ti_twl6030_id1_write_8(void *d, size_t off, uint8_t regval)$/;"	f	file:
 _time_locale	lib/newlib/newlib/libc/locale/timelocal.c	/^static struct lc_time_T _time_locale;$/;"	v	typeref:struct:lc_time_T	file:
 _time_using_locale	lib/newlib/newlib/libc/locale/timelocal.c	/^static int _time_using_locale;$/;"	v	file:
@@ -22020,6 +22106,7 @@ barrelfish_ntohl	include/arch/cc.h	/^static inline u32_t barrelfish_ntohl(u32_t 
 barrelfish_ntohs	include/arch/cc.h	/^static inline u16_t barrelfish_ntohs(u16_t n)$/;"	f
 base	include/barrelfish/bulk_transfer.h	/^    void *base;$/;"	m	struct:bulk_buf
 base	include/barrelfish/heap.h	/^    union heap_header base;                         \/* allocated list head *\/$/;"	m	struct:heap	typeref:union:heap::heap_header
+base	include/barrelfish/proc.h	/^	genpaddr_t base;$/;"	m	struct:frame_node
 base	include/barrelfish/vregion.h	/^    genvaddr_t base;         \/\/\/< Base address of the vregion$/;"	m	struct:vregion
 base	include/barrelfish_kpi/capabilities.h	/^    genpaddr_t base;   \/\/\/< Physical base address of frame$/;"	m	struct:frame_identity
 base	include/mm/mm.h	/^    genpaddr_t base;               \/\/\/< Physical base address of region$/;"	m	struct:mem_cap
@@ -22330,6 +22417,7 @@ btodb	include/sys/param.h	119;"	d
 btowc	lib/newlib/newlib/libc/stdlib/btowc.c	/^btowc (int c)$/;"	f
 btowc	lib/oldc/src/locale/btowc.c	/^btowc(int c)$/;"	f
 buckets	include/collections/hash_table.h	/^	collections_listnode	**buckets;$/;"	m	struct:_collections_hash_table
+buf	include/barrelfish/i2c.h	/^    uint8_t *buf;$/;"	m	struct:i2c_msg
 buf	include/barrelfish/lmp_endpoints.h	/^    struct lmp_recv_buf buf;$/;"	m	struct:lmp_recv_msg	typeref:struct:lmp_recv_msg::lmp_recv_buf
 buf	include/barrelfish/msgbuf.h	/^    char *buf;      \/\/\/< Pointer to start of message buffer$/;"	m	struct:msgbuf
 buf	include/barrelfish_kpi/lmp.h	/^    uintptr_t   buf[];      \/\/\/< Buffer for async LMP messages$/;"	m	struct:lmp_endpoint_kern
@@ -22346,6 +22434,7 @@ buf	lib/newlib/newlib/libc/stdio/ungetwc.c	/^  char buf[MB_LEN_MAX];$/;"	m	struc
 buf	lib/newlib/newlib/libc/stdio64/tmpfile64.c	/^  char buf[L_tmpnam];$/;"	m	struct:ptr	file:
 buf	lib/newlib/newlib/libc/syscalls/systimes.c	/^     struct tms *buf)$/;"	s	file:
 buf	lib/oldc/src/xprintf.c	/^        } buf;$/;"	m	union:__printf_io::__anon303	typeref:struct:__printf_io::__anon303::__anon304	file:
+buf	usr/init/i2c.h	/^    uint8_t *buf;$/;"	m	struct:i2c_msg
 buf	usr/mmchs_driver/i2c.h	/^    uint8_t *buf;$/;"	m	struct:i2c_msg
 buf_allocated	include/stdio_file.h	/^    int buf_allocated;      \/\/ Was the buffer malloc'd (=1) or is it static (=0)?$/;"	m	struct:__file
 buf_pos	include/stdio_file.h	/^    int buf_pos;    \/\/ Current position in output buffer$/;"	m	struct:__file
@@ -22837,6 +22926,8 @@ chan_id	kernel/include/arch/armv7/arm_core_data.h	/^    uint32_t    chan_id;$/;"
 chan_id	kernel/include/diteinfo.h	/^    uint32_t chan_id;$/;"	m	struct:diteinfo
 change	lib/newlib/newlib/libc/include/time.h	/^  time_t change;$/;"	m	struct:__tzrule_struct
 change _waitset	doc/011-idc/IDC.tex	/^only one continuation may be registered at a time.$/;"	b
+change_clock_frequency_to_fit_protocol	lib/barrelfish/mmchs.c	/^static void change_clock_frequency_to_fit_protocol(uint32_t clock)$/;"	f	file:
+change_clock_frequency_to_fit_protocol	usr/init/mmchs.c	/^static void change_clock_frequency_to_fit_protocol(uint32_t clock)$/;"	f	file:
 change_clock_frequency_to_fit_protocol	usr/mmchs_driver/mmchs.c	/^static void change_clock_frequency_to_fit_protocol(uint32_t clock)$/;"	f	file:
 change_mparam	lib/dmalloc/dmalloc.c	/^static int change_mparam(int param_number, int value) {$/;"	f	file:
 change_mparam	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^static int change_mparam(int param_number, int value) {$/;"	f	file:
@@ -23208,6 +23299,8 @@ client_endpoint	include/barrelfish/proc.h	/^	struct capref client_endpoint;$/;"	
 client_handler	include/octopus_server/service.h	/^    uint64_t client_handler;$/;"	m	struct:oct_reply_state
 client_no	lib/net_queue_manager/queue_manager.c	/^static int client_no = 0;  \/\/ number of clients(apps) connected$/;"	v	file:
 client_state	include/octopus_server/service.h	/^    uint64_t client_state;$/;"	m	struct:oct_reply_state
+clkgen_cm2	lib/barrelfish/cm2.c	/^static omap44xx_ckgen_cm2_t clkgen_cm2;$/;"	v	file:
+clkgen_cm2	usr/init/cm2.c	/^static omap44xx_ckgen_cm2_t clkgen_cm2;$/;"	v	file:
 clkgen_cm2	usr/mmchs_driver/cm2.c	/^static omap44xx_ckgen_cm2_t clkgen_cm2;$/;"	v	file:
 clock	lib/newlib/newlib/libc/time/clock.c	/^clock ()$/;"	f
 clock	lib/oldc/src/clock.c	/^clock(void)$/;"	f
@@ -23248,10 +23341,20 @@ clr	lib/newlib/newlib/libc/machine/mn10300/strchr.S	/^	clr d0$/;"	d
 clr	lib/newlib/newlib/libc/machine/mn10300/strcmp.S	/^	clr d0$/;"	d
 clrbit	include/sys/param.h	185;"	d
 clrl	lib/newlib/newlib/libc/machine/m68k/setjmp.S	/^	clrl d0$/;"	d
+cm2_enable_hsmmc1	lib/barrelfish/cm2.c	/^void cm2_enable_hsmmc1(void)$/;"	f
+cm2_enable_hsmmc1	usr/init/cm2.c	/^void cm2_enable_hsmmc1(void)$/;"	f
 cm2_enable_hsmmc1	usr/mmchs_driver/cm2.c	/^void cm2_enable_hsmmc1(void)$/;"	f
+cm2_enable_i2c	lib/barrelfish/cm2.c	/^void cm2_enable_i2c(size_t i2c_index)$/;"	f
+cm2_enable_i2c	usr/init/cm2.c	/^void cm2_enable_i2c(size_t i2c_index)$/;"	f
 cm2_enable_i2c	usr/mmchs_driver/cm2.c	/^void cm2_enable_i2c(size_t i2c_index)$/;"	f
+cm2_get_hsmmc1_base_clock	lib/barrelfish/cm2.c	/^int cm2_get_hsmmc1_base_clock(void)$/;"	f
+cm2_get_hsmmc1_base_clock	usr/init/cm2.c	/^int cm2_get_hsmmc1_base_clock(void)$/;"	f
 cm2_get_hsmmc1_base_clock	usr/mmchs_driver/cm2.c	/^int cm2_get_hsmmc1_base_clock(void)$/;"	f
+cm2_init	lib/barrelfish/cm2.c	/^void cm2_init(void)$/;"	f
+cm2_init	usr/init/cm2.c	/^void cm2_init(void)$/;"	f
 cm2_init	usr/mmchs_driver/cm2.c	/^void cm2_init(void)$/;"	f
+cmd_line_reset	lib/barrelfish/mmchs.c	/^static void cmd_line_reset(void)$/;"	f	file:
+cmd_line_reset	usr/init/mmchs.c	/^static void cmd_line_reset(void)$/;"	f	file:
 cmd_line_reset	usr/mmchs_driver/mmchs.c	/^static void cmd_line_reset(void)$/;"	f	file:
 cmd_t	include/bfdmuxtools/bfdmux.h	/^typedef uint8_t cmd_t;          \/**< \\brief Command type *\/$/;"	t
 cmdarg	include/getopt/getopt.h	/^struct cmdarg {$/;"	s
@@ -23280,6 +23383,8 @@ cnode	include/barrelfish/caddr.h	/^    struct cnoderef cnode;    \/\/\/< CNode t
 cnode	include/barrelfish/red_black_tree.h	/^	struct capref cnode;$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 cnode	include/barrelfish/slot_alloc.h	/^    struct cnoderef cnode;       \/\/\/< cnoderef for the cnode to allocate from$/;"	m	struct:range_slot_allocator	typeref:struct:range_slot_allocator::cnoderef
 cnode	include/barrelfish/slot_alloc.h	/^    struct cnoderef cnode;      \/\/\/< Cnode the allocator is tracking$/;"	m	struct:single_slot_allocator	typeref:struct:single_slot_allocator::cnoderef
+cnode	lib/barrelfish/main.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
+cnode	usr/init/fat32.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
 cnode	usr/mmchs_driver/main.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
 cnode_base	lib/barrelfish/capabilities.c	/^struct cnoderef cnode_base = {$/;"	v	typeref:struct:cnoderef
 cnode_build_cnoderef	lib/barrelfish/capabilities.c	/^errval_t cnode_build_cnoderef(struct cnoderef *cnoder, struct capref capr)$/;"	f
@@ -23404,6 +23509,8 @@ compile_filter	lib/bfdmuxtools/codegen.c	/^compile_filter(char *expression, uint
 compile_subtree	lib/bfdmuxtools/codegen.c	/^compile_subtree(char *expr, int from_pos, int to_pos, uint8_t ** out,$/;"	f	file:
 compile_vaddr	kernel/paging_generic.c	/^errval_t compile_vaddr(struct cte *ptable, size_t entry, genvaddr_t *retvaddr)$/;"	f
 compl	include/oldc/iso646.h	93;"	d
+complete_card_transaction	lib/barrelfish/mmchs.c	/^static errval_t complete_card_transaction(void)$/;"	f	file:
+complete_card_transaction	usr/init/mmchs.c	/^static errval_t complete_card_transaction(void)$/;"	f	file:
 complete_card_transaction	usr/mmchs_driver/mmchs.c	/^static errval_t complete_card_transaction(void)$/;"	f	file:
 complex	include/oldc/complex.h	39;"	d
 complex	lib/newlib/newlib/libc/include/complex.h	11;"	d
@@ -23829,7 +23936,11 @@ ctors	lib/crt/crtbegin.c	/^static CDtor ctors[1]$/;"	v	file:
 ctors	lib/crt/crtend.c	/^static CDtor ctors[1]$/;"	v	file:
 ctr	kernel/arch/arm/exec.c	/^uint32_t ctr=0;$/;"	v
 ctrl	kernel/include/dispatch.h	/^    struct cte          ctrl;           \/\/\/< The VMKit guest shared data structure$/;"	m	struct:guest	typeref:struct:guest::cte
+ctrlmod	lib/barrelfish/ctrlmod.c	/^static omap44xx_sysctrl_padconf_core_t ctrlmod;$/;"	v	file:
+ctrlmod	usr/init/ctrlmod.c	/^static omap44xx_sysctrl_padconf_core_t ctrlmod;$/;"	v	file:
 ctrlmod	usr/mmchs_driver/ctrlmod.c	/^static omap44xx_sysctrl_padconf_core_t ctrlmod;$/;"	v	file:
+ctrlmod_init	lib/barrelfish/ctrlmod.c	/^void ctrlmod_init(void)$/;"	f
+ctrlmod_init	usr/init/ctrlmod.c	/^void ctrlmod_init(void)$/;"	f
 ctrlmod_init	usr/mmchs_driver/ctrlmod.c	/^void ctrlmod_init(void)$/;"	f
 ctx	include/lwip/tcpip.h	/^                void *ctx;$/;"	m	struct:tcpip_msg::__anon43::__anon45
 ctype	lib/newlib/newlib/libc/locale/nl_langinfo.c	/^    struct lc_ctype_T *    (*ctype)(void);$/;"	m	union:_nl_item_t::__anon196	typeref:struct:_nl_item_t::__anon196::ctype	file:
@@ -23998,6 +24109,8 @@ d_val	tools/dite/elf.h	/^        uint32_t     d_val;$/;"	m	union:Elf32_Dyn::__an
 d_val	tools/dite/elf.h	/^        uint64_t    d_val;$/;"	m	union:Elf64_Dyn::__anon310
 dabt_handler	kernel/arch/armv7/exceptions.S	/^dabt_handler:$/;"	l
 daddr_t	lib/newlib/newlib/libc/include/sys/types.h	/^typedef	long	daddr_t;$/;"	t
+dat_line_reset	lib/barrelfish/mmchs.c	/^static void dat_line_reset(void)$/;"	f	file:
+dat_line_reset	usr/init/mmchs.c	/^static void dat_line_reset(void)$/;"	f	file:
 dat_line_reset	usr/mmchs_driver/mmchs.c	/^static void dat_line_reset(void)$/;"	f	file:
 data	include/collections/hash_table.h	/^	void	*data;$/;"	m	struct:_collections_hash_elem
 data	include/collections/list.h	/^    void                         *data;$/;"	m	struct:_collections_listnode
@@ -24068,6 +24181,8 @@ dbl_limits	lib/newlib/newlib/libc/xdr/xdr_float_vax.c	/^static struct dbl_limits
 dbl_limits	lib/newlib/newlib/libc/xdr/xdr_float_vax.c	/^} dbl_limits[2] =$/;"	v	typeref:struct:dbl_limits	file:
 dbtob	include/sys/param.h	126;"	d
 dbtoc	include/sys/param.h	245;"	d
+dbuf	lib/barrelfish/mmchs.c	/^static char dbuf[DBUF_SIZE];$/;"	v	file:
+dbuf	usr/init/mmchs.c	/^static char dbuf[DBUF_SIZE];$/;"	v	file:
 dbuf	usr/mmchs_driver/mmchs.c	/^static char dbuf[DBUF_SIZE];$/;"	v	file:
 dc	tools/demo/Aquarium/Window1.xaml.cs	/^        public DrawingContext dc;$/;"	f	class:Aquarium.MyDrawingVisual
 dcb	include/spawndomain/spawndomain.h	/^    struct capref	dcb __attribute__ ((aligned(4)));$/;"	m	struct:spawninfo	typeref:struct:spawninfo::capref
@@ -24318,6 +24433,7 @@ dir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data dir_wcc;$/;"	m	struct:SYMLINK3resfa
 dir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data dir_wcc;$/;"	m	struct:SYMLINK3resok
 dircount	include/nfs/nfs_rpc.h	/^    count3 dircount;$/;"	m	struct:READDIRPLUS3args
 direct	lib/newlib/newlib/libc/include/sys/dir.h	8;"	d
+dirent	include/barrelfish/fat32.h	/^struct dirent {$/;"	s
 dirent	include/sys/dirent.h	/^    struct dirent dirent;$/;"	m	struct:__anon102	typeref:struct:__anon102::dirent
 dirent	include/sys/dirent.h	/^struct dirent {$/;"	s
 dirent	lib/newlib/newlib/libc/machine/spu/sys/dirent.h	/^  struct dirent dirent;$/;"	m	struct:__anon229	typeref:struct:__anon229::dirent
@@ -24786,6 +24902,12 @@ dtype_max	lib/oldc/msun/src/s_lround.c	/^static const type dtype_max = DTYPE_MAX
 dtype_min	lib/oldc/msun/src/s_lround.c	/^static const type dtype_min = DTYPE_MIN - 0.5;$/;"	v	file:
 dummy	include/lwip/sys.h	/^        u8_t dummy;$/;"	m	struct:sys_timeo
 dummy	include/thc/thcstubs.h	/^    int dummy;$/;"	m	struct:event_mutex
+dummy	lib/barrelfish/ctrlmod.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
+dummy	lib/barrelfish/mmchs.c	/^volatile uint32_t dummy = 0;$/;"	v
+dummy	lib/barrelfish/twl6030.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
+dummy	usr/init/ctrlmod.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
+dummy	usr/init/mmchs.c	/^volatile uint32_t dummy = 0;$/;"	v
+dummy	usr/init/twl6030.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
 dummy	usr/mmchs_driver/ctrlmod.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
 dummy	usr/mmchs_driver/mmchs.c	/^volatile uint32_t dummy = 0;$/;"	v
 dummy	usr/mmchs_driver/twl6030.c	/^static volatile uint32_t dummy = 0;$/;"	v	file:
@@ -25723,6 +25845,9 @@ fast_copy	lib/newlib/newlib/libc/machine/h8300/memcpy.S	/^fast_copy:$/;"	l
 fast_loop	lib/newlib/newlib/libc/machine/h8300/memcpy.S	/^fast_loop:$/;"	l
 fast_loop_next	lib/newlib/newlib/libc/machine/h8300/memcpy.S	/^fast_loop_next:$/;"	l
 fast_putc	lib/newlib/newlib/libc/include/stdio.h	669;"	d
+fat32_init	lib/barrelfish/fat32.c	/^errval_t fat32_init(void) {$/;"	f
+fat32_init	usr/init/fat32.c	/^errval_t fat32_init(void) {$/;"	f
+fat32_init	usr/mmchs_driver/fat32.c	/^errval_t fat32_init(void) {$/;"	f
 fatal	tools/arm_gem5/gem5Panda.py	/^from m5.util import fatal$/;"	i
 fatal	tools/arm_gem5/gem5script.py	/^from m5.util import fatal$/;"	i
 fatal	tools/molly/m5script.py	/^from m5.util import fatal$/;"	i
@@ -25766,6 +25891,7 @@ fd	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  struct malloc_chunk* fd;
 fd	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  struct malloc_tree_chunk* fd;$/;"	m	struct:malloc_tree_chunk	typeref:struct:malloc_tree_chunk::malloc_tree_chunk	file:
 fd_bits	include/lwip/sockets.h	/^        unsigned char fd_bits[(FD_SETSIZE + 7) \/ 8];$/;"	m	struct:fd_set
 fd_mask	lib/newlib/newlib/libc/include/sys/types.h	/^typedef	long	fd_mask;$/;"	t
+fd_node	include/barrelfish/proc.h	/^	struct file_descriptor_node *fd_node;	$/;"	m	struct:process_node	typeref:struct:process_node::file_descriptor_node
 fd_set	include/lwip/sockets.h	/^    typedef struct fd_set {$/;"	s
 fd_set	include/lwip/sockets.h	/^    } fd_set;$/;"	t	typeref:struct:fd_set
 fd_set	lib/newlib/newlib/libc/include/sys/types.h	234;"	d
@@ -25890,6 +26016,7 @@ filesize	include/vfs/mmap.h	/^    size_t filesize; \/\/ size to read from file (
 filesize	lib/cpio/cpiobin.c	/^    char filesize[8];$/;"	m	struct:__anon141	file:
 filesize	lib/cpio/cpiobin.c	/^    uint8_t filesize[4];$/;"	m	struct:__anon140	file:
 filetype	include/barrelfish/aos_rpc.h	/^enum filetype {$/;"	g
+filetype	include/barrelfish/fat32.h	/^enum filetype {$/;"	g
 fill	include/barrelfish/memobj.h	/^    errval_t (*fill)(struct memobj *memobj, genvaddr_t offset, struct capref frame,$/;"	m	struct:memobj_funcs
 fill	lib/newlib/newlib/testsuite/newlib.string/memmove1.c	/^fill (unsigned char dest[MAX*3])$/;"	f
 fill_diteinfo	tools/dite/dite.c	/^    void (*fill_diteinfo)(char *fbuf, genvaddr_t elfbase);$/;"	m	struct:elf_funcs	file:
@@ -25967,6 +26094,7 @@ first	lib/newlib/newlib/libc/stdlib/vallocr.c	1624;"	d	file:
 first	lib/newlib/newlib/libc/string/wcwidth.c	/^  int first;$/;"	m	struct:interval	file:
 first	lib/newlib/newlib/testsuite/newlib.locale/UTF-8.c	/^char first[6][6] = {$/;"	v
 firstCluster	include/barrelfish/aos_rpc.h	/^	uint32_t firstCluster;$/;"	m	struct:aos_dirent
+firstCluster	include/barrelfish/fat32.h	/^	uint32_t firstCluster;$/;"	m	struct:dirent
 first_app_b	lib/net_queue_manager/queue_manager.c	/^static struct buffer_descriptor *first_app_b = NULL;$/;"	v	typeref:struct:buffer_descriptor	file:
 first_day	lib/newlib/newlib/libc/time/strptime.c	/^first_day (int year)$/;"	f	file:
 first_free	lib/newlib/newlib/libc/search/hash_page.c	/^first_free(map)$/;"	f	file:
@@ -25983,6 +26111,7 @@ flag	lib/newlib/newlib/libc/include/getopt.h	/^    int *flag;			\/* determines i
 flag	lib/newlib/newlib/libc/machine/spu/stack_reg_va.S	/^#define flag		$68$/;"	d
 flag_t	lib/dmalloc/dmalloc.c	/^typedef unsigned int flag_t;           \/* The type of various bit flag sets *\/$/;"	t	file:
 flag_t	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^typedef unsigned int flag_t;           \/* The type of various bit flag sets *\/$/;"	t	file:
+flags	include/barrelfish/i2c.h	/^    enum i2c_flags flags;$/;"	m	struct:i2c_msg	typeref:enum:i2c_msg::i2c_flags
 flags	include/barrelfish/idc_export.h	/^    idc_export_flags_t flags;$/;"	m	struct:idc_export
 flags	include/barrelfish/memobj.h	/^    memobj_flags_t flags;     \/\/\/< Flags for the object. NYI.$/;"	m	struct:memobj
 flags	include/barrelfish/vregion.h	/^    vregion_flags_t flags;   \/\/\/< Flags$/;"	m	struct:vregion
@@ -26007,6 +26136,7 @@ flags	lib/newlib/newlib/libc/search/db_local.h	/^	u_long	flags;$/;"	m	struct:__a
 flags	lib/newlib/newlib/libc/search/db_local.h	/^	u_long	flags;$/;"	m	struct:__anon248
 flags	lib/newlib/newlib/libc/search/hash.h	/^	char	 	flags;$/;"	m	struct:_bufhead
 flags	lib/newlib/newlib/libc/search/hash.h	/^	int		flags;		\/* Flag values *\/$/;"	m	struct:htab
+flags	usr/init/i2c.h	/^    enum i2c_flags flags;$/;"	m	struct:i2c_msg	typeref:enum:i2c_msg::i2c_flags
 flags	usr/mmchs_driver/i2c.h	/^    enum i2c_flags flags;$/;"	m	struct:i2c_msg	typeref:enum:i2c_msg::i2c_flags
 flash_fake	tools/arm_gem5/RealView.py	/^    flash_fake    = IsaFake(pio_addr=0x40000000, pio_size=0x20000000,$/;"	v	class:RealViewPBX
 flash_fake	tools/arm_gem5/RealView.py	/^    flash_fake    = IsaFake(pio_addr=0x40000000, pio_size=0x20000000-1,$/;"	v	class:RealViewEB
@@ -26066,6 +26196,8 @@ flounder_ump_msgtype	include/flounder/flounder_support_ump.h	/^enum flounder_ump
 flounder_ump_state	include/flounder/flounder_support_ump.h	/^struct flounder_ump_state {$/;"	s
 flow1	include/ipv6/lwip/ip.h	/^        u8_t flow1:4, tclass2:4;$/;"	m	struct:ip_hdr
 flow2	include/ipv6/lwip/ip.h	/^        u16_t flow2;$/;"	m	struct:ip_hdr
+flush_cache	lib/barrelfish/service.c	/^static void flush_cache(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
+flush_cache	usr/init/service.c	/^static void flush_cache(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
 flush_cache	usr/mmchs_driver/service.c	/^static void flush_cache(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
 flush_callback	lib/trace/control.c	/^static struct event_closure flush_callback;$/;"	v	typeref:struct:event_closure	file:
 flush_meta	lib/newlib/newlib/libc/search/hash.c	/^flush_meta(hashp)$/;"	f	file:
@@ -26771,6 +26903,8 @@ get_build_targets	tools/harness/tests/rcce.py	/^    def get_build_targets(self, 
 get_buildarchs	tools/harness/machines/__init__.py	/^    def get_buildarchs(self):$/;"	m	class:Machine
 get_buildarchs	tools/harness/machines/eth.py	/^    def get_buildarchs(self):$/;"	m	class:ETHMachine
 get_buildarchs	tools/harness/machines/msrc.py	/^    def get_buildarchs(self):$/;"	m	class:MSRCMachine
+get_cap	lib/barrelfish/main.c	/^static void get_cap(lpaddr_t base, size_t size)$/;"	f	file:
+get_cap	usr/init/fat32.c	/^errval_t get_cap(lpaddr_t base, size_t size)$/;"	f
 get_cap	usr/mmchs_driver/main.c	/^static void get_cap(lpaddr_t base, size_t size)$/;"	f	file:
 get_cap_addr	include/barrelfish/caddr.h	/^static __attribute__((noinline)) capaddr_t get_cap_addr(struct capref cap)$/;"	f
 get_cap_valid_bits	include/barrelfish/caddr.h	/^static inline uint8_t get_cap_valid_bits(struct capref cap)$/;"	f
@@ -26789,11 +26923,17 @@ get_cores_per_socket	tools/harness/machines/msrc.py	/^    def get_cores_per_sock
 get_crc_table	include/zconf.h	43;"	d
 get_current_paging_state	lib/barrelfish/domain.c	/^struct paging_state *get_current_paging_state(void)$/;"	f
 get_cycle_count	include/arch/arm/barrelfish_kpi/asm_inlines_arch.h	/^static inline uint32_t get_cycle_count(void)$/;"	f
+get_data	lib/barrelfish/fat32.c	/^errval_t get_data(uint32_t cluster_nr, void *buf) {$/;"	f
+get_data	usr/init/fat32.c	/^errval_t get_data(uint32_t cluster_nr, void *buf) {$/;"	f
+get_data	usr/mmchs_driver/fat32.c	/^errval_t get_data(uint32_t cluster_nr, void *buf) {$/;"	f
 get_default_slot_allocator	lib/barrelfish/slot_alloc/slot_alloc.c	/^struct slot_allocator *get_default_slot_allocator(void)$/;"	f
 get_default_waitset	lib/barrelfish/domain.c	/^struct waitset *get_default_waitset(void)$/;"	f
 get_devframe	usr/init/init.c	/^errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)$/;"	f
 get_devframe	usr/initapp/initapp.c	/^errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)$/;"	f
 get_did_by_name	lib/barrelfish/proc.c	/^domainid_t get_did_by_name(struct process_node * head, const char * name) $/;"	f
+get_dirents	lib/barrelfish/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct dirent **dirtable, uint32_t *dir_size) {$/;"	f
+get_dirents	usr/init/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size) {$/;"	f
+get_dirents	usr/mmchs_driver/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size) {$/;"	f
 get_dispatcher_generic	include/arch/arm/barrelfish/dispatcher_arch.h	/^get_dispatcher_generic(dispatcher_handle_t handle)$/;"	f
 get_dispatcher_generic	include/arch/x86_32/barrelfish/dispatcher_arch.h	/^get_dispatcher_generic(dispatcher_handle_t handle)$/;"	f
 get_dispatcher_generic	include/arch/x86_64/barrelfish/dispatcher_arch.h	/^get_dispatcher_generic(dispatcher_handle_t handle)$/;"	f
@@ -26814,6 +26954,9 @@ get_domain_state	lib/barrelfish/domain.c	/^struct domain_state *get_domain_state
 get_driver_benchmark_state	lib/lwip/src/barrelfish/idc_barrelfish.c	/^uint8_t get_driver_benchmark_state(int direction,$/;"	f
 get_era_info	lib/newlib/newlib/libc/time/strftime.c	/^get_era_info (const struct tm *tim_p, const wchar_t *era)$/;"	f	file:
 get_error_position_string	lib/bfdmuxtools/tools.c	/^get_error_position_string(int pos)$/;"	f
+get_fat_entry	lib/barrelfish/fat32.c	/^uint32_t get_fat_entry(uint32_t cluster_nr) {$/;"	f
+get_fat_entry	usr/init/fat32.c	/^uint32_t get_fat_entry(uint32_t cluster_nr) {$/;"	f
+get_fat_entry	usr/mmchs_driver/fat32.c	/^uint32_t get_fat_entry(uint32_t cluster_nr) {$/;"	f
 get_finish_string	tools/harness/tests/clockdrift.py	/^    def get_finish_string(self):$/;"	m	class:ClockDriftTest
 get_finish_string	tools/harness/tests/common.py	/^    def get_finish_string(self):$/;"	m	class:TestCommon
 get_finish_string	tools/harness/tests/fputest.py	/^    def get_finish_string(self):$/;"	m	class:FpuTest
@@ -26829,6 +26972,9 @@ get_finish_string	tools/harness/tests/rcce.py	/^    def get_finish_string(self):
 get_finish_string	tools/harness/tests/rpctests.py	/^    def get_finish_string(self):$/;"	m	class:LrpcTest
 get_finish_string	tools/harness/tests/vmkit.py	/^    def get_finish_string(self):$/;"	m	class:VMKitTest
 get_first	include/hashtable/multimap.h	/^    int (*get_first)(struct multimap*, char*, void**);$/;"	m	struct:multimap
+get_first_cluster	lib/barrelfish/fat32.c	/^uint32_t get_first_cluster(const char *filename, uint32_t *filesize) {$/;"	f
+get_first_cluster	usr/init/fat32.c	/^uint32_t get_first_cluster(const char *filename, uint32_t *filesize) {$/;"	f
+get_first_cluster	usr/mmchs_driver/fat32.c	/^uint32_t get_first_cluster(const char *filename, uint32_t *filesize) {$/;"	f
 get_foot	lib/dmalloc/dmalloc.c	2271;"	d	file:
 get_foot	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2276;"	d	file:
 get_frame	lib/barrelfish/paging.c	/^errval_t get_frame(size_t bytes, struct capref* current_frame)$/;"	f
@@ -27662,12 +27808,22 @@ i	lib/newlib/newlib/libc/time/tzset_r.c	/^  int i, ch;$/;"	m	struct:reent_ptr	fi
 i2b	lib/newlib/newlib/libc/stdlib/mprec.h	359;"	d
 i2b	lib/oldc/src/gdtoa/gdtoaimp.h	572;"	d
 i2b	lib/oldc/src/gdtoa/misc.c	/^i2b$/;"	f
+i2c	lib/barrelfish/i2c.c	/^static ti_i2c_t i2c[I2C_COUNT];$/;"	v	file:
+i2c	usr/init/i2c.c	/^static ti_i2c_t i2c[I2C_COUNT];$/;"	v	file:
 i2c	usr/mmchs_driver/i2c.c	/^static ti_i2c_t i2c[I2C_COUNT];$/;"	v	file:
+i2c_flags	include/barrelfish/i2c.h	/^enum i2c_flags {$/;"	g
 i2c_flags	kernel/include/arch/armv7/ti_i2c.h	/^enum i2c_flags {$/;"	g
+i2c_flags	usr/init/i2c.h	/^enum i2c_flags {$/;"	g
 i2c_flags	usr/mmchs_driver/i2c.h	/^enum i2c_flags {$/;"	g
+i2c_initialized	lib/barrelfish/i2c.c	/^static bool i2c_initialized[I2C_COUNT];$/;"	v	file:
+i2c_initialized	usr/init/i2c.c	/^static bool i2c_initialized[I2C_COUNT];$/;"	v	file:
 i2c_initialized	usr/mmchs_driver/i2c.c	/^static bool i2c_initialized[I2C_COUNT];$/;"	v	file:
+i2c_msg	include/barrelfish/i2c.h	/^struct i2c_msg {$/;"	s
 i2c_msg	kernel/include/arch/armv7/ti_i2c.h	/^struct i2c_msg {$/;"	s
+i2c_msg	usr/init/i2c.h	/^struct i2c_msg {$/;"	s
 i2c_msg	usr/mmchs_driver/i2c.h	/^struct i2c_msg {$/;"	s
+i2c_pbase	lib/barrelfish/i2c.c	/^static lpaddr_t i2c_pbase[I2C_COUNT] = {$/;"	v	file:
+i2c_pbase	usr/init/i2c.c	/^static lpaddr_t i2c_pbase[I2C_COUNT] = {$/;"	v	file:
 i2c_pbase	usr/mmchs_driver/i2c.c	/^static lpaddr_t i2c_pbase[I2C_COUNT] = {$/;"	v	file:
 iConfiguration	include/usb/ch9.h	/^    uint8_t iConfiguration:8;   \/\/ 6$/;"	m	struct:usb_configuration_descriptor
 iInterface	include/usb/ch9.h	/^    uint8_t iInterface:8;$/;"	m	struct:usb_interface_descriptor
@@ -27836,6 +27992,8 @@ ident	include/lwip/snmp_structs.h	/^        s32_t *ident;$/;"	m	struct:snmp_name
 ident_cmp	include/lwip/snmp_structs.h	/^         s32_t(*ident_cmp) (void *addr_inf, u8_t level, u16_t idx,$/;"	m	struct:mib_external_node
 ident_len	include/lwip/snmp_msg.h	/^        u8_t ident_len;$/;"	m	struct:snmp_varbind
 ident_len	include/lwip/snmp_structs.h	/^        u8_t ident_len;$/;"	m	struct:snmp_name_ptr
+identify_device	lib/barrelfish/service.c	/^static void identify_device(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
+identify_device	usr/init/service.c	/^static void identify_device(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
 identify_device	usr/mmchs_driver/service.c	/^static void identify_device(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
 idle	include/barrelfish/waitset.h	/^                             *idle;    \/\/\/< All other channels on this waitset$/;"	m	struct:waitset	typeref:struct:waitset::
 idleComplete	include/thc/thcinternal.h	/^  int idleComplete;$/;"	m	struct:ptstate_t
@@ -28052,6 +28210,8 @@ init_net_ARP_connection	lib/lwip/src/barrelfish/ARP_lookup_client.c	/^static voi
 init_net_ports_connection	lib/lwip/src/barrelfish/idc_net_control.c	/^static void init_net_ports_connection(char *service_name)$/;"	f	file:
 init_page_tables	kernel/arch/omap44xx/startup_arch.c	/^static void init_page_tables(struct spawn_state *spawn_state)$/;"	f	file:
 init_ports_service	lib/net_device_manager/port_service_impl.c	/^int init_ports_service(char *dev_name)$/;"	f
+init_service	lib/barrelfish/service.c	/^void init_service(void)$/;"	f
+init_service	usr/init/service.c	/^void init_service(void)$/;"	f
 init_service	usr/mmchs_driver/service.c	/^void init_service(void)$/;"	f
 init_soft_filters_service	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^void init_soft_filters_service(char *service_name, uint64_t qid)$/;"	f
 init_top	lib/dmalloc/dmalloc.c	/^static void init_top(mstate m, mchunkptr p, size_t psize) {$/;"	f	file:
@@ -29088,7 +29248,11 @@ l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0x2
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake      = IsaFake(pio_addr=0xE0202000, pio_size=0xfff)$/;"	v	class:VExpress_ELT
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake     = IsaFake(pio_addr=0x1f002000, pio_size=0xfff)$/;"	v	class:RealViewPBX
 l2x0_fake	tools/arm_gem5/RealView.py	/^    l2x0_fake     = IsaFake(pio_addr=0x1f002000, pio_size=0xfff, warn_access="1")$/;"	v	class:RealViewEB
+l3init_cm2	lib/barrelfish/cm2.c	/^static omap44xx_l3init_cm2_t l3init_cm2;$/;"	v	file:
+l3init_cm2	usr/init/cm2.c	/^static omap44xx_l3init_cm2_t l3init_cm2;$/;"	v	file:
 l3init_cm2	usr/mmchs_driver/cm2.c	/^static omap44xx_l3init_cm2_t l3init_cm2;$/;"	v	file:
+l4per_cm2	lib/barrelfish/cm2.c	/^static omap44xx_l4per_cm2_t l4per_cm2;$/;"	v	file:
+l4per_cm2	usr/init/cm2.c	/^static omap44xx_l4per_cm2_t l4per_cm2;$/;"	v	file:
 l4per_cm2	usr/mmchs_driver/cm2.c	/^static omap44xx_l4per_cm2_t l4per_cm2;$/;"	v	file:
 l_len	include/fcntl.h	/^	off_t	l_len;		\/* len = 0 means until end of file *\/$/;"	m	struct:flock
 l_len	include/fcntl.h	/^	off_t	l_len;		\/* len = 0 means until end of file *\/$/;"	m	struct:oflock
@@ -29339,6 +29503,7 @@ len	lib/newlib/newlib/testsuite/newlib.iconv/iconvru.c	/^    int len;$/;"	m	stru
 len	lib/oldc/src/xprintf.c	/^            size_t len;$/;"	m	struct:__printf_io::__anon303::__anon304	file:
 lenerr	include/lwip/stats.h	/^        STAT_COUNTER lenerr;    \/* Invalid length error. *\/$/;"	m	struct:stats_igmp
 lenerr	include/lwip/stats.h	/^        STAT_COUNTER lenerr;    \/* Invalid length error. *\/$/;"	m	struct:stats_proto
+length	include/barrelfish/i2c.h	/^    uint16_t length;$/;"	m	struct:i2c_msg
 length	include/barrelfish_kpi/legacy_idc_buffer.h	/^        uint8_t     length;                 \/\/\/< Length of payload in words$/;"	m	struct:idc_recv_header::__anon15
 length	include/barrelfish_kpi/legacy_idc_buffer.h	/^        uint8_t     length;         \/\/\/< Length of payload in words$/;"	m	struct:idc_send_header::__anon13
 length	include/barrelfish_kpi/lmp.h	/^        uint8_t     length;                 \/\/\/< Length of payload in words$/;"	m	struct:lmp_recv_header::__anon18
@@ -29350,6 +29515,7 @@ length	kernel/include/arch/armv7/ti_i2c.h	/^    uint16_t length;$/;"	m	struct:i2
 length	kernel/include/diteinfo.h	/^    uint64_t    length;$/;"	m	struct:diteinfo_mmap
 length	kernel/include/multiboot.h	/^    uint64_t    length;$/;"	m	struct:multiboot_mmap
 length	lib/newlib/newlib/libc/machine/spu/calloc_ea.c	/^  unsigned long long length;$/;"	m	struct:__anon210	file:
+length	usr/init/i2c.h	/^    uint16_t length;$/;"	m	struct:i2c_msg
 length	usr/mmchs_driver/i2c.h	/^    uint16_t length;$/;"	m	struct:i2c_msg
 lesscore	lib/newlib/newlib/libc/sys/barrelfish/oldsys_morecore.c	/^void lesscore(void)$/;"	f
 lesscore	lib/oldc/src/sys-barrelfish/sys_morecore.c	/^void lesscore(void)$/;"	f
@@ -29426,7 +29592,10 @@ linkdir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data linkdir_wcc;$/;"	m	struct:LINK3
 linkdir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data linkdir_wcc;$/;"	m	struct:LINK3resok
 linkmax	include/nfs/nfs_rpc.h	/^    uint32_t linkmax;$/;"	m	struct:PATHCONF3resok
 linkoutput	include/lwip/netif.h	/^         err_t(*linkoutput) (struct netif * netif, struct pbuf * p);$/;"	m	struct:netif
+list	lib/barrelfish/fat32.c	/^errval_t list(const char *path, struct dirent **dirtable, uint32_t *size) {$/;"	f
 list	lib/newlib/newlib/libc/time/strftime.c	/^struct list {$/;"	s	file:
+list	usr/init/fat32.c	/^errval_t list(const char *dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
+list	usr/mmchs_driver/fat32.c	/^errval_t list(const char *path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
 list_all	tools/harness/scalebench.py	/^def list_all():$/;"	f
 list_create_node	lib/collections/list.c	/^static collections_listnode *list_create_node(collections_listnode *start,$/;"	f	file:
 list_destroy_node	lib/collections/list.c	/^static void list_destroy_node(collections_listnode *start,$/;"	f	file:
@@ -30219,6 +30388,7 @@ magic2	lib/newlib/newlib/libc/machine/arm/strcmp.c	47;"	d	file:
 magic2	lib/newlib/newlib/libc/machine/arm/strcmp.c	50;"	d	file:
 magic2	lib/newlib/newlib/libc/machine/arm/strcpy.c	35;"	d	file:
 magic2	lib/newlib/newlib/libc/machine/arm/strcpy.c	38;"	d	file:
+main	lib/barrelfish/main.c	/^int main(int argc, char **argv)$/;"	f
 main	lib/barrelfish/test_red_black_tree.c	/^int main(int argc, char** argv) {$/;"	f
 main	lib/cpio/cpiobin.c	/^int main(int argc, const char* argv[])$/;"	f
 main	lib/newlib/newlib/libc/machine/h8500/divsi3.c	/^main ()$/;"	f
@@ -31222,8 +31392,9 @@ memp_sizes	lib/lwip/src/core/memp.c	/^const u16_t memp_sizes[MEMP_MAX] = {$/;"	v
 memp_t	include/lwip/memp.h	/^    } memp_t;$/;"	t	typeref:enum:__anon36
 memp_tab	lib/lwip/src/core/memp.c	/^static struct memp *memp_tab[MEMP_MAX];$/;"	v	typeref:struct:memp	file:
 memptr	lib/newlib/newlib/libc/machine/spu/posix_memalign_ea.c	/^  unsigned int memptr;$/;"	m	struct:__anon223	file:
-memserv_alloc	usr/init/mem_serv.c	/^static errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,$/;"	f	file:
+memserv_alloc	usr/init/mem_serv.c	/^errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,$/;"	f
 memserv_alloc	usr/initapp/mem_serv.c	/^static errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,$/;"	f	file:
+memserv_free	usr/init/mem_serv.c	/^errval_t memserv_free (struct capref ram_cap, genpaddr_t base, uint8_t bits) $/;"	f
 memset	kernel/memset.c	/^memset(void *s, int c, size_t n)$/;"	f
 memset	lib/newlib/newlib/libc/machine/cris/memset.c	/^void *memset(void *pdst, int c, unsigned int plen)$/;"	f
 memset	lib/newlib/newlib/libc/machine/spu/memset.c	/^void * memset(void *s, int c, size_t n)$/;"	f
@@ -31273,6 +31444,8 @@ microbench_run_func	kernel/include/microbenchmarks.h	/^typedef int (* microbench
 microbenchmarks_print_all	kernel/microbenchmarks.c	/^static int microbenchmarks_print_all(struct microbench *benchs, size_t nbenchs)$/;"	f	file:
 microbenchmarks_run	kernel/microbenchmarks.c	/^static int microbenchmarks_run(struct microbench *benchs, size_t nbenchs)$/;"	f	file:
 microbenchmarks_run_all	kernel/microbenchmarks.c	/^void microbenchmarks_run_all(void)$/;"	f
+millis_to_vsel	lib/barrelfish/twl6030.c	/^static ti_twl6030_vsel_t millis_to_vsel(int millis)$/;"	f	file:
+millis_to_vsel	usr/init/twl6030.c	/^static ti_twl6030_vsel_t millis_to_vsel(int millis)$/;"	f	file:
 millis_to_vsel	usr/mmchs_driver/twl6030.c	/^static ti_twl6030_vsel_t millis_to_vsel(int millis)$/;"	f	file:
 millitm	lib/newlib/newlib/libc/include/sys/timeb.h	/^  unsigned short millitm;$/;"	m	struct:timeb
 min	kernel/include/kernel.h	53;"	d
@@ -31428,12 +31601,26 @@ mmc_fake	tools/arm_gem5/RealView.py	/^    mmc_fake       = AmbaFake(pio_addr=0x1
 mmc_fake	tools/arm_gem5/RealView.py	/^    mmc_fake       = AmbaFake(pio_addr=0xE0005000) # not sure if we need this$/;"	v	class:VExpress_ELT
 mmc_fake	tools/arm_gem5/RealView.py	/^    mmc_fake      = AmbaFake(pio_addr=0x10005000)$/;"	v	class:RealViewEB
 mmc_fake	tools/arm_gem5/RealView.py	/^    mmc_fake      = AmbaFake(pio_addr=0x10005000)$/;"	v	class:RealViewPBX
+mmc_host_and_bus_configuration	lib/barrelfish/mmchs.c	/^static void mmc_host_and_bus_configuration(void)$/;"	f	file:
+mmc_host_and_bus_configuration	usr/init/mmchs.c	/^static void mmc_host_and_bus_configuration(void)$/;"	f	file:
 mmc_host_and_bus_configuration	usr/mmchs_driver/mmchs.c	/^static void mmc_host_and_bus_configuration(void)$/;"	f	file:
+mmchs	lib/barrelfish/mmchs.c	/^static omap44xx_mmchs1_t mmchs;$/;"	v	file:
+mmchs	usr/init/mmchs.c	/^static omap44xx_mmchs1_t mmchs;$/;"	v	file:
 mmchs	usr/mmchs_driver/mmchs.c	/^static omap44xx_mmchs1_t mmchs;$/;"	v	file:
+mmchs_identify_card	lib/barrelfish/mmchs.c	/^static void mmchs_identify_card(void)$/;"	f	file:
+mmchs_identify_card	usr/init/mmchs.c	/^static void mmchs_identify_card(void)$/;"	f	file:
 mmchs_identify_card	usr/mmchs_driver/mmchs.c	/^static void mmchs_identify_card(void)$/;"	f	file:
+mmchs_init	lib/barrelfish/mmchs.c	/^void mmchs_init(void)$/;"	f
+mmchs_init	usr/init/mmchs.c	/^void mmchs_init(void)$/;"	f
 mmchs_init	usr/mmchs_driver/mmchs.c	/^void mmchs_init(void)$/;"	f
+mmchs_read_block	lib/barrelfish/mmchs.c	/^errval_t mmchs_read_block(size_t block_nr, void *buffer)$/;"	f
+mmchs_read_block	usr/init/mmchs.c	/^errval_t mmchs_read_block(size_t block_nr, void *buffer)$/;"	f
 mmchs_read_block	usr/mmchs_driver/mmchs.c	/^errval_t mmchs_read_block(size_t block_nr, void *buffer)$/;"	f
+mmchs_soft_reset	lib/barrelfish/mmchs.c	/^static void mmchs_soft_reset(void)$/;"	f	file:
+mmchs_soft_reset	usr/init/mmchs.c	/^static void mmchs_soft_reset(void)$/;"	f	file:
 mmchs_soft_reset	usr/mmchs_driver/mmchs.c	/^static void mmchs_soft_reset(void)$/;"	f	file:
+mmchs_write_block	lib/barrelfish/mmchs.c	/^errval_t mmchs_write_block(size_t block_nr, void *buffer)$/;"	f
+mmchs_write_block	usr/init/mmchs.c	/^errval_t mmchs_write_block(size_t block_nr, void *buffer)$/;"	f
 mmchs_write_block	usr/mmchs_driver/mmchs.c	/^errval_t mmchs_write_block(size_t block_nr, void *buffer)$/;"	f
 mmnode	include/mm/mm.h	/^struct mmnode {$/;"	s
 mname	lib/newlib/newlib/libm/test/math.c	/^char *mname;$/;"	v
@@ -31961,6 +32148,7 @@ n_sign_posn	lib/oldc/src/locale/lmonetary.h	/^	const char	*n_sign_posn;$/;"	m	st
 n_time	include/netinet/in_systm.h	/^typedef	u_int32_t n_time;		\/* ms since 00:00 GMT, byte rev *\/$/;"	t
 name	include/arch/x86/barrelfish_kpi/perfmon.h	/^    char name[PERFMON_DISP_NAME_LEN]; \/\/ Name of the running task$/;"	m	struct:perfmon_overflow_data
 name	include/barrelfish/aos_rpc.h	/^    char name[MAXNAMELEN];$/;"	m	struct:aos_dirent
+name	include/barrelfish/fat32.h	/^	char name[13]; \/\/ <- For now we hold just the small name$/;"	m	struct:dirent
 name	include/barrelfish/proc.h	/^	char * name;$/;"	m	struct:process_node
 name	include/barrelfish_kpi/dispatcher_shared.h	/^    char        name[DISP_NAME_LEN];\/\/\/< Name of domain, for debugging purposes$/;"	m	struct:dispatcher_shared_generic
 name	include/contmng/contmng.h	/^    char name[64]; \/* for debugging purposes *\/$/;"	m	struct:cont_queue
@@ -35497,11 +35685,18 @@ read	lib/oldc/src/locale/namespace.h	206;"	d
 read	lib/oldc/src/locale/un-namespace.h	187;"	d
 read	tools/harness/tests/webserver.py	/^    def read(self):$/;"	m	class:HTTPerfClient
 read_capref_from_ring	lib/barrelfish/omap_uart.c	/^struct capref * read_capref_from_ring(struct serial_capref_ring_buffer * ring, struct capref * cap) {$/;"	f
+read_dma	lib/barrelfish/service.c	/^static void read_dma(struct ata_rw28_thc_service_binding_t *sv,$/;"	f	file:
+read_dma	usr/init/service.c	/^static void read_dma(struct ata_rw28_thc_service_binding_t *sv,$/;"	f	file:
 read_dma	usr/mmchs_driver/service.c	/^static void read_dma(struct ata_rw28_thc_service_binding_t *sv,$/;"	f	file:
+read_dma_block	lib/barrelfish/service.c	/^static void read_dma_block(struct ata_rw28_thc_service_binding_t *sv, uint32_t lba)$/;"	f	file:
+read_dma_block	usr/init/service.c	/^static void read_dma_block(struct ata_rw28_thc_service_binding_t *sv, uint32_t lba)$/;"	f	file:
 read_dma_block	usr/mmchs_driver/service.c	/^static void read_dma_block(struct ata_rw28_thc_service_binding_t *sv, uint32_t lba)$/;"	f	file:
 read_ea	lib/newlib/newlib/libc/machine/spu/read_ea.c	/^COMPAT_EA_ALIAS (read_ea);$/;"	v
 read_ea	lib/newlib/newlib/libc/machine/spu/read_ea.c	/^read_ea (int fd, __ea void *buf, size_ea_t count)$/;"	f
 read_fail	lib/newlib/newlib/libc/sys/barrelfish/posix_syscalls.c	/^static int read_fail(int fd, void *buf, size_t len)        { FAIL_FN(); }$/;"	f	file:
+read_file	lib/barrelfish/fat32.c	/^errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize) {$/;"	f
+read_file	usr/init/fat32.c	/^errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize) {$/;"	f
+read_file	usr/mmchs_driver/fat32.c	/^errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize) {$/;"	f
 read_fn	include/stdio_file.h	/^    size_t (*read_fn)(void *, long int, size_t, void *);$/;"	m	struct:__file
 read_from_core_0	lib/barrelfish/cross_core.c	/^struct ump_message read_from_core_0(void) $/;"	f
 read_from_core_1	lib/barrelfish/cross_core.c	/^struct ump_message read_from_core_1(void) $/;"	f
@@ -36602,6 +36797,8 @@ scu	kernel/arch/omap44xx/omap.c	/^static a9scu_t scu;$/;"	v	file:
 scu_enable	kernel/arch/omap44xx/omap.c	/^void scu_enable(void)$/;"	f
 scu_get_core_count	kernel/arch/omap44xx/omap.c	/^int scu_get_core_count(void)$/;"	f
 scu_initialize	kernel/arch/omap44xx/omap.c	/^void scu_initialize(void)$/;"	f
+sdmmc1_enable_power	lib/barrelfish/ctrlmod.c	/^void sdmmc1_enable_power(void)$/;"	f
+sdmmc1_enable_power	usr/init/ctrlmod.c	/^void sdmmc1_enable_power(void)$/;"	f
 sdmmc1_enable_power	usr/mmchs_driver/ctrlmod.c	/^void sdmmc1_enable_power(void)$/;"	f
 search	lib/concurrent/linked_list.c	/^static struct ll_element *search(struct ll_element *head,$/;"	f	file:
 search	lib/newlib/newlib/libc/machine/hppa/memcmp.S	/^search:	combf,=,n 	s1,s2,findout 	\/*s1 != s2? *\/$/;"	l
@@ -36691,6 +36888,8 @@ send_cap_err	lib/barrelfish/domain.c	/^static errval_t send_cap_err = SYS_ERR_OK
 send_cap_reply	lib/barrelfish/domain.c	/^static void send_cap_reply(struct interdisp_binding *st, errval_t err)$/;"	f	file:
 send_cap_request	lib/barrelfish/domain.c	/^static void send_cap_request(struct interdisp_binding *st,$/;"	f	file:
 send_close_port_response	lib/net_device_manager/port_service_impl.c	/^static errval_t send_close_port_response(struct q_entry e)$/;"	f	file:
+send_command	lib/barrelfish/mmchs.c	/^static void send_command(omap44xx_mmchs1_indx_status_t cmd, uint32_t arg)$/;"	f	file:
+send_command	usr/init/mmchs.c	/^static void send_command(omap44xx_mmchs1_indx_status_t cmd, uint32_t arg)$/;"	f	file:
 send_command	usr/mmchs_driver/mmchs.c	/^static void send_command(omap44xx_mmchs1_indx_status_t cmd, uint32_t arg)$/;"	f	file:
 send_cptr	include/barrelfish_kpi/legacy_idc_buffer.h	/^        capaddr_t     send_cptr;      \/\/\/< Cap to send or #CPTR_NULL$/;"	m	struct:idc_send_header::__anon13
 send_deregister_filter_response	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^static errval_t send_deregister_filter_response(struct q_entry e)$/;"	f	file:
@@ -36775,6 +36974,8 @@ server_id	include/octopus_server/service.h	/^    octopus_trigger_id_t server_id;
 server_ip_addr	include/lwip/dhcp.h	/^        struct ip_addr server_ip_addr;  \/* dhcp server address that offered this lease *\/$/;"	m	struct:dhcp	typeref:struct:dhcp::ip_addr
 server_listening	lib/barrelfish/domain.c	/^static void server_listening(void *st, errval_t err, iref_t iref)$/;"	f	file:
 server_ram_alloc	lib/barrelfish/ram_alloc.c	/^errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,$/;"	f
+service_client	lib/barrelfish/service.c	/^static void service_client(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
+service_client	usr/init/service.c	/^static void service_client(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
 service_client	usr/mmchs_driver/service.c	/^static void service_client(struct ata_rw28_thc_service_binding_t *sv)$/;"	f	file:
 setCPUClass	tools/arm_gem5/gem5Panda.py	/^def setCPUClass(options):$/;"	f
 setCPUClass	tools/arm_gem5/gem5script.py	/^def setCPUClass(options):$/;"	f
@@ -36816,6 +37017,8 @@ set_from_buf	lib/newlib/newlib/libc/locale/ldpart.c	/^set_from_buf(const char *p
 set_gid3	include/nfs/nfs_rpc.h	/^struct set_gid3 {$/;"	s
 set_gid3	include/nfs/nfs_rpc.h	/^typedef struct set_gid3 set_gid3;$/;"	t	typeref:struct:set_gid3
 set_gid3_u	include/nfs/nfs_rpc.h	/^    } set_gid3_u;$/;"	m	struct:set_gid3	typeref:union:set_gid3::__anon58
+set_hardware_capabilities	lib/barrelfish/mmchs.c	/^static void set_hardware_capabilities(void)$/;"	f	file:
+set_hardware_capabilities	usr/init/mmchs.c	/^static void set_hardware_capabilities(void)$/;"	f	file:
 set_hardware_capabilities	usr/mmchs_driver/mmchs.c	/^static void set_hardware_capabilities(void)$/;"	f	file:
 set_head	lib/newlib/newlib/libc/machine/powerpc/vec_mallocr.c	312;"	d	file:
 set_head	lib/newlib/newlib/libc/stdlib/callocr.c	1515;"	d	file:
@@ -36938,6 +37141,8 @@ set_value	include/lwip/snmp_structs.h	/^        void (*set_value) (struct obj_de
 set_value_a	include/lwip/snmp_structs.h	/^        void (*set_value_a) (u8_t rid, struct obj_def * od, u16_t len,$/;"	m	struct:mib_external_node
 set_value_pc	include/lwip/snmp_structs.h	/^        void (*set_value_pc) (u8_t rid, struct obj_def * od);$/;"	m	struct:mib_external_node
 set_value_q	include/lwip/snmp_structs.h	/^        void (*set_value_q) (u8_t rid, struct obj_def * od, u16_t len,$/;"	m	struct:mib_external_node
+set_wake_up_configuration	lib/barrelfish/mmchs.c	/^static void set_wake_up_configuration(void)$/;"	f	file:
+set_wake_up_configuration	usr/init/mmchs.c	/^static void set_wake_up_configuration(void)$/;"	f	file:
 set_wake_up_configuration	usr/mmchs_driver/mmchs.c	/^static void set_wake_up_configuration(void)$/;"	f	file:
 set_week_number_mon	lib/newlib/newlib/libc/time/strptime.c	/^set_week_number_mon (struct tm *timeptr, int wnum)$/;"	f	file:
 set_week_number_mon4	lib/newlib/newlib/libc/time/strptime.c	/^set_week_number_mon4 (struct tm *timeptr, int wnum)$/;"	f	file:
@@ -37293,6 +37498,7 @@ size	include/barrelfish/aos_rpc.h	/^    size_t size;$/;"	m	struct:aos_dirent
 size	include/barrelfish/bulk_transfer.h	/^    size_t size, block_size;$/;"	m	struct:bulk_transfer
 size	include/barrelfish/bulk_transfer.h	/^    size_t size;$/;"	m	struct:bulk_buf
 size	include/barrelfish/bulk_transfer.h	/^    size_t size;$/;"	m	struct:bulk_transfer_slave
+size	include/barrelfish/fat32.h	/^	uint32_t size;$/;"	m	struct:dirent
 size	include/barrelfish/heap.h	/^        unsigned size;              \/* size of this block *\/$/;"	m	struct:heap_header::__anon10
 size	include/barrelfish/memobj.h	/^    size_t size;                    \/\/\/< Size of the frame$/;"	m	struct:memobj_frame_list
 size	include/barrelfish/memobj.h	/^    size_t size;              \/\/\/< Size of the object$/;"	m	struct:memobj
@@ -37417,7 +37623,9 @@ slab_refill_func_t	include/barrelfish/slab.h	/^typedef errval_t (*slab_refill_fu
 slab_refill_pages	lib/barrelfish/slab.c	/^static errval_t slab_refill_pages(struct slab_alloc *slabs, size_t bytes)$/;"	f	file:
 slabs	include/barrelfish/slab.h	/^    struct slab_head *slabs;    \/\/\/< Pointer to list of slabs$/;"	m	struct:slab_alloc	typeref:struct:slab_alloc::slab_head
 slabs	include/mm/mm.h	/^    struct slab_alloc slabs;\/\/\/< Slab allocator used for allocating nodes$/;"	m	struct:mm	typeref:struct:mm::slab_alloc
+slave	include/barrelfish/i2c.h	/^    uint16_t slave;$/;"	m	struct:i2c_msg
 slave	kernel/include/arch/armv7/ti_i2c.h	/^    uint16_t slave;$/;"	m	struct:i2c_msg
+slave	usr/init/i2c.h	/^    uint16_t slave;$/;"	m	struct:i2c_msg
 slave	usr/mmchs_driver/i2c.h	/^    uint16_t slave;$/;"	m	struct:i2c_msg
 sleep	lib/newlib/newlib/libc/machine/spu/sleep.c	/^unsigned sleep(unsigned seconds)$/;"	f
 sleep	lib/newlib/newlib/libc/posix/sleep.c	/^unsigned sleep(unsigned seconds)$/;"	f
@@ -39442,18 +39650,44 @@ threadid	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  pthread_t threadid
 threads_prepare_to_span	lib/barrelfish/threads.c	/^void threads_prepare_to_span(dispatcher_handle_t newdh)$/;"	f
 three_way_min	lib/newlib/newlib/libc/machine/spu/ea_internal.h	/^three_way_min(size_t x, size_t y, size_t z)$/;"	f
 threshold	include/hashtable/hashtable.h	/^    int threshold;$/;"	m	struct:hashtable
+ti_i2c_init	lib/barrelfish/i2c.c	/^void ti_i2c_init(int i)$/;"	f
+ti_i2c_init	usr/init/i2c.c	/^void ti_i2c_init(int i)$/;"	f
 ti_i2c_init	usr/mmchs_driver/i2c.c	/^void ti_i2c_init(int i)$/;"	f
+ti_i2c_poll_stat	lib/barrelfish/i2c.c	/^static inline bool ti_i2c_poll_stat(ti_i2c_t *dev, ti_i2c_irqstatus_t flags,$/;"	f	file:
+ti_i2c_poll_stat	usr/init/i2c.c	/^static inline bool ti_i2c_poll_stat(ti_i2c_t *dev, ti_i2c_irqstatus_t flags,$/;"	f	file:
 ti_i2c_poll_stat	usr/mmchs_driver/i2c.c	/^static inline bool ti_i2c_poll_stat(ti_i2c_t *dev, ti_i2c_irqstatus_t flags,$/;"	f	file:
+ti_i2c_read	lib/barrelfish/i2c.c	/^ti_i2c_read(ti_i2c_t *dev, uint8_t *buf, uint16_t length)$/;"	f	file:
+ti_i2c_read	usr/init/i2c.c	/^ti_i2c_read(ti_i2c_t *dev, uint8_t *buf, uint16_t length)$/;"	f	file:
 ti_i2c_read	usr/mmchs_driver/i2c.c	/^ti_i2c_read(ti_i2c_t *dev, uint8_t *buf, uint16_t length)$/;"	f	file:
+ti_i2c_transfer	lib/barrelfish/i2c.c	/^errval_t ti_i2c_transfer(int devid, struct i2c_msg *msgs, size_t msgcount)$/;"	f
+ti_i2c_transfer	usr/init/i2c.c	/^errval_t ti_i2c_transfer(int devid, struct i2c_msg *msgs, size_t msgcount)$/;"	f
 ti_i2c_transfer	usr/mmchs_driver/i2c.c	/^errval_t ti_i2c_transfer(int devid, struct i2c_msg *msgs, size_t msgcount)$/;"	f
+ti_i2c_wait_for_free_bus	lib/barrelfish/i2c.c	/^static bool ti_i2c_wait_for_free_bus(ti_i2c_t *dev, int32_t timeout)$/;"	f	file:
+ti_i2c_wait_for_free_bus	usr/init/i2c.c	/^static bool ti_i2c_wait_for_free_bus(ti_i2c_t *dev, int32_t timeout)$/;"	f	file:
 ti_i2c_wait_for_free_bus	usr/mmchs_driver/i2c.c	/^static bool ti_i2c_wait_for_free_bus(ti_i2c_t *dev, int32_t timeout)$/;"	f	file:
+ti_i2c_write	lib/barrelfish/i2c.c	/^ti_i2c_write(ti_i2c_t *dev, uint8_t *buf, uint16_t length)$/;"	f	file:
+ti_i2c_write	usr/init/i2c.c	/^ti_i2c_write(ti_i2c_t *dev, uint8_t *buf, uint16_t length)$/;"	f	file:
 ti_i2c_write	usr/mmchs_driver/i2c.c	/^ti_i2c_write(ti_i2c_t *dev, uint8_t *buf, uint16_t length)$/;"	f	file:
+ti_twl6030_id1_read_8	lib/barrelfish/twl6030.c	15;"	d	file:
+ti_twl6030_id1_read_8	usr/init/twl6030.c	15;"	d	file:
 ti_twl6030_id1_read_8	usr/mmchs_driver/twl6030.c	15;"	d	file:
+ti_twl6030_id1_write_8	lib/barrelfish/twl6030.c	16;"	d	file:
+ti_twl6030_id1_write_8	usr/init/twl6030.c	16;"	d	file:
 ti_twl6030_id1_write_8	usr/mmchs_driver/twl6030.c	16;"	d	file:
+ti_twl6030_init	lib/barrelfish/twl6030.c	/^void ti_twl6030_init(void)$/;"	f
+ti_twl6030_init	usr/init/twl6030.c	/^void ti_twl6030_init(void)$/;"	f
 ti_twl6030_init	usr/mmchs_driver/twl6030.c	/^void ti_twl6030_init(void)$/;"	f
+ti_twl6030_set_vmmc_vsel	lib/barrelfish/twl6030.c	/^errval_t ti_twl6030_set_vmmc_vsel(int millis)$/;"	f
+ti_twl6030_set_vmmc_vsel	usr/init/twl6030.c	/^errval_t ti_twl6030_set_vmmc_vsel(int millis)$/;"	f
 ti_twl6030_set_vmmc_vsel	usr/mmchs_driver/twl6030.c	/^errval_t ti_twl6030_set_vmmc_vsel(int millis)$/;"	f
+ti_twl6030_vmmc_off	lib/barrelfish/twl6030.c	/^void ti_twl6030_vmmc_off(void)$/;"	f
+ti_twl6030_vmmc_off	usr/init/twl6030.c	/^void ti_twl6030_vmmc_off(void)$/;"	f
 ti_twl6030_vmmc_off	usr/mmchs_driver/twl6030.c	/^void ti_twl6030_vmmc_off(void)$/;"	f
+ti_twl6030_vmmc_on	lib/barrelfish/twl6030.c	/^void ti_twl6030_vmmc_on(void)$/;"	f
+ti_twl6030_vmmc_on	usr/init/twl6030.c	/^void ti_twl6030_vmmc_on(void)$/;"	f
 ti_twl6030_vmmc_on	usr/mmchs_driver/twl6030.c	/^void ti_twl6030_vmmc_on(void)$/;"	f
+ti_twl6030_vmmc_pr	lib/barrelfish/twl6030.c	/^void ti_twl6030_vmmc_pr(void)$/;"	f
+ti_twl6030_vmmc_pr	usr/init/twl6030.c	/^void ti_twl6030_vmmc_pr(void)$/;"	f
 ti_twl6030_vmmc_pr	usr/mmchs_driver/twl6030.c	/^void ti_twl6030_vmmc_pr(void)$/;"	f
 tickspersec	kernel/include/arch/armv7/global.h	/^    uint32_t tickspersec;$/;"	m	struct:global
 tim	lib/newlib/newlib/libc/time/mktime.c	/^    tim += (time_t) tz->__tzrule[0].offset;$/;"	m	struct:tim_p	file:
@@ -40032,12 +40266,16 @@ ts_lastacksent	include/lwip/tcp.h	/^        u32_t ts_lastacksent;$/;"	m	struct:t
 ts_recent	include/lwip/tcp.h	/^        u32_t ts_recent;$/;"	m	struct:tcp_pcb
 tsc	kernel/arch/omap44xx/omap.c	/^static cortex_a9_pit_t tsc;$/;"	v	file:
 tsc_get_hz	kernel/arch/omap44xx/omap.c	/^uint32_t tsc_get_hz(void)$/;"	f
+tsc_get_hz	lib/barrelfish/i2c.c	/^static int tsc_get_hz(void)$/;"	f	file:
+tsc_get_hz	usr/init/i2c.c	/^static int tsc_get_hz(void)$/;"	f	file:
 tsc_get_hz	usr/mmchs_driver/i2c.c	/^static int tsc_get_hz(void)$/;"	f	file:
 tsc_hz	kernel/arch/omap44xx/omap.c	/^static uint32_t tsc_hz = 2000000000;$/;"	v	file:
 tsc_hz	lib/bench/arch/arm/bench_arch.c	/^uint64_t tsc_hz;$/;"	v
 tsc_init	kernel/arch/omap44xx/omap.c	/^void tsc_init(void)$/;"	f
 tsc_overhead	lib/bench/bench.c	/^static cycles_t tsc_overhead;$/;"	v	file:
 tsc_read	kernel/arch/omap44xx/omap.c	/^uint32_t tsc_read(void)$/;"	f
+tsc_read	lib/barrelfish/i2c.c	/^static int tsc_read(void)$/;"	f	file:
+tsc_read	usr/init/i2c.c	/^static int tsc_read(void)$/;"	f	file:
 tsc_read	usr/mmchs_driver/i2c.c	/^static int tsc_read(void)$/;"	f	file:
 tscperms	lib/bench/arch/x86/bench_arch.c	/^static uint64_t tscperms;$/;"	v	file:
 tsctests	tools/harness/tests/__init__.py	/^    multihoptests, perfmontest, freemem, spawntest, spantest$/;"	i
@@ -40065,6 +40303,8 @@ tv_sec	lib/newlib/newlib/libc/include/sys/types.h	/^  time_t  tv_sec;   \/* Seco
 tv_usec	include/lwip/sockets.h	/^        long tv_usec;           \/* and microseconds *\/$/;"	m	struct:timeval
 tv_usec	include/sys/time.h	/^  long    tv_usec;        \/* and microseconds *\/$/;"	m	struct:timeval
 tv_usec	lib/newlib/newlib/libc/include/sys/time.h	/^  suseconds_t tv_usec;$/;"	m	struct:timeval
+twl	lib/barrelfish/twl6030.c	/^static ti_twl6030_t twl;$/;"	v	file:
+twl	usr/init/twl6030.c	/^static ti_twl6030_t twl;$/;"	v	file:
 twl	usr/mmchs_driver/twl6030.c	/^static ti_twl6030_t twl;$/;"	v	file:
 two	lib/newlib/newlib/libm/math/e_jn.c	/^two   =  2.00000000000000000000e+00, \/* 0x40000000, 0x00000000 *\/$/;"	v	file:
 two	lib/newlib/newlib/libm/math/e_pow.c	/^two	=  2.0,$/;"	v	file:
@@ -40162,6 +40402,7 @@ tx_index	include/net_queue_manager/net_queue_manager.h	/^    uint64_t tx_index; 
 type	include/barrelfish/aos_rpc.h	/^    enum filetype type;$/;"	m	struct:aos_dirent	typeref:enum:aos_dirent::filetype
 type	include/barrelfish/cross_core.h	/^	enum type type;$/;"	m	struct:ump_message	typeref:enum:ump_message::type
 type	include/barrelfish/cross_core.h	/^enum type {$/;"	g
+type	include/barrelfish/fat32.h	/^	enum filetype type;$/;"	m	struct:dirent	typeref:enum:dirent::filetype
 type	include/barrelfish/memobj.h	/^    enum memobj_type type;    \/\/\/< Type of the memory object$/;"	m	struct:memobj	typeref:enum:memobj::memobj_type
 type	include/getopt/getopt.h	/^    enum argtype        type;$/;"	m	struct:cmdarg	typeref:enum:cmdarg::argtype
 type	include/hashtable/hashtable.h	/^    ENTRY_TYPE type;$/;"	m	struct:_ht_entry
@@ -40232,7 +40473,9 @@ type	tools/arm_gem5/RealView.py	/^    type = 'Sp804'$/;"	v	class:Sp804
 type	tools/schedsim/simulator.c	/^    enum objtype        type;$/;"	m	struct:capability	typeref:enum:capability::objtype	file:
 type	tools/schedsim/simulator.c	/^    enum task_type      type;$/;"	m	struct:dcb	typeref:enum:dcb::task_type	file:
 typeDir	include/barrelfish/aos_rpc.h	/^	typeDir$/;"	e	enum:filetype
+typeDir	include/barrelfish/fat32.h	/^	typeDir$/;"	e	enum:filetype
 typeFile	include/barrelfish/aos_rpc.h	/^	typeFile,$/;"	e	enum:filetype
+typeFile	include/barrelfish/fat32.h	/^	typeFile,$/;"	e	enum:filetype
 type_is_vnode	include/barrelfish_kpi/capabilities.h	/^static inline bool type_is_vnode(enum objtype type)$/;"	f
 typechar	tools/schedsim/simulator.c	/^static inline char typechar(enum task_type type)$/;"	f	file:
 types	lib/newlib/newlib/libc/posix/runetype.h	/^	unsigned long	*types;		\/* Array of types in range *\/$/;"	m	struct:__anon241
@@ -41500,6 +41743,12 @@ wait4	lib/newlib/newlib/libc/posix/un-namespace.h	88;"	d
 wait4	lib/oldc/src/locale/namespace.h	230;"	d
 wait4	lib/oldc/src/locale/un-namespace.h	211;"	d
 wait_for_interrupt	kernel/arch/arm/exec.c	/^void wait_for_interrupt(void)$/;"	f
+wait_msec	lib/barrelfish/ctrlmod.c	/^static void wait_msec(long msec)$/;"	f	file:
+wait_msec	lib/barrelfish/mmchs.c	/^static void wait_msec(long msec)$/;"	f	file:
+wait_msec	lib/barrelfish/twl6030.c	/^static void wait_msec(long msec)$/;"	f	file:
+wait_msec	usr/init/ctrlmod.c	/^static void wait_msec(long msec)$/;"	f	file:
+wait_msec	usr/init/mmchs.c	/^static void wait_msec(long msec)$/;"	f	file:
+wait_msec	usr/init/twl6030.c	/^static void wait_msec(long msec)$/;"	f	file:
 wait_msec	usr/mmchs_driver/ctrlmod.c	/^static void wait_msec(long msec)$/;"	f	file:
 wait_msec	usr/mmchs_driver/mmchs.c	/^static void wait_msec(long msec)$/;"	f	file:
 wait_msec	usr/mmchs_driver/twl6030.c	/^static void wait_msec(long msec)$/;"	f	file:
@@ -41789,6 +42038,8 @@ write_callgraph	lib/newlib/newlib/libc/machine/spu/spu-gmon.c	/^write_callgraph 
 write_capref_to_ring	lib/barrelfish/omap_uart.c	/^bool write_capref_to_ring (struct serial_capref_ring_buffer * ring, struct capref * cap) {$/;"	f
 write_delayed	include/lwip/api.h	/^        u8_t write_delayed;$/;"	m	struct:netconn
 write_description	tools/harness/scalebench.py	/^def write_description(options, checkout, build, machine, test, path):$/;"	f
+write_dma	lib/barrelfish/service.c	/^static void write_dma(struct ata_rw28_thc_service_binding_t *sv,$/;"	f	file:
+write_dma	usr/init/service.c	/^static void write_dma(struct ata_rw28_thc_service_binding_t *sv,$/;"	f	file:
 write_dma	usr/mmchs_driver/service.c	/^static void write_dma(struct ata_rw28_thc_service_binding_t *sv,$/;"	f	file:
 write_ea	lib/newlib/newlib/libc/machine/spu/write_ea.c	/^COMPAT_EA_ALIAS (write_ea);$/;"	v
 write_ea	lib/newlib/newlib/libc/machine/spu/write_ea.c	/^write_ea (int fd, __ea const void *buf, size_ea_t count)$/;"	f

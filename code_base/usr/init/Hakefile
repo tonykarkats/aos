@@ -11,12 +11,22 @@
 --------------------------------------------------------------------------
 
 [ build application { target = "init",
-  		      cFiles = [ "mem_alloc.c", "init.c", "mem_serv.c"],
+  		      cFiles = [ "mem_alloc.c", "init.c", "mem_serv.c", "fat32.c",
+						 "cm2.c", "i2c.c", "mmchs.c", "twl6030.c", "ctrlmod.c"],
                       flounderDefs = [ "mem" ],
                       addLinkFlags = [ "-e _start_init"],
                       addLibraries = [ "mm", "getopt", "trace", "elf",
-                            "spawndomain", "elf" , "barrelfish"],
-                      mackerelDevices = [ "omap/omap_uart" ],
+                            "spawndomain", "elf" , "barrelfish", "driverkit"],
+                      mackerelDevices = [ "omap/omap_uart", 
+										   "ti_i2c",
+    			                           "ti_twl6030",
+                                           "omap/omap44xx_mmchs1",
+                                           "omap/omap44xx_sysctrl_padconf_core",
+                                           "omap/omap44xx_l3init_cm2",
+                            			   "omap/omap44xx_ckgen_cm2",
+                            			   "omap/omap44xx_l4per_cm2"
+
+											],
                       architectures = allArchitectures
                     }
 ]

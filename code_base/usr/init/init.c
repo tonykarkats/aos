@@ -28,6 +28,7 @@
 #include <barrelfish/proc.h>
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
+#include "fat32.h"
 #include <mm/mm.h>
 #define UNUSED(x) (x) = (x)
 
@@ -424,7 +425,8 @@ static void recv_handler(void *arg)
 		
 			cap_destroy(cap);
 			break;
-		case AOS_RPC_READ_DIR: ;	
+		case AOS_RPC_READ_DIR: ;	 
+			// Will list() a directory and will return results to the caller
 			char path[512];
 	
 			thread_mutex_lock(&process_list_lock);	
@@ -432,13 +434,33 @@ static void recv_handler(void *arg)
 			thread_mutex_unlock(&process_list_lock);	
 
 			strcpy(path, process->buffer);
-			// debug_printf("Client requests for path %s\n", path);
-			
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
-			}
+			debug_printf("Client requests for path %s\n", path);
+		
+			struct aos_dirent * dirtable = NULL;
+			uint32_t size;
 	
+			err = list(path, &dirtable, &size);
+			if (err_is_fail(err)) {
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
+				}
+			}
+			else {
+				debug_printf("Found %" PRIu32 "\n", size);
+				for (int i=0; i<size; i++) {
+					struct aos_dirent dirent;
+					dirent = dirtable[i];
+					debug_printf("%s\n", dirent.name);	
+				}
+
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
+				}
+			}
+
+			cap_destroy(cap);
 			break;	
 		case AOS_RPC_OPEN_FILE: ;
 			char open_file_name[512];
@@ -664,6 +686,10 @@ int main(int argc, char *argv[])
 	// Boot core and wait for signal
 	spawn_second_core(bi, aux_core_0, aux_core_1);
  	poll_for_core(aux_core_0);
+	
+	// Initialize fat-infrastructure
+	debug_printf("Initializing the fat infrastructure...\n");
+	fat32_init();
 
 	thread_mutex_init(&process_list_lock);
 	struct thread *cross_core_thread = thread_create( cross_core_thread_0, NULL);
@@ -697,8 +723,8 @@ int main(int argc, char *argv[])
 	struct capref disp_frame;
 	
 	global_did++;
-	err = bootstrap_domain("mmchs", &mem_si, bi, my_core_id, &disp_frame, global_did);
-	pr_head = insert_process_node(pr_head, global_did, "mmchs", false, NULL_CAP, disp_frame);
+	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame, global_did);
+	pr_head = insert_process_node(pr_head, global_did, "memeater", false, NULL_CAP, disp_frame);
 	
 	assert(err_is_ok(err));
 	while(true) {

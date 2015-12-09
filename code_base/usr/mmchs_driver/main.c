@@ -44,7 +44,6 @@ static void get_cap(lpaddr_t base, size_t size)
 
     static size_t current_slot = 0;
     device_cap_iter.slot = current_slot++;
-	//debug_printf("Slot = %zu \n", device_cap_iter.slot);
 		
     err = cap_copy(device_cap_iter, cap);
     if (err_is_fail(err)) {
@@ -89,12 +88,12 @@ int main(int argc, char **argv)
 	err = fat32_init();
 	assert(err_is_ok(err));
 
-	// This is how list() is used!
+	// this is how list() is used!
 
 	struct aos_dirent * dirtable = NULL;
 	uint32_t size;
 	
-	list("/TEMP1/ELF", &dirtable, &size);
+	list("/", &dirtable, &size);
   
 	printf("Found %" PRIu32 "\n", size);
 	for (int i=0; i<size; i++) {
