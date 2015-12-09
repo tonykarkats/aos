@@ -454,7 +454,9 @@ static void recv_handler(void *arg)
 					debug_printf("%s\n", dirent.name);	
 				}
 
-				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+				memcpy(process->buffer, dirtable, size * sizeof(struct aos_dirent));
+
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) size);
 				if (err_is_fail(err)) {
 					DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
 				}

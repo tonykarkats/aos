@@ -233,14 +233,16 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 			break;
 	}
 
+	// Wait for reply from server
     event_dispatch(get_default_waitset());
+	
 	*newpid = chan->words[0];
 	
 	if (*newpid == 0) {
 		return AOS_ERR_LMP_SPAWN_DOM;
 	}
 	
-	// Wait for the process to finish!
+	// Wait for the process to finish! For processes on core-1 this is a dummy response
  	event_dispatch(get_default_waitset());
 	
     return SYS_ERR_OK;
@@ -436,9 +438,18 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
 	// Returned dir entries in the shared buffer	
 	*elem_count = returned_value;
 
-	// Malloc and fill in with data from the shared buffer and return to user!
-	*dir = (struct aos_dirent *) malloc(sizeof(struct aos_dirent) * *elem_count);
+	debug_printf("Found %" PRIu32 "\n", returned_value);
 	
+	// Malloc and fill in with data from the shared buffer and return them to user!
+	*dir = (struct aos_dirent *) malloc(sizeof(struct aos_dirent) * returned_value);
+	memcpy(*dir, chan->shared_buffer, sizeof(struct aos_dirent) * returned_value);
+
+
+	for (int i=0; i<returned_value; i++) {
+		struct aos_dirent dirent;
+		dirent = (*dir)[i];
+		debug_printf("%s\n", dirent.name);	
+	}	
     return SYS_ERR_OK;
 }
 
