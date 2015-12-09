@@ -273,9 +273,7 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
     errval_t err;
 	//char *domain_name;
 	
-	//debug_printf("WIll request name of pid %d\n", pid);
-
-	//domain_name = (char *) malloc(36);    
+	*name = (char *) malloc(36);    
     
 	while(true) {
 		event_dispatch(&chan->s_waitset);
@@ -294,14 +292,8 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
 
     event_dispatch(get_default_waitset());
 
-	for (int i = 0; i< 9; i++) {
-		uint32_t * word = (uint32_t *) (*name + i*4);
-		*word = chan->words[i];   
-	}
+	strncpy(*name, (char *) chan->words, 32);	
    
-	//debug_printf("Client: Process with %s\n", domain_name);
-    	
-	//*name = domain_name;
     return SYS_ERR_OK;
 }
 
@@ -333,11 +325,10 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 		count++;
 	}
 
-	//debug_printf("Returned! Count = %d\n", count);
+	*pids_returned = (domainid_t *) malloc(sizeof(domainid_t) * count);
+
 	for (int i = 0; i<count; i++) {
-		//debug_printf("Returned pid %d\n", chan->words[i]);
 		(*pids_returned)[i] = (domainid_t) chan->words[i];
-		//debug_printf("Returned pid %d\n",(*pids_returned)[i] );
 	}
 
 	*pid_count = count;

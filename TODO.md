@@ -27,4 +27,4 @@
 
 - Fix bug in initapp when processes from initapp spawning processes on initapp fail at process # = 18.
 
-
+- Fix bug where both /hello and hello work as files

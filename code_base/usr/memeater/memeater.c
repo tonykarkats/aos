@@ -50,37 +50,7 @@ int main(int argc, char *argv[])
 	const char space_token[2] = " ";
 	char *token;
 	char *next_token;
-	char *domain_name = malloc(36); 
 	size_t dir_entries;
-
-	//int l = 0;	
-	/*
-	while (1) {
-		
-		debug_printf("--------------------------- SPAWNED TOTAL = %d\n", l);
-		domainid_t pid;
-		err = aos_rpc_process_spawn(get_init_chan(), "led_on", 1, &pid);
-		if (err_is_fail(err) || (pid == 0))
-			printf("Could not spawn domain [%s]\n", "led_on");
-		else 
-			printf("Domain spawned with pid = %d\n", pid);
-		
-		err = aos_rpc_process_spawn(get_init_chan(), "led_off", 0, &pid);
-		if (err_is_fail(err) || (pid == 0))
-			printf("Could not spawn domain [%s]\n", "led_off");
-		else 
-			printf("Domain spawned with pid = %d\n", pid);
-		
-		err = aos_rpc_process_spawn(get_init_chan(), "stress_paging", 0, &pid);
-		if (err_is_fail(err) || (pid == 0))
-			printf("Could not spawn domain [%s]\n", "stress_paging");
-		else 
-			printf("Domain spawned with pid = %d\n", pid);
-		
-
-		l = l+3;
-	}
-	*/
 
 	while(1) {
 		printf("$>");
@@ -106,7 +76,7 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("ps", token)) {
 			domainid_t * pids;
-			pids = (domainid_t *) malloc(sizeof(domainid_t)*32);
+				
 			size_t pid_count;
 			err = aos_rpc_process_get_all_pids(get_init_chan(), &pids, &pid_count);
 			if (err_is_fail(err)) {
@@ -114,27 +84,17 @@ int main(int argc, char *argv[])
 				continue;
 			}
 			
+			char * domain_name;
 			for (int i = 0; i < pid_count; i++) {
 				err = aos_rpc_process_get_name(get_init_chan(), pids[i], &domain_name);	
 				if (err_is_ok(err)) 
-					printf("PID: %d NAME: %s\n", pids[i], domain_name); 
-				memset(domain_name, 0, 36);
+					printf("pid: %d name: %s	", pids[i], domain_name); 
+				free(domain_name);
 			}
-			
-		}
-		else if (!strcmp("kill", token)) {
-			token = strtok(NULL, space_token);
-			if (token == NULL)
-				continue;
-			
-			domainid_t did = atoi(token);
-			err = aos_rpc_process_kill_process(get_init_chan(), did);
-			if (err_is_fail(err)) {
-				printf("Could not fetch pids from server!\n");
-				continue;
-			}
-
-		}
+			printf("\n");
+		
+			free(pids);	
+		}	
 		else if (!strcmp("oncore", token)) {
 			token = strtok(NULL, space_token);
 			next_token = strtok(NULL, space_token);
@@ -168,8 +128,9 @@ int main(int argc, char *argv[])
 			else {
 				// debug_printf("entries = %"PRIu32"\n", dir_entries);
 				for (int i = 0; i < dir_entries; i++) {
-					printf("%s	\n", dirtable[i].name);
+					printf("%s ", dirtable[i].name);
 				}	
+				printf("\n");
 			}
 			free(dirtable);
 		}
@@ -186,14 +147,13 @@ int main(int argc, char *argv[])
 				printf("Got fd %d \n", fd);
 			}
 
-			//err = aos_rpc_close(get_init_chan(),fd);
-			//if (err_is_fail(err)) {
-
-			//	printf("Can not close fd %d\n", fd);
-			//}
-			//else {
-			//	printf("Closed fd %d \n", fd);
-			//}
+			err = aos_rpc_close(get_init_chan(),fd);
+			if (err_is_fail(err)) {
+				printf("Can not close fd %d\n", fd);
+			}
+			else {
+				printf("Closed fd %d \n", fd);
+			}
 
 		}
 		else if (!strcmp("exit", token)) {
