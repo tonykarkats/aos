@@ -49,8 +49,8 @@ static errval_t get_cap(lpaddr_t base, size_t size)
         USER_PANIC_ERR(err, "cap_copy failed.");
     }
 
-    assert(err_is_ok(err));
 	return SYS_ERR_OK;
+    assert(err_is_ok(err));
 }
 
 errval_t fat32_init(void) {
@@ -226,7 +226,7 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 			path[i] = toupper((int) c);
 	}
 	
-	//debug_printf("Will search for %s\n", path);
+//	debug_printf("Will search for %s\n", path);
 	errval_t err;
 
 	//Get root dirents to start with
@@ -265,7 +265,7 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 				if (!strcmp(stripped, p)) {
 					found = true;
 		
-					//debug_printf("Found name %s. Moving deeper. firstCluster = %" PRIu32 "\n", dirent.name, dirent.firstCluster);
+					// debug_printf("Found name %s. Moving deeper. firstCluster = %" PRIu32 "\n", dirent.name, dirent.firstCluster);
 					uint32_t first_cluster = ((dirent.firstCluster  -2)*BPB_SecPerClus + FirstDataSector);
 					
 					p = strtok(NULL, "/");
@@ -274,7 +274,6 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 
 						struct aos_dirent* file_dirent = (struct aos_dirent *) malloc(sizeof(struct aos_dirent));
 						*file_dirent = dirent;
-						
 						//free(cur_table);
 						
 						*dirtable = file_dirent;
@@ -304,7 +303,7 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 				 							
 					break;
 				}
-				return AOS_ERR_FAT_FILE_NOT_FOUND;
+				found = false;
 			} 
 					
 			if (!found) {
@@ -342,7 +341,8 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
 errval_t get_data(uint32_t cluster_nr, void *buf) {
 
 	errval_t err;
-
+	debug_printf("Buff addr  = %p\n", buf);
+	
 	uint32_t sector = ((cluster_nr - 2) * BPB_SecPerClus) + FirstDataSector;
 
 	err = mmchs_read_block(sector, buf);
@@ -352,10 +352,10 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
 	}
 
 	
-	char * vbuf = (char *)buf;
-	for (int i = 0; i < 512 ; i++) {
-		debug_printf("   %c\n", vbuf[i] );
-	}	
+	//char * vbuf = (char *)buf;
+	//for (int i = 0; i < 512 ; i++) {
+	//	debug_printf("   %c\n", vbuf[i] );
+	//}	
 		
 
 	return SYS_ERR_OK;
@@ -375,29 +375,59 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
     uint32_t filesize;
     first_cluster = get_first_cluster(filename, &filesize);
 
-    if (first_cluster != -1) {
-		// First calculate the number of blocks the file needs in order to allocate the buffer        
+    if (first_cluster != -1) { // If file exists
 
-		uint32_t blocks_needed = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
+		if (position + size > filesize)
+			size = filesize - position;
+
+		// First calculate the number of blocks the file needs in order to allocate the buffer        
+		uint32_t cluster_chain[4096];
+		uint32_t total_blocks = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
 
 		// Follow every cluster in the clusterchain of the FAT table
-		char * data_buffer = malloc(blocks_needed * BPB_BytsPerSec + 1);
-
+		
 		uint32_t cur_cluster = first_cluster;
 		
-		for (int i=0; i < blocks_needed; i++) {	
-			//printf("Readin cluster = %" PRIu32 "\n", cur_cluster);
-			err = get_data(cur_cluster, data_buffer + i*BPB_BytsPerSec);
+		for (int i=0; i<total_blocks; i++) {
+			cluster_chain[i] = cur_cluster;
 			cur_cluster = get_fat_entry(cur_cluster);
 		}
+
+		uint32_t starting_block = position / BPB_BytsPerSec;
+		uint32_t ending_block = (position + size) / BPB_BytsPerSec;
+		uint32_t starting_offset = (position % BPB_BytsPerSec);
+
+		uint32_t blocks_needed = (ending_block - starting_block + 1);
+
+		debug_printf("Blocks Needed: %d\n", blocks_needed);
+		debug_printf("Starting Block: %d\n", starting_block);
+		debug_printf("Ending Block: %d\n", ending_block);
+		debug_printf("Starting Offset: %d\n", starting_offset);
+
+		// This buffer holds all the blocks needed
+		char * data_buffer = (char *)malloc(blocks_needed * BPB_BytsPerSec + 1);
+		for (int i=0 ; i<blocks_needed; i++) {	
+			err = get_data(cluster_chain[starting_block + i], data_buffer + i*BPB_BytsPerSec);
+		}
+	
+		// This is the buffer that will be returned
+		// It is actually a stripped version of the first one
 		
-		*retsize = blocks_needed * BPB_BytsPerSec;	
-		*buf = data_buffer;	
+		char *final_buffer = (char *)malloc(size);
+		memcpy(final_buffer, data_buffer + starting_offset, size);	
+		free(data_buffer);
+
+		*retsize = size;	
+		*buf = final_buffer;	
+		
+	
 		return SYS_ERR_OK;
     }
 
 	return AOS_ERR_FAT_FILE_NOT_FOUND;
 }
+
+
 
 /* This function searches the filetree recursively until it finds the filename requested.
  * It also return the filesize. Returns -1 if file was not found. */
@@ -420,11 +450,9 @@ uint32_t get_first_cluster(const char *filename, uint32_t *filesize) {
 
 	*filesize = dirent.size;
 
-//	printf("Filesize = %d\n", dirent.size);
-//	printf("%s\n", dirent.name);
-//	printf("%d\n", dirent.firstCluster);
-
 	return dirent.firstCluster;
 }
+
+
 
 

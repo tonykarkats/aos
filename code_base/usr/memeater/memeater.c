@@ -137,6 +137,8 @@ int main(int argc, char *argv[])
 		else if (!strcmp("cat", token)) {	
 			token = strtok(NULL, space_token);
 			int fd;
+			void *fbuf;
+			size_t buflen;
 
 			err = aos_rpc_open(get_init_chan(), token, &fd);
 			if (err_is_fail(err)) {
@@ -146,6 +148,13 @@ int main(int argc, char *argv[])
 			else {
 				printf("Got fd %d \n", fd);
 			}
+	
+			err = aos_rpc_read(get_init_chan(), fd, 0, 1000, &fbuf, &buflen);
+			if (err_is_fail(err)) {
+				debug_printf("Can not read from file ! with fd %d\n", fd);		
+			}
+
+			printf("%s\n", (char *) fbuf);
 
 			err = aos_rpc_close(get_init_chan(),fd);
 			if (err_is_fail(err)) {

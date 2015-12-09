@@ -442,12 +442,13 @@ errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size
                       void** buf, size_t *buflen)
 {
     errval_t err;
-	
+	memset(chan->shared_buffer, 0, 4096);
+		
 	while(true) {
    		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send3(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
+		err = lmp_chan_send4(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, 
 							 chan->rpc_channel.local_cap, 
-							 ((AOS_RPC_READ_FILE  << 24) | (0x00FFFFFF & disp_get_domain_id())), fd, position);
+							 ((AOS_RPC_READ_FILE  << 24) | (0x00FFFFFF & disp_get_domain_id())), fd, position, size);
 
     	if ((err_no(err) != 17)&&(err_is_fail(err))) {
        		debug_printf("aos_rpc_readdir: Error in reading dir!\n");
@@ -468,8 +469,11 @@ errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size
 		*buflen = 0;
 		return AOS_ERR_LMP_NON_EXISTED_FD;
 	}
-	
+
+	debug_printf("Read size = %d \n", returned_value);	
 	// Create a buffer of 4096 bytes and copy stuff in it.
+	*buf = malloc(returned_value);
+	memcpy( *buf, chan->shared_buffer, returned_value);
 
 	return SYS_ERR_OK;
 }

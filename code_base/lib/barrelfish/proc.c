@@ -194,20 +194,20 @@ void update_fd_list (struct process_node *node, int fd, int poss, char * name)
 	return;
 }
 
-bool check_if_fd_exists(struct file_descriptor_node *node, int fd) 
+char * check_if_fd_exists(struct file_descriptor_node *node, int fd) 
 {
 	struct file_descriptor_node * head = node;
 
 	if (head == NULL)
-		return false;
+		return NULL;
 			
 	while(head != NULL) {
 		if (head->fd == fd)
-			return true;	
+			return head->file_name;	
 		head = head->next_file_descriptor;
 	}
 
-	return false;
+	return NULL;
 }
 
 bool delete_fd(struct process_node *node, int fd) 

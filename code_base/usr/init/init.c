@@ -507,7 +507,8 @@ static void recv_handler(void *arg)
 			break;
 		case AOS_RPC_READ_FILE: ;
 			int read_fd = msg.words[1];
-			// int read_possition = msg.words[2];
+			uint32_t read_pos = msg.words[2];
+			uint32_t read_size = msg.words[3];
 			int read_response;
 
 			thread_mutex_lock(&process_list_lock);	
@@ -515,13 +516,28 @@ static void recv_handler(void *arg)
 			thread_mutex_unlock(&process_list_lock);	
 			
 			debug_printf("Client requests to read file from fd %d\n", read_fd);
-			
-			if (!check_if_fd_exists(process->fd_node, read_fd)) {
+				
+			char * file_name = check_if_fd_exists(process->fd_node, read_fd);
+			if (!file_name) {
 				read_response = -1;
 			}
 			else {
-				read_response = -1;	
+				void * fbuf;
+				if (read_size > 4096)
+					read_size = 4096;	
+				uint32_t ret_size;	
+				err = read_file( file_name, &fbuf, read_pos, read_size, &ret_size);
+				if (err_is_fail(err))
+					read_response = -1;	
+				else {
+					read_response = ret_size;
+					memcpy(process->buffer, fbuf, ret_size);	
+				}
+				
+				free(fbuf);
 			}
+
+
 
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, read_response);
 			if (err_is_fail(err)) {
