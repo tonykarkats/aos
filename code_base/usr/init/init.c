@@ -488,6 +488,11 @@ static void recv_handler(void *arg)
 				next_fd ++;
 				update_fd_list(process, next_fd, 0, open_file_name);
 
+				struct file_descriptor_node* n = process->fd_node;
+				while(n != NULL) {
+					debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
+					n = n->next_file_descriptor;
+				}
 				thread_mutex_unlock(&process_list_lock);	
 				
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) next_fd);
@@ -500,36 +505,52 @@ static void recv_handler(void *arg)
 			cap_destroy(cap);
 			break;
 		case AOS_RPC_READ_FILE: ;
-			char read_file_name[512];
-			// FILL ME IN
+			int read_fd = msg.words[1];
+			// int read_possition = msg.words[2];
+			int read_response;
+
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
 			
-			strcpy(read_file_name, process->buffer);
-			debug_printf("Client requests to read file %s\n", read_file_name);
-	
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+			debug_printf("Client requests to read file from fd %d\n", read_fd);
+			
+			if (!check_if_fd_exists(process->fd_node, read_fd)) {
+				read_response = -1;
+			}
+			else {
+				read_response = -1;	
+			}
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, read_response);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send response for read file back to the client!\n");
 			}
 		
 			break;
 		case AOS_RPC_CLOSE_FILE: ;
-			int fd = msg.words[1];
-			int response;	
+			int close_fd = msg.words[1];
+			int close_response;	
+			
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
 
 			// debug_printf("Client requests to close file with fd %d\n", fd);	
 		
-			if (!check_if_fd_exists( process->fd_node, fd)) 
-				response = -1;
+			if (!delete_fd( process, close_fd)) 
+				close_response = -1;
 			else 
-				response = 1;
+				close_response = 1;
 
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, response);
+			struct file_descriptor_node* n = process->fd_node;
+			while(n != NULL) {
+				debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
+				n = n->next_file_descriptor;
+			}
+
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, close_response);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send response for closing file back to the client!\n");
 			}

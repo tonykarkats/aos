@@ -186,13 +186,14 @@ int main(int argc, char *argv[])
 				printf("Got fd %d \n", fd);
 			}
 
-			err = aos_rpc_close(get_init_chan(),fd);
-			if (err_is_fail(err)) {
-				printf("Can not close fd %d\n", fd);
-			}
-			else {
-				printf("Closed fd %d \n", fd);
-			}
+			//err = aos_rpc_close(get_init_chan(),fd);
+			//if (err_is_fail(err)) {
+
+			//	printf("Can not close fd %d\n", fd);
+			//}
+			//else {
+			//	printf("Closed fd %d \n", fd);
+			//}
 
 		}
 		else if (!strcmp("exit", token)) {

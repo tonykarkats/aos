@@ -182,6 +182,9 @@ void update_fd_list (struct process_node *node, int fd, int poss, char * name)
 
 	struct file_descriptor_node* new_fd = ( struct file_descriptor_node *) malloc(sizeof(struct file_descriptor_node));
 
+	new_fd->file_name = malloc(sizeof(name));
+	strncpy(new_fd->file_name, name, 20);
+
 	new_fd->fd = fd;
 	new_fd->possition_in_file = poss;
 	new_fd->next_file_descriptor = node->fd_node;

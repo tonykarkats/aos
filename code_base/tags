@@ -24298,6 +24298,7 @@ del_module	tools/harness/barrelfish.py	/^    def del_module(self, name):$/;"	m	c
 delayus_t	include/barrelfish/types.h	/^typedef uint64_t delayus_t;$/;"	t
 delete_chunked	include/mm/mm.h	/^    bool delete_chunked;    \/\/\/< Delete chunked capabilities if true$/;"	m	struct:mm
 delete_cnode_or_dcb	kernel/capabilities.c	/^static void delete_cnode_or_dcb(struct capability *cap, bool from_monitor)$/;"	f	file:
+delete_fd	lib/barrelfish/proc.c	/^bool delete_fd(struct process_node *node, int fd) $/;"	f
 delete_from_filter_list	lib/net_queue_manager/net_soft_filters_srv_impl.c	/^static struct filter *delete_from_filter_list(struct filter *head,$/;"	f	file:
 delete_process_node	lib/barrelfish/proc.c	/^struct process_node * delete_process_node(struct process_node ** head, domainid_t did, char * name) $/;"	f
 delivered	include/barrelfish_kpi/lmp.h	/^    uint32_t    delivered;  \/\/\/< Position in buffer (words delivered by kernel)$/;"	m	struct:lmp_endpoint_kern
@@ -26000,6 +26001,7 @@ file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	
 file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	struct:READ3resfail
 file_attributes	include/nfs/nfs_rpc.h	/^    post_op_attr file_attributes;$/;"	m	struct:READ3resok
 file_descriptor_node	include/barrelfish/proc.h	/^struct file_descriptor_node {$/;"	s
+file_name	include/barrelfish/proc.h	/^	char *file_name;$/;"	m	struct:file_descriptor_node
 file_wcc	include/nfs/nfs_rpc.h	/^    wcc_data file_wcc;$/;"	m	struct:COMMIT3resfail
 file_wcc	include/nfs/nfs_rpc.h	/^    wcc_data file_wcc;$/;"	m	struct:COMMIT3resok
 file_wcc	include/nfs/nfs_rpc.h	/^    wcc_data file_wcc;$/;"	m	struct:WRITE3resfail
@@ -41092,7 +41094,7 @@ uordblks	lib/newlib/newlib/libc/stdlib/vallocr.c	/^  int uordblks; \/* total all
 uordblks	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  MALLINFO_FIELD_TYPE uordblks; \/* total allocated space *\/$/;"	m	struct:mallinfo	file:
 upcall_state	kernel/arch/arm/exec.c	/^static arch_registers_state_t upcall_state;$/;"	v	file:
 update_arp_entry	lib/lwip/src/netif/etharp.c	/^update_arp_entry(struct netif *netif, struct ip_addr *ipaddr,$/;"	f	file:
-update_fd_list	lib/barrelfish/proc.c	/^void update_fd_list (struct process_node *node, int fd, int poss) $/;"	f
+update_fd_list	lib/barrelfish/proc.c	/^void update_fd_list (struct process_node *node, int fd, int poss, char * name) $/;"	f
 update_frame_list	lib/barrelfish/proc.c	/^void update_frame_list(struct process_node *node, struct capref ram, size_t bits) $/;"	f
 update_sched_timer	kernel/timer.c	/^void update_sched_timer(systime_t t)$/;"	f
 update_timer	kernel/timer.c	/^static void update_timer(void)$/;"	f	file:
