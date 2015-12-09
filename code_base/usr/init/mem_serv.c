@@ -44,7 +44,7 @@ static struct slot_prealloc ram_slot_alloc;
 static bool refilling = false;
 
 errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
-                              genpaddr_t maxlimit)
+                              genpaddr_t maxlimit, genpaddr_t *retbase)
 {
     errval_t err;
 	
@@ -118,7 +118,7 @@ errval_t initialize_mem_serv(void)
     struct capref cnode_start_cap = { .slot  = 0 };
 
     struct capref ram;
-    err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0);
+    err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0, NULL);
     assert(err_is_ok(err));
     err = cnode_create_from_mem(cnode_cap, ram, &cnode_start_cap.cnode,
                               DEFAULT_CNODE_BITS);

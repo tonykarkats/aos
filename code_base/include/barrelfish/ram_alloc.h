@@ -21,12 +21,12 @@
 __BEGIN_DECLS
 
 typedef errval_t (* ram_alloc_func_t)(struct capref *ret, uint8_t size_bits,
-                                      uint64_t minbase, uint64_t maxlimit);
+                                      uint64_t minbase, uint64_t maxlimit, uint64_t *retbase);
 errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
-                         uint64_t minbase, uint64_t maxlimit);
+                         uint64_t minbase, uint64_t maxlimit, uint64_t * retbase);
 
 errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
-                         uint64_t minbase, uint64_t maxlimit);
+                         uint64_t minbase, uint64_t maxlimit, uint64_t * retbase);
 errval_t ram_alloc(struct capref *retcap, uint8_t size_bits);
 errval_t ram_available(genpaddr_t *available, genpaddr_t *total);
 errval_t ram_alloc_set(ram_alloc_func_t local_allocator);

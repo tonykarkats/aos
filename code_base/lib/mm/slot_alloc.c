@@ -145,7 +145,7 @@ errval_t slot_alloc_basecn_init(struct slot_alloc_basecn *this)
     }
 
     struct capref ram;
-    err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0);
+    err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0, NULL);
     if (err_is_fail(err)) {
         return err_push(err, LIB_ERR_RAM_ALLOC);
     }
@@ -172,7 +172,7 @@ errval_t slot_alloc_basecn(void *inst, uint64_t nslots, struct capref *ret)
 
         /* XXX: Special case for init, need to get memory from basecn */
         struct capref ram;
-        err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0);
+        err = ram_alloc_fixed(&ram, BASE_PAGE_BITS, 0, 0, NULL);
         if (err_is_fail(err)) {
             return err_push(err, LIB_ERR_RAM_ALLOC);
         }

@@ -31,7 +31,7 @@
 static struct mm mymm;
 
 static errval_t mymm_alloc(struct capref *ret, uint8_t bits, uint64_t minbase,
-                           uint64_t maxlimit)
+                           uint64_t maxlimit, uint64_t * retbase)
 {
     /* XXX: although we have calculated the space requirements for
      * MM_MINSIZEBITS, we only ever allocate a single dispatcher from this

@@ -132,7 +132,7 @@ void ram_get_affinity(uint64_t *minbase, uint64_t *maxlimit)
 #define OBJSPERPAGE_CTE         (1 << (BASE_PAGE_BITS - OBJBITS_CTE))
 
 errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
-                         uint64_t minbase, uint64_t maxlimit)
+                         uint64_t minbase, uint64_t maxlimit, uint64_t *retbase)
 {
     struct ram_alloc_state *state = get_ram_alloc_state();
 
@@ -152,7 +152,7 @@ errval_t ram_alloc_fixed(struct capref *ret, uint8_t size_bits,
 
 
 errval_t server_ram_alloc(struct capref *ret, uint8_t size_bits,
-                         uint64_t minbase, uint64_t maxlimit)
+                         uint64_t minbase, uint64_t maxlimit, uint64_t *retbase)
 {
 	size_t ret_bits;
 		
@@ -185,7 +185,7 @@ errval_t ram_alloc(struct capref *ret, uint8_t size_bits)
     
 	errval_t err = ram_alloc_state->
         ram_alloc_func(ret, size_bits, ram_alloc_state->default_minbase,
-                       ram_alloc_state->default_maxlimit);
+                       ram_alloc_state->default_maxlimit, NULL);
     if(err_is_fail(err)) {
       debug_printf("ram_alloc: Error in ram_alloc_func!\n");
 

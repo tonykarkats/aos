@@ -304,6 +304,7 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 				 							
 					break;
 				}
+				return AOS_ERR_FAT_FILE_NOT_FOUND;
 			} 
 					
 			if (!found) {

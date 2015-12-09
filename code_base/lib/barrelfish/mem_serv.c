@@ -13,7 +13,7 @@
  */
 
 #include <string.h>
-#include "initapp.h"
+#include <barrelfish/mem_serv.h>
 #include <mm/mm.h>
 
 size_t mem_total = 0, mem_avail = 0;
@@ -44,7 +44,7 @@ static struct slot_prealloc ram_slot_alloc;
 static bool refilling = false;
 
 errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
-                              genpaddr_t maxlimit, uint64_t *retbase)
+                              genpaddr_t maxlimit, genpaddr_t *retbase)
 {
     errval_t err;
 	
@@ -59,8 +59,9 @@ errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
     size_t freecount = slab_freecount(&mm_ram.slabs);
     while (!refilling && (freecount <= MINSPARENODES)) {
 	
-		// debug_printf("memeserv_alloc: Need to refill..\n");
+		debug_printf("memeserv_alloc: Need to refill..\n");
     
+		//abort();
 	    refilling = true;
         struct capref frame;
         err = msa.a.alloc(&msa.a, &frame);
@@ -83,6 +84,8 @@ errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
         refilling = false;
     }
 
+	
+
     if(maxlimit == 0) {
         err = mm_alloc(&mm_ram, bits, ret, NULL);
     } else {
@@ -98,7 +101,13 @@ errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
     return err;
 }
 
-errval_t initialize_mem_serv(void)
+
+errval_t memserv_free (struct capref ram_cap, genpaddr_t base, uint8_t bits) 
+{
+	return mm_free(&mm_ram, ram_cap, base, bits);
+}
+
+errval_t initialize_mem_serv(struct bootinfo *bi)
 {
     errval_t err;
 
