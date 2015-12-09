@@ -249,24 +249,14 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
 
 	uint32_t FATOffset = cluster_nr * 4;
 
-	// ThisFATSecNum is the sector number of the FAT sector that contains the entry
-	// for cluster_nr in the first FAT table.
-
 	uint32_t ThisFATSecNum = BPB_RsvdSecCnt + (FATOffset / BPB_BytsPerSec);
 	uint32_t ThisFATEntOffset = FATOffset % BPB_BytsPerSec;
-
-	debug_printf("ThisFATSecNum = %" PRIu8 ". ThisFATEntOffset =  %" PRIu32 "\n", ThisFATSecNum, ThisFATEntOffset);
-
-	// We now read sector number ThisFATSecNum into a buffer
 	
-	uint32_t * secBuff = malloc(BPB_BytsPerSec);
+	char * secBuff = malloc(BPB_BytsPerSec);
 	mmchs_read_block(ThisFATSecNum, secBuff);
-	//debug_printf(" %"PRIu32"\n", secBuff[15]);
  	
-	//while(1);
-	// We can now calculate the FAT Entry value
-	//char * addr = (char *) secBuff + ThisFATEntOffset;	//(uintptr_t *) (&secBuff[ThisFATEntOffset]);
-	uint32_t FAT32ClusEntryVal = (* (( uint32_t *) &secBuff[ThisFATEntOffset])) & 0x0FFFFFFF;
+	uint32_t FAT32ClusEntryVal =   (*((uint32_t *)(secBuff + ThisFATEntOffset))) & 0x0FFFFFFF;
+
 	if (FAT32ClusEntryVal >= 0x0FFFFFF8) {
 		debug_printf("Reached end!\n");
 	}	
@@ -288,11 +278,13 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
 		return AOS_ERR_FAT_FILE_NOT_FOUND;
 	}
 
+	
 	char * vbuf = (char *)buf;
 	for (int i = 0; i < 512 ; i++) {
 		debug_printf("   %c\n", vbuf[i] );
 	}	
 		
+
 	return SYS_ERR_OK;
 }
 
@@ -301,7 +293,7 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
  * - Retrieves the next FAT entry from the FAT table and repeats until EOC.
  */
 
-errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size) {
+errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize) {
 
 	errval_t err;
 	
@@ -311,29 +303,23 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
     first_cluster = get_first_cluster(filename, &filesize);
 
     if (first_cluster != -1) {
-        printf("File was found! Size = %d and first Cluster at %d\n", filesize, first_cluster);
 		// First calculate the number of blocks the file needs in order to allocate the buffer        
 
 		uint32_t blocks_needed = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
-		debug_printf("Size = %d. Blocks needed = %d\n", filesize, blocks_needed);
 
-		// blocks_needed *= 2;
 		// Follow every cluster in the clusterchain of the FAT table
-		char * data_buffer = malloc(blocks_needed * BPB_BytsPerSec);
+		char * data_buffer = malloc(blocks_needed * BPB_BytsPerSec + 1);
 
 		uint32_t cur_cluster = first_cluster;
 		
-		for (int i=0; i < blocks_needed; i++) {
-		
-			printf("Readin cluster = %" PRIu32 "\n", cur_cluster);
+		for (int i=0; i < blocks_needed; i++) {	
+			//printf("Readin cluster = %" PRIu32 "\n", cur_cluster);
 			err = get_data(cur_cluster, data_buffer + i*BPB_BytsPerSec);
 			cur_cluster = get_fat_entry(cur_cluster);
 		}
 		
-		//data_buffer[1023] = '\0';
-
-		//debug_printf("%s\n", data_buffer);
-	
+		*retsize = blocks_needed * BPB_BytsPerSec;	
+		*buf = data_buffer;	
 		return SYS_ERR_OK;
     }
 

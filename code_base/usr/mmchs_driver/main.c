@@ -92,15 +92,15 @@ int main(int argc, char **argv)
     // This should be the same information you get with
     // dd when reading the first block on linux...
     //
-//    void *buffer = malloc(512);
-//    assert(buffer != NULL);
-//
-//    err = mmchs_read_block(0, buffer);
-//    assert(err_is_ok(err));
-//
-//	debug_printf("Boot Block Info\n");
-//	debug_printf("--------------\n");
-//
+    void *buffer = malloc(512);
+    assert(buffer != NULL);
+	void *data = NULL;
+    err = mmchs_read_block(0, buffer);
+    assert(err_is_ok(err));
+
+	debug_printf("Boot Block Info\n");
+	debug_printf("--------------\n");
+
 //	debug_printf("Manufacturer: ");
 //	for (int i=3; i<=10; ++i) {
 //		debug_printf("%c", ((uint8_t*) buffer)[i]);
@@ -155,10 +155,11 @@ int main(int argc, char **argv)
     {
         debug_printf("%x\t", ((uint8_t*) buffer)[i-1]);
         if (i % 4 == 0) {
-            debug_printf("\n");
+            printf("\n");
         }
     }
-
+*/
+/*
 	// Read FAT
     err = mmchs_read_block(1, buffer);
     debug_printf("\nPrinting FAT\n");
@@ -207,7 +208,7 @@ int main(int argc, char **argv)
 //	uint32_t fat_entry = get_fat_entry(408);
 //	debug_printf("FAT Entry contents: 0x%x\n", fat_entry);
 
-	void *data = malloc(512);
+/*	void *data = malloc(512);
 	//void *data_2 = malloc(512);
 	char *vdata;
 
@@ -215,8 +216,7 @@ int main(int argc, char **argv)
 		debug_printf("Printing cluster == %d\n", i);
 		get_data(i, data);	
 	}
-
-	while(1);
+*/
 /*	vdata = (char *) data;
 	for (int i = 0; i < 512; i = i + 4) {
 		uint32_t entry = (vdata[i+3] << 24) + (vdata[i+2] << 16) + (vdata[i+1] << 8) + (vdata[i]);
@@ -230,20 +230,25 @@ int main(int argc, char **argv)
 		}
 	}	
 */
-	while(1);
+/*
 	debug_printf("--------\n");
-	mmchs_read_block(33, data);
-	vdata = (char *) data;
+	data = malloc(512);
+	mmchs_read_block(32, data);
+	char * vdata = (char *) data;
 	for (int i = 0; i < 512; i = i + 4) {
 		uint32_t entry = (vdata[i+3] << 24) + (vdata[i+2] << 16) + (vdata[i+1] << 8) + (vdata[i]);
-		debug_printf("FAT TABLE ENTRY = %d 0x%x\n", i/4, entry);
+		debug_printf("FAT TABLE ENTRY = %d %" PRIu32 "\n", i/4, entry);
 	}	
-
-	err = read_file("/DIR1/DIR12/F122", &data, 0, 0);
+*/
+	uint32_t retsize;
+	err = read_file("/DIR1/TEST1", &data, 0, 0, &retsize);
 	if (err_is_fail(err)) {
 		debug_printf("File not found!\n");
 	}	
 	
-	//printf("%s\n", data);
+	//char * char_data = (char *) data;
+	//char_data[retsize] = '\0';
+	//debug_printf("%s\n", char_data);
+	
     return 0;
 }
