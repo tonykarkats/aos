@@ -188,23 +188,62 @@ int main(int argc, char **argv)
 
 	err = fat32_init();
 
-	// Check in root directory first	
+
 //	struct dirent * dirtable = NULL;
 //	uint32_t size;
-	//err = get_dirents(FirstSectorofRootDir, &dirtable, &size);
-	//printf("Size of Directory = %d\n", size);	
+//	list("/DIR1/DIR12/F121", &dirtable, &size);
+	
+//	printf("Found %" PRIu32 "\n", size);
+//	for (int i=0; i<size; i++) {
+//		struct dirent dirent;
+//		dirent = dirtable[i];
+//		printf("%s\n", dirent.name);	
+//		printf("Starting cluster at %"PRIu32"\n", dirent.firstCluster);
+//	}
 
-	struct dirent * dirtable = NULL;
-	uint32_t size;
-	list("/DIR1/DIR12", &dirtable, &size);
-	
-	printf("Found %" PRIu32 "\n", size);
-	for (int i=0; i<size; i++) {
-		struct dirent dirent;
-		dirent = dirtable[i];
-		printf("%s\n", dirent.name);	
+
+//	err = read_file(15, data, 1);
+
+//	uint32_t fat_entry = get_fat_entry(408);
+//	debug_printf("FAT Entry contents: 0x%x\n", fat_entry);
+
+	void *data = malloc(512);
+	//void *data_2 = malloc(512);
+	char *vdata;
+
+	for (int i=15; i<100; i++) {
+		debug_printf("Printing cluster == %d\n", i);
+		get_data(i, data);	
 	}
-	
+
 	while(1);
+/*	vdata = (char *) data;
+	for (int i = 0; i < 512; i = i + 4) {
+		uint32_t entry = (vdata[i+3] << 24) + (vdata[i+2] << 16) + (vdata[i+1] << 8) + (vdata[i]);
+		debug_printf("FAT TABLE ENTRY = %d 0x%x\n", i/4, entry);
+		if (entry < 50)
+			mmchs_read_block(entry, data_2);
+	
+		if (*((char *)data_2) == 'n') {
+			debug_printf("SUCCESS\n");
+			break;
+		}
+	}	
+*/
+	while(1);
+	debug_printf("--------\n");
+	mmchs_read_block(33, data);
+	vdata = (char *) data;
+	for (int i = 0; i < 512; i = i + 4) {
+		uint32_t entry = (vdata[i+3] << 24) + (vdata[i+2] << 16) + (vdata[i+1] << 8) + (vdata[i]);
+		debug_printf("FAT TABLE ENTRY = %d 0x%x\n", i/4, entry);
+	}	
+
+	err = read_file("/DIR1/DIR12/F122", &data, 0, 0);
+	if (err_is_fail(err)) {
+		debug_printf("File not found!\n");
+	}	
+	
+	//printf("%s\n", data);
     return 0;
 }

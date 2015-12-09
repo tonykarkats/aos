@@ -3,6 +3,7 @@
 #include <arch/arm/omap44xx/device_registers.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 static uint16_t BPB_BytsPerSec;
 static uint8_t BPB_SecPerClus;
@@ -171,6 +172,13 @@ errval_t list(const char *path, struct dirent **dirtable, uint32_t *size) {
 	uint32_t cur_size = size_root;
 	bool found = false;
 
+	// If root path is requested return it
+	if (!strcmp(s, "/")) {
+		*dirtable = dirtable_root;
+		*size = size_root;
+		return SYS_ERR_OK;
+	}
+
 	for (char *p = strtok(s,"/"); p != NULL; ) {
 			
 			for (int i=0; i<cur_size; i++) {
@@ -187,16 +195,16 @@ errval_t list(const char *path, struct dirent **dirtable, uint32_t *size) {
 				if (!strcmp(stripped, p)) {
 					found = true;
 		
-					// debug_printf("Found name %s. Moving deeper. firstCluster = %" PRIu32 "\n", dirent.name, dirent.firstCluster);
+					//debug_printf("Found name %s. Moving deeper. firstCluster = %" PRIu32 "\n", dirent.name, dirent.firstCluster);
 					uint32_t first_cluster = ((dirent.firstCluster  -2)*BPB_SecPerClus + FirstDataSector);
 					
 					p = strtok(NULL, "/");
 
 					if ((dirent.type != typeDir)&&(p == NULL)) {
-						
+
 						struct dirent* file_dirent = (struct dirent *) malloc(sizeof(struct dirent));
 						*file_dirent = dirent;
-						free(cur_table);
+						//free(cur_table);
 						
 						*dirtable = file_dirent;
 						*size = 1;
@@ -244,15 +252,120 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
 	// ThisFATSecNum is the sector number of the FAT sector that contains the entry
 	// for cluster_nr in the first FAT table.
 
-	uint8_t ThisFATSecNum = BPB_RsvdSecCnt + (FATOffset / BPB_BytsPerSec);
+	uint32_t ThisFATSecNum = BPB_RsvdSecCnt + (FATOffset / BPB_BytsPerSec);
 	uint32_t ThisFATEntOffset = FATOffset % BPB_BytsPerSec;
+
+	debug_printf("ThisFATSecNum = %" PRIu8 ". ThisFATEntOffset =  %" PRIu32 "\n", ThisFATSecNum, ThisFATEntOffset);
 
 	// We now read sector number ThisFATSecNum into a buffer
 	
-
+	uint32_t * secBuff = malloc(BPB_BytsPerSec);
+	mmchs_read_block(ThisFATSecNum, secBuff);
+	//debug_printf(" %"PRIu32"\n", secBuff[15]);
+ 	
+	//while(1);
 	// We can now calculate the FAT Entry value
-	uint32_t FAT32ClusEntryVal = (* ((uint16_t *) &SecBuff[ThisFATEntOffset]) ) & 0x0FFFFFFF;
-
+	//char * addr = (char *) secBuff + ThisFATEntOffset;	//(uintptr_t *) (&secBuff[ThisFATEntOffset]);
+	uint32_t FAT32ClusEntryVal = (* (( uint32_t *) &secBuff[ThisFATEntOffset])) & 0x0FFFFFFF;
+	if (FAT32ClusEntryVal >= 0x0FFFFFF8) {
+		debug_printf("Reached end!\n");
+	}	
+	
 	return FAT32ClusEntryVal;
 }
+
+/* This function takes a cluster number and returns the respective data from the data section */
+
+errval_t get_data(uint32_t cluster_nr, void *buf) {
+
+	errval_t err;
+
+	uint32_t sector = ((cluster_nr - 2) * BPB_SecPerClus) + FirstDataSector;
+
+	err = mmchs_read_block(sector, buf);
+	if (err_is_fail(err)) {
+		debug_printf("Cannot read block from SD card\n");
+		return AOS_ERR_FAT_FILE_NOT_FOUND;
+	}
+
+	char * vbuf = (char *)buf;
+	for (int i = 0; i < 512 ; i++) {
+		debug_printf("   %c\n", vbuf[i] );
+	}	
+		
+	return SYS_ERR_OK;
+}
+
+/* Given a valid cluster_nr for the start of the file this function:
+ * - Reads the actual data from the data section for that cluster_nr
+ * - Retrieves the next FAT entry from the FAT table and repeats until EOC.
+ */
+
+errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size) {
+
+	errval_t err;
+	
+	// Calculate how many blocks the file needs
+	uint32_t first_cluster;
+    uint32_t filesize;
+    first_cluster = get_first_cluster(filename, &filesize);
+
+    if (first_cluster != -1) {
+        printf("File was found! Size = %d and first Cluster at %d\n", filesize, first_cluster);
+		// First calculate the number of blocks the file needs in order to allocate the buffer        
+
+		uint32_t blocks_needed = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
+		debug_printf("Size = %d. Blocks needed = %d\n", filesize, blocks_needed);
+
+		// blocks_needed *= 2;
+		// Follow every cluster in the clusterchain of the FAT table
+		char * data_buffer = malloc(blocks_needed * BPB_BytsPerSec);
+
+		uint32_t cur_cluster = first_cluster;
+		
+		for (int i=0; i < blocks_needed; i++) {
+		
+			printf("Readin cluster = %" PRIu32 "\n", cur_cluster);
+			err = get_data(cur_cluster, data_buffer + i*BPB_BytsPerSec);
+			cur_cluster = get_fat_entry(cur_cluster);
+		}
+		
+		//data_buffer[1023] = '\0';
+
+		//debug_printf("%s\n", data_buffer);
+	
+		return SYS_ERR_OK;
+    }
+
+	return AOS_ERR_FAT_FILE_NOT_FOUND;
+}
+
+/* This function searches the filetree recursively until it finds the filename requested.
+ * It also return the filesize. Returns -1 if file was not found. */
+
+uint32_t get_first_cluster(const char *filename, uint32_t *filesize) {
+	
+	errval_t err;
+	struct dirent * dirtable = NULL;
+    uint32_t size;
+	
+    err = list(filename, &dirtable, &size);
+	if (err_is_fail(err)) {
+		*filesize = 0;
+		return -1;
+	}
+
+	//If this file has been found then only one direntry will be returned
+	struct dirent dirent;
+	dirent = dirtable[0];
+
+	*filesize = dirent.size;
+
+//	printf("Filesize = %d\n", dirent.size);
+//	printf("%s\n", dirent.name);
+//	printf("%d\n", dirent.firstCluster);
+
+	return dirent.firstCluster;
+}
+
 
