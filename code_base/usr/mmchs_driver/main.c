@@ -16,6 +16,7 @@
 #include <arch/arm/omap44xx/device_registers.h>
 
 #include "mmchs.h"
+#include "fat32.h"
 
 static struct cnoderef cnode;
 
@@ -43,7 +44,7 @@ static void get_cap(lpaddr_t base, size_t size)
 
     static size_t current_slot = 0;
     device_cap_iter.slot = current_slot++;
-	debug_printf("Slot = %zu \n", device_cap_iter.slot);
+	//debug_printf("Slot = %zu \n", device_cap_iter.slot);
 		
     err = cap_copy(device_cap_iter, cap);
     if (err_is_fail(err)) {
@@ -85,25 +86,36 @@ int main(int argc, char **argv)
 
     mmchs_init();
 
+	err = fat32_init();
+	assert(err_is_ok(err));
 
-    //
-    // Reading the first block from the SD-Card
-    // This should be the same information you get with
-    // dd when reading the first block on linux...
-    //
-    void *buffer = malloc(512);
-    assert(buffer != NULL);
+	// This is how list() is used!
 
-    err = mmchs_read_block(0, buffer);
-    assert(err_is_ok(err));
-    printf("Read block %d:\n", 0);
-    for (int i = 1; i <= 512; ++i)
-    {
-        printf("%"PRIu8"\t", ((uint8_t*) buffer)[i-1]);
-        if (i % 4 == 0) {
-            printf("\n");
-        }
-    }
+	struct aos_dirent * dirtable = NULL;
+	uint32_t size;
+	
+	list("/TEMP1/ELF", &dirtable, &size);
+  
+	printf("Found %" PRIu32 "\n", size);
+	for (int i=0; i<size; i++) {
+		struct aos_dirent dirent;
+		dirent = dirtable[i];
+		printf("%s\n", dirent.name);	
+	}
 
+	// This is how read_file() is used!
+	void * data;
+	uint32_t retsize;
+	err = read_file("/TEMP1/HELLO", &data, 0, 0, &retsize);
+	if (err_is_fail(err)) {
+		debug_printf("File not found!\n");
+	}	
+	
+	//char * char_data = (char *) data;
+	//char_data[retsize] = '\0';
+	//debug_printf("%s\n", char_data);
+	
+
+	while(1);
     return 0;
 }

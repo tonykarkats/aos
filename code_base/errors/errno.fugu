@@ -941,4 +941,5 @@ errors aos AOS_ERR_ {
 	failure LMP_NON_EXISTED_FD	"File descriptor for process does not exist",
 	failure LMP_ERROR_IN_READ_FILE	"Can not read from file",
 	failure LMP_CAN_NOT_CLOSE_FILE	"Can not close file",
+	failure FAT_FILE_NOT_FOUND 		"Can not find file",
 };

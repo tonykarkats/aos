@@ -691,13 +691,14 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
+	
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
 	
 	global_did++;
-	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame, global_did);
-	pr_head = insert_process_node(pr_head, global_did, "memeater", false, NULL_CAP, disp_frame);
+	err = bootstrap_domain("mmchs", &mem_si, bi, my_core_id, &disp_frame, global_did);
+	pr_head = insert_process_node(pr_head, global_did, "mmchs", false, NULL_CAP, disp_frame);
 	
 	assert(err_is_ok(err));
 	while(true) {
