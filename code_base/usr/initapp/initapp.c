@@ -12,6 +12,7 @@
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
 #include "initapp.h"
+#include <barrelfish/mem_serv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <barrelfish/morecore.h>
@@ -506,7 +507,7 @@ int main(int argc, char *argv[])
     }
 
 	debug_printf("initialized local ram alloc\n");
-	err = initialize_mem_serv();
+	err = initialize_mem_serv(bi);
     if (err_is_fail(err)) {
         DEBUG_ERR(err, "Failed to init memory server module");
         abort();

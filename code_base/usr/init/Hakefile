@@ -11,7 +11,7 @@
 --------------------------------------------------------------------------
 
 [ build application { target = "init",
-  		      cFiles = [ "mem_alloc.c", "init.c", "mem_serv.c", "fat32.c",
+  		      cFiles = [ "mem_alloc.c", "init.c", "fat32.c",
 						 "cm2.c", "i2c.c", "mmchs.c", "twl6030.c", "ctrlmod.c"],
                       flounderDefs = [ "mem" ],
                       addLinkFlags = [ "-e _start_init"],
