@@ -166,10 +166,10 @@ int main(int argc, char *argv[])
 				printf("%s not found!\n", token);
 			}
 			else {
+				// debug_printf("entries = %"PRIu32"\n", dir_entries);
 				for (int i = 0; i < dir_entries; i++) {
-					printf("%s	", dirtable[i].name);
+					printf("%s	\n", dirtable[i].name);
 				}	
-				printf("\n");
 			}
 			free(dirtable);
 		}
@@ -180,7 +180,20 @@ int main(int argc, char *argv[])
 			err = aos_rpc_open(get_init_chan(), token, &fd);
 			if (err_is_fail(err)) {
 				printf("Can not open file %s\n", token);
+				continue;
 			}
+			else {
+				printf("Got fd %d \n", fd);
+			}
+
+			err = aos_rpc_close(get_init_chan(),fd);
+			if (err_is_fail(err)) {
+				printf("Can not close fd %d\n", fd);
+			}
+			else {
+				printf("Closed fd %d \n", fd);
+			}
+
 		}
 		else if (!strcmp("exit", token)) {
 			return 0;

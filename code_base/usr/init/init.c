@@ -52,7 +52,7 @@ struct thread_cond capref_cond;
 
 struct process_node* pr_head;
 int global_did = 1000;
-
+int next_fd	   = 1000;
 errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
 {
 	errval_t err;
@@ -434,7 +434,7 @@ static void recv_handler(void *arg)
 			thread_mutex_unlock(&process_list_lock);	
 
 			strcpy(path, process->buffer);
-			debug_printf("Client requests for path %s\n", path);
+			//debug_printf("Client requests for path %s\n", path);
 		
 			struct aos_dirent * dirtable = NULL;
 			uint32_t size;
@@ -447,13 +447,6 @@ static void recv_handler(void *arg)
 				}
 			}
 			else {
-				debug_printf("Found %" PRIu32 "\n", size);
-				for (int i=0; i<size; i++) {
-					struct aos_dirent dirent;
-					dirent = dirtable[i];
-					debug_printf("%s\n", dirent.name);	
-				}
-
 				memcpy(process->buffer, dirtable, size * sizeof(struct aos_dirent));
 
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) size);
@@ -462,24 +455,49 @@ static void recv_handler(void *arg)
 				}
 			}
 
+			free(dirtable);
 			cap_destroy(cap);
 			break;	
 		case AOS_RPC_OPEN_FILE: ;
 			char open_file_name[512];
-			// FILL ME IN
-
+			
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
+
+			strncpy(open_file_name, process->buffer, 512);
 			
-			strcpy(open_file_name, process->buffer);
-			// debug_printf("Client requests to open file %s\n", open_file_name);
-		
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
+			struct aos_dirent * temp_dirtable = NULL;
+			uint32_t temp_size;
+			err = list( open_file_name, &temp_dirtable, &temp_size);
+
+			//debug_printf("Returned type = %" PRIu32 ". Type = %d Will open file %s\n", temp_size, temp_dirtable[0].type , temp_dirtable[0].name);
+			// file not found, or a directory or not a file :)
+			if (err_is_fail(err) || temp_size != 1 || temp_dirtable[0].type == typeDir) { 
+				//debug_printf("no file!\n");
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
+				}
 			}
+			else {
+				// File exists !
+				thread_mutex_lock(&process_list_lock);	
+				process = get_process_node(&pr_head, domain_id, "aa");
 	
+				next_fd ++;
+				update_fd_list(process, next_fd, 0, open_file_name);
+
+				thread_mutex_unlock(&process_list_lock);	
+				
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) next_fd);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
+				}
+			}
+
+			free(temp_dirtable);
+			cap_destroy(cap);
 			break;
 		case AOS_RPC_READ_FILE: ;
 			char read_file_name[512];
@@ -499,19 +517,23 @@ static void recv_handler(void *arg)
 			break;
 		case AOS_RPC_CLOSE_FILE: ;
 			int fd = msg.words[1];
-			// FILL ME IN
+			int response;	
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
 
-			strcpy(read_file_name, process->buffer);
-			debug_printf("Client requests to close file with fd %d\n", fd);	
-			
-			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+			// debug_printf("Client requests to close file with fd %d\n", fd);	
+		
+			if (!check_if_fd_exists( process->fd_node, fd)) 
+				response = -1;
+			else 
+				response = 1;
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, response);
 			if (err_is_fail(err)) {
 				DEBUG_ERR(err,"recv_handler: Can not send response for closing file back to the client!\n");
 			}
-		
+
 			break;	
 
 		case AOS_RPC_TERMINATING:;

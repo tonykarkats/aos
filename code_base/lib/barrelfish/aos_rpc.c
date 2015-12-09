@@ -442,12 +442,6 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
 
 	memcpy(dirtable, chan->shared_buffer, sizeof(struct aos_dirent) * returned_value);
 
-	for (int i=0; i<returned_value; i++) {
-		struct aos_dirent dirent;
-		dirent = dirtable[i];
-		debug_printf("%s\n", dirent.name);	
-	}	
-
 	*dir = dirtable;
 
     return SYS_ERR_OK;

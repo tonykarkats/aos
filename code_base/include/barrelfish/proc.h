@@ -18,8 +18,9 @@ struct frame_node {
 struct file_descriptor_node {
 	int fd;
 	int possition_in_file;
+	char *file_name;
 	
-	struct file_descriptor_node * next_file_descrptor;
+	struct file_descriptor_node * next_file_descriptor;
 };
 
 struct process_node {
@@ -45,8 +46,11 @@ struct process_node {
 	struct process_node * next_pr;
 };
 
+bool delete_fd(struct process_node *node, int fd);
+void update_fd_list (struct process_node *node, int fd, int poss, char *name);
 void clear_process_node(struct process_node *node, struct mm mm_ram);
 void update_frame_list(struct process_node *node, struct capref ram, size_t bits);
+bool check_if_fd_exists(struct file_descriptor_node *node, int fd);
 
 struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name);
 void print_nodes( struct process_node *head);

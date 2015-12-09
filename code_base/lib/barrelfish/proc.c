@@ -177,17 +177,76 @@ void clear_process_node(struct process_node *node, struct mm mm_ram)
 	return;
 }
 
-void update_frame_list(struct process_node *node, struct capref ram, size_t bits) 
+void update_fd_list (struct process_node *node, int fd, int poss, char * name) 
 {
-	//debug_printf("update_frame_list starting!\n");
-		
+
+	struct file_descriptor_node* new_fd = ( struct file_descriptor_node *) malloc(sizeof(struct file_descriptor_node));
+
+	new_fd->fd = fd;
+	new_fd->possition_in_file = poss;
+	new_fd->next_file_descriptor = node->fd_node;
+
+	node->fd_node = new_fd;
+
+	return;
+}
+
+bool check_if_fd_exists(struct file_descriptor_node *node, int fd) 
+{
+	struct file_descriptor_node * head = node;
+
+	if (head == NULL)
+		return false;
+			
+	while(head != NULL) {
+		if (head->fd == fd)
+			return true;	
+		head = head->next_file_descriptor;
+	}
+
+	return false;
+}
+
+bool delete_fd(struct process_node *node, int fd) 
+{
+	struct file_descriptor_node * head = node->fd_node;
+	struct file_descriptor_node * temp = node->fd_node;
+	
+	if (head == NULL)
+		return false;
+			
+	if (head->fd == fd) {
+		node->fd_node = NULL;
+		free(head);
+		return true;
+	}
+
+	temp = head;	
+	head = head->next_file_descriptor;
+	
+	while (head != NULL) {
+		if (head->fd == fd) {
+			temp->next_file_descriptor = head->next_file_descriptor;
+			free(head);
+			return true;
+		}	
+		temp = head;
+		head = head->next_file_descriptor;
+	}
+
+	return false;
+}
+
+
+void update_frame_list(struct process_node *node, struct capref ram, size_t bits) 
+{	
 	struct frame_node* new_frame_node = (struct frame_node *) malloc(sizeof(struct frame_node));
 	new_frame_node->bits = bits;
 	new_frame_node->frame = ram;
 	new_frame_node->next_frame = node->consumed_frame;
+	
 	node->consumed_frame = new_frame_node;
-
-	//debug_printf("update_frame_list ending!\n");
+	
 	return;
 }
 

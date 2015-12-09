@@ -23017,6 +23017,7 @@ check_free_chunk	lib/newlib/newlib/libc/stdlib/vallocr.c	1888;"	d	file:
 check_free_chunk	lib/newlib/newlib/libc/stdlib/vallocr.c	1893;"	d	file:
 check_free_chunk	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2778;"	d	file:
 check_free_chunk	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2786;"	d	file:
+check_if_fd_exists	lib/barrelfish/proc.c	/^bool check_if_fd_exists(struct file_descriptor_node *node, int fd) $/;"	f
 check_inuse_chunk	lib/dmalloc/dmalloc.c	2774;"	d	file:
 check_inuse_chunk	lib/dmalloc/dmalloc.c	2782;"	d	file:
 check_inuse_chunk	lib/newlib/newlib/libc/stdlib/callocr.c	1889;"	d	file:
@@ -26904,7 +26905,7 @@ get_buildarchs	tools/harness/machines/__init__.py	/^    def get_buildarchs(self)
 get_buildarchs	tools/harness/machines/eth.py	/^    def get_buildarchs(self):$/;"	m	class:ETHMachine
 get_buildarchs	tools/harness/machines/msrc.py	/^    def get_buildarchs(self):$/;"	m	class:MSRCMachine
 get_cap	lib/barrelfish/main.c	/^static void get_cap(lpaddr_t base, size_t size)$/;"	f	file:
-get_cap	usr/init/fat32.c	/^errval_t get_cap(lpaddr_t base, size_t size)$/;"	f
+get_cap	usr/init/fat32.c	/^static errval_t get_cap(lpaddr_t base, size_t size)$/;"	f	file:
 get_cap	usr/mmchs_driver/main.c	/^static void get_cap(lpaddr_t base, size_t size)$/;"	f	file:
 get_cap_addr	include/barrelfish/caddr.h	/^static __attribute__((noinline)) capaddr_t get_cap_addr(struct capref cap)$/;"	f
 get_cap_valid_bits	include/barrelfish/caddr.h	/^static inline uint8_t get_cap_valid_bits(struct capref cap)$/;"	f
@@ -29594,8 +29595,8 @@ linkmax	include/nfs/nfs_rpc.h	/^    uint32_t linkmax;$/;"	m	struct:PATHCONF3reso
 linkoutput	include/lwip/netif.h	/^         err_t(*linkoutput) (struct netif * netif, struct pbuf * p);$/;"	m	struct:netif
 list	lib/barrelfish/fat32.c	/^errval_t list(const char *path, struct dirent **dirtable, uint32_t *size) {$/;"	f
 list	lib/newlib/newlib/libc/time/strftime.c	/^struct list {$/;"	s	file:
-list	usr/init/fat32.c	/^errval_t list(const char *dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
-list	usr/mmchs_driver/fat32.c	/^errval_t list(const char *path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
+list	usr/init/fat32.c	/^errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
+list	usr/mmchs_driver/fat32.c	/^errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
 list_all	tools/harness/scalebench.py	/^def list_all():$/;"	f
 list_create_node	lib/collections/list.c	/^static collections_listnode *list_create_node(collections_listnode *start,$/;"	f	file:
 list_destroy_node	lib/collections/list.c	/^static void list_destroy_node(collections_listnode *start,$/;"	f	file:
@@ -32565,7 +32566,8 @@ next_chunk	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	2269;"	d	file:
 next_entry	lib/newlib/newlib/libc/iconv/ces/mkdeps.pl	/^sub next_entry($$$)$/;"	s
 next_event	lib/barrelfish/event_queue.c	/^static struct event_queue_node *next_event(struct event_queue *q)$/;"	f	file:
 next_event	lib/newlib/newlib/libc/machine/spu/spu_timer_flih.S	/^next_event:$/;"	l
-next_file_descrptor	include/barrelfish/proc.h	/^	struct file_descriptor_node * next_file_descrptor;$/;"	m	struct:file_descriptor_node	typeref:struct:file_descriptor_node::file_descriptor_node
+next_fd	usr/init/init.c	/^int next_fd	   = 1000;$/;"	v
+next_file_descriptor	include/barrelfish/proc.h	/^	struct file_descriptor_node * next_file_descriptor;$/;"	m	struct:file_descriptor_node	typeref:struct:file_descriptor_node::file_descriptor_node
 next_frame	include/barrelfish/proc.h	/^	struct frame_node * next_frame;$/;"	m	struct:frame_node	typeref:struct:frame_node::frame_node
 next_free	include/red_black_tree.h	/^  struct rb_red_blk_node* next_free;$/;"	m	struct:rb_red_blk_node	typeref:struct:rb_red_blk_node::rb_red_blk_node
 next_id	include/flounder/flounder_support_ump.h	/^    ump_index_t next_id;   \/\/\/< Sequence number of next message to be sent$/;"	m	struct:flounder_ump_state
@@ -41090,6 +41092,7 @@ uordblks	lib/newlib/newlib/libc/stdlib/vallocr.c	/^  int uordblks; \/* total all
 uordblks	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^  MALLINFO_FIELD_TYPE uordblks; \/* total allocated space *\/$/;"	m	struct:mallinfo	file:
 upcall_state	kernel/arch/arm/exec.c	/^static arch_registers_state_t upcall_state;$/;"	v	file:
 update_arp_entry	lib/lwip/src/netif/etharp.c	/^update_arp_entry(struct netif *netif, struct ip_addr *ipaddr,$/;"	f	file:
+update_fd_list	lib/barrelfish/proc.c	/^void update_fd_list (struct process_node *node, int fd, int poss) $/;"	f
 update_frame_list	lib/barrelfish/proc.c	/^void update_frame_list(struct process_node *node, struct capref ram, size_t bits) $/;"	f
 update_sched_timer	kernel/timer.c	/^void update_sched_timer(systime_t t)$/;"	f
 update_timer	kernel/timer.c	/^static void update_timer(void)$/;"	f	file:

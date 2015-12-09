@@ -226,7 +226,7 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 			path[i] = toupper((int) c);
 	}
 	
-	debug_printf("Will search for %s\n", path);
+	//debug_printf("Will search for %s\n", path);
 	errval_t err;
 
 	//Get root dirents to start with
@@ -274,6 +274,7 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 
 						struct aos_dirent* file_dirent = (struct aos_dirent *) malloc(sizeof(struct aos_dirent));
 						*file_dirent = dirent;
+						
 						//free(cur_table);
 						
 						*dirtable = file_dirent;
