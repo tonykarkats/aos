@@ -156,17 +156,22 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("ls", token)) {
 			token = strtok(NULL, space_token);
+			struct aos_dirent * dirtable;
 			if (token == NULL)
 				continue;
 			//debug_printf("Will ls path %s\n", token);
 			
-			err = aos_rpc_readdir( get_init_chan(), token, NULL, &dir_entries);
+			err = aos_rpc_readdir( get_init_chan(), token, &dirtable, &dir_entries);
 			if (err_is_fail(err)) {
 				printf("%s not found!\n", token);
 			}
 			else {
-				;
+				for (int i = 0; i < dir_entries; i++) {
+					printf("%s	", dirtable[i].name);
+				}	
+				printf("\n");
 			}
+			free(dirtable);
 		}
 		else if (!strcmp("cat", token)) {	
 			token = strtok(NULL, space_token);

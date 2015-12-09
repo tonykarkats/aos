@@ -438,18 +438,18 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
 	// Returned dir entries in the shared buffer	
 	*elem_count = returned_value;
 
-	debug_printf("Found %" PRIu32 "\n", returned_value);
-	
-	// Malloc and fill in with data from the shared buffer and return them to user!
-	*dir = (struct aos_dirent *) malloc(sizeof(struct aos_dirent) * returned_value);
-	memcpy(*dir, chan->shared_buffer, sizeof(struct aos_dirent) * returned_value);
+	struct aos_dirent * dirtable =  (struct aos_dirent *) malloc(sizeof(struct aos_dirent) * returned_value);
 
+	memcpy(dirtable, chan->shared_buffer, sizeof(struct aos_dirent) * returned_value);
 
 	for (int i=0; i<returned_value; i++) {
 		struct aos_dirent dirent;
-		dirent = (*dir)[i];
+		dirent = dirtable[i];
 		debug_printf("%s\n", dirent.name);	
 	}	
+
+	*dir = dirtable;
+
     return SYS_ERR_OK;
 }
 
