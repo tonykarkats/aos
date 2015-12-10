@@ -164,14 +164,14 @@ int main(int argc, char *argv[])
 				if (buflen == 0)
 					break;
 	
-				debug_printf("read %" PRIu32 "\n", buflen);	
+				//debug_printf("read %" PRIu32 "\n", buflen);	
 				pos += buflen;
 				
 				//memcpy(temp_buf, fbuf, buflen);
 				
 				//free(fbuf);
 				temp_buf[buflen] = '\0';							
-				printf("%s\n", (char *)fbuf);
+				debug_printf("%s\n", (char *)fbuf);
 				fflush(stdout);
 				break;
 			}		
