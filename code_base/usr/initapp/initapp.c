@@ -12,9 +12,10 @@
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
 #include "initapp.h"
-// #include <barrelfish/mem_serv.h>
+#include <barrelfish/mem_serv.h>
 #include <stdlib.h>
 #include <string.h>
+#include <barrelfish/fat32.h>
 #include <barrelfish/morecore.h>
 #include <barrelfish/dispatcher_arch.h>
 #include <barrelfish/debug.h>
@@ -28,16 +29,13 @@
 #include <barrelfish/proc.h>
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
-#include "../../lib/spawndomain/arch.h"
-#include <elf/elf.h>
+// #include "../../lib/spawndomain/arch.h"
 #include <mm/mm.h>
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
 static volatile int pseudo_lock;
-static struct mm dev_mm;
-extern struct mm mm_ram;
 
 struct thread_mutex process_list_lock;
 
@@ -46,24 +44,9 @@ static coreid_t my_core_id;
 struct thread_cond char_cond;
 struct thread_cond capref_cond;
 struct process_node* pr_head;
-int global_did = 1;
 
-errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
-{
-	errval_t err;
-
-	err = mm_realloc_range( &dev_mm, length, start_addr,ret);
-	if (err_is_fail(err)) {
-		debug_printf("get_dev_frame: can not allocate range for device!\n");
-		return MM_ERR_DEVICE_ALLOC;
-	}
-
-	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
-
-	assert(err_is_ok(err));
-	
-	return SYS_ERR_OK;
-}
+int next_fd	   = 1000;
+int global_did = 1000;
 
 static int cross_core_thread_1(void *arg) 
 {
@@ -104,7 +87,7 @@ static int cross_core_thread_1(void *arg)
 				pr_head = insert_process_node(pr_head, spawned_domain, message_string, true, NULL_CAP, NULL_CAP);
 				thread_mutex_unlock(&process_list_lock);	
 			
-				err = bootstrap_domain(message_string, &si, thread_bi, my_core_id, &disp_frame, spawned_domain);
+				err = bootstrap_domain(message_string, &si, thread_bi, my_core_id, &disp_frame, spawned_domain, NULL, 0);
 				if (err_is_fail(err)) {
 					
 					thread_mutex_lock(&process_list_lock);	
@@ -243,6 +226,7 @@ static void recv_handler(void *arg)
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
+			genpaddr_t retbase;
 	
 			// debug_printf("Request for memory from client with %"PRIu32"\n", domain_id);
 			// Check if client has exceeded it's memory limit
@@ -255,14 +239,14 @@ static void recv_handler(void *arg)
 			}
 			else {
 				// Allocate memory for the client and keep the frame...
-				process->memory_consumed += pow(2, size_requested);
-				err = ram_alloc(&returned_cap, size_requested); 
+				process->memory_consumed += pow(2, size_requested);	
+				err = memserv_alloc(&returned_cap, size_requested, 0, 0, &retbase); 
 				if (err_is_fail(err)) {
 					debug_printf("recv_handler: Failed to allocate ram capability for client\n");
 					returned_cap = NULL_CAP;	
 				}
 					
-				//update_frame_list(process, returned_cap, size_requested);	
+				update_frame_list(process, returned_cap, size_requested, retbase);	
 			}	
 
 			thread_mutex_unlock(&process_list_lock);
@@ -314,7 +298,7 @@ static void recv_handler(void *arg)
 			
 			strncpy(message_string, (char *) msg.words + 8, 28);
 
-			debug_printf("Received request for spawn for %s\n", message_string);
+			// debug_printf("Received request for spawn for %s\n", message_string);
 
 			uint32_t core = msg.words[1];
 			if (core != 1) {
@@ -354,7 +338,7 @@ static void recv_handler(void *arg)
 					pr_head = insert_process_node(pr_head, pseudo_lock, message_string, false, cap, NULL_CAP);
 					
 					//debug_printf("2 %s\n", message_string);
-					err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame, pseudo_lock);
+					err = bootstrap_domain(message_string, &si, bi, my_core_id, &disp_frame, pseudo_lock, NULL, 0);
 					//debug_printf("2.5\n");
 					if (err_is_fail(err)) {
 						
@@ -389,6 +373,155 @@ static void recv_handler(void *arg)
 			}
 			
 			break;
+		case AOS_RPC_READ_DIR: ;	 
+			// Will list() a directory and will return results to the caller
+			char path[512];
+	
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+
+			strcpy(path, process->buffer);
+			//debug_printf("Client requests for path %s\n", path);
+		
+			struct aos_dirent * dirtable = NULL;
+			uint32_t size;
+	
+			err = list(path, &dirtable, &size);
+			if (err_is_fail(err)) {
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
+				}
+			}
+			else {
+				memcpy(process->buffer, dirtable, size * sizeof(struct aos_dirent));
+
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) size);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for listing directory back to the client!\n");
+				}
+			}
+
+			free(dirtable);
+			cap_destroy(cap);
+			break;	
+		case AOS_RPC_OPEN_FILE: ;
+			char open_file_name[512];
+			
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+
+			strncpy(open_file_name, process->buffer, 512);
+			
+			struct aos_dirent * temp_dirtable = NULL;
+			uint32_t temp_size;
+			err = list( open_file_name, &temp_dirtable, &temp_size);
+
+			//debug_printf("Returned type = %" PRIu32 ". Type = %d Will open file %s\n", temp_size, temp_dirtable[0].type , temp_dirtable[0].name);
+			// file not found, or a directory or not a file :)
+			if (err_is_fail(err) || temp_size != 1 || temp_dirtable[0].type == typeDir) { 
+				//debug_printf("no file!\n");
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
+				}
+			}
+			else {
+				// File exists !
+				thread_mutex_lock(&process_list_lock);	
+				process = get_process_node(&pr_head, domain_id, "aa");
+	
+				next_fd ++;
+				update_fd_list(process, next_fd, 0, open_file_name);
+
+				//struct file_descriptor_node* n = process->fd_node;
+				//while(n != NULL) {
+				//	debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
+				//	n = n->next_file_descriptor;
+				//}
+				thread_mutex_unlock(&process_list_lock);	
+				
+				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) next_fd);
+				if (err_is_fail(err)) {
+					DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
+				}
+			}
+
+			free(temp_dirtable);
+			cap_destroy(cap);
+			break;
+		case AOS_RPC_READ_FILE: ;
+			int read_fd = msg.words[1];
+			uint32_t read_pos = msg.words[2];
+			uint32_t read_size = msg.words[3];
+			int read_response;
+
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+			
+			//debug_printf("Client requests to read file from fd %d\n", read_fd);
+				
+			char * file_name = check_if_fd_exists(process->fd_node, read_fd);
+			
+			if (!file_name) {
+				read_response = -1;
+			}
+			else {
+				void * fbuf;
+				if (read_size > 4096)
+					read_size = 4096;	
+				uint32_t ret_size;	
+				err = read_file( file_name, &fbuf, read_pos, read_size, &ret_size, false);
+				if (err_is_fail(err))
+					read_response = -1;	
+				else {
+					read_response = ret_size;
+					if (ret_size != 0)
+						memcpy(process->buffer, fbuf, ret_size);	
+				}
+				
+				free(fbuf);
+			}
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, read_response);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send response for read file back to the client!\n");
+			}
+		
+			break;
+		case AOS_RPC_CLOSE_FILE: ;
+			int close_fd = msg.words[1];
+			int close_response;	
+			
+			thread_mutex_lock(&process_list_lock);	
+			process = get_process_node(&pr_head, domain_id, "aa");
+			thread_mutex_unlock(&process_list_lock);	
+
+			// debug_printf("Client requests to close file with fd %d\n", fd);	
+		
+			if (!delete_fd( process, close_fd)) 
+				close_response = -1;
+			else 
+				close_response = 1;
+
+			struct file_descriptor_node* n = process->fd_node;
+			while(n != NULL) {
+				debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
+				n = n->next_file_descriptor;
+			}
+
+
+			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, close_response);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not send response for closing file back to the client!\n");
+			}
+
+			break;	
+
+
 		case AOS_RPC_TERMINATING:;
 			domainid_t exiting_did = msg.words[1];
 			int exit_status = msg.words[2];
@@ -513,27 +646,11 @@ int main(int argc, char *argv[])
         abort();
     }
 
-
-	static struct range_slot_allocator devframes_allocator;
-    err = range_slot_alloc_init(&devframes_allocator, 1024, NULL);
-    if (err_is_fail(err)) {
-        return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
-    }
-	
-	err = mm_init(&dev_mm, ObjType_DevFrame,
-                  0x40000000,  30,
-                  1, slab_default_refill, slot_alloc_dynamic,
-                  &devframes_allocator, false);
-    if (err_is_fail(err)) {
-        return err_push(err, MM_ERR_MM_INIT);
-    }
-
-	err = mm_add(&dev_mm, cap_io, 30, 0x40000000);
+	err = init_devserver();
 	if (err_is_fail(err)) {
-		debug_printf("Error in adding device frame to device memory manager!\n");
+		DEBUG_ERR(err, "Failed to init dev server !\n");
 		abort();
 	}
-
 
 	debug_printf("Mapping aux core registers and signaling core-0 that we are up!\n");
 
@@ -555,6 +672,9 @@ int main(int argc, char *argv[])
 	lvaddr_t aux_core_0 = (lvaddr_t) vbuf + 0x800;
 	signal_core_0(aux_core_0);
 
+	// Initialize fat-infrastructure
+	debug_printf("Initializing the fat infrastructure...\n");
+	fat32_init();
 
 	thread_mutex_init( &process_list_lock);
 	struct thread *cross_core_thread = thread_create( cross_core_thread_1, bi);

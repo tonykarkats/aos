@@ -363,7 +363,7 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
  * - Retrieves the next FAT entry from the FAT table and repeats until EOC.
  */
 
-errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize) {
+errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize, bool read_all_file) {
 
 	errval_t err;
 
@@ -377,10 +377,15 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 	//debug_printf("first cluster = %" PRIu32 " size of file = %" PRIu32 "\n", first_cluster, filesize);
 
     if (first_cluster != -1) { // If file exists
-
-		if (position + size > filesize)
+		
+		if (read_all_file) {
+			position = 0;
+			size = filesize;
+		}	
+		else if (position + size > filesize) {
 			size = filesize - position;
-		if (position >= filesize) {
+		}
+		else if (position >= filesize) {
 			*retsize = 0;
 			*buf = NULL;
 			return SYS_ERR_OK;
@@ -406,7 +411,7 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 		// Follow every cluster in the clusterchain of the FAT table
 		uint32_t cur_cluster = first_cluster;
 		for (int i=0; i<total_blocks; i++) {
-			// debug_printf("next cluster = %" PRIu32 "\n", cur_cluster);
+			//debug_printf("next cluster = %" PRIu32 "\n", cur_cluster);
 			cluster_chain[i] = cur_cluster;
 			cur_cluster = get_fat_entry(cur_cluster);
 		}
@@ -414,9 +419,11 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 		// This buffer holds all the blocks needed
 		char * data_buffer = (char *)malloc(blocks_needed * BPB_BytsPerSec + 1);
 		for (int i=0 ; i<blocks_needed; i++) {	
+			//debug_printf("next_block = %" PRIu32 "\n", cluster_chain[starting_block + i]);
 			err = get_data(cluster_chain[starting_block + i], data_buffer + i*BPB_BytsPerSec);
 		}
-	
+
+		//debug_printf("All blocks are read!\n");	
 		// This is the buffer that will be returned
 		// It is actually a stripped version of the first one
 		

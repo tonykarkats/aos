@@ -30,3 +30,5 @@
 - Fix bug where both /hello and hello work as files
 
 - Ask whether mm_free actually frees the memory
+
+- Free shared frame between process and init

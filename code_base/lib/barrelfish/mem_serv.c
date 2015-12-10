@@ -59,9 +59,8 @@ errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
     size_t freecount = slab_freecount(&mm_ram.slabs);
     while (!refilling && (freecount <= MINSPARENODES)) {
 	
-		debug_printf("memeserv_alloc: Need to refill..\n");
+		// debug_printf("memeserv_alloc: Need to refill now!\n");
     
-		//abort();
 	    refilling = true;
         struct capref frame;
         err = msa.a.alloc(&msa.a, &frame);
@@ -72,13 +71,18 @@ errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
         assert(retsize % BASE_PAGE_SIZE == 0);
         assert(retsize >= BASE_PAGE_SIZE);
         void *buf;
-        err = paging_map_frame(get_current_paging_state(), &buf, retsize, frame, NULL, NULL);
+   
+		// debug_printf("memeserv_alloc: Before paging_map_frame!\n");
+	    err = paging_map_frame(get_current_paging_state(), &buf, retsize, frame, NULL, NULL);
         if (err_is_fail(err)) {
             DEBUG_ERR(err, "paging_map_frame failed");
             assert(buf);
         }
+			
+		// debug_printf("memeserv_alloc: After paging_map_frame!\n");
         slab_grow(&mm_ram.slabs, buf, retsize);
         freecount = slab_freecount(&mm_ram.slabs);
+		// debug_printf("In refilling...\n");
     }
     if (freecount > MINSPARENODES) {
         refilling = false;

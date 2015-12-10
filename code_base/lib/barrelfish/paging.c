@@ -212,7 +212,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	errval_t err;
 
-	// debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
+	//debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings
@@ -265,8 +265,12 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		}
 	}
 
+	
+	thread_mutex_lock(&st->paging_tree_lock);
 	rb_red_blk_node* node = RBExactQuery(st->mem_tree, &vaddr);
 	memory_chunk* chunk = (memory_chunk*) node->info; 
+	thread_mutex_unlock(&st->paging_tree_lock);
+
 	struct capref l2_table = get_l2_table(vaddr, st);
 
 	// Logic for mapping frames created on the fly (on pagefaults)
@@ -346,11 +350,9 @@ static void exception_handler(enum exception_type type,
 			      arch_registers_state_t *regs,
 			      arch_registers_fpu_state_t *fpuregs) 
 {
-	
-	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
-	
+		
 	if (type == EXCEPT_PAGEFAULT) {
-		//debug_printf("Pagefault exception at address %p\n", addr);
+		// debug_printf("Pagefault exception at address %p\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -362,9 +364,8 @@ static void exception_handler(enum exception_type type,
 			exit(2);
 		}		
 
-
-	
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
+			
 			debug_printf("exception_handler: Address not mapped!\n");
 			exit(2);			
 		} 
@@ -377,7 +378,6 @@ static void exception_handler(enum exception_type type,
 			}
 		}
 		
-		thread_mutex_unlock(&get_current_paging_state()->paging_tree_lock);
 	}
 }
 
@@ -588,10 +588,13 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	lvaddr_t vaddr;
 	int frames_needed, size_of_last_frame;
 	bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
-   
+  
+
+	//debug_printf("Before getting the lock!%zu\n");
+ 
 	thread_mutex_lock(&st->paging_tree_lock);
  
-	// debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
+	//debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
     
 	vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
@@ -600,7 +603,8 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	}
 
 	//debug_printf("paging_alloc: Memory allocated at %p\n",vaddr);
-    node = RBExactQuery(st->mem_tree, &vaddr);
+    
+	node = RBExactQuery(st->mem_tree, &vaddr);
     struct memory_chunk* chunk = (struct memory_chunk*) node->info;
   
     if (bytes <= (1024*1024)) {

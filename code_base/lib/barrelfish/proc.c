@@ -1,5 +1,5 @@
 #include <barrelfish/proc.h>
-
+#include <barrelfish/mem_serv.h>
 
 struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name) 
 {
@@ -55,7 +55,8 @@ struct process_node* insert_process_node(struct process_node * head, domainid_t 
 
 		
 	//debug_printf("inserted %s and name %s\n", new_node->name, name);
-	
+
+	new_node->memory_consumed = 0;	
 	new_node->next_pr = NULL;
 	new_node->consumed_frame = NULL;
 	new_node->fd_node = NULL;
@@ -258,7 +259,8 @@ errval_t locate_and_map_shared_frame( struct process_node *node, struct capref *
 
 
 }
-errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did)
+
+errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did, char * elf_vaddr, uint32_t elf_size)
 {
 
 	errval_t err;
@@ -267,7 +269,7 @@ errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct 
 	char * module_name = strcat(prefix, name);
 
 	//debug_printf("Before spawn! %s\n", module_name);
-	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id, did);
+	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id, did, elf_vaddr, elf_size);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_load_with_bootinfo: ERROR in loading module %s!\n", name);
 		return SPAWN_ERR_LOAD;

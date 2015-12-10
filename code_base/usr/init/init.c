@@ -12,9 +12,10 @@
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
 #include "init.h"
-//#include <barrelfish/mem_serv.h>
+#include <barrelfish/mem_serv.h>
 #include <stdlib.h>
 #include <string.h>
+#include <barrelfish/fat32.h>
 #include <barrelfish/morecore.h>
 #include <barrelfish/dispatcher_arch.h>
 #include <barrelfish/debug.h>
@@ -30,15 +31,12 @@
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
 #include <mm/mm.h>
-#include <barrelfish/fat32.h>
-// #include <barrelfish/dev_serv.h>
 
 #define UNUSED(x) (x) = (x)
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-extern struct mm mm_ram;
 
 // shared variable between cross-core thread and recv handler
 volatile int pseudo_lock;
@@ -242,6 +240,7 @@ static void recv_handler(void *arg)
 			process = get_process_node(&pr_head, domain_id, "aa");
 			if ((process->memory_consumed + pow(2, size_requested)) > CLIENT_MEMORY_LIMIT) {
 				// Client has exceeded its memory limit do not give more memory.
+				// debug_printf("Client exceeded it's limit!\n");
 				returned_cap = NULL_CAP;
 			}
 			else {
@@ -330,7 +329,7 @@ static void recv_handler(void *arg)
 				struct capref disp_frame;
 				global_did++;
 	
-				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did);
+				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did, NULL, 0);
 				if (err_is_fail(err)) {
 					debug_printf("recv_handler: Can not spawn process for the client! \n");
 					d_id = 0;	
@@ -516,7 +515,7 @@ static void recv_handler(void *arg)
 				if (read_size > 4096)
 					read_size = 4096;	
 				uint32_t ret_size;	
-				err = read_file( file_name, &fbuf, read_pos, read_size, &ret_size);
+				err = read_file( file_name, &fbuf, read_pos, read_size, &ret_size, false);
 				if (err_is_fail(err))
 					read_response = -1;	
 				else {
@@ -727,16 +726,6 @@ int main(int argc, char *argv[])
 	debug_printf("Initializing the fat infrastructure...\n");
 	fat32_init();
 
-	/*
-	void *buf;
-	uint32_t len;
-	err = read_file("/temp1/elf/led_off", &buf, 0, 10000, &len);
-
-	debug_printf("read_file returned!\n");	
-	while(1);
-	*/
-
-
 	thread_mutex_init(&process_list_lock);
 	struct thread *cross_core_thread = thread_create( cross_core_thread_0, NULL);
 	cross_core_thread = cross_core_thread;
@@ -763,14 +752,20 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-	debug_printf("Spawning shell!\n"); 
-	struct spawninfo mem_si;
-	struct capref disp_frame;
+	void *buf;
+	uint32_t len;
 	
-	global_did++;
-	err = bootstrap_domain("shell", &mem_si, bi, my_core_id, &disp_frame, global_did);
-	pr_head = insert_process_node(pr_head, global_did, "shell", false, NULL_CAP, disp_frame);
+	debug_printf("Reading shell binary from SD card.. This might take a while...\n");
+	err = read_file("/sbin/shell", &buf, 0, 0, &len, true);
+	if (err_is_fail(err)) {
+		debug_printf("Could not read module from sd card!\n");
+	}	
 	
+	struct spawninfo led_si;	
+	struct capref dispframe1;
+	err = bootstrap_domain("shell", &led_si, bi, my_core_id, &dispframe1, global_did, buf, len);
+	pr_head = insert_process_node(pr_head, global_did, "shell", false, NULL_CAP, NULL_CAP);
+
 	assert(err_is_ok(err));
 	while(true) {
 		err = event_dispatch(get_default_waitset());

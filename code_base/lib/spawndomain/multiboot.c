@@ -52,6 +52,30 @@ const char *getopt_module(struct mem_region *module)
 }
 
 /// Map in the frame caps for a module into our vspace, return their location
+errval_t spawn_map_module_from_sd(struct mem_region *module, size_t *retsize,
+						  lvaddr_t *retaddr, genpaddr_t *retpaddr, char * name)
+{
+	/*
+	assert(module != NULL);
+	assert(module->mr_type == RegionType_Module);
+
+	errval_t err;
+
+	// Find and round up the size of module, and save it back in retsize
+	// debug_printf("%s %d\n", __FILE__, __LINE__);
+	size_t size = module->mrmod_size;
+	size = ROUND_UP(size, BASE_PAGE_SIZE);
+	if (retsize) {
+		*retsize = size;
+	}
+
+	err = read_file( );
+	*/
+	return SYS_ERR_OK;
+}
+
+
+/// Map in the frame caps for a module into our vspace, return their location
 errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
                           lvaddr_t *retaddr, genpaddr_t *retpaddr)
 {

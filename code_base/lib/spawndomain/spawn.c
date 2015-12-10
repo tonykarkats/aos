@@ -727,27 +727,37 @@ errval_t spawn_load_with_args(struct spawninfo *si, struct mem_region *module,
  * Just monitor and memserv should be spawned using this.
  */
 errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
-                                  const char *name, coreid_t coreid, domainid_t did)
+                                  const char *name, coreid_t coreid, domainid_t did, char * elf_vaddr, uint32_t elf_size)
 {
     errval_t err;
 	
 	// debug_printf("spawn_load_with_bootinfo: Spawninfo at address %p \n", si);
 
-    /* Get the module from the multiboot */
-    struct mem_region *module = multiboot_find_module(bi, name);
-    if (module == NULL) {
-        debug_printf("could not find module [%s] in multiboot image\n", name);
-        return SPAWN_ERR_FIND_MODULE;
-    }
-
 	// debug_printf("module find... moving on..\n");
-    /* Lookup and map the elf image */
+    /* Lookup and map the elf image */	
+
     lvaddr_t binary;
     size_t binary_size;
-    err = spawn_map_module(module, &binary_size, &binary, NULL);
-    if (err_is_fail(err)) {
-        return err_push(err, SPAWN_ERR_ELF_MAP);
-    }
+
+	// If no address provided locate and map module from boot info.
+	if (elf_vaddr == NULL) {
+		    /* Get the module from the multiboot */
+    	struct mem_region *module = multiboot_find_module(bi, name);
+    	if (module == NULL) {
+    	    debug_printf("could not find module [%s] in multiboot image\n", name);
+    	    return SPAWN_ERR_FIND_MODULE;
+    	}
+
+    	err = spawn_map_module(module, &binary_size, &binary, NULL);
+    	if (err_is_fail(err)) {
+    	    return err_push(err, SPAWN_ERR_ELF_MAP);
+    	}
+	}
+	else {
+		debug_printf("Module loaded from file system!\n");
+		binary_size = elf_size;
+		binary = (lvaddr_t) elf_vaddr;	
+	}
 
 	// debug_printf("module mapped... moving on!\n");
     /* Determine cpu type */
@@ -816,12 +826,14 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     strcat(args, vaddr_char);
     strcat(args, " ");
 
+	/*
     // Multiboot args
     char *multiboot_args;
     err = spawn_get_cmdline_args(module, &multiboot_args);
     if (err_is_fail(err)) {
         return err_push(err, SPAWN_ERR_GET_CMDLINE_ARGS);
     }
+	
 
 	// Lop off the name
     char *multiboot_args_lop = strchr(multiboot_args, ' ');
@@ -829,6 +841,11 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         multiboot_args_lop++;
         strcat(args, multiboot_args_lop);
     }
+
+	
+    free(multiboot_args);
+
+	*/
 
     // Tokenize
     char *argv[MAX_CMDLINE_ARGS + 1];
@@ -840,10 +857,11 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
         return err_push(err, SPAWN_ERR_SETUP_ENV);
     }
 
-    free(multiboot_args);
 
-    // unmap bootinfo module pages
-    spawn_unmap_module(binary);
+
+    // unmap bootinfo module pages if booted from bootinfo struct
+    if (elf_vaddr != NULL)
+    	spawn_unmap_module(binary);
 
 	//debug_printf("spawn with bootinfo returning!\n");
 	return SYS_ERR_OK;

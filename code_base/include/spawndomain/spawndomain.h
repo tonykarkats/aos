@@ -60,7 +60,7 @@ errval_t spawn_get_cmdline_args(struct mem_region *module,
                                 char **retargs);
 int spawn_tokenize_cmdargs(char *args, char *argv[], size_t argv_len);
 errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
-                                  const char *name, coreid_t coreid, domainid_t did);
+                                  const char *name, coreid_t coreid, domainid_t did, char * elf_vaddr, uint32_t elf_size);
 errval_t spawn_load_with_args(struct spawninfo *si, struct mem_region *module,
                               const char *name, coreid_t coreid,
                               char *const argv[], char *const envp[]);
@@ -87,6 +87,8 @@ struct mem_region *multiboot_find_module(struct bootinfo *bi, const char *name);
 struct mem_region *multiboot_find_module_containing(struct bootinfo *bi,
 						    const char *name,
 						    const char *containing);
+errval_t spawn_map_module_from_sd(struct mem_region *module, size_t *retsize,
+						  lvaddr_t *retaddr, genpaddr_t *retpaddr, char * name);
 errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
                           lvaddr_t *retaddr, genpaddr_t *retpaddr);
 errval_t spawn_unmap_module(lvaddr_t mapped_addr);
