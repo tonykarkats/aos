@@ -1,22 +1,16 @@
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
 #include <barrelfish/barrelfish.h>
+#include <barrelfish/aos_rpc.h>
+#include <barrelfish/mmchs.h>
+#include <barrelfish/dev_serv.h>
+#include <barrelfish/aos_rpc.h>
+#include <arch/arm/omap44xx/device_registers.h>
 
-enum filetype {
-	typeFile,
-	typeDir
-};
+errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size);
 
-struct dirent {
-
-	char name[13]; // <- For now we hold just the small name
-	enum filetype type;
-	uint32_t size;
-	uint32_t firstCluster;
-
-};
-
-errval_t get_dirents(uint32_t DirSector, struct dirent **dirtable, uint32_t *dir_size);
-
-errval_t list(const char *path, struct dirent **dirtable, uint32_t * size);
+errval_t list(const char *path, struct aos_dirent **dirtable, uint32_t * size);
 
 errval_t fat32_init(void);
 

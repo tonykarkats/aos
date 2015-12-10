@@ -22813,6 +22813,7 @@ cnode	include/barrelfish/caddr.h	/^    struct cnoderef cnode;    \/\/\/< CNode t
 cnode	include/barrelfish/red_black_tree.h	/^	struct capref cnode;$/;"	m	struct:memory_chunk	typeref:struct:memory_chunk::capref
 cnode	include/barrelfish/slot_alloc.h	/^    struct cnoderef cnode;       \/\/\/< cnoderef for the cnode to allocate from$/;"	m	struct:range_slot_allocator	typeref:struct:range_slot_allocator::cnoderef
 cnode	include/barrelfish/slot_alloc.h	/^    struct cnoderef cnode;      \/\/\/< Cnode the allocator is tracking$/;"	m	struct:single_slot_allocator	typeref:struct:single_slot_allocator::cnoderef
+cnode	lib/barrelfish/fat32.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
 cnode	lib/barrelfish/main.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
 cnode	usr/init/fat32.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
 cnode	usr/mmchs_driver/main.c	/^static struct cnoderef cnode;$/;"	v	typeref:struct:cnoderef	file:
@@ -23757,6 +23758,7 @@ dev	lib/cpio/cpiobin.c	/^    uint8_t dev[2];$/;"	m	struct:__anon139	file:
 dev_attributes	include/nfs/nfs_rpc.h	/^    sattr3 dev_attributes;$/;"	m	struct:devicedata3
 dev_mem_avail	usr/init/dev_serv.c	/^size_t dev_mem_total = 0, dev_mem_avail = 0;$/;"	v
 dev_mem_total	usr/init/dev_serv.c	/^size_t dev_mem_total = 0, dev_mem_avail = 0;$/;"	v
+dev_mm	lib/barrelfish/dev_serv.c	/^static struct mm dev_mm;$/;"	v	typeref:struct:mm	file:
 dev_mm	usr/init/init.c	/^static struct mm dev_mm;$/;"	v	typeref:struct:mm	file:
 dev_mm	usr/initapp/initapp.c	/^static struct mm dev_mm;$/;"	v	typeref:struct:mm	file:
 dev_msa	usr/init/dev_serv.c	/^static struct multi_slot_allocator dev_msa;$/;"	v	typeref:struct:multi_slot_allocator	file:
@@ -23864,7 +23866,6 @@ dir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data dir_wcc;$/;"	m	struct:SYMLINK3resfa
 dir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data dir_wcc;$/;"	m	struct:SYMLINK3resok
 dircount	include/nfs/nfs_rpc.h	/^    count3 dircount;$/;"	m	struct:READDIRPLUS3args
 direct	lib/newlib/newlib/libc/include/sys/dir.h	8;"	d
-dirent	include/barrelfish/fat32.h	/^struct dirent {$/;"	s
 dirent	include/sys/dirent.h	/^    struct dirent dirent;$/;"	m	struct:__anon101	typeref:struct:__anon101::dirent
 dirent	include/sys/dirent.h	/^struct dirent {$/;"	s
 dirent	lib/newlib/newlib/libc/machine/spu/sys/dirent.h	/^  struct dirent dirent;$/;"	m	struct:__anon187	typeref:struct:__anon187::dirent
@@ -25448,7 +25449,6 @@ filesize	include/vfs/mmap.h	/^    size_t filesize; \/\/ size to read from file (
 filesize	lib/cpio/cpiobin.c	/^    char filesize[8];$/;"	m	struct:__anon140	file:
 filesize	lib/cpio/cpiobin.c	/^    uint8_t filesize[4];$/;"	m	struct:__anon139	file:
 filetype	include/barrelfish/aos_rpc.h	/^enum filetype {$/;"	g
-filetype	include/barrelfish/fat32.h	/^enum filetype {$/;"	g
 fill	include/barrelfish/memobj.h	/^    errval_t (*fill)(struct memobj *memobj, genvaddr_t offset, struct capref frame,$/;"	m	struct:memobj_funcs
 fill	lib/newlib/newlib/testsuite/newlib.string/memmove1.c	/^fill (unsigned char dest[MAX*3])$/;"	f
 fill_diteinfo	tools/dite/dite.c	/^    void (*fill_diteinfo)(char *fbuf, genvaddr_t elfbase);$/;"	m	struct:elf_funcs	file:
@@ -25526,7 +25526,6 @@ first	lib/newlib/newlib/libc/stdlib/vallocr.c	1624;"	d	file:
 first	lib/newlib/newlib/libc/string/wcwidth.c	/^  int first;$/;"	m	struct:interval	file:
 first	lib/newlib/newlib/testsuite/newlib.locale/UTF-8.c	/^char first[6][6] = {$/;"	v
 firstCluster	include/barrelfish/aos_rpc.h	/^	uint32_t firstCluster;$/;"	m	struct:aos_dirent
-firstCluster	include/barrelfish/fat32.h	/^	uint32_t firstCluster;$/;"	m	struct:dirent
 first_app_b	lib/net_queue_manager/queue_manager.c	/^static struct buffer_descriptor *first_app_b = NULL;$/;"	v	typeref:struct:buffer_descriptor	file:
 first_day	lib/newlib/newlib/libc/time/strptime.c	/^first_day (int year)$/;"	f	file:
 first_free	lib/newlib/newlib/libc/search/hash_page.c	/^first_free(map)$/;"	f	file:
@@ -26335,6 +26334,7 @@ get_build_targets	tools/harness/tests/rcce.py	/^    def get_build_targets(self, 
 get_buildarchs	tools/harness/machines/__init__.py	/^    def get_buildarchs(self):$/;"	m	class:Machine
 get_buildarchs	tools/harness/machines/eth.py	/^    def get_buildarchs(self):$/;"	m	class:ETHMachine
 get_buildarchs	tools/harness/machines/msrc.py	/^    def get_buildarchs(self):$/;"	m	class:MSRCMachine
+get_cap	lib/barrelfish/fat32.c	/^static errval_t get_cap(lpaddr_t base, size_t size)$/;"	f	file:
 get_cap	lib/barrelfish/main.c	/^static void get_cap(lpaddr_t base, size_t size)$/;"	f	file:
 get_cap	usr/init/fat32.c	/^static errval_t get_cap(lpaddr_t base, size_t size)$/;"	f	file:
 get_cap	usr/mmchs_driver/main.c	/^static void get_cap(lpaddr_t base, size_t size)$/;"	f	file:
@@ -26360,10 +26360,11 @@ get_data	usr/init/fat32.c	/^errval_t get_data(uint32_t cluster_nr, void *buf) {$
 get_data	usr/mmchs_driver/fat32.c	/^errval_t get_data(uint32_t cluster_nr, void *buf) {$/;"	f
 get_default_slot_allocator	lib/barrelfish/slot_alloc/slot_alloc.c	/^struct slot_allocator *get_default_slot_allocator(void)$/;"	f
 get_default_waitset	lib/barrelfish/domain.c	/^struct waitset *get_default_waitset(void)$/;"	f
+get_devframe	lib/barrelfish/dev_serv.c	/^errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)$/;"	f
 get_devframe	usr/init/init.c	/^errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)$/;"	f
 get_devframe	usr/initapp/initapp.c	/^errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)$/;"	f
 get_did_by_name	lib/barrelfish/proc.c	/^domainid_t get_did_by_name(struct process_node * head, const char * name) $/;"	f
-get_dirents	lib/barrelfish/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct dirent **dirtable, uint32_t *dir_size) {$/;"	f
+get_dirents	lib/barrelfish/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size) {$/;"	f
 get_dirents	usr/init/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size) {$/;"	f
 get_dirents	usr/mmchs_driver/fat32.c	/^errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size) {$/;"	f
 get_dispatcher_generic	include/arch/arm/barrelfish/dispatcher_arch.h	/^get_dispatcher_generic(dispatcher_handle_t handle)$/;"	f
@@ -27617,6 +27618,7 @@ init_bins	lib/newlib/newlib/libc/sys/barrelfish/dlmalloc.c	/^static void init_bi
 init_chan	include/barrelfish/core_state.h	/^    struct aos_rpc *init_chan;$/;"	m	struct:core_state_generic	typeref:struct:core_state_generic::aos_rpc
 init_dcb	tools/schedsim/simulator.c	/^static void init_dcb(struct dcb *dcb, int id)$/;"	f	file:
 init_device_manager	lib/net_device_manager/device_manager.c	/^errval_t init_device_manager(char *dev_name, uint64_t valid_queues,$/;"	f
+init_devserver	lib/barrelfish/dev_serv.c	/^errval_t init_devserver(void) $/;"	f
 init_domain	lib/barrelfish/init.c	/^static bool init_domain;$/;"	v	file:
 init_domain_global	lib/barrelfish/threads.c	/^static bool init_domain_global; \/\/ XXX$/;"	v	file:
 init_executed	lib/newlib/newlib/libc/include/sys/types.h	/^  int   init_executed;   \/* has the initialization routine been run? *\/$/;"	m	struct:__anon238
@@ -29025,7 +29027,7 @@ linkdir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data linkdir_wcc;$/;"	m	struct:LINK3
 linkdir_wcc	include/nfs/nfs_rpc.h	/^    wcc_data linkdir_wcc;$/;"	m	struct:LINK3resok
 linkmax	include/nfs/nfs_rpc.h	/^    uint32_t linkmax;$/;"	m	struct:PATHCONF3resok
 linkoutput	include/lwip/netif.h	/^         err_t(*linkoutput) (struct netif * netif, struct pbuf * p);$/;"	m	struct:netif
-list	lib/barrelfish/fat32.c	/^errval_t list(const char *path, struct dirent **dirtable, uint32_t *size) {$/;"	f
+list	lib/barrelfish/fat32.c	/^errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
 list	lib/newlib/newlib/libc/time/strftime.c	/^struct list {$/;"	s	file:
 list	usr/init/fat32.c	/^errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
 list	usr/mmchs_driver/fat32.c	/^errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *size) {$/;"	f
@@ -31588,7 +31590,6 @@ n_sign_posn	lib/oldc/src/locale/lmonetary.h	/^	const char	*n_sign_posn;$/;"	m	st
 n_time	include/netinet/in_systm.h	/^typedef	u_int32_t n_time;		\/* ms since 00:00 GMT, byte rev *\/$/;"	t
 name	include/arch/x86/barrelfish_kpi/perfmon.h	/^    char name[PERFMON_DISP_NAME_LEN]; \/\/ Name of the running task$/;"	m	struct:perfmon_overflow_data
 name	include/barrelfish/aos_rpc.h	/^    char name[MAXNAMELEN];$/;"	m	struct:aos_dirent
-name	include/barrelfish/fat32.h	/^	char name[13]; \/\/ <- For now we hold just the small name$/;"	m	struct:dirent
 name	include/barrelfish/proc.h	/^	char * name;$/;"	m	struct:process_node
 name	include/barrelfish_kpi/dispatcher_shared.h	/^    char        name[DISP_NAME_LEN];\/\/\/< Name of domain, for debugging purposes$/;"	m	struct:dispatcher_shared_generic
 name	include/contmng/contmng.h	/^    char name[64]; \/* for debugging purposes *\/$/;"	m	struct:cont_queue
@@ -36939,7 +36940,6 @@ size	include/barrelfish/aos_rpc.h	/^    size_t size;$/;"	m	struct:aos_dirent
 size	include/barrelfish/bulk_transfer.h	/^    size_t size, block_size;$/;"	m	struct:bulk_transfer
 size	include/barrelfish/bulk_transfer.h	/^    size_t size;$/;"	m	struct:bulk_buf
 size	include/barrelfish/bulk_transfer.h	/^    size_t size;$/;"	m	struct:bulk_transfer_slave
-size	include/barrelfish/fat32.h	/^	uint32_t size;$/;"	m	struct:dirent
 size	include/barrelfish/heap.h	/^        unsigned size;              \/* size of this block *\/$/;"	m	struct:heap_header::__anon97
 size	include/barrelfish/memobj.h	/^    size_t size;                    \/\/\/< Size of the frame$/;"	m	struct:memobj_frame_list
 size	include/barrelfish/memobj.h	/^    size_t size;              \/\/\/< Size of the object$/;"	m	struct:memobj
@@ -39843,7 +39843,6 @@ tx_index	include/net_queue_manager/net_queue_manager.h	/^    uint64_t tx_index; 
 type	include/barrelfish/aos_rpc.h	/^    enum filetype type;$/;"	m	struct:aos_dirent	typeref:enum:aos_dirent::filetype
 type	include/barrelfish/cross_core.h	/^	enum type type;$/;"	m	struct:ump_message	typeref:enum:ump_message::type
 type	include/barrelfish/cross_core.h	/^enum type {$/;"	g
-type	include/barrelfish/fat32.h	/^	enum filetype type;$/;"	m	struct:dirent	typeref:enum:dirent::filetype
 type	include/barrelfish/memobj.h	/^    enum memobj_type type;    \/\/\/< Type of the memory object$/;"	m	struct:memobj	typeref:enum:memobj::memobj_type
 type	include/getopt/getopt.h	/^    enum argtype        type;$/;"	m	struct:cmdarg	typeref:enum:cmdarg::argtype
 type	include/hashtable/hashtable.h	/^    ENTRY_TYPE type;$/;"	m	struct:_ht_entry
@@ -39914,9 +39913,7 @@ type	tools/arm_gem5/RealView.py	/^    type = 'Sp804'$/;"	v	class:Sp804
 type	tools/schedsim/simulator.c	/^    enum objtype        type;$/;"	m	struct:capability	typeref:enum:capability::objtype	file:
 type	tools/schedsim/simulator.c	/^    enum task_type      type;$/;"	m	struct:dcb	typeref:enum:dcb::task_type	file:
 typeDir	include/barrelfish/aos_rpc.h	/^	typeDir$/;"	e	enum:filetype
-typeDir	include/barrelfish/fat32.h	/^	typeDir$/;"	e	enum:filetype
 typeFile	include/barrelfish/aos_rpc.h	/^	typeFile,$/;"	e	enum:filetype
-typeFile	include/barrelfish/fat32.h	/^	typeFile,$/;"	e	enum:filetype
 type_is_vnode	include/barrelfish_kpi/capabilities.h	/^static inline bool type_is_vnode(enum objtype type)$/;"	f
 typechar	tools/schedsim/simulator.c	/^static inline char typechar(enum task_type type)$/;"	f	file:
 types	lib/newlib/newlib/libc/posix/runetype.h	/^	unsigned long	*types;		\/* Array of types in range *\/$/;"	m	struct:__anon244

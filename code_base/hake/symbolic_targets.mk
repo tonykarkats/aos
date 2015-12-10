@@ -458,7 +458,7 @@ PANDABOARD_MODULES=\
 	armv7/sbin/cpu_omap44xx \
 	armv7/sbin/init \
 	armv7/sbin/initapp \
-	armv7/sbin/memeater \
+	armv7/sbin/shell \
 	armv7/sbin/led_on \
 	armv7/sbin/led_off \
 	armv7/sbin/stress_paging \

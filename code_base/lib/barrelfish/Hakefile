@@ -21,7 +21,7 @@
                       "slot_alloc/slot_alloc.c", "slot_alloc/range_slot_alloc.c",
                       "trace.c", "resource_ctrl.c", "coreset.c",
                       "inthandler.c", "deferred.c", "paging.c", "red_black_tree.c", "stack.c",
-					  "misc.c", "mem_serv.c"
+					  "misc.c", "mem_serv.c", "mmchs.c", "cm2.c", "i2c.c", "twl6030.c", "ctrlmod.c", "fat32.c", "dev_serv.c"
                     ]
 
       idc_srcs = concat $ map getsrcs $ optInterconnectDrivers $ options arch

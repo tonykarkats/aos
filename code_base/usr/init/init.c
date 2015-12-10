@@ -29,14 +29,15 @@
 #include <barrelfish/proc.h>
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
-#include "fat32.h"
 #include <mm/mm.h>
+#include <barrelfish/fat32.h>
+// #include <barrelfish/dev_serv.h>
+
 #define UNUSED(x) (x) = (x)
 
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
-static struct mm dev_mm;
 extern struct mm mm_ram;
 
 // shared variable between cross-core thread and recv handler
@@ -54,21 +55,6 @@ struct thread_cond capref_cond;
 struct process_node* pr_head;
 int global_did = 1000;
 int next_fd	   = 1000;
-errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length)
-{
-	errval_t err;
-
-	//genpaddr_t ret_base;
-	//err = mm_alloc_range(&dev_mm, length, start_addr, 0x8000000, ret, &ret_base);
-	err = mm_realloc_range( &dev_mm, length, start_addr,ret);
-	if (err_is_fail(err)) {
-		debug_printf("get_dev_frame: can not allocate range for device!\n");
-		return MM_ERR_DEVICE_ALLOC;
-	}
-	*retlen = ((0x80000000 - start_addr) < length) ? (0x80000000 - start_addr) : length;
-
-	return SYS_ERR_OK;
-}
 
 static int cross_core_thread_0(void *arg) 
 {
@@ -692,24 +678,9 @@ int main(int argc, char *argv[])
         abort();
     }
 
-	// Initialize device memory allocator 
-	static struct range_slot_allocator devframes_allocator;
-    err = range_slot_alloc_init(&devframes_allocator, 1024, NULL);
-    if (err_is_fail(err)) {
-        return err_push(err, LIB_ERR_SLOT_ALLOC_INIT);
-    }
-	
-	err = mm_init(&dev_mm, ObjType_DevFrame,
-                  0x40000000,  30,
-                  1, slab_default_refill, slot_alloc_dynamic,
-                  &devframes_allocator, false);
-    if (err_is_fail(err)) {
-        return err_push(err, MM_ERR_MM_INIT);
-    }
-
-	err = mm_add(&dev_mm, cap_io, 30, 0x40000000);
+	err = init_devserver();
 	if (err_is_fail(err)) {
-		debug_printf("Error in adding device frame to device memory manager!\n");
+		DEBUG_ERR(err, "Failed to init dev server !\n");
 		abort();
 	}
 
@@ -756,13 +727,14 @@ int main(int argc, char *argv[])
 	debug_printf("Initializing the fat infrastructure...\n");
 	fat32_init();
 
+	/*
 	void *buf;
 	uint32_t len;
 	err = read_file("/temp1/elf/led_off", &buf, 0, 10000, &len);
 
 	debug_printf("read_file returned!\n");	
 	while(1);
-
+	*/
 
 
 	thread_mutex_init(&process_list_lock);
@@ -791,13 +763,13 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-	debug_printf("Spawning memeater!\n"); 
+	debug_printf("Spawning shell!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
 	
 	global_did++;
-	err = bootstrap_domain("memeater", &mem_si, bi, my_core_id, &disp_frame, global_did);
-	pr_head = insert_process_node(pr_head, global_did, "memeater", false, NULL_CAP, disp_frame);
+	err = bootstrap_domain("shell", &mem_si, bi, my_core_id, &disp_frame, global_did);
+	pr_head = insert_process_node(pr_head, global_did, "shell", false, NULL_CAP, disp_frame);
 	
 	assert(err_is_ok(err));
 	while(true) {

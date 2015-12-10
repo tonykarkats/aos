@@ -25,7 +25,7 @@ static void _ti_twl6030_id1_write_8(void *d, size_t off, uint8_t regval);
 static char PRBUF[PBS];
 #define PRBUFL PRBUF, (PBS-1)
 
-#include "mmchs_debug.h"
+#include <barrelfish/mmchs_debug.h>
 #if defined(TWL_SERIVCE_DEBUG) || defined(MMCHS_SERVICE_DEBUG) || defined(GLOBAL_DEBUG)
 #define TWL_DEBUG(x...) debug_printf(x)
 #else

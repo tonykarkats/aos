@@ -17,7 +17,7 @@
 #include <barrelfish/twl6030.h>
 #include <barrelfish/omap44xx_ctrlmod.h>
 
-#include "mmchs_debug.h"
+#include <barrelfish/mmchs_debug.h>
 
 #if defined(CTRLMOD_SERVICE_DEBUG) || defined(MMCHS_SERVICE_DEBUG) || defined(GLOBAL_DEBUG)
 #define CTRLMOD_DEBUG(x...) debug_printf(x)
