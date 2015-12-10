@@ -323,15 +323,19 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
 
 	uint32_t ThisFATSecNum = BPB_RsvdSecCnt + (FATOffset / BPB_BytsPerSec);
 	uint32_t ThisFATEntOffset = FATOffset % BPB_BytsPerSec;
-	
-	char * secBuff = malloc(BPB_BytsPerSec);
-	mmchs_read_block(ThisFATSecNum, secBuff);
- 	
-	uint32_t FAT32ClusEntryVal =   (*((uint32_t *)(secBuff + ThisFATEntOffset))) & 0x0FFFFFFF;
 
+	debug_printf("cluster_nr %" PRIu32 " fatsecnum %" PRIu32 " fatentoffset %" PRIu32 "\n", cluster_nr, ThisFATSecNum, ThisFATEntOffset);	
+	char * secBuff = malloc(BPB_BytsPerSec);
+	
+	mmchs_read_block(ThisFATSecNum, secBuff);
+ 	//uint32_t FAT32ClusEntryVal =   (*((uint32_t *)(secBuff + ThisFATEntOffset))) & 0x0FFFFFFF;
+	uint32_t FAT32ClusEntryVal = (*((uint32_t *) &secBuff[ThisFATEntOffset])) & 0x0FFFFFFF;
+	
 	if (FAT32ClusEntryVal >= 0x0FFFFFF8) {
 		; //debug_printf("Reached end!\n");
 	}	
+
+	free(secBuff);
 	
 	return FAT32ClusEntryVal;
 }
@@ -350,12 +354,11 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
 		debug_printf("Cannot read block from SD card\n");
 		return AOS_ERR_FAT_FILE_NOT_FOUND;
 	}
-
 	
-	//char * vbuf = (char *)buf;
-	//for (int i = 0; i < 512 ; i++) {
-	//	debug_printf("   %c\n", vbuf[i] );
-	//}	
+	char * vbuf = (char *)buf;
+	for (int i = 0; i < 512 ; i++) {
+		debug_printf("   %c\n", vbuf[i] );
+	}	
 		
 
 	return SYS_ERR_OK;
@@ -370,11 +373,14 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 
 	errval_t err;
 
-	//debug_printf("%s\n", filename);	
+	debug_printf("%s\n", filename);	
+	
 	// Calculate how many blocks the file needs
 	uint32_t first_cluster;
     uint32_t filesize;
     first_cluster = get_first_cluster(filename, &filesize);
+	
+	debug_printf("first cluster = %" PRIu32 " size of file = %" PRIu32 "\n", first_cluster, filesize);
 
     if (first_cluster != -1) { // If file exists
 
@@ -390,25 +396,26 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 		uint32_t cluster_chain[4096];
 		uint32_t total_blocks = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
 
-		// Follow every cluster in the clusterchain of the FAT table
-		
-		uint32_t cur_cluster = first_cluster;
-		
-		for (int i=0; i<total_blocks; i++) {
-			cluster_chain[i] = cur_cluster;
-			cur_cluster = get_fat_entry(cur_cluster);
-		}
-
 		uint32_t starting_block = position / BPB_BytsPerSec;
 		uint32_t ending_block = (position + size) / BPB_BytsPerSec;
 		uint32_t starting_offset = (position % BPB_BytsPerSec);
 
 		uint32_t blocks_needed = (ending_block - starting_block + 1);
 
-		//debug_printf("Blocks Needed: %d\n", blocks_needed);
-		//debug_printf("Starting Block: %d\n", starting_block);
-		//debug_printf("Ending Block: %d\n", ending_block);
-		//debug_printf("Starting Offset: %d\n", starting_offset);
+		debug_printf("Total blocks %" PRIu32 "\n", total_blocks);
+		debug_printf("File size %" PRIu32 "\n", filesize);
+		debug_printf("Blocks Needed: %d\n", blocks_needed);
+		debug_printf("Starting Block: %d\n", starting_block);
+		debug_printf("Ending Block: %d\n", ending_block);
+		debug_printf("Starting Offset: %d\n", starting_offset);
+
+		// Follow every cluster in the clusterchain of the FAT table
+		uint32_t cur_cluster = first_cluster;
+		for (int i=0; i<total_blocks; i++) {
+			// debug_printf("next cluster = %" PRIu32 "\n", cur_cluster);
+			cluster_chain[i] = cur_cluster;
+			cur_cluster = get_fat_entry(cur_cluster);
+		}
 
 		// This buffer holds all the blocks needed
 		char * data_buffer = (char *)malloc(blocks_needed * BPB_BytsPerSec + 1);

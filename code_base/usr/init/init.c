@@ -751,10 +751,19 @@ int main(int argc, char *argv[])
 	// Boot core and wait for signal
 	spawn_second_core(bi, aux_core_0, aux_core_1);
  	poll_for_core(aux_core_0);
-	
+		
 	// Initialize fat-infrastructure
 	debug_printf("Initializing the fat infrastructure...\n");
 	fat32_init();
+
+	void *buf;
+	uint32_t len;
+	err = read_file("/temp1/elf/led_off", &buf, 0, 10000, &len);
+
+	debug_printf("read_file returned!\n");	
+	while(1);
+
+
 
 	thread_mutex_init(&process_list_lock);
 	struct thread *cross_core_thread = thread_create( cross_core_thread_0, NULL);
@@ -782,7 +791,6 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-	
 	debug_printf("Spawning memeater!\n"); 
 	struct spawninfo mem_si;
 	struct capref disp_frame;
