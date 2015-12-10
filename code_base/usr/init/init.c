@@ -12,7 +12,7 @@
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
 #include "init.h"
-#include <barrelfish/mem_serv.h>
+//#include <barrelfish/mem_serv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <barrelfish/morecore.h>
@@ -247,7 +247,8 @@ static void recv_handler(void *arg)
 		case AOS_RPC_GET_RAM_CAP: ;// Request Ram Capability
 			size_t size_requested = msg.words[1];	
 			struct capref returned_cap;
-	
+			genpaddr_t retbase;
+
 			// debug_printf("Request for memory from client with %"PRIu32"\n", domain_id);
 			// Check if client has exceeded it's memory limit
 			// and keep track of the frames allocated from this client.
@@ -260,13 +261,15 @@ static void recv_handler(void *arg)
 			else {
 				// Allocate memory for the client and keep the frame...
 				process->memory_consumed += pow(2, size_requested);
-				err = ram_alloc(&returned_cap, size_requested); 
+		
+				err = memserv_alloc(&returned_cap, size_requested, 0, 0, &retbase); 
 				if (err_is_fail(err)) {
 					debug_printf("recv_handler: Failed to allocate ram capability for client\n");
 					returned_cap = NULL_CAP;	
 				}
-					
-				// update_frame_list(process, returned_cap, size_requested);	
+				
+				//debug_printf("allocating frame! with base %"PRIu32" and size %" PRIu32 "\n", retbase, size_requested);	
+				update_frame_list(process, returned_cap, size_requested, retbase);	
 			}	
 
 			thread_mutex_unlock(&process_list_lock);
@@ -531,13 +534,12 @@ static void recv_handler(void *arg)
 					read_response = -1;	
 				else {
 					read_response = ret_size;
-					memcpy(process->buffer, fbuf, ret_size);	
+					if (ret_size != 0)
+						memcpy(process->buffer, fbuf, ret_size);	
 				}
 				
 				free(fbuf);
 			}
-
-
 
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, read_response);
 			if (err_is_fail(err)) {
@@ -597,7 +599,7 @@ static void recv_handler(void *arg)
 
 			// Clears the process node and released the ram used
 			// by this child. 
-			// clear_process_node(terminated_process, mm_ram);
+			clear_process_node(terminated_process);
 			free(terminated_process);
 			
 			break;

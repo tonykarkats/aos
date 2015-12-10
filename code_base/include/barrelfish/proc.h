@@ -2,7 +2,7 @@
 #include <mm/mm.h>
 #include <spawndomain/spawndomain.h>
 #include <string.h>
-
+#include <barrelfish/mem_serv.h>
 #define CLIENT_MEMORY_LIMIT 50*1024*1024
 
 // Process node. It keeps all information regarding
@@ -48,9 +48,10 @@ struct process_node {
 
 bool delete_fd(struct process_node *node, int fd);
 void update_fd_list (struct process_node *node, int fd, int poss, char *name);
-void clear_process_node(struct process_node *node, struct mm mm_ram);
-void update_frame_list(struct process_node *node, struct capref ram, size_t bits);
+void clear_process_node(struct process_node *node);
+void update_frame_list(struct process_node *node, struct capref ram, size_t bits, genpaddr_t base);
 char* check_if_fd_exists(struct file_descriptor_node *node, int fd);
+errval_t locate_and_map_shared_frame( struct process_node *node, struct capref * ret, void **buf);
 
 struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name);
 void print_nodes( struct process_node *head);

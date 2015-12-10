@@ -87,9 +87,9 @@ errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,
 	
 
     if(maxlimit == 0) {
-        err = mm_alloc(&mm_ram, bits, ret, NULL);
+        err = mm_alloc(&mm_ram, bits, ret, retbase);
     } else {
-        err = mm_alloc_range(&mm_ram, bits, minbase, maxlimit, ret, NULL);
+        err = mm_alloc_range(&mm_ram, bits, minbase, maxlimit, ret, retbase);
     }
 
     if (err_is_fail(err)) {

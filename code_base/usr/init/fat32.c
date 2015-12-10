@@ -379,6 +379,11 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 
 		if (position + size > filesize)
 			size = filesize - position;
+		if (position > filesize) {
+			*retsize = 0;
+			*buf = NULL;
+			return SYS_ERR_OK;
+		}
 
 		// First calculate the number of blocks the file needs in order to allocate the buffer        
 		uint32_t cluster_chain[4096];

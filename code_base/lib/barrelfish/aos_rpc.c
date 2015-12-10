@@ -472,8 +472,13 @@ errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size
 
 	debug_printf("Read size = %d \n", returned_value);	
 	// Create a buffer of 4096 bytes and copy stuff in it.
-	*buf = malloc(returned_value);
-	memcpy( *buf, chan->shared_buffer, returned_value);
+	if (returned_value != 0) {
+		*buf = malloc(returned_value);
+		memcpy( *buf, chan->shared_buffer, returned_value);
+		debug_printf("%s\n", (char *) *buf);
+	}
+	else 
+		*buf = NULL;
 
 	return SYS_ERR_OK;
 }

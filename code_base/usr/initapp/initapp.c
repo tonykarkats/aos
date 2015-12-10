@@ -12,7 +12,7 @@
  * ETH Zurich D-INFK, Haldeneggsteig 4, CH-8092 Zurich. Attn: Systems Group.
  */
 #include "initapp.h"
-#include <barrelfish/mem_serv.h>
+// #include <barrelfish/mem_serv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <barrelfish/morecore.h>

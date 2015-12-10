@@ -182,10 +182,11 @@ errval_t ram_alloc(struct capref *ret, uint8_t size_bits)
     struct ram_alloc_state *ram_alloc_state = get_ram_alloc_state();
     
 	assert(ram_alloc_state->ram_alloc_func != NULL);
+	genpaddr_t retbase;
     
 	errval_t err = ram_alloc_state->
         ram_alloc_func(ret, size_bits, ram_alloc_state->default_minbase,
-                       ram_alloc_state->default_maxlimit, NULL);
+                       ram_alloc_state->default_maxlimit, &retbase);
     if(err_is_fail(err)) {
       debug_printf("ram_alloc: Error in ram_alloc_func!\n");
 

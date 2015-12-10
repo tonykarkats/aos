@@ -52,13 +52,17 @@ struct process_node* insert_process_node(struct process_node * head, domainid_t 
 	new_node->d_id = did;
 	new_node->name = malloc(strlen(name)+1);
 	memcpy(new_node->name, name, strlen(name) + 1);
-	
+
+		
 	//debug_printf("inserted %s and name %s\n", new_node->name, name);
 	
+	new_node->next_pr = NULL;
+	new_node->consumed_frame = NULL;
+	new_node->fd_node = NULL;
 	new_node->background = background;
 	new_node->client_endpoint = client_endpoint;
 	new_node->dispatcher_frame = dispatcher_frame;
-	new_node->next_pr = NULL;
+
 
 	if (head == NULL) {
 		return new_node;
@@ -107,56 +111,30 @@ void print_nodes( struct process_node *head)
 
 }
 
-void clear_process_node(struct process_node *node, struct mm mm_ram) 
+void clear_process_node(struct process_node *node) 
 {
 	errval_t err;
 
 	struct frame_node* head_frame = node->consumed_frame;
 	struct frame_node* temp;
-
-	debug_printf("Clearing up for client that requested total memory %d\n", node->memory_consumed);
+	err = 1;
+	
+	//debug_printf("Clearing up for client that requested total memory %" PRIu32 "\n", node->memory_consumed);
 	// First free ALL allocated frames and also 
 	// free regions in mm_ram allocator
 	while (head_frame != NULL) {
-		
-		struct frame_identity fid;
-		err = cap_revoke(head_frame->frame);
-		if (err_is_fail(err)) {
-			debug_printf("Can not revoke frame of mm_ram allcoator!\n");
-		}
-		
-		struct capref current_frame;
-		err = slot_alloc(&current_frame);
-		if (err_is_fail(err)) {
-			debug_printf("Can not allocate frame for bookkeeping!\n");
-			cap_destroy(head_frame->frame);
-			continue;
-		}
 
-		err = cap_retype(current_frame, head_frame->frame, ObjType_Frame, head_frame->bits);
-    	if (err_is_fail(err)) {
-			debug_printf("error in cap_retype!\n");
-			cap_destroy(head_frame->frame);
-			cap_destroy(current_frame);
-			continue;	
-		}
-		err = invoke_frame_identify( current_frame, &fid);
+		//debug_printf("clearing frame! with base %"PRIu32" and size %" PRIu32 "\n", head_frame->base, head_frame->bits);	
+		
+		err = memserv_free(head_frame->frame, head_frame->base, head_frame->bits);
 		if (err_is_fail(err)) {
-			debug_printf("Can not identify frame of domain!\n");
-			cap_destroy(head_frame->frame);
-			cap_destroy(current_frame);
-			continue;
-		}
-		else {
-			err = mm_free(&mm_ram, head_frame->frame, fid.base, fid.bits);
-			if (err_is_fail(err)) {
-				debug_printf("Can not free frame in mm_ram allocator!\n");	
-			}	
+			debug_printf("Can not free frame in mm_ram allocator!\n");	
+		}	
+		
+		//debug_printf("cleared frame!\n");	
 
-			cap_destroy(current_frame);
-			// cap_destroy(head_frame->frame);
-		}
-	
+		cap_revoke(head_frame->frame);
+		// cap_delete(head_frame->frame);	
 		temp = head_frame;
 		head_frame = head_frame->next_frame;		
 		free(temp);
@@ -164,6 +142,17 @@ void clear_process_node(struct process_node *node, struct mm mm_ram)
 
 	// Then free everything else in the node	
 	free(node->name);
+
+	debug_printf("ram cleared...\n");
+
+	struct file_descriptor_node * head_fd = node->fd_node;
+	struct file_descriptor_node * temp_fd;
+
+	while (head_fd != NULL) {
+		temp_fd = head_fd->next_file_descriptor;
+		free(head_fd->file_name);
+		free(head_fd);
+	}
 
 	err = paging_unmap(get_current_paging_state(), NULL);
 	if (err_is_fail(err)) {
@@ -241,18 +230,34 @@ bool delete_fd(struct process_node *node, int fd)
 }
 
 
-void update_frame_list(struct process_node *node, struct capref ram, size_t bits) 
+void update_frame_list(struct process_node *node, struct capref ram, size_t bits, genpaddr_t base) 
 {	
 	struct frame_node* new_frame_node = (struct frame_node *) malloc(sizeof(struct frame_node));
 	new_frame_node->bits = bits;
 	new_frame_node->frame = ram;
-	new_frame_node->next_frame = node->consumed_frame;
+	new_frame_node->base = base;
 	
+	new_frame_node->next_frame = node->consumed_frame;
 	node->consumed_frame = new_frame_node;
 	
 	return;
 }
 
+errval_t locate_and_map_shared_frame( struct process_node *node, struct capref * ret, void **buf) 
+{
+	////struct capref ram;
+	errval_t err;
+	
+    err = 1;
+    if (err_is_fail(err)){ 
+        debug_printf("get_frame : Error in ram_alloc!\n");
+        return err_push(err, LIB_ERR_RAM_ALLOC);
+    }
+
+	return SYS_ERR_OK;
+
+
+}
 errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did)
 {
 

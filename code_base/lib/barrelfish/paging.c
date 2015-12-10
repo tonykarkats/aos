@@ -540,7 +540,6 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 	//alloc_bits = log2floor(bytes);
 	alloc_bits = log2ceil(bytes);
 	
-	// debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
 	
 	err = ram_alloc(&ram, alloc_bits);
     if (err_is_fail(err)){ 
@@ -550,9 +549,7 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
-   	
-   	// debug_printf("get_frame: Need %d slots\n", slots_needed);
-   	
+   		
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
 		struct capref nextcncap; struct cnoderef nextcn;

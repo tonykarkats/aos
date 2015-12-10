@@ -136,9 +136,14 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp("cat", token)) {	
 			token = strtok(NULL, space_token);
+			if (token == NULL)
+				continue;
+
 			int fd;
 			void *fbuf;
 			size_t buflen;
+			char temp_buf[5001];
+			int pos = 0;
 
 			err = aos_rpc_open(get_init_chan(), token, &fd);
 			if (err_is_fail(err)) {
@@ -149,12 +154,29 @@ int main(int argc, char *argv[])
 				printf("Got fd %d \n", fd);
 			}
 	
-			err = aos_rpc_read(get_init_chan(), fd, 0, 1000, &fbuf, &buflen);
-			if (err_is_fail(err)) {
-				debug_printf("Can not read from file ! with fd %d\n", fd);		
-			}
+			
+			while (1) {
+				err = aos_rpc_read(get_init_chan(), fd, pos, 5000, &fbuf, &buflen);
+				if (err_is_fail(err)) {
+					debug_printf("Can not read from file ! with fd %d\n", fd);		
+				}
+			
+				if (buflen == 0)
+					break;
+	
+				debug_printf("read %" PRIu32 "\n", buflen);	
+				pos += buflen;
+				
+				//memcpy(temp_buf, fbuf, buflen);
+				
+				//free(fbuf);
+				temp_buf[buflen] = '\0';							
+				printf("%s\n", (char *)fbuf);
+				fflush(stdout);
+				break;
+			}		
 
-			printf("%s\n", (char *) fbuf);
+
 
 			err = aos_rpc_close(get_init_chan(),fd);
 			if (err_is_fail(err)) {
