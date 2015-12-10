@@ -330,7 +330,7 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
 	uint32_t FAT32ClusEntryVal =   (*((uint32_t *)(secBuff + ThisFATEntOffset))) & 0x0FFFFFFF;
 
 	if (FAT32ClusEntryVal >= 0x0FFFFFF8) {
-		debug_printf("Reached end!\n");
+		; //debug_printf("Reached end!\n");
 	}	
 	
 	return FAT32ClusEntryVal;
@@ -341,7 +341,7 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
 errval_t get_data(uint32_t cluster_nr, void *buf) {
 
 	errval_t err;
-	debug_printf("Buff addr  = %p\n", buf);
+	//debug_printf("Buff addr  = %p\n", buf);
 	
 	uint32_t sector = ((cluster_nr - 2) * BPB_SecPerClus) + FirstDataSector;
 
@@ -369,7 +369,8 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
 errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize) {
 
 	errval_t err;
-	
+
+	//debug_printf("%s\n", filename);	
 	// Calculate how many blocks the file needs
 	uint32_t first_cluster;
     uint32_t filesize;
@@ -404,10 +405,10 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 
 		uint32_t blocks_needed = (ending_block - starting_block + 1);
 
-		debug_printf("Blocks Needed: %d\n", blocks_needed);
-		debug_printf("Starting Block: %d\n", starting_block);
-		debug_printf("Ending Block: %d\n", ending_block);
-		debug_printf("Starting Offset: %d\n", starting_offset);
+		//debug_printf("Blocks Needed: %d\n", blocks_needed);
+		//debug_printf("Starting Block: %d\n", starting_block);
+		//debug_printf("Ending Block: %d\n", ending_block);
+		//debug_printf("Starting Offset: %d\n", starting_offset);
 
 		// This buffer holds all the blocks needed
 		char * data_buffer = (char *)malloc(blocks_needed * BPB_BytsPerSec + 1);

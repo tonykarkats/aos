@@ -492,11 +492,11 @@ static void recv_handler(void *arg)
 				next_fd ++;
 				update_fd_list(process, next_fd, 0, open_file_name);
 
-				struct file_descriptor_node* n = process->fd_node;
-				while(n != NULL) {
-					debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
-					n = n->next_file_descriptor;
-				}
+				//struct file_descriptor_node* n = process->fd_node;
+				//while(n != NULL) {
+				//	debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
+				//	n = n->next_file_descriptor;
+				//}
 				thread_mutex_unlock(&process_list_lock);	
 				
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) next_fd);
@@ -518,9 +518,10 @@ static void recv_handler(void *arg)
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
 			
-			debug_printf("Client requests to read file from fd %d\n", read_fd);
+			//debug_printf("Client requests to read file from fd %d\n", read_fd);
 				
 			char * file_name = check_if_fd_exists(process->fd_node, read_fd);
+			
 			if (!file_name) {
 				read_response = -1;
 			}

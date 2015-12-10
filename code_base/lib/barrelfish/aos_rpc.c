@@ -470,12 +470,13 @@ errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size
 		return AOS_ERR_LMP_NON_EXISTED_FD;
 	}
 
-	debug_printf("Read size = %d \n", returned_value);	
+	*buflen = returned_value;
+
 	// Create a buffer of 4096 bytes and copy stuff in it.
 	if (returned_value != 0) {
 		char *buffer = malloc(returned_value);
 		memcpy( buffer, chan->shared_buffer, returned_value);
-		*buf = buffer;
+		*buf = buffer;	
 	}
 	else 
 		*buf = NULL;

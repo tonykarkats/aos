@@ -154,29 +154,26 @@ int main(int argc, char *argv[])
 				printf("Got fd %d \n", fd);
 			}
 	
-			
+			// Reading the whole file!			
 			while (1) {
 				err = aos_rpc_read(get_init_chan(), fd, pos, 5000, &fbuf, &buflen);
 				if (err_is_fail(err)) {
 					debug_printf("Can not read from file ! with fd %d\n", fd);		
 				}
-			
+				//debug_printf("size %"PRIu32"\n", buflen);	
 				if (buflen == 0)
 					break;
 	
-				//debug_printf("read %" PRIu32 "\n", buflen);	
+
 				pos += buflen;
+				memcpy(temp_buf, fbuf, buflen);
 				
-				//memcpy(temp_buf, fbuf, buflen);
+				free(fbuf);
 				
-				//free(fbuf);
 				temp_buf[buflen] = '\0';							
-				debug_printf("%s\n", (char *)fbuf);
+				printf("%s", temp_buf);
 				fflush(stdout);
-				break;
 			}		
-
-
 
 			err = aos_rpc_close(get_init_chan(),fd);
 			if (err_is_fail(err)) {
