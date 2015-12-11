@@ -105,11 +105,21 @@ static int boot_thread(void *arg)
 		char * name = strcat(prefix, mod_name);
 	
 		debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
-		err = read_file(name, &buf, 0, 0, &len, true);
-		if (err_is_fail(err)) {
-			debug_printf("Could not read module from sd card! Will boot it from kernel\n");
-		}	
-	
+		
+		struct module_node * module = get_module_from_cache(name);
+		if (module == NULL) {
+			err = read_file(name, &buf, 0, 0, &len, true);
+			if (err_is_fail(err)) {
+				debug_printf("Could not read module from sd card! Will boot it from kernel\n");
+			}	
+			else 
+				put_module_in_cache( name, buf, len);
+		}
+		else {
+			buf = module->module_data;
+			len = module->len; 
+		}
+
 		struct spawninfo si;	
 		struct capref disp_frame;
 		domainid_t d_id;
@@ -131,9 +141,6 @@ static int boot_thread(void *arg)
 		if (err_is_fail(err)) {
 			DEBUG_ERR(err,"boot_thread: Can not send domain id back to the client!\n");
 		}
-	
-		if (buf != NULL)
-			free(buf);	
 	}		
 
 	free(args->name);
@@ -807,8 +814,8 @@ int main(int argc, char *argv[])
 
 	struct spawninfo led_si;	
 	struct capref dispframe1;
-	err = bootstrap_domain("fseval", &led_si, bi, my_core_id, &dispframe1, global_did, buf, len);
-	pr_head = insert_process_node(pr_head, global_did, "fseval", false, NULL_CAP, NULL_CAP);
+	err = bootstrap_domain("shell", &led_si, bi, my_core_id, &dispframe1, global_did, buf, len);
+	pr_head = insert_process_node(pr_head, global_did, "shell", false, NULL_CAP, NULL_CAP);
 
 	assert(err_is_ok(err));
 	while(true) {

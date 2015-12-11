@@ -8,9 +8,39 @@ static uint16_t BPB_RsvdSecCnt;
 static uint32_t FirstDataSector;
 static uint32_t BPB_RootClus;
 static uint32_t FirstSectorofRootDir;
-
 static struct cnoderef cnode;
-  
+static struct module_node * module_list_head;
+
+struct module_node * get_module_from_cache(char *module_name) 
+{
+	struct module_node * module_node = module_list_head;
+
+	while (module_node != NULL) {
+		if (!strcmp(module_node->module_name, module_name)) {
+			return module_node;
+		} 
+		module_node = module_node->next;
+	}
+
+	return NULL;
+}
+
+void put_module_in_cache( char *module_name, char * module_data, size_t len) 
+{
+
+	struct module_node * mod = (struct module_node *) malloc(sizeof(struct module_node));
+	
+	mod->module_name = malloc(strlen(module_name));
+	strcpy(mod->module_name, module_name);
+
+	mod->module_data = module_data;
+	mod->len = len;
+	mod->next = module_list_head;
+
+	module_list_head = mod;
+
+}
+
 static errval_t get_cap(lpaddr_t base, size_t size)
 {
     errval_t err;
@@ -373,6 +403,8 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 	uint32_t first_cluster;
     uint32_t filesize;
     first_cluster = get_first_cluster(filename, &filesize);
+
+	module_list_head = NULL;
 	
 	//debug_printf("first cluster = %" PRIu32 " size of file = %" PRIu32 "\n", first_cluster, filesize);
 

@@ -63,10 +63,20 @@ static int boot_thread (void * arg)
 	char * name = strcat(prefix, mod_name);
 	
 	debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
-	err = read_file(name, &buf, 0, 0, &len, true);
-	if (err_is_fail(err)) {
-		debug_printf("Could not read module from sd card! Will boot it from kernel\n");
-	}	
+		
+	struct module_node * module = get_module_from_cache(name);
+	if (module == NULL) {
+		err = read_file(name, &buf, 0, 0, &len, true);
+		if (err_is_fail(err)) {
+			debug_printf("Could not read module from sd card! Will boot it from kernel\n");
+		}	
+		else 
+			put_module_in_cache(name, buf, len);
+	}
+	else {
+		buf = module->module_data;
+		len = module->len; 
+	}
 
 	uint32_t util_word;
 	struct spawninfo si;	
@@ -378,8 +388,7 @@ static void recv_handler(void *arg)
 					else {
 						util_word = pseudo_lock;
 					}
-	
-						
+			
 					thread_mutex_unlock(&process_list_lock);		
 						
 					//debug_printf("4\n");
