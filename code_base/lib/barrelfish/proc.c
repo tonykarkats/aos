@@ -144,7 +144,7 @@ void clear_process_node(struct process_node *node)
 	// Then free everything else in the node	
 	free(node->name);
 
-	debug_printf("ram cleared...\n");
+	// debug_printf("ram cleared...\n");
 
 	struct file_descriptor_node * head_fd = node->fd_node;
 	struct file_descriptor_node * temp_fd;
