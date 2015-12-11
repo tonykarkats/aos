@@ -155,6 +155,8 @@ void clear_process_node(struct process_node *node)
 		free(head_fd);
 	}
 
+	cap_destroy(node->client_endpoint);
+
 	err = paging_unmap(get_current_paging_state(), NULL);
 	if (err_is_fail(err)) {
 		debug_printf("Can not unmap for terminated process!\n");
@@ -271,7 +273,7 @@ errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct 
 	//debug_printf("Before spawn! %s\n", module_name);
 	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id, did, elf_vaddr, elf_size);
 	if (err_is_fail(err)) {
-		debug_printf("spawn_load_with_bootinfo: ERROR in loading module %s!\n", name);
+		debug_printf("spawn_load_with_bootinfo: ERROR in loading module %s! Error %s\n", name, err_getstring(err));
 		return SPAWN_ERR_LOAD;
 	}
 

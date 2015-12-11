@@ -16,6 +16,8 @@ module /armv7/sbin/led_on
 module /armv7/sbin/led_off
 module /armv7/sbin/stress_paging
 module /armv7/sbin/mmchs
+module /armv7/sbin/fseval
+
 # TODO: add different modules here for later milestones
 
 # For pandaboard, use following values.

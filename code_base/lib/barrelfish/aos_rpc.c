@@ -236,6 +236,8 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
 	// Wait for reply from server
     event_dispatch(get_default_waitset());
 	
+	// debug_printf("domain was spawned waiting for terminating signal...\n");
+	
 	*newpid = chan->words[0];
 	
 	if (*newpid == 0) {

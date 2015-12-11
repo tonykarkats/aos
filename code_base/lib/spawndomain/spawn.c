@@ -763,6 +763,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     /* Determine cpu type */
     err = spawn_determine_cputype(si, binary);
     if (err_is_fail(err)) {
+		debug_printf("Error in determining cputype!\n");
         return err_push(err, SPAWN_ERR_DETERMINE_CPUTYPE);
     }
 
@@ -777,6 +778,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     /* Initialize vspace */
     err = spawn_setup_vspace(si);
     if (err_is_fail(err)) {
+		debug_printf("Error in setting up vspace!\n");
         return err_push(err, SPAWN_ERR_VSPACE_INIT);
     }
 
@@ -786,7 +788,8 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     genvaddr_t entry;
     void* arch_info;
     err = spawn_arch_load(si, binary, binary_size, &entry, &arch_info);
-    if (err_is_fail(err)) {
+    if (err_is_fail(err)) {	
+		debug_printf("Error in spawn arch load!\n");
         return err_push(err, SPAWN_ERR_LOAD);
     }
 	// debug_printf("Image loaded ready to set up the dispatcher!\n");
@@ -794,6 +797,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     /* Setup dispatcher frame */
     err = spawn_setup_dispatcher(si, coreid, name, entry, arch_info);
     if (err_is_fail(err)) {
+		debug_printf("Error in setting up dispatcher!\n");
         return err_push(err, SPAWN_ERR_SETUP_DISPATCHER);
     }
 
@@ -803,6 +807,7 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     genvaddr_t vaddr;
     err = spawn_map_bootinfo(si, &vaddr);
     if (err_is_fail(err)) {
+		debug_printf("Error in spawn map bootinfo\n");
         return err_push(err, SPAWN_ERR_MAP_BOOTINFO);
     }
 
@@ -854,13 +859,12 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
     // Setup
     err = spawn_setup_env(si, argv, environ);
     if (err_is_fail(err)) {
+		debug_printf("Error in setting up th environment!\n");
         return err_push(err, SPAWN_ERR_SETUP_ENV);
     }
 
-
-
     // unmap bootinfo module pages if booted from bootinfo struct
-    if (elf_vaddr != NULL)
+    if (elf_vaddr == NULL)
     	spawn_unmap_module(binary);
 
 	//debug_printf("spawn with bootinfo returning!\n");

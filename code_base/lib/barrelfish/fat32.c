@@ -393,7 +393,7 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 
 		// First calculate the number of blocks the file needs in order to allocate the buffer        
 		uint32_t cluster_chain[4096];
-		uint32_t total_blocks = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
+		//uint32_t total_blocks = (filesize % BPB_BytsPerSec == 0) ? (filesize/BPB_BytsPerSec) : (filesize/BPB_BytsPerSec + 1); 	
 
 		uint32_t starting_block = position / BPB_BytsPerSec;
 		uint32_t ending_block = (position + size) / BPB_BytsPerSec;
@@ -410,7 +410,7 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 
 		// Follow every cluster in the clusterchain of the FAT table
 		uint32_t cur_cluster = first_cluster;
-		for (int i=0; i<total_blocks; i++) {
+		for (int i=0; i<ending_block; i++) {
 			//debug_printf("next cluster = %" PRIu32 "\n", cur_cluster);
 			cluster_chain[i] = cur_cluster;
 			cur_cluster = get_fat_entry(cur_cluster);

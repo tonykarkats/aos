@@ -21,6 +21,10 @@
 
 extern struct bootinfo *bi;
 
+struct boot_thread_args {
+	char name[36];
+	int domain_id;
+};
 errval_t initialize_ram_alloc(void);
 
 #endif // INIT_H

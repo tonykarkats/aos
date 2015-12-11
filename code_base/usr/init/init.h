@@ -24,12 +24,13 @@ extern struct bootinfo *bi;
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
+struct boot_thread_args {
+	char *name;
+	struct capref ep;
+	int core;	
+};
+
 errval_t initialize_ram_alloc(void);
-//errval_t initialize_mem_serv(void);
-//errval_t initialize_dev_serv(void);
-//errval_t get_devframe(struct capref * ret, size_t * retlen, lpaddr_t start_addr, size_t length);
 errval_t devserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase,genpaddr_t maxlimit);
-//errval_t memserv_alloc(struct capref *ret, uint8_t bits, genpaddr_t minbase, genpaddr_t maxlimit, genpaddr_t *retbase);
-//errval_t memserv_free (struct capref ram_cap, genpaddr_t base, uint8_t bits);
 
 #endif // INIT_H

@@ -54,6 +54,94 @@ struct process_node* pr_head;
 int global_did = 1000;
 int next_fd	   = 1000;
 
+static int boot_thread(void *arg) 
+{
+	// Spawn process at core-0, update list and answer back to the client...
+
+	errval_t err;
+	struct boot_thread_args *args = (struct boot_thread_args *) arg;
+	char * mod_name = args->name;
+	struct capref client_ep = args->ep;
+	int core = args->core;
+
+	
+	if (core == 1) {	
+		// Spawn domain at core-1					
+		global_did++;
+	
+		struct ump_message core_1_msg;
+		core_1_msg.type = SPAWNED_PROCESS_REQUEST;
+		core_1_msg.util_word = global_did;
+		strcpy((char *) core_1_msg.words, mod_name);
+		
+		pseudo_lock = -1;
+
+		write_to_core_1(core_1_msg);				
+
+		// Wait on pseudo lock, pseudo lock has the domain-id of the domain spawned	
+		while(pseudo_lock == -1);	
+			
+		// Report back to shell that process was spawned with the domain-id of the domain
+		err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err,"recv_handler: Can not report process creation back to client!\n");
+		}
+
+		if (pseudo_lock != 0) {
+			err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
+			if (err_is_fail(err)) {
+				DEBUG_ERR(err,"recv_handler: Can not report back to client!\n");
+			}
+		}			
+		
+		cap_destroy(client_ep);
+	}
+	else {
+
+		char prefix[100] = "armv7/sbin/";	
+		void *buf = NULL;
+		uint32_t len = 0;
+	
+		char * name = strcat(prefix, mod_name);
+	
+		debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
+		err = read_file(name, &buf, 0, 0, &len, true);
+		if (err_is_fail(err)) {
+			debug_printf("Could not read module from sd card! Will boot it from kernel\n");
+		}	
+	
+		struct spawninfo si;	
+		struct capref disp_frame;
+		domainid_t d_id;
+		
+		err = bootstrap_domain(mod_name, &si, bi, my_core_id, &disp_frame, global_did + 1, buf, len);
+		if (err_is_fail(err)) {
+			debug_printf("boot_thread: Can not spawn process for the client! With error %s\n", err_getstring(err));
+			d_id = 0;	
+		}
+		else {
+			thread_mutex_lock(&process_list_lock);
+			global_did++;
+			d_id = global_did;	
+			pr_head = insert_process_node (pr_head, d_id, mod_name, false, client_ep, disp_frame);
+			thread_mutex_unlock(&process_list_lock);
+		}
+		
+		err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
+		if (err_is_fail(err)) {
+			DEBUG_ERR(err,"boot_thread: Can not send domain id back to the client!\n");
+		}
+	
+		if (buf != NULL)
+			free(buf);	
+	}		
+
+	free(args->name);
+	free(args);
+
+	return 0;
+}
+
 static int cross_core_thread_0(void *arg) 
 {
 	errval_t err;	
@@ -282,70 +370,21 @@ static void recv_handler(void *arg)
 			
 			break;
 		case AOS_RPC_PROC_SPAWN:;
-			domainid_t d_id;
 			char *token;
-			bool background;
+			int core = msg.words[1];
 
-			strncpy(message_string, (char *) msg.words + 8, 28);
-			uint32_t core = msg.words[1];
-	
-			//debug_printf("Will spawn %s at core %zu\n", message_string, core);	
+			strncpy(message_string, (char *) msg.words + 8, 28);	
 			token = strtok(message_string, " ");
 			
-			if (core == 1) {	
-				// Spawn domain at core-1					
-				global_did++;
-			
-				struct ump_message core_1_msg;
-				core_1_msg.type = SPAWNED_PROCESS_REQUEST;
-				core_1_msg.util_word = global_did;
-				strcpy((char *) core_1_msg.words, message_string);
-				
-				pseudo_lock = -1;
-
-				write_to_core_1(core_1_msg);				
-
-				// Wait on pseudo lock, pseudo lock has the domain-id of the domain spawned	
-				while(pseudo_lock == -1);	
+			struct boot_thread_args* bt = (struct boot_thread_args *) malloc(sizeof(struct boot_thread_args));
+			bt->name = malloc(strlen(token));
+			bt->ep = cap;
+			bt->core = core;
+			strcpy(bt->name, token);
 					
-				// Report back to shell that process was spawned with the domain-id of the domain
-				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
-				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not report process creation back to client!\n");
-				}
-
-				if (pseudo_lock != 0) {
-					err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
-					if (err_is_fail(err)) {
-						DEBUG_ERR(err,"recv_handler: Can not report back to client!\n");
-					}
-				}			
-			}
-			else {
-				// Spawn domain at own core! 	
-				background = false;	
-	
-			 	struct spawninfo si;	
-				struct capref disp_frame;
-				global_did++;
-	
-				err = bootstrap_domain(token, &si, bi, my_core_id, &disp_frame, global_did, NULL, 0);
-				if (err_is_fail(err)) {
-					debug_printf("recv_handler: Can not spawn process for the client! \n");
-					d_id = 0;	
-				}
-				else {
-					d_id = global_did;	
-					thread_mutex_lock(&process_list_lock);
-					pr_head = insert_process_node(pr_head, d_id, token, background, cap, disp_frame);
-					thread_mutex_unlock(&process_list_lock);
-				}
-				
-				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
-				if (err_is_fail(err)) {
-					DEBUG_ERR(err,"recv_handler: Can not send domain id back to the client!\n");
-				}		
-			}
+			//debug_printf("Will spawn %s at core %zu\n", message_string, core);	
+			struct thread * _boot_thread = thread_create(boot_thread,bt);
+			_boot_thread = _boot_thread;		
 
 			break;
 		case AOS_RPC_PROC_GET_NAME:;
@@ -429,6 +468,7 @@ static void recv_handler(void *arg)
 			uint32_t size;
 	
 			err = list(path, &dirtable, &size);
+			// debug_printf("LIST returned!\n");
 			if (err_is_fail(err)) {
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
 				if (err_is_fail(err)) {
@@ -503,7 +543,7 @@ static void recv_handler(void *arg)
 			process = get_process_node(&pr_head, domain_id, "aa");
 			thread_mutex_unlock(&process_list_lock);	
 			
-			//debug_printf("Client requests to read file from fd %d\n", read_fd);
+			// debug_printf("Client requests to read file from fd %d at poss %" PRIu32 "\n", read_fd, read_pos);
 				
 			char * file_name = check_if_fd_exists(process->fd_node, read_fd);
 			
@@ -514,6 +554,7 @@ static void recv_handler(void *arg)
 				void * fbuf;
 				if (read_size > 4096)
 					read_size = 4096;	
+		
 				uint32_t ret_size;	
 				err = read_file( file_name, &fbuf, read_pos, read_size, &ret_size, false);
 				if (err_is_fail(err))
@@ -718,14 +759,14 @@ int main(int argc, char *argv[])
 	lvaddr_t aux_core_0 = (lvaddr_t) vbuf + 0x800;
 	lvaddr_t aux_core_1 = (lvaddr_t) vbuf + 0x804;
 
+	debug_printf("Initializing the fat infrastructure...\n");
+	fat32_init();
+
 	// Boot core and wait for signal
 	spawn_second_core(bi, aux_core_0, aux_core_1);
  	poll_for_core(aux_core_0);
 		
 	// Initialize fat-infrastructure
-	debug_printf("Initializing the fat infrastructure...\n");
-	fat32_init();
-
 	thread_mutex_init(&process_list_lock);
 	struct thread *cross_core_thread = thread_create( cross_core_thread_0, NULL);
 	cross_core_thread = cross_core_thread;
@@ -752,19 +793,22 @@ int main(int argc, char *argv[])
 	err = setup_channel(&channel);
    	assert(err_is_ok(err));
 
-	void *buf;
-	uint32_t len;
 	
+	void *buf = NULL;
+	uint32_t len = 0;
+	
+	/*	
 	debug_printf("Reading shell binary from SD card.. This might take a while...\n");
-	err = read_file("/sbin/shell", &buf, 0, 0, &len, true);
+	err = read_file("/armv7/sbin/shell", &buf, 0, 0, &len, true);
 	if (err_is_fail(err)) {
 		debug_printf("Could not read module from sd card!\n");
 	}	
-	
+	*/
+
 	struct spawninfo led_si;	
 	struct capref dispframe1;
-	err = bootstrap_domain("shell", &led_si, bi, my_core_id, &dispframe1, global_did, buf, len);
-	pr_head = insert_process_node(pr_head, global_did, "shell", false, NULL_CAP, NULL_CAP);
+	err = bootstrap_domain("fseval", &led_si, bi, my_core_id, &dispframe1, global_did, buf, len);
+	pr_head = insert_process_node(pr_head, global_did, "fseval", false, NULL_CAP, NULL_CAP);
 
 	assert(err_is_ok(err));
 	while(true) {

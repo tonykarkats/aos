@@ -48,11 +48,63 @@ struct process_node* pr_head;
 int next_fd	   = 1000;
 int global_did = 1000;
 
-static int cross_core_thread_1(void *arg) 
+static int boot_thread (void * arg) 
 {
 	errval_t err;
 
-	struct bootinfo * thread_bi = (struct bootinfo *) arg;
+	struct boot_thread_args * args = (struct boot_thread_args *) arg;
+
+	char * mod_name = args->name;
+	domainid_t spawned_domain = args->domain_id;
+	
+	char prefix[100] = "armv7/sbin/";	
+	void *buf = NULL;
+	uint32_t len = 0;
+	char * name = strcat(prefix, mod_name);
+	
+	debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
+	err = read_file(name, &buf, 0, 0, &len, true);
+	if (err_is_fail(err)) {
+		debug_printf("Could not read module from sd card! Will boot it from kernel\n");
+	}	
+
+	uint32_t util_word;
+	struct spawninfo si;	
+	struct capref disp_frame;	
+
+	thread_mutex_lock(&process_list_lock);	
+	pr_head = insert_process_node(pr_head, spawned_domain, mod_name, true, NULL_CAP, NULL_CAP);
+	thread_mutex_unlock(&process_list_lock);	
+
+	err = bootstrap_domain(mod_name, &si, bi, my_core_id, &disp_frame, spawned_domain, buf, len);
+	if (err_is_fail(err)) {
+		
+		thread_mutex_lock(&process_list_lock);	
+		struct process_node * temp = delete_process_node( &pr_head, spawned_domain, "aaa");
+		thread_mutex_unlock(&process_list_lock);		
+		temp = temp;
+
+		util_word = 0;	
+	}
+	else {
+		util_word = spawned_domain;
+	}
+	
+	// Write response to core-0 !				
+	struct ump_message returned_message;
+	returned_message.type      = SPAWNED_PROCESS_RESPONSE;
+	returned_message.util_word = util_word;
+	strcpy( (char *) returned_message.words, mod_name);
+	
+	write_to_core_0(returned_message);					
+
+	free(args);
+	return 1;
+}
+
+static int cross_core_thread_1(void *arg) 
+{
+	errval_t err;
 
 	void * buf;
 	err = map_shared_frame(&buf, true);
@@ -68,47 +120,24 @@ static int cross_core_thread_1(void *arg)
 		switch(type) {
 			case(SPAWNED_PROCESS_REQUEST): ;
 
-				char message_string[36];
+			char message_string[36];
 
-				for (int i = 0; i<9; i++){
-					uint32_t * word = (uint32_t *) (message_string + i*4);
-					*word = received_message.words[i];   
-				}		
-				
-				domainid_t spawned_domain = received_message.util_word;
+			for (int i = 0; i<9; i++){
+				uint32_t * word = (uint32_t *) (message_string + i*4);
+				*word = received_message.words[i];   
+			}		
+	
+			domainid_t spawned_domain = received_message.util_word;
+	
+			struct boot_thread_args * bt = (struct boot_thread_args *) malloc(sizeof(struct boot_thread_args));
+			strncpy(bt->name, message_string, 36);
+			bt->domain_id = spawned_domain;
 
-				//debug_printf("cross_core_thread_1: Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
-			 		
-				uint32_t util_word;
-				struct spawninfo si;	
-				struct capref disp_frame;	
-
-				thread_mutex_lock(&process_list_lock);	
-				pr_head = insert_process_node(pr_head, spawned_domain, message_string, true, NULL_CAP, NULL_CAP);
-				thread_mutex_unlock(&process_list_lock);	
-			
-				err = bootstrap_domain(message_string, &si, thread_bi, my_core_id, &disp_frame, spawned_domain, NULL, 0);
-				if (err_is_fail(err)) {
-					
-					thread_mutex_lock(&process_list_lock);	
-					struct process_node * temp = delete_process_node( &pr_head, spawned_domain, "aaa");
-					thread_mutex_unlock(&process_list_lock);		
-					temp = temp;
-
-					util_word = 0;	
-				}
-				else {
-					util_word = spawned_domain;
-				}
-			
-				// Write response to core-0 !				
-				struct ump_message returned_message;
-				returned_message.type      = SPAWNED_PROCESS_RESPONSE;
-				returned_message.util_word = util_word;
-				strcpy( (char *) returned_message.words, message_string);
-				
-				write_to_core_0(returned_message);					
-				break;
+			struct thread* bthread = thread_create(boot_thread, bt);
+			bthread = bthread;
+			//debug_printf("cross_core_thread_1: Received spawn for domain %s with did %zu\n", message_string, spawned_domain);
+	 		
+			break;
 		
 		case(SPAWNED_PROCESS_RESPONSE_PERMISSION_FOR_SPAWN): ;
 			
@@ -669,12 +698,12 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-	lvaddr_t aux_core_0 = (lvaddr_t) vbuf + 0x800;
-	signal_core_0(aux_core_0);
-
 	// Initialize fat-infrastructure
 	debug_printf("Initializing the fat infrastructure...\n");
 	fat32_init();
+
+	lvaddr_t aux_core_0 = (lvaddr_t) vbuf + 0x800;
+	signal_core_0(aux_core_0);
 
 	thread_mutex_init( &process_list_lock);
 	struct thread *cross_core_thread = thread_create( cross_core_thread_1, bi);

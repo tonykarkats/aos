@@ -41,7 +41,7 @@ errval_t omap_timer_init(void)
 
     struct capref pmcap;
     size_t retsize;
-    err = aos_rpc_get_dev_cap(get_init_rpc(), cp15_read_cbar(), 8092, &pmcap, &retsize);
+    err = aos_rpc_get_dev_cap(get_init_chan(), cp15_read_cbar(), 8092, &pmcap, &retsize);
     if (err_is_fail(err)) {
         DEBUG_ERR(err, "omap_timer_init");
         return err;
