@@ -212,7 +212,7 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
 
 	errval_t err;
 
-	//debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
+	// debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings

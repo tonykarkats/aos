@@ -151,7 +151,7 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
 	event_dispatch(get_default_waitset());
 
 	*retcap = chan->cap;
-	*retlen = chan->words[0];
+	*retlen = pow(2,chan->words[0]);
 
 	if (capref_is_null(chan->cap))  {
 		debug_printf("aos_rpc_get_ram_cap: Server can not handle our request!\n");
