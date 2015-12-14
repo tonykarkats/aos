@@ -11,6 +11,12 @@ static uint32_t FirstSectorofRootDir;
 static struct cnoderef cnode;
 static struct module_node * module_list_head;
 
+/**
+ * \brief This function retrieves a module from the module cache if it is available. 
+ *	  The cache significantly increases performance when the module is requested 
+ *	  more than one times.
+ * \param module_name The name of the module.
+ */
 struct module_node * get_module_from_cache(char *module_name) 
 {
 	struct module_node * module_node = module_list_head;
@@ -25,6 +31,13 @@ struct module_node * get_module_from_cache(char *module_name)
 	return NULL;
 }
 
+/**
+ * \brief This function puts a module into the cache.
+ *
+ * \param module_name The name of the module.
+ * \param module_data The data of the module.
+ * \param len The size of the module.
+ */
 void put_module_in_cache( char *module_name, char * module_data, size_t len) 
 {
 
@@ -77,6 +90,9 @@ static errval_t get_cap(lpaddr_t base, size_t size)
     assert(err_is_ok(err));
 }
 
+/**
+ * \brief Initialize the FAT-32 system.
+ */
 errval_t fat32_init(void) {
 
 	errval_t err;
@@ -124,10 +140,10 @@ errval_t fat32_init(void) {
 	BPB_NumFATs =  ((uint8_t*) buffer)[16];
 	debug_printf("Number of FATs: %d\n", BPB_NumFATs);
 
-	FATSz = 	(((uint8_t*) buffer)[39] << 24) +
-				   		(((uint8_t*) buffer)[38] << 16) +
-				   		(((uint8_t*) buffer)[37] <<  8) +
-				   		((uint8_t*) buffer)[36];
+	FATSz = 	 (((uint8_t*) buffer)[39] << 24) +
+				 (((uint8_t*) buffer)[38] << 16) +
+				 (((uint8_t*) buffer)[37] <<  8) +
+				  ((uint8_t*) buffer)[36];
 	debug_printf("Size of FAT: %d\n", FATSz);
 
 	BPB_RsvdSecCnt = (((uint8_t*) buffer)[15] <<  8) +
@@ -140,11 +156,10 @@ errval_t fat32_init(void) {
 	debug_printf("First Data Sector: %d\n", FirstDataSector);
 
 	// Calculate first cluster of root directory
-		
 	BPB_RootClus = 	(((uint8_t*) buffer)[47] << 24) +
-				   				(((uint8_t*) buffer)[46] << 16) +
-				   				(((uint8_t*) buffer)[45] <<  8) +
-				   				((uint8_t*) buffer)[44];
+				   	(((uint8_t*) buffer)[46] << 16) +
+				   	(((uint8_t*) buffer)[45] <<  8) +
+				     ((uint8_t*) buffer)[44];
 	debug_printf("First cluster of Root Directory: %d\n", BPB_RootClus);
 
 
@@ -156,6 +171,13 @@ errval_t fat32_init(void) {
 	return SYS_ERR_OK;
 }
 
+/**
+ * \brief Get the entities of a directory with a given sector number.
+ * 
+ * \params DirSector The sector number of the directory.
+ * \params dirtable The returned table of directory entries.
+ * \params dir_size The size of the returned table (Number of entries in the directory).
+ */
 errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t *dir_size) {
 
 	errval_t err;
@@ -232,13 +254,16 @@ errval_t get_dirents(uint32_t DirSector, struct aos_dirent **dirtable, uint32_t 
 
 }
 
-/* This function lists the entries of the pathname specified.
- * If the pathname is a directory a dirtable is returned.
- * If the pathname corresponds to a file then dirtable = NULL is returned
+/**
+ * \brief This function lists the entries of the pathname specified.
+ * 		  If the pathname is a directory a dirtable is returned.
+ * 	 	  If the pathname corresponds to a file then dirtable = NULL is returned.
  */
 
 errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *size) {
 
+
+	errval_t err;
 
 	// Split up the path and recursively look into the directories until we find the file
 	// or directory
@@ -250,9 +275,6 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 			path[i] = toupper((int) c);
 	}
 	
-//	debug_printf("Will search for %s\n", path);
-	errval_t err;
-
 	//Get root dirents to start with
   	uint32_t size_root;
 	struct aos_dirent *dirtable_root = NULL;
@@ -339,8 +361,12 @@ errval_t list(const char * dir_path, struct aos_dirent **dirtable, uint32_t *siz
 	return SYS_ERR_OK;
 }
 
-/* Returns the contents of the FAT32 entry for the given cluster_nr */
-
+/**
+ * \brief Returns the contents of the FAT32 entry for the given cluster_nr
+ * 
+ * \params cluster_nr The cluster number of the requested cluster.
+ * \return The FAT table entry value corresponding to this cluster number.
+ */
 uint32_t get_fat_entry(uint32_t cluster_nr) {
 
 	uint32_t FATOffset = cluster_nr * 4;
@@ -355,21 +381,22 @@ uint32_t get_fat_entry(uint32_t cluster_nr) {
  	//uint32_t FAT32ClusEntryVal =   (*((uint32_t *)(secBuff + ThisFATEntOffset))) & 0x0FFFFFFF;
 	uint32_t FAT32ClusEntryVal = (*((uint32_t *) &secBuff[ThisFATEntOffset])) & 0x0FFFFFFF;
 	
-	if (FAT32ClusEntryVal >= 0x0FFFFFF8) {
-		; //debug_printf("Reached end!\n");
-	}	
-
 	free(secBuff);
 	
 	return FAT32ClusEntryVal;
 }
 
-/* This function takes a cluster number and returns the respective data from the data section */
+/**
+ * \brief  This function reads the data corresponding to a specific cluster number
+ * 		   from the data section.
+ * \params cluster_nr The cluster number of the cluster.
+ * \params buf The buffer to be filled with the data.
+ */
 
-errval_t get_data(uint32_t cluster_nr, void *buf) {
+errval_t get_data(uint32_t cluster_nr, void *buf)
+{
 
 	errval_t err;
-	//debug_printf("Buff addr  = %p\n", buf);
 	
 	uint32_t sector = ((cluster_nr - 2) * BPB_SecPerClus) + FirstDataSector;
 
@@ -379,18 +406,18 @@ errval_t get_data(uint32_t cluster_nr, void *buf) {
 		return AOS_ERR_FAT_FILE_NOT_FOUND;
 	}
 	
-	//char * vbuf = (char *)buf;
-	//for (int i = 0; i < 512 ; i++) {
-	//	debug_printf("   %c\n", vbuf[i] );
-	//}	
-		
-
 	return SYS_ERR_OK;
 }
 
-/* Given a valid cluster_nr for the start of the file this function:
- * - Reads the actual data from the data section for that cluster_nr
- * - Retrieves the next FAT entry from the FAT table and repeats until EOC.
+/* \brief Given a valid cluster_nr for the start of the file this function:
+ * 		  -> Reads the actual data from the data section for that cluster_nr.
+ * 		  -> Retrieves the next FAT entry from the FAT table and repeats until EOC.
+ * \params filename The full pathname of the file to read.
+ * \params buf The buffer to be filled in with the data.
+ * \params position The position inside the file that we want to read from.
+ * \params size The size that we want to read.
+ * \params retsize The returned size that was read.
+ * \params Flag to indicate whether the whole file should be read. In this case postion and size don't matter.
  */
 
 errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t size, uint32_t * retsize, bool read_all_file) {
@@ -475,9 +502,12 @@ errval_t read_file(const char *filename, void **buf, uint32_t position, uint32_t
 
 
 
-/* This function searches the filetree recursively until it finds the filename requested.
- * It also return the filesize. Returns -1 if file was not found. */
-
+/**
+ *  \brief This function searches the filetree recursively until it finds the filename requested.
+ *  \params filename The name of the file.
+ *  \params filesize The returned filesize.
+ *	\returns The first cluster of the file or -1 if the file was not found.
+ */
 uint32_t get_first_cluster(const char *filename, uint32_t *filesize) {
 	
 	errval_t err;
