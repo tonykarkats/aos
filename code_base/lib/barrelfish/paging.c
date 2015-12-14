@@ -54,6 +54,10 @@ static errval_t arml2_alloc(struct capref *ret)
     return SYS_ERR_OK;
 }
 
+/**
+ * \brief This function returns the capability to the l2 table
+ *        given a valid virual address
+ */
 struct capref get_l2_table(lvaddr_t vaddr, struct paging_state * st){
 
 	int l1_index = ARM_L1_USER_OFFSET(vaddr);
@@ -61,6 +65,10 @@ struct capref get_l2_table(lvaddr_t vaddr, struct paging_state * st){
 	return st->mem_tree->l2_tables[l1_index];
 }
 
+/**
+ * \brief This function returns whether the virtual address given 
+ *        is mapped into the paging state.
+ */
 bool is_l2_mapped(lvaddr_t vaddr, struct paging_state * st) {
 	
 	int l1_index = ARM_L1_USER_OFFSET(vaddr);
@@ -68,17 +76,22 @@ bool is_l2_mapped(lvaddr_t vaddr, struct paging_state * st) {
 	return st->mem_tree->l2_maps[l1_index];	
 }
 
-errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st){
+/**
+ * \brief This function tries to map a given virtual address to the
+ *        current paging state.
+ */
+errval_t map_l2(lvaddr_t vaddr, struct paging_state * st)
+{
 
-	errval_t err;
+    errval_t err;
     int l1_index = ARM_L1_USER_OFFSET(vaddr);
-	struct capref l2_table;
+    struct capref l2_table;
     struct capref l1_table = st->pdir;
 
 //	debug_printf("Mapping l2 table at l1... For l1 index = %d\n", l1_index);
-	err = arml2_alloc(&l2_table);
+    err = arml2_alloc(&l2_table);
 	if (err_is_fail(err)) {
-		debug_printf("map_l2: Error in allocating cab for l2 table!\n");
+		debug_printf("map_l2: Error in allocating cap for l2 table!\n");
 		return err_push(err, LIB_ERR_VNODE_MAP);
 	}
 
@@ -94,7 +107,22 @@ errval_t map_l2 (lvaddr_t vaddr, struct paging_state * st){
 	return SYS_ERR_OK;
 }
 
-errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st) {
+
+/**
+ * \brief This function maps a user provided frame with a specific size and
+ *		  offset to the paging state. Our paging state tree is not aware of
+ *        this mapping
+ * \param vaddr The virtual address to be mapped.
+ * \param usercap The user provided frame.
+ * \param off The offset from which we start the mapping of the cap.
+ * \param size The size to map.
+ * \param mapping_flags The flags to be used for the mapping.
+ * \param st The paging state.
+ * \return Error status
+ */
+errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap,
+									 uint64_t off, uint64_t size, int mapping_flags,
+									 struct paging_state* st) {
 
 	errval_t err;
 	//debug_printf("map_user_frame_outside_tree: Initiating...\n");
@@ -208,11 +236,16 @@ errval_t map_user_frame_outside_tree(lvaddr_t vaddr, struct capref usercap, uint
 	return SYS_ERR_OK;
 }
 
+
+/**
+ * \brief This function maps a user provided frame with a specific size and
+ *		  offset to the paging state.
+ */
 errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state* st) {
 
 	errval_t err;
 
-	// debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
+	//debug_printf("map_user_frame: Will map user frame for address %p offset %" PRIu64 " size %" PRIu64 " \n", vaddr, off, size);
 	
 	// Arbitary frame mapped by user at low addresses. 
 	// Our tree DOES not keep the user frames for those mappings
@@ -239,7 +272,16 @@ errval_t map_user_frame(lvaddr_t vaddr, struct capref usercap, uint64_t off, uin
     return SYS_ERR_OK;
 }
 
-errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t size, int mapping_flags, struct paging_state * st) {
+
+/**
+ * \brief This function maps a user provided frame with a specific size and
+ *		  offset to the paging state. If no usercap is provided then we
+ *		  insert our mapping in the page tree.
+ */
+
+errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off,
+				  uint64_t size, int mapping_flags, struct paging_state * st)
+{
 	
 	errval_t err;
 	
@@ -255,7 +297,6 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 	}
 
 	int l2_index = ARM_L2_USER_OFFSET(vaddr);
-    //int l1_index = ARM_L1_USER_OFFSET(vaddr);
 
     if (!is_l2_mapped(vaddr, st)) {
 		//debug_printf("MAPPING L2 = %d!\n", ARM_L1_USER_OFFSET(vaddr));
@@ -265,12 +306,8 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 		}
 	}
 
-	
-	thread_mutex_lock(&st->paging_tree_lock);
 	rb_red_blk_node* node = RBExactQuery(st->mem_tree, &vaddr);
 	memory_chunk* chunk = (memory_chunk*) node->info; 
-	thread_mutex_unlock(&st->paging_tree_lock);
-
 	struct capref l2_table = get_l2_table(vaddr, st);
 
 	// Logic for mapping frames created on the fly (on pagefaults)
@@ -342,17 +379,21 @@ errval_t map_page(lvaddr_t vaddr, struct capref usercap, uint64_t off, uint64_t 
 }
 
 
-// Page fault handler that installs frames when a page fault
-// occurs and keeps track of the virtual address space.
+/**
+ * \brief Page fault handler that installs frames when a page fault
+ *		  occurs and keeps track of the virtual address space.	  
+ */
 static void exception_handler(enum exception_type type,
 			      int subtype,
 			      void *addr,
 			      arch_registers_state_t *regs,
 			      arch_registers_fpu_state_t *fpuregs) 
 {
-		
+	
+	thread_mutex_lock(&get_current_paging_state()->paging_tree_lock);
+	
 	if (type == EXCEPT_PAGEFAULT) {
-		// debug_printf("Pagefault exception at address %p\n", addr);
+		//debug_printf("Pagefault exception at address %p\n", addr);
 
 		if (addr == NULL){
 			debug_printf("exception_handler: NULL pointer!\n");
@@ -364,8 +405,9 @@ static void exception_handler(enum exception_type type,
 			exit(2);
 		}		
 
+
+	
 		if ( !is_virtual_address_mapped(get_current_paging_state()->mem_tree, (lvaddr_t) addr)) {
-			
 			debug_printf("exception_handler: Address not mapped!\n");
 			exit(2);			
 		} 
@@ -378,14 +420,15 @@ static void exception_handler(enum exception_type type,
 			}
 		}
 		
+		thread_mutex_unlock(&get_current_paging_state()->paging_tree_lock);
 	}
 }
 
 
-/* This function initializes our paging state tree. In order to initialize the 
+/* \brief This function initializes our paging state tree. In order to initialize the 
  * tree we use SafeMalloc which is essentially an allocation from a static 
- * array. We initialize the first chunk to [0-1GB] */
-
+ * array. We initialize the first chunk to [0-1GB]
+ */
 errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
         struct capref pdir)
 {
@@ -429,6 +472,7 @@ errval_t paging_init_state(struct paging_state *st, lvaddr_t start_vaddr,
 	return SYS_ERR_OK;
 }
 
+// Exception stack for the thread.
 static char e_stack[S_SIZE];
 static int e_stack_head = 0;
 
@@ -455,15 +499,11 @@ errval_t paging_init(void)
 
 
 /*
- * Mallos a new stack for each new thread
- * and initializes the thread exception stack.
- * Ask the TAs about this.
+ * \brief Mallocs a new stack for each new thread
+ * 		  and initializes the thread exception stack.
  */
 void paging_init_onthread(struct thread *t)
 {
-    // TODO: setup exception handler for thread `t'.
-	// debug_printf("paging_init_onthread: Initializing...\n");
-	    
 	t->exception_handler = exception_handler;
 
 	t->exception_stack = e_stack + e_stack_head;
@@ -488,9 +528,9 @@ errval_t paging_region_init(struct paging_state *st, struct paging_region *pr, s
     pr->base_addr    = (lvaddr_t)base;
     pr->current_addr = pr->base_addr;
     pr->region_size  = size;
-    // TODO: maybe add paging regions to paging state?
     return SYS_ERR_OK;
 }
+
 /**
  * \brief return a pointer to a bit of the paging region `pr`.
  * This function gets used in some of the code that is responsible
@@ -531,15 +571,22 @@ errval_t paging_region_unmap(struct paging_region *pr, lvaddr_t base, size_t byt
     return SYS_ERR_OK;
 }
 
+/**
+ * \brief This function allocates a frame of the requested size 
+ * 
+ * \param bytes The size of the requested frame in bytes.
+ * \param current_frame The returned cap to the frame.
+ * \return Error code.
+ */
 errval_t get_frame(size_t bytes, struct capref* current_frame)
 {
 	struct capref ram;
 	size_t alloc_bits;
 	errval_t err;
 
-	//alloc_bits = log2floor(bytes);
 	alloc_bits = log2ceil(bytes);
 	
+	// debug_printf("get_frame: Requesting for size %d\n", alloc_bits);
 	
 	err = ram_alloc(&ram, alloc_bits);
     if (err_is_fail(err)){ 
@@ -549,7 +596,9 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 
 	cslot_t slots_needed = bytes / BASE_PAGE_SIZE;
 	cslot_t slots;
-   		
+   	
+   	// debug_printf("get_frame: Need %d slots\n", slots_needed);
+   	
 	if (slots_needed > 1) {
 		/* get CNode and retype into it */
 		struct capref nextcncap; struct cnoderef nextcn;
@@ -578,9 +627,18 @@ errval_t get_frame(size_t bytes, struct capref* current_frame)
 		debug_printf("get_frame: error in cap_destroy!\n");
 		return err_push(err,LIB_ERR_CAP_DESTROY);
 	}
-
-	return SYS_ERR_OK;
+ 
+    return SYS_ERR_OK;
 }
+
+
+/**
+ * \brief This function allocates a buffer of a given size.
+ * 
+ * \param st The paging state to use.
+ * \param buf Return address to the start of the buffer.
+ * \return bytes Size in bytes to allocate.
+ */
 
 errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 {
@@ -588,13 +646,10 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	lvaddr_t vaddr;
 	int frames_needed, size_of_last_frame;
 	bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
-  
-
-	//debug_printf("Before getting the lock!%zu\n");
- 
+   
 	thread_mutex_lock(&st->paging_tree_lock);
  
-	//debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
+	// debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
     
 	vaddr = allocate_memory(st->mem_tree, bytes);
 	if (vaddr == -1) {
@@ -603,8 +658,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
 	}
 
 	//debug_printf("paging_alloc: Memory allocated at %p\n",vaddr);
-    
-	node = RBExactQuery(st->mem_tree, &vaddr);
+    node = RBExactQuery(st->mem_tree, &vaddr);
     struct memory_chunk* chunk = (struct memory_chunk*) node->info;
   
     if (bytes <= (1024*1024)) {
@@ -641,12 +695,6 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     return SYS_ERR_OK;
 }
 
-errval_t paging_free(struct paging_state *st, void *buf) 
-{
-	// TODO: Please fill me if you want to
-	// pass the stress tests :D
-	return SYS_ERR_OK;
-}
 /**
  * \brief map a user provided frame, and return the VA of the mapped
  *        frame in `buf`.
@@ -693,9 +741,6 @@ errval_t paging_map_fixed_attr_args(struct paging_state *st, lvaddr_t vaddr,
 errval_t paging_map_fixed_attr(struct paging_state *st, lvaddr_t vaddr,
         struct capref frame, size_t bytes, int flags)
 {
-	//debug_printf("paging_map_fixed_attr: Initiating...\n");
-
-	
 	return map_page(vaddr, frame, 0, bytes, flags, st);
 }
 

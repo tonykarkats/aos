@@ -21,6 +21,11 @@
 
 static struct aos_rpc memory_channel;
 
+/**
+* \brief Send handler. This handler re-registers a new handler when
+* 	 the channel is able to send again.
+*
+*/
 static void send_handler(void *arg) {
 
 	errval_t err;
@@ -35,6 +40,11 @@ static void send_handler(void *arg) {
 	return; 
 }
 
+/**
+* \brief Receive handler. This handler receives the message and 
+* 	 re-registers the handler so that it can receive again.
+*
+*/
 static void recv_handler(void *arg) 
 {
 //	debug_printf("recv_handler: Got a message or a cap!");
@@ -69,6 +79,10 @@ static void recv_handler(void *arg)
 
 }
 
+/**
+* \brief Sends a string over the given RPC channel.
+*
+*/
 errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 {
 	errval_t err;
@@ -95,8 +109,15 @@ errval_t aos_rpc_send_string(struct aos_rpc *chan, const char *string)
 	return SYS_ERR_OK;
 }
 
-
-
+/**
+* \brief Sends a request over the RPC channel for a RAM capability.
+*
+* \param chan The RPC Channel
+* \param request_bits The requested bits to allocate
+* \param retcap The returned cap to fill in.
+* \param ret_bits The returned bits.
+*
+*/
 errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
                              struct capref *retcap, size_t *ret_bits)
 {
@@ -129,6 +150,17 @@ errval_t aos_rpc_get_ram_cap(struct aos_rpc *chan, size_t request_bits,
 
 }
 
+/**
+* \brief Sends a request over the RPC channel for a device capability.
+*        This call can be used in order to request a part of a larger
+*		 capability from the server.
+*
+* \param chan The RPC Channel
+* \param paddr The physical address where the cap starts.
+* \param length The length of the allocated device capability,
+* \param retcap The returned capability.
+*
+*/
 errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
                              size_t length, struct capref *retcap,
                              size_t *retlen)
@@ -163,6 +195,14 @@ errval_t aos_rpc_get_dev_cap(struct aos_rpc *chan, lpaddr_t paddr,
 	return SYS_ERR_OK;
 }
 
+/**
+* \brief Sends a request over the RPC channel in order to get a character
+*		 from the serial input.
+*
+* \param chan The RPC Channel
+* \param paddr The returned character from the input.
+*
+*/
 errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 {
    	errval_t err;
@@ -186,6 +226,14 @@ errval_t aos_rpc_serial_getchar(struct aos_rpc *chan, char *retc)
 }
 
 
+/**
+* \brief Sends a request over the RPC channel in order to print a character
+*		 to the serial output.
+*
+* \param chan The RPC Channel
+* \param paddr The character to print.
+*
+*/
 errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 {
 	errval_t err;
@@ -205,6 +253,15 @@ errval_t aos_rpc_serial_putchar(struct aos_rpc *chan, char c)
 	return SYS_ERR_OK;
 }
 
+/**
+* \brief Sends a request over the RPC channel in order to spawn a process
+*
+* \param chan The RPC Channel
+* \param name The name of the process to spawn.
+* \param core The core in which to spawn the process.
+* \param newpid The returned pid of the process. 
+*
+*/
 errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
                                coreid_t core ,domainid_t *newpid)
 {
@@ -250,25 +307,15 @@ errval_t aos_rpc_process_spawn(struct aos_rpc *chan, char *name,
     return SYS_ERR_OK;
 }
 
-errval_t aos_rpc_process_kill_process(struct aos_rpc *chan, domainid_t pid)
-{
-    errval_t err;
-
-	while(true) {
-		event_dispatch(&chan->s_waitset);
-		err = lmp_chan_send2(&chan->rpc_channel, LMP_SEND_FLAGS_DEFAULT, chan->rpc_channel.local_cap, AOS_RPC_KILL, (uint32_t) pid);
-       	if ((err_no(err) != 17)&&(err_is_fail(err))) {	
-			debug_printf("aos_rpc_process_spawn: Error in killing process!\n");
-       		return err_push(err, AOS_ERR_LMP_SPAWN_DOM);
-    	}
-		else if (err_is_ok(err))
-			break;	
-	}
-	
-    return SYS_ERR_OK;
-}
-
-
+/**
+* \brief Sends a request over the RPC channel in order to get the name
+* 		 of a process with a given pid.
+*
+* \param chan The RPC Channel
+* \param pid The pid of the process.
+* \param core The returned name of the process.
+*
+*/
 errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
                                   char **name)
 {
@@ -299,6 +346,15 @@ errval_t aos_rpc_process_get_name(struct aos_rpc *chan, domainid_t pid,
     return SYS_ERR_OK;
 }
 
+/**
+* \brief Sends a request over the RPC channel in order to get all the
+* 		 pids of the currently running processes.
+*
+* \param chan The RPC Channel.
+* \param pids_returned An array of the returned pids.
+* \param core The returned count of pids (length of pids_returned array).
+*
+*/
 errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
                                       domainid_t **pids_returned, size_t *pid_count)
 {
@@ -337,6 +393,15 @@ errval_t aos_rpc_process_get_all_pids(struct aos_rpc *chan,
 	return SYS_ERR_OK;
 }
 
+/**
+* \brief This RPC request is made when a process is terminating so that the
+*	 server can remove it from the process list.
+*
+* \param chan The RPC Channel.
+* \param did The domain id of the process.
+* \param exit_status The exit status of the process.
+*
+*/
 errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_status) 
 {
 	errval_t err;
@@ -361,6 +426,14 @@ errval_t aos_rpc_terminating(struct aos_rpc *chan, domainid_t did, int exit_stat
 	return SYS_ERR_OK;
 }
 
+/**
+* \brief Send a request over the rpc channel to open a file.
+*
+* \param chan The RPC Channel.
+* \param path The complete path of the filename.
+* \param fd The returned file descriptor of the open file.
+*
+*/
 errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd)
 {
 	errval_t err;
@@ -397,6 +470,17 @@ errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd)
     return SYS_ERR_OK;
 }
 
+/**
+* \brief Send a request over the RPC channel to read a directory or a file.
+*	 If the path specified corresponds to a file then only the entry
+*	 of the file is returned.
+*
+* \param chan The RPC Channel.
+* \param path The path to the directory or the file.
+* \param dir The returned table of directory entries.
+* \param elem_count The count of the directory elements.
+*
+*/
 errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
                          struct aos_dirent **dir, size_t *elem_count)
 {
@@ -440,6 +524,18 @@ errval_t aos_rpc_readdir(struct aos_rpc *chan, char* path,
     return SYS_ERR_OK;
 }
 
+/**
+* \brief Send a request over the RPC channel to read a file.
+*
+* \param chan The RPC Channel.
+* \param fd The file descriptor of the file.
+* \param position The starting offset from which to read. 
+* \param size The number of bytes to read from the file.
+* \param buf The buffer that will be filled with the contents of the file.
+*	     This has to be allocated by the user.
+* \param buflen Then number of total bytes read.
+*
+*/
 errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size,
                       void** buf, size_t *buflen)
 {
@@ -486,6 +582,12 @@ errval_t aos_rpc_read(struct aos_rpc *chan, int fd, size_t position, size_t size
 	return SYS_ERR_OK;
 }
 
+/**
+* \brief Send a request over the RPC channel to close a file.
+*
+* \param chan The RPC Channel.
+* \param fd The file descriptor of the file.
+*/
 errval_t aos_rpc_close(struct aos_rpc *chan, int fd)
 {
    	errval_t err;
@@ -518,22 +620,28 @@ errval_t aos_rpc_close(struct aos_rpc *chan, int fd)
 errval_t aos_rpc_write(struct aos_rpc *chan, int fd, size_t position, size_t *size,
                        void *buf, size_t buflen)
 {
-    // TODO (milestone 7): implement file write
     return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_create(struct aos_rpc *chan, char *path, int *fd)
 {
-    // TODO (milestone 7): implement file create
     return SYS_ERR_OK;
 }
 
 errval_t aos_rpc_delete(struct aos_rpc *chan, char *path)
 {
-    // TODO (milestone 7): implement file delete
     return SYS_ERR_OK;
 }
 
+
+/**
+* \brief Send a request over the RPC channel to get the domain id of a given process.
+*
+* \param chan The RPC Channel.
+* \param name The name of the process.
+* \param did The returned domain id.
+* \param shared_frame The capability to the shared frame.
+*/
 errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * did, struct capref *shared_frame) 
 {
 	errval_t err;
@@ -559,7 +667,7 @@ errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * d
 			break;
 	}
 
-    event_dispatch(get_default_waitset());
+    	event_dispatch(get_default_waitset());
 
 	*did = chan->words[0];
 	*shared_frame = chan->cap;
@@ -572,6 +680,12 @@ errval_t aos_rpc_get_did (struct aos_rpc *chan, const char* name, domainid_t * d
     return SYS_ERR_OK;
 
 }
+
+/**
+* \brief Initializes the RPC system.
+*
+*/
+
 errval_t aos_rpc_init(int slot_number)
 {
 	errval_t err;
