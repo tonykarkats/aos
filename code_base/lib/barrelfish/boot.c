@@ -18,14 +18,17 @@ static errval_t monitor_elfload_allocate(void *state, genvaddr_t base,
 {
     struct monitor_allocate_state *s = state;
 	
-	debug_printf("Returning at retbase the address %p\n", (char *)s->vbase + base - s->elfbase);
-
+    debug_printf("Returning at retbase the address %p\n", (char *)s->vbase + base - s->elfbase);
 	
     *retbase = (char *)s->vbase + base - s->elfbase;
     return SYS_ERR_OK;
 }
 
-static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
+/**
+ * \brief This function prepares the boot of the second core by allocating
+ *        a frame for it and mapping it to our own vspace.
+ */
+static errval_t cpu_memory_prepare(size_t *size, struct capref * cap_ret,
 								   void ** buf_ret, struct frame_identity *frameid)
 {
 	errval_t err;
@@ -59,6 +62,11 @@ static errval_t cpu_memory_prepare(size_t * size, struct capref * cap_ret,
 	return SYS_ERR_OK;
 }
 
+
+/**
+ * \brief This function loads the ELF file and relocates it to a given virtual address.
+ *
+ */
 static errval_t
 elf_load_and_relocate(lvaddr_t blob_start, 
 					  size_t blob_size,
@@ -104,6 +112,14 @@ elf_load_and_relocate(lvaddr_t blob_start,
 	
     return SYS_ERR_OK;
 }
+
+/**
+ * \brief Spawns the second core on the pandaboard.
+ * 
+ * \params bi The bootinfo struct.
+ * \params aux_core_0 The physical address of the first communication register for the processors.
+ * \params aux_core_1 The physical address of the second communication register for the processors.
+ */
 
 errval_t spawn_second_core(struct bootinfo *bi, lvaddr_t aux_core_0, lvaddr_t aux_core_1) 
 {
@@ -197,8 +213,8 @@ errval_t spawn_second_core(struct bootinfo *bi, lvaddr_t aux_core_0, lvaddr_t au
     core_data->elf.addr = cpu_mem.frameid.base + BASE_PAGE_SIZE + (uintptr_t)head32->e_shoff;
     core_data->elf.num  = head32->e_shnum;
 	
-	core_data->mods_addr = bi->mod_start;
-	core_data->mods_count = bi->mod_count;
+    core_data->mods_addr = bi->mod_start;
+    core_data->mods_count = bi->mod_count;
 	core_data->mmap_addr = bi->mmap_addr;
 	core_data->mmap_length = bi->mmap_length;
 
@@ -216,6 +232,12 @@ errval_t spawn_second_core(struct bootinfo *bi, lvaddr_t aux_core_0, lvaddr_t au
 
 	return SYS_ERR_OK;
 }
+
+/**
+ * \brief Prints all the available modules in the bootinfo structure
+ * 
+ * \params bi The bootinfo structure given.
+ */
 
 void print_modules(struct bootinfo *bi)
 {
