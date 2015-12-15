@@ -21,10 +21,10 @@
 /***********************************************************************/
 
 rb_red_blk_tree* RBTreeCreate(int (*CompFunc) (const void*,const void*),
-			      void (*DestFunc) (void*),
-			      void (*InfoDestFunc) (void*),
-			      void (*PrintFunc) (const void*),
-			      void (*PrintInfo)(const void*))
+    		      void (*DestFunc) (void*),
+    		      void (*InfoDestFunc) (void*),
+    		      void (*PrintFunc) (const void*),
+    		      void (*PrintInfo)(const void*))
 {
     rb_red_blk_tree* newTree;
     rb_red_blk_node* temp;
@@ -215,7 +215,7 @@ rb_red_blk_node * RBTreeInsert(rb_red_blk_tree* tree, void* key, void* info)
                 x->parent->parent->red=1;
                 x=x->parent->parent;
             }
-	    else {
+        else {
                 if (x == x->parent->right) {
                     x=x->parent;
                     LeftRotate(tree,x);
@@ -225,7 +225,7 @@ rb_red_blk_node * RBTreeInsert(rb_red_blk_tree* tree, void* key, void* info)
             RightRotate(tree,x->parent->parent);
             } 
         }
-	else { /* case for x->parent == x->parent->parent->right */
+    else { /* case for x->parent == x->parent->parent->right */
             y=x->parent->parent->left;
             if (y->red) {
                 x->parent->red=0;
@@ -233,7 +233,7 @@ rb_red_blk_node * RBTreeInsert(rb_red_blk_tree* tree, void* key, void* info)
                 x->parent->parent->red=1;
                 x=x->parent->parent;
             }
-	    else {
+        else {
                 if (x == x->parent->left) {
                     x=x->parent;
                     RightRotate(tree,x);
@@ -655,7 +655,7 @@ stk_stack* RBEnumerate(rb_red_blk_tree* tree, void* low, void* high)
         if ( 1 == (tree->Compare(x->key,high)) ) { /* x->key > high */
             x=x->left;
         }
-	     else {
+         else {
         lastBest=x;
         x=x->right;
       }
@@ -729,7 +729,7 @@ rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, s
                 else {
                     if (chunk->size > bytes) {
                         //debug_debug_printf("find_memory_chunk:   ----- Memory
-			// area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
+    		// area of %d can fit into memory chunk that starts at %p\n", bytes, *((lvaddr_t*)x->key));
                         init_guard = x;
                     }
                     else

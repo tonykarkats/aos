@@ -13,203 +13,237 @@ static volatile lvaddr_t uart3_fcr;
 static volatile lvaddr_t uart3_ier;
 static volatile lvaddr_t uart3_lcr;
 
-void uart_initialize(lvaddr_t mapped_address){
+/**
+ * \brief Initializes the UART device by writing to the required registers.
+ *
+ * \param mapped_address The address to where UART has been mapped
+ */
+void uart_initialize(lvaddr_t mapped_address)
+{
+    uart3_base = mapped_address;
+    uart3_thr = mapped_address + 0x00;
+    uart3_ier = mapped_address + 0x04;
+    uart3_lsr = mapped_address + 0x14;
+    uart3_fcr = mapped_address + 0x08;
+    uart3_lcr = mapped_address + 0x0C;
 
-	uart3_base = mapped_address;
-	uart3_thr = mapped_address + 0x00;
-	uart3_ier = mapped_address + 0x04;
-	uart3_lsr = mapped_address + 0x14;
-	uart3_fcr = mapped_address + 0x08;
-	uart3_lcr = mapped_address + 0x0C;
-
-	
-	*(char *) uart3_ier = 0;
-	*(char *) uart3_fcr = 0xf1;
-	*(char *) uart3_lcr = 0x03;
+    *(char *) uart3_ier = 0;
+    *(char *) uart3_fcr = 0xf1;
+    *(char *) uart3_lcr = 0x03;
 }
 
+/**
+ * \brief Prints a character on the serial output.
+ */
 void serial_putchar(char c) {
 
-	if (c == '\n')
-		serial_putchar('\r');
+    if (c == '\n')
+    	serial_putchar('\r');
 
-	while (! (((* (char * ) uart3_lsr )) & 0x20));
+    while (! (((* (char * ) uart3_lsr )) & 0x20));
 
-	*(char *)uart3_thr = c;
+    *(char *)uart3_thr = c;
 }
 
+/**
+ * \brief Gets a character from the serial input
+ */
 char serial_getchar(void) {
 
-	while (! ((* (char *) uart3_lsr & 0x01)));
+    while (! ((* (char *) uart3_lsr & 0x01)));
 
-	return (char) *(char *) uart3_thr;
+    return (char) *(char *) uart3_thr;
 }
 
+/**
+ * \brief Prints a string on the serial output
+ */
 void serial_putstring(char *str) {
+	//TODO Termination??
+    int printed = 0;
+    
+    while (1) {
+    	if ( *(str + printed) == '\0')
+    		break;
 
-	int printed = 0;
-	
-	while (1) {
-		if ( *(str + printed) == '\0')
-			break;
-
-		serial_putchar(*(str + printed)); 
-		
-		printed++;
-	}
-
+    	serial_putchar(*(str + printed)); 
+    	
+    	printed++;
+    }
 }
+
+/**
+ * \brief This is the code for the thread that polls on the serial ring 
+ *        buffer and when a character is found, sends it over to the remote
+ *        endpoint.
+ */
 
 int get_char_thread(void *arg) 
 {
-	errval_t err;
-	struct ring_arguments* r = (struct ring_arguments *) arg;	
-	struct serial_ring_buffer  * ring = r->r_b;
-	struct serial_capref_ring_buffer * capref_buffer = r->r_c;
-	struct thread_cond * char_cond = r->char_wait_cond;
-	struct thread_cond * capref_cond = r->capref_wait_cond;
-	
-	debug_printf("get_char_thread: Initiating...\n");
-	char in_c;
+    errval_t err;
+    struct ring_arguments* r = (struct ring_arguments *) arg;	
+    struct serial_ring_buffer  * ring = r->r_b;
+    struct serial_capref_ring_buffer * capref_buffer = r->r_c;
+    struct thread_cond * char_cond = r->char_wait_cond;
+    struct thread_cond * capref_cond = r->capref_wait_cond;
+    
+    debug_printf("get_char_thread: Initiating...\n");
+    char in_c;
 
-	while(true) {	
-		// debug_printf("Will read a char and a capref and transmit it!\n");
-		struct capref remep;
-		struct capref *p_remep;
+    while(true) {	
+    	// debug_printf("Will read a char and a capref and transmit it!\n");
+    	struct capref remep;
+    	struct capref *p_remep;
 
-		//debug_printf("get_char_thread: Character read.. going to read capref!\n");
-		while(true) {
-			p_remep = read_capref_from_ring(capref_buffer, &remep);	
-			if (p_remep != NULL)
-				break;
-			thread_cond_wait(capref_cond, NULL);
-		}
+    	//debug_printf("get_char_thread: Character read.. going to read capref!\n");
+    	while(true) {
+    		p_remep = read_capref_from_ring(capref_buffer, &remep);	
+    		if (p_remep != NULL)
+    			break;
+    		thread_cond_wait(capref_cond, NULL);
+    	}
 
-		while(true) {
-			char * ret_char = read_from_ring(ring, &in_c);
-			if (ret_char != NULL){
-				break;
-			}	
-			thread_cond_wait(char_cond, NULL);
-		}
-			
-		if (in_c != 13)
-			serial_putchar(in_c);
-		else { 
-			serial_putchar('\n');
-			in_c = '\n';
-		}
-	
-		err = lmp_ep_send1(remep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
-		if (err_is_fail(err)) {
-				DEBUG_ERR(err,"get_char_thread: Can not send character back to client!\n");
-		}	
+    	while(true) {
+    		char * ret_char = read_from_ring(ring, &in_c);
+    		if (ret_char != NULL){
+    			break;
+    		}	
+    		thread_cond_wait(char_cond, NULL);
+    	}
+    		
+    	if (in_c != 13)
+    		serial_putchar(in_c);
+    	else { 
+    		serial_putchar('\n');
+    		in_c = '\n';
+    	}
+    
+    	err = lmp_ep_send1(remep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, in_c);
+    	if (err_is_fail(err)) {
+    			DEBUG_ERR(err,"get_char_thread: Can not send character back to client!\n");
+    	}	
 
-		cap_destroy(remep);
-	}
+    	cap_destroy(remep);
+    }
 
-	return 1;
+    return 1;
 }
 
+/**
+ * \brief This is the code for the thread that polls on the serial input
+ *        and when it finds a character it write it to the ring buffer
+ */
 int poll_serial_thread(void * arg) {
 
-	struct serial_ring_buffer * ring = ( (struct ring_arguments *) arg )->r_b;
-	char c;
-	struct thread_cond * char_cond = ( (struct ring_arguments *) arg )->char_wait_cond;
+    struct serial_ring_buffer * ring = ( (struct ring_arguments *) arg )->r_b;
+    char c;
+    struct thread_cond * char_cond = ( (struct ring_arguments *) arg )->char_wait_cond;
  
-	while(1) {
-		thread_yield();
-		c = serial_getchar();
-		//debug_printf("poll_serial_thread: Got input from user c = %c will put it at tail %d\n", c, ring->tail);
-		bool ret = write_to_ring(ring, &c);
-		thread_cond_signal(char_cond);
-		if (!ret) 
-			; //debug_printf("poll_serial_thread: Ring buffer is full ! User input is dropped \n!");
-	}
+    while(1) {
+    	thread_yield();
+    	c = serial_getchar();
+    	//debug_printf("poll_serial_thread: Got input from user c = %c will put it at tail %d\n", c, ring->tail);
+    	bool ret = write_to_ring(ring, &c);
+    	thread_cond_signal(char_cond);
+    	if (!ret) 
+    		; //debug_printf("poll_serial_thread: Ring buffer is full ! User input is dropped \n!");
+    }
 
-	return 1;	
+    return 1;	
 }
 
 void initialize_capref_ring(struct serial_capref_ring_buffer * ring) {
 
-	ring->head = 0;
-	ring->tail = 0;
+    ring->head = 0;
+    ring->tail = 0;
 }
 
 void initialize_ring(struct serial_ring_buffer* ring) {
 
-	ring->head = 0;
-	ring->tail = 0;
+    ring->head = 0;
+    ring->tail = 0;
 
 }
 
+/**
+ * \brief Reads a capability ref from the ring buffer
+ */
 struct capref * read_capref_from_ring(struct serial_capref_ring_buffer * ring, struct capref * cap) {
 
-	
-	size_t head = ring->head;
-	size_t tail = ring->tail;
+    
+    size_t head = ring->head;
+    size_t tail = ring->tail;
 
-	if (head == tail) {
-		//debug_printf("NULL CAPREF!\n");
-		return NULL;
-	}
-		
-	*cap = ring->buffer[head];
-	ring->head = (head+1) % INPUT_BUF_SIZE;
-	
-	return cap;
+    if (head == tail) {
+    	//debug_printf("NULL CAPREF!\n");
+    	return NULL;
+    }
+    	
+    *cap = ring->buffer[head];
+    ring->head = (head+1) % INPUT_BUF_SIZE;
+    
+    return cap;
 }
 
+/**
+ * \brief Writes a capability ref to the ring buffer
+ */
 bool write_capref_to_ring (struct serial_capref_ring_buffer * ring, struct capref * cap) {
 
-	size_t head = ring->head;
-	size_t tail = ring->tail;
+    size_t head = ring->head;
+    size_t tail = ring->tail;
 
-	if ( (tail + 1)%INPUT_BUF_SIZE == head) {
-		return false;
-	}
-	
-	//debug_printf("Writing capref to ring. Tail = %d\n", ring->tail);
-	ring->buffer[tail] = *cap;
-	ring->tail = (tail+1) % INPUT_BUF_SIZE;
+    if ( (tail + 1)%INPUT_BUF_SIZE == head) {
+    	return false;
+    }
+    
+    //debug_printf("Writing capref to ring. Tail = %d\n", ring->tail);
+    ring->buffer[tail] = *cap;
+    ring->tail = (tail+1) % INPUT_BUF_SIZE;
 
-	return true	;
+    return true	;
 }
 
+/**
+ * \brief Reads a character from the ring buffer.
+ */
 char * read_from_ring(struct serial_ring_buffer * ring, char * c) {
 
-	
-	size_t head = ring->head;
-	size_t tail = ring->tail;
+    
+    size_t head = ring->head;
+    size_t tail = ring->tail;
 
-	// debug_printf("read_from_ring: Reading from ring! Head = %d , Tail = %d\n", ring->head, ring->tail);
-	if (head == tail) {
-		//debug_printf("Ring is null!\n");
-		return NULL;
-	}
-		
-	*c = ring->buffer[head];
-	ring->head = (head+1) % INPUT_BUF_SIZE;
-	
-	//thread_mutex_unlock(&ring->ring_lock);
+    // debug_printf("read_from_ring: Reading from ring! Head = %d , Tail = %d\n", ring->head, ring->tail);
+    if (head == tail) {
+    	//debug_printf("Ring is null!\n");
+    	return NULL;
+    }
+    	
+    *c = ring->buffer[head];
+    ring->head = (head+1) % INPUT_BUF_SIZE;
+    
+    //thread_mutex_unlock(&ring->ring_lock);
 
-	return c;
+    return c;
 }
 
+/**
+ * \brief Writes a character to the ring buffer.
+ */
 bool write_to_ring (struct serial_ring_buffer * ring, char * c) {
 
-	size_t head = ring->head;
-	size_t tail = ring->tail;
+    size_t head = ring->head;
+    size_t tail = ring->tail;
 
 
-	if ( (tail + 1)%INPUT_BUF_SIZE == head) {
-		return false;
-	}
+    if ( (tail + 1)%INPUT_BUF_SIZE == head) {
+    	return false;
+    }
 
-	//debug_printf("write_to_ring: Writing to ring! Ring tail = %d\n", ring->tail);
-	ring->buffer[tail] = *c;
-	ring->tail = (tail+1) % INPUT_BUF_SIZE;
+    //debug_printf("write_to_ring: Writing to ring! Ring tail = %d\n", ring->tail);
+    ring->buffer[tail] = *c;
+    ring->tail = (tail+1) % INPUT_BUF_SIZE;
 
-	return true	;
+    return true	;
 }
 
