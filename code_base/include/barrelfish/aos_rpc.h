@@ -49,16 +49,16 @@
 #define AOS_RPC_CLOSE_FILE	15
 
 struct aos_rpc {
-	struct lmp_chan rpc_channel;
+    struct lmp_chan rpc_channel;
 
-	struct thread_mutex lock;
-	struct waitset s_waitset;
+    struct thread_mutex lock;
+    struct waitset s_waitset;
 
-	size_t message_length;	
-	uint32_t words[9];
-	struct capref cap;
+    size_t message_length;	
+    uint32_t words[9];
+    struct capref cap;
 
-	char * shared_buffer;
+    char * shared_buffer;
 };
 
 
@@ -131,8 +131,8 @@ errval_t aos_rpc_open(struct aos_rpc *chan, char *path, int *fd);
 #define MAXNAMELEN 255
 
 enum filetype {
-	typeFile,
-	typeDir
+    typeFile,
+    typeDir
 };
 
 struct aos_dirent {
@@ -142,7 +142,7 @@ struct aos_dirent {
     size_t size;
     /// Optional: add more information about a directory entry here
     enum filetype type;
-	uint32_t firstCluster;
+    uint32_t firstCluster;
 };
 
 /**
