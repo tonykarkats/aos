@@ -62,8 +62,6 @@ struct aos_rpc {
 };
 
 
-errval_t aos_rpc_process_kill_process(struct aos_rpc *chan, domainid_t pid);
-
 /**
  * \brief send a string over the given channel
  */
