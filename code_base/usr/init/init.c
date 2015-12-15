@@ -78,7 +78,8 @@ static int boot_thread(void *arg)
 
 		write_to_core_1(core_1_msg);				
 
-		// Wait on pseudo lock, pseudo lock has the domain-id of the domain spawned	
+		// Wait on pseudo lock, pseudo lock has the domain-id of the domain spawned, 
+		// if it is actually spawned
 		while(pseudo_lock == -1);	
 			
 		// Report back to shell that process was spawned with the domain-id of the domain
