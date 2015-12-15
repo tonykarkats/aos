@@ -21,8 +21,6 @@ typedef uintptr_t lvaddr_t;
  *  size        : the size of the chunk
  *  reserved    : set when the memory is reserved
  *  frame cap   : the physical frame capability corresponding to the chunk
- *  l2_mapped   : boolean array that shows which l2 pages have been mapped
- *  l2_table_cap: the capabilities for the l2 pages
 */
   
 
@@ -95,28 +93,45 @@ rb_red_blk_tree* RBTreeCreate(int  (*CompFunc)(const void*, const void*),
     		     void (*PrintInfo)(const void*));
 
 rb_red_blk_node * RBTreeInsert(rb_red_blk_tree*, void* key, void* info);
+
 void RBTreePrint(rb_red_blk_tree*);
-void RBDelete(rb_red_blk_tree* , rb_red_blk_node* );
+
+void RBDelete(rb_red_blk_tree*, rb_red_blk_node*);
+
 void RBTreeDestroy(rb_red_blk_tree*);
+
 rb_red_blk_node* TreePredecessor(rb_red_blk_tree*,rb_red_blk_node*);
+
 rb_red_blk_node* TreeSuccessor(rb_red_blk_tree*,rb_red_blk_node*);
+
 rb_red_blk_node* RBExactQuery(rb_red_blk_tree*, void*);
+
 stk_stack * RBEnumerate(rb_red_blk_tree* tree,void* low, void* high);
 
 void VirtaddrDest(void* a);
+
 int VirtaddrComp(const void* a,const void* b);
+
 void VirtaddrInfoDest(void *);
+
 void VirtaddrPrint(const void*);
+
 void VirtaddrInfo(const void*);
+
 void LeftRotate(rb_red_blk_tree* tree, rb_red_blk_node* x);
+
 int is_virtual_address_mapped(rb_red_blk_tree*, lvaddr_t);
+
 void RightRotate(rb_red_blk_tree* tree, rb_red_blk_node* y);
 
 void RBDeleteFixUp(rb_red_blk_tree* tree, rb_red_blk_node* x);
+
 void InorderTreePrint(rb_red_blk_tree* tree, rb_red_blk_node* x);
+
 void TreeInsertHelp(rb_red_blk_tree* tree, rb_red_blk_node* z);
+
 void TreeDestHelper(rb_red_blk_tree* tree, rb_red_blk_node* x);
+
 lvaddr_t allocate_memory(rb_red_blk_tree*, size_t);
 
 rb_red_blk_node* find_memory_chunk (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t bytes, rb_red_blk_node* guard);
-
