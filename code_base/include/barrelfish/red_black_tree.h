@@ -27,20 +27,19 @@ typedef uintptr_t lvaddr_t;
   
 
 typedef struct memory_chunk {
-	size_t size;
-	int reserved;
 
+    size_t size;
+    int reserved;
     int current_frame_used;
     int total_frames_needed;
     int size_of_last_frame;
-	size_t frame_offset;
-	
+    size_t frame_offset;
     struct capref* frame_caps_for_region;
 
-	// For user provided frames only
-	bool user_provided_frame;
-	struct cnoderef user_frame_cnode;
-	struct capref cnode;
+    // For user provided frames only
+    bool user_provided_frame;
+    struct cnoderef user_frame_cnode;
+    struct capref cnode;
 } memory_chunk;
 
 /* Our paging state struct is a Red-Black tree whose nodes represent the
@@ -55,12 +54,12 @@ typedef struct memory_chunk {
 
 
 typedef struct rb_red_blk_node {
-	void* key;
+    void* key;
  	void* info;
  	int red; /* if red=0 then the node is black */
     struct rb_red_blk_node* left;
-	struct rb_red_blk_node* right;
-	struct rb_red_blk_node* parent;
+    struct rb_red_blk_node* right;
+    struct rb_red_blk_node* parent;
 
 } rb_red_blk_node;
 
@@ -68,32 +67,32 @@ typedef struct rb_red_blk_node {
 /* Compare(a,b) should return 1 if *a > *b, -1 if *a < *b, and 0 otherwise */
 /* Destroy(a) takes a pointer to whatever key might be and frees it accordingly */
 typedef struct rb_red_blk_tree {
-	int (*Compare)(const void* a, const void* b); 
-	void (*DestroyKey)(void* a);
-	void (*DestroyInfo)(void* a);
-	void (*PrintKey)(const void* a);
-	 void (*PrintInfo)(const void* a);
+    int (*Compare)(const void* a, const void* b); 
+    void (*DestroyKey)(void* a);
+    void (*DestroyInfo)(void* a);
+    void (*PrintKey)(const void* a);
+    void (*PrintInfo)(const void* a);
   /*  A sentinel is used for root and for nil.  These sentinels are */
   /*  created when RBTreeCreate is caled.  root->left should always */
   /*  point to the node which is the root of the tree.  nil points to a */
   /*  node which should always be black but has aribtrary children and */
   /*  parent and no key or info.  The point of using these sentinels is so */
   /*  that the root and nil nodes do not require special cases in the code */
-	rb_red_blk_node* root;             
-	rb_red_blk_node* nil;              
+    rb_red_blk_node* root;             
+    rb_red_blk_node* nil;              
 
-	lvaddr_t lowest_memory_address;
-	struct capref l2_tables[1024];
-	bool l2_maps[1024];
-	struct thread_mutex paging_tree_lock;
+    lvaddr_t lowest_memory_address;
+    struct capref l2_tables[1024];
+    bool l2_maps[1024];
+    struct thread_mutex paging_tree_lock;
 } rb_red_blk_tree;
 
 /* The functions below are described in the .c file */ 
 rb_red_blk_tree* RBTreeCreate(int  (*CompFunc)(const void*, const void*),
-			     void (*DestFunc)(void*), 
-			     void (*InfoDestFunc)(void*), 
-			     void (*PrintFunc)(const void*),
-			     void (*PrintInfo)(const void*));
+    		     void (*DestFunc)(void*), 
+    		     void (*InfoDestFunc)(void*), 
+    		     void (*PrintFunc)(const void*),
+    		     void (*PrintInfo)(const void*));
 
 rb_red_blk_node * RBTreeInsert(rb_red_blk_tree*, void* key, void* info);
 void RBTreePrint(rb_red_blk_tree*);
