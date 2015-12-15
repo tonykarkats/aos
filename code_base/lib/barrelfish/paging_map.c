@@ -4,6 +4,10 @@
 #include<stdint.h>
 
 
+/**
+ * \brief These 4 helper functions are used for our red black tree
+ *        for the paging.
+ */
 void VirtaddrDest(void* a) {
   free((int*)a);
 }
@@ -31,73 +35,82 @@ int is_virtual_address_mapped(rb_red_blk_tree* tree, lvaddr_t q) {
     return (( (memory_chunk*)is_in_memory_chunk->info)->reserved);
 }
 
+/**
+ * \brief This function finds an available node in our paging tree.
+ */
 rb_red_blk_node* find_node (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t bytes, rb_red_blk_node* guard) 
 {
-	rb_red_blk_node* nil=tree->nil;
-	rb_red_blk_node* root=tree->root;
+    rb_red_blk_node* nil=tree->nil;
+    rb_red_blk_node* root=tree->root;
     memory_chunk *chunk;
     rb_red_blk_node* init_guard = guard;
 
     if (x != tree->nil) {
-			init_guard = find_node(tree, x->left, bytes, init_guard);
+    		init_guard = find_node(tree, x->left, bytes, init_guard);
 //	    	printf("Searching node with start address = %p\n",*((lvaddr_t*)x->key));
-			if (init_guard == NULL) { 
-				 
-				chunk =  ((memory_chunk*) x->info);
-				if ( chunk->reserved == 1) 
-					init_guard = NULL;
-				else {
-					if (chunk->size > bytes) {
+    		if (init_guard == NULL) { 
+    			 
+    			chunk =  ((memory_chunk*) x->info);
+    			if ( chunk->reserved == 1) 
+    				init_guard = NULL;
+    			else {
+    				if (chunk->size > bytes) {
 //						printf("----- Memory area can fit into memory chunk that starts at %p\n", *((lvaddr_t*)x->key));
    						init_guard = x;
    					}
-					else 
-						init_guard = NULL;
-			}		
-		}
-		init_guard = find_node(tree, x->right, bytes, init_guard);
-		return init_guard;
+    				else 
+    					init_guard = NULL;
+    		}		
+    	}
+    	init_guard = find_node(tree, x->right, bytes, init_guard);
+    	return init_guard;
    }
    return init_guard;
 
 }
 
+/**
+ * \brief This function allocates a requested area on our paging struct
+ * 
+ * \param tree Our paging tree
+ * \param bytes The size in bytes of the requested area.
+ */
 lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
 
-	memory_chunk *chunk, *new_chunk_1, *new_chunk_2;
-	lvaddr_t *addr1, *addr2;
-	
-	rb_red_blk_node* node = find_node(tree, tree->root->left, bytes, NULL);	
-	
-	if (node == NULL) 
-		return -1;
+    memory_chunk *chunk, *new_chunk_1, *new_chunk_2;
+    lvaddr_t *addr1, *addr2;
+    
+    rb_red_blk_node* node = find_node(tree, tree->root->left, bytes, NULL);	
+    
+    if (node == NULL) 
+    	return -1;
 
-	printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
-	chunk = (memory_chunk*) node->info;
-	
-	size_t size1 = bytes;
-	size_t size2 = chunk->size - bytes;				
-	addr1 = (lvaddr_t*) malloc(sizeof(lvaddr_t));  
-	addr2 = (lvaddr_t*) malloc(sizeof(lvaddr_t));  
-	
-	*addr1 = *((lvaddr_t*) node->key);
-	*addr2 = *addr1 + bytes;
+    printf("Found node that fits our allocation that starts at = %p\n",*((lvaddr_t*)node->key));
+    chunk = (memory_chunk*) node->info;
+    
+    size_t size1 = bytes;
+    size_t size2 = chunk->size - bytes;				
+    addr1 = (lvaddr_t*) malloc(sizeof(lvaddr_t));  
+    addr2 = (lvaddr_t*) malloc(sizeof(lvaddr_t));  
+    
+    *addr1 = *((lvaddr_t*) node->key);
+    *addr2 = *addr1 + bytes;
 
-	new_chunk_1 = (memory_chunk*) malloc(sizeof(memory_chunk));			
-	new_chunk_2 = (memory_chunk*) malloc(sizeof(memory_chunk));		
+    new_chunk_1 = (memory_chunk*) malloc(sizeof(memory_chunk));			
+    new_chunk_2 = (memory_chunk*) malloc(sizeof(memory_chunk));		
 
-	new_chunk_1->size = bytes;
-	new_chunk_2->size = size2;
-				
-	new_chunk_1->reserved = 1;
-	new_chunk_2->reserved = 0;
+    new_chunk_1->size = bytes;
+    new_chunk_2->size = size2;
+    			
+    new_chunk_1->reserved = 1;
+    new_chunk_2->reserved = 0;
 
-	RBDelete(tree, node);
-	RBTreeInsert(tree, addr1, new_chunk_1);
-	RBTreeInsert(tree, addr2, new_chunk_2);	
+    RBDelete(tree, node);
+    RBTreeInsert(tree, addr1, new_chunk_1);
+    RBTreeInsert(tree, addr2, new_chunk_2);	
 
     //printf("!! Will return %p\n",*addr1);		
-	return *addr1;	
+    return *addr1;	
 }
 
 
