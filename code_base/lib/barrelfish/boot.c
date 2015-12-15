@@ -64,7 +64,7 @@ static errval_t cpu_memory_prepare(size_t *size, struct capref * cap_ret,
 
 
 /**
- * \brief This function loads the ELF file and relocates it to a given virtual address.
+ * \brief This function loads the ELF file and relocates it to a given physical address.
  *
  */
 static errval_t
