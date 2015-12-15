@@ -587,7 +587,7 @@ static void recv_handler(void *arg)
 			// Clears the process node and released the ram used
 			// by this child. 
 
-			clear_process_node(terminated_process, mm_ram);
+			clear_process_node(terminated_process);
 			free(terminated_process);
 	
 			// Inform core-0 that a process terminated ! 
