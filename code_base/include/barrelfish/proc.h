@@ -2,13 +2,11 @@
 #include <mm/mm.h>
 #include <spawndomain/spawndomain.h>
 #include <string.h>
+
 #define CLIENT_MEMORY_LIMIT 50*1024*1024
 
-/** Process node. It keeps all information regarding
- * memory consumed by a process, the shared frame between the 
- * domain and the init server etc.
- */
 struct frame_node {
+
 	struct capref frame;
 	size_t bits;
 	genpaddr_t base;
@@ -16,33 +14,29 @@ struct frame_node {
 };
 
 struct file_descriptor_node {
+
 	int fd;
 	int possition_in_file;
 	char *file_name;
-	
 	struct file_descriptor_node * next_file_descriptor;
 };
 
+/**
+ * \brief This struct describes a node on the process list maintained by the 
+ *        process manager.
+ */
 struct process_node {
 
-	domainid_t d_id;
-	char * name;
-	bool background;
-	struct capref client_endpoint;
-	struct capref dispatcher_frame;
-
-	// Shared memory between init process and spawned process
-	char * buffer;
-	struct capref shared_frame;
-
-	// Memory frames used by this domain
-	uint32_t memory_consumed; 	
-	struct frame_node *consumed_frame;
-
-	// Open file descriptors used by that process
-	struct file_descriptor_node *fd_node;	
-	
-	// Next process node 
+	domainid_t d_id;                      // <- The domain id of the process.
+	char * name;       		      // <- The name of the process.
+	bool background;   		      // <- Whether the process runs on the background.
+	struct capref client_endpoint;        // <- Endpoint of the client that requested the process.
+	struct capref dispatcher_frame;       // <- Unused.
+	char * buffer;                        // <- Shared buffer used for communication between init and spawned process.
+	struct capref shared_frame;           // <- Shared frame for the communication.
+	uint32_t memory_consumed;             // <- Amount of memory already consumed by the process
+	struct frame_node *consumed_frame;    // <- List of frames used by the process
+	struct file_descriptor_node *fd_node; // <- List of open files for this process.
 	struct process_node * next_pr;
 };
 
