@@ -64,7 +64,7 @@ void * SafeMalloc(size_t size) {
 /*  been defined */
 bool use_system_wide_malloc = false;
 
-#define BUFFER_SIZE 10UL*1024*1024
+#define BUFFER_SIZE 20UL*1024*1024
 static char memory_buffer[BUFFER_SIZE];
 static int pointer = 0;
 

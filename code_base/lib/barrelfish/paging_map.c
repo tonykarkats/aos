@@ -75,11 +75,14 @@ rb_red_blk_node* find_node (rb_red_blk_tree* tree, rb_red_blk_node* x, size_t by
  * \param tree Our paging tree
  * \param bytes The size in bytes of the requested area.
  */
-lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) {
+lvaddr_t allocate_memory(rb_red_blk_tree* tree, size_t bytes) 
+{
+	debug_printf("starting to allocate memory\n");
 
     memory_chunk *chunk, *new_chunk_1, *new_chunk_2;
     lvaddr_t *addr1, *addr2;
-    
+  
+	debug_printf("before find node\n");
     rb_red_blk_node* node = find_node(tree, tree->root->left, bytes, NULL);	
     
     if (node == NULL) 

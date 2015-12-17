@@ -14,14 +14,7 @@ int main(int argc, char *argv[])
 	size_t ret_len;
 
 	printf("Hello world from led_on!\n");
-	
-	domainid_t did;
-	err = aos_rpc_process_spawn(get_init_chan(),"led_on", 0, &did);
-	if (err_is_fail(err)) {
-		debug_printf("Could not spawn!\n");
-	}
-	
-	return 0;
+
 
 	err = aos_rpc_get_dev_cap(get_init_chan(), 0x4A310000, 4096, &dev_cap, &ret_len);
 	if (err_is_fail(err)) {

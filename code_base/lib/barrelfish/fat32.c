@@ -9,7 +9,7 @@ static uint32_t FirstDataSector;
 static uint32_t BPB_RootClus;
 static uint32_t FirstSectorofRootDir;
 static struct cnoderef cnode;
-static struct module_node * module_list_head;
+struct module_node * module_list_head;
 
 /**
  * \brief This function retrieves a module from the module cache if it is available. 
@@ -23,6 +23,7 @@ struct module_node * get_module_from_cache(char *module_name)
 
 	while (module_node != NULL) {
 		if (!strcmp(module_node->module_name, module_name)) {
+			debug_printf("Found %s \n", module_node->module_name);
 			return module_node;
 		} 
 		module_node = module_node->next;

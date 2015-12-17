@@ -85,7 +85,7 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
     errval_t err;
 
     // Find and round up the size of module, and save it back in retsize
-    // debug_printf("%s %d\n", __FILE__, __LINE__);
+    //debug_printf("%s %d\n", __FILE__, __LINE__);
     size_t size = module->mrmod_size;
     size = ROUND_UP(size, BASE_PAGE_SIZE);
     if (retsize) {
@@ -93,7 +93,7 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
     }
 
     // Get virtual address range to hold the module
-    // debug_printf("%s %d\n", __FILE__, __LINE__);
+    //debug_printf("%s %d\n", __FILE__, __LINE__);
     void *vaddr_range;
 	//debug_printf("spawn_map_module: Mapping module in our vspace with size = %zu\n", size);
     err = paging_alloc(get_current_paging_state(), &vaddr_range, size);
@@ -102,6 +102,7 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
         return (err);
     }
 
+	// debug_printf("Mapped it in our vspace!\n");
     // start_addr, rounded_up_size,
 
     struct capref frame = {
@@ -122,9 +123,10 @@ errval_t spawn_map_module(struct mem_region *module, size_t *retsize,
     }
 
     lvaddr_t vaddr = (lvaddr_t)vaddr_range;
-
+	//debug_printf("before while loop");
+	
     while (size > 0) {
-        // debug_printf("%s %d %zu\n", __FILE__, __LINE__, size);
+        //debug_printf("%s %d %zu\n", __FILE__, __LINE__, size);
         assert((size & BASE_PAGE_MASK) == 0);
 
         struct frame_identity id;

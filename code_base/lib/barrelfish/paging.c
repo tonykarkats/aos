@@ -27,7 +27,7 @@
 #include <math.h>
 
 #define S_SIZE_PER_THREAD 2*8192
-#define S_SIZE 1024*100
+#define S_SIZE 1024*1024*4
 
 #define MAX_MEMORY (1024*1024*3*512)
 static struct paging_state current;
@@ -631,11 +631,11 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     lvaddr_t vaddr;
     int frames_needed, size_of_last_frame;
     bytes = ROUND_UP(bytes, BYTES_PER_PAGE); 
-    //debug_printf("Before getting the lock!%zu\n");
+    // debug_printf("Before getting the lock!%zu\n");
  
-    thread_mutex_lock(&st->paging_tree_lock);
+    //thread_mutex_lock(&st->paging_tree_lock);
  
-    //debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
+    // debug_printf("Trying to allocate memory. Rounded up to %zu\n",bytes);
     
     vaddr = allocate_memory(st->mem_tree, bytes);
     if (vaddr == -1) {
@@ -643,7 +643,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     	return LIB_ERR_OUT_OF_VIRTUAL_ADDR;
     }
 
-    //debug_printf("paging_alloc: Memory allocated at %p\n",vaddr);
+    // debug_printf("paging_alloc: Memory allocated at %p\n",vaddr);
     
     node = RBExactQuery(st->mem_tree, &vaddr);
     struct memory_chunk* chunk = (struct memory_chunk*) node->info;
@@ -666,7 +666,7 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     		size_of_last_frame = 1024*1024;
     	}
     	
-    	// debug_printf("SIZE OF LAST FRAME = %d\n", size_of_last_frame);
+    	//debug_printf("SIZE OF LAST FRAME = %d\n", size_of_last_frame);
     	chunk->current_frame_used = -1;
     	chunk->total_frames_needed = frames_needed;
     	chunk->size_of_last_frame  = size_of_last_frame;
@@ -674,11 +674,11 @@ errval_t paging_alloc(struct paging_state *st, void **buf, size_t bytes)
     	chunk->frame_caps_for_region = (struct capref *) SafeMalloc(sizeof(struct capref) * frames_needed);	
     }
 
-    thread_mutex_unlock(&st->paging_tree_lock);
+    //thread_mutex_unlock(&st->paging_tree_lock);
     	
     *buf = (void *)vaddr;
 
-    //debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
+    // debug_printf("paging_alloc: Allocated address at %p with size = %zu and total pages = %d\n", *buf, bytes, bytes/BYTES_PER_PAGE);
     return SYS_ERR_OK;
 }
 

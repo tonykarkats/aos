@@ -52,15 +52,6 @@ int main(int argc, char *argv[])
 	char *next_token;
 	size_t dir_entries;
 
-	domainid_t did_2;
-	int sp = 1;
-	while(1) {
-		err = aos_rpc_process_spawn(get_init_chan(), "led_on", 0, &did_2);
-		debug_printf("SPAWNED %d\n", sp++);
-	}
-
-
-
 	while(1) {
 		printf("$>");
 		fflush(stdout);

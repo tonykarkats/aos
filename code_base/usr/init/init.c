@@ -37,7 +37,7 @@
 
 
 // shared variable between cross-core thread and recv handler
-volatile int pseudo_lock;
+// volatile int pseudo_lock;
 
 struct thread_mutex process_list_lock;
 
@@ -69,31 +69,12 @@ static int boot_thread(void *arg)
 	
 		struct ump_message core_1_msg;
 		core_1_msg.type = SPAWNED_PROCESS_REQUEST;
-		core_1_msg.util_word = global_did;
+		core_1_msg.util_word  = global_did;
+		core_1_msg.client_cap = client_ep;
 		strcpy((char *) core_1_msg.words, mod_name);
 		
-		pseudo_lock = -1;
-
 		write_to_core_1(core_1_msg);				
 
-		// Wait on pseudo lock, pseudo lock has the domain-id of the domain spawned, 
-		// if it is actually spawned
-		while(pseudo_lock == -1);	
-			
-		// Report back to shell that process was spawned with the domain-id of the domain
-		err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, pseudo_lock);
-		if (err_is_fail(err)) {
-			DEBUG_ERR(err,"recv_handler: Can not report process creation back to client!\n");
-		}
-
-		if (pseudo_lock != 0) {
-			err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
-			if (err_is_fail(err)) {
-				DEBUG_ERR(err,"recv_handler: Can not report back to client!\n");
-			}
-		}			
-		
-		cap_destroy(client_ep);
 	}
 	else {
 
@@ -102,24 +83,26 @@ static int boot_thread(void *arg)
 		uint32_t len = 0;
 	
 		char * name = strcat(prefix, mod_name);
-	
-		debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
 		
+		debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
+			
 		struct module_node * module = get_module_from_cache(name);
 		if (module == NULL) {
 			err = read_file(name, &buf, 0, 0, &len, true);
+			debug_printf("file read!\n");
 			if (err_is_fail(err)) {
 				debug_printf("Could not read module from sd card! Will boot it from kernel\n");
 			}	
-			else 
+			else {
+				debug_printf("puting it in cache!\n"); 
 				put_module_in_cache( name, buf, len);
+			}
 		}
 		else {
 			buf = module->module_data;
 			len = module->len; 
 		}
-
-		debug_printf("Spawning the module!\n");
+		
 		struct spawninfo si;	
 		struct capref disp_frame;
 		domainid_t d_id;
@@ -138,15 +121,14 @@ static int boot_thread(void *arg)
 			thread_mutex_unlock(&process_list_lock);
 		}
 		
-		debug_printf("Answering to client..\n");
 		err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
 		if (err_is_fail(err)) {
 			DEBUG_ERR(err,"boot_thread: Can not send domain id back to the client!\n");
 		}
 	}		
 
-	//free(args->name);
-	//free(args);
+	free(args->name);
+	free(args);
 
 	return 0;
 }
@@ -190,9 +172,17 @@ static int cross_core_thread_0(void *arg)
 					pr_head = insert_process_node(pr_head, success_spawn, spawned_process, true, NULL_CAP, NULL_CAP);
 					thread_mutex_unlock(&process_list_lock);
 				}
-					
+
+				struct capref client_ep = received_message.client_cap;
+
+				err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, 0);
+				if (err_is_fail(err)) {
+					debug_printf("boot_thread: Can not report back to client!\n");
+				}
+
+				cap_destroy(client_ep);	
 			    // debug_printf("core-1 returned to us spawned response with response %d and name %s!\n", success_spawn, spawned_process);
-				pseudo_lock = success_spawn;
+				// pseudo_lock = success_spawn;
 	
 				break;
 			case(SPAWNED_PROCESS_TERMINATED_RESPONSE): ;
@@ -301,7 +291,8 @@ static void recv_handler(void *arg)
 
 			process->shared_frame = shared_frame;	
 			thread_mutex_unlock(&process_list_lock);
-								
+							
+			debug_printf("Sending back to the client!\n");	
 			err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, shared_frame, (uint32_t) requested_did);
 			if (err_is_fail(err))
 				DEBUG_ERR(err,"recv_handler: Error in sending did back to the process!\n");	

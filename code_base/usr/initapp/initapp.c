@@ -61,6 +61,7 @@ static int boot_thread (void * arg)
 	uint32_t len = 0;
 	char * name = strcat(prefix, mod_name);
 	
+		
 	debug_printf("Reading module %s binary from SD card.. This might take a while...\n", mod_name);
 		
 	struct module_node * module = get_module_from_cache(name);
@@ -103,6 +104,7 @@ static int boot_thread (void * arg)
 	struct ump_message returned_message;
 	returned_message.type      = SPAWNED_PROCESS_RESPONSE;
 	returned_message.util_word = util_word;
+	returned_message.client_cap = args->client_ep;
 	strcpy( (char *) returned_message.words, mod_name);
 	
 	write_to_core_0(returned_message);					
@@ -141,6 +143,7 @@ static int cross_core_thread_1(void *arg)
 			struct boot_thread_args * bt = (struct boot_thread_args *) malloc(sizeof(struct boot_thread_args));
 			strncpy(bt->name, message_string, 36);
 			bt->domain_id = spawned_domain;
+			bt->client_ep = received_message.client_cap;
 
 			struct thread* bthread = thread_create(boot_thread, bt);
 			bthread = bthread;
@@ -366,7 +369,6 @@ static void recv_handler(void *arg)
 				}
 				else {
 					// Remote core accepted our request for spawning! Value of pseudo_lock is the returned domain-id
-					//debug_printf("Core-0 responded with did %zu\n", pseudo_lock);
 					uint32_t util_word;
 					struct spawninfo si;	
 					struct capref disp_frame;	

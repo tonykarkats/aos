@@ -24,6 +24,7 @@ extern struct bootinfo *bi;
 struct boot_thread_args {
 	char name[36];
 	int domain_id;
+	struct capref client_ep;
 };
 errval_t initialize_ram_alloc(void);
 
