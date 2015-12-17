@@ -17,7 +17,7 @@ enum type {
 struct ump_message {
 	uint32_t is_request;
 	enum type type;
-
+	struct capref client_cap; // Used for answering back to our client that domain is spawned. this is a hack :)
  	uint32_t words[9];
 	uint32_t util_word;
 };

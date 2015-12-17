@@ -29,7 +29,6 @@
 #include <barrelfish/proc.h>
 #include <barrelfish/boot.h>
 #include <barrelfish/cross_core.h>
-// #include "../../lib/spawndomain/arch.h"
 #include <mm/mm.h>
 
 #define FIRSTEP_BUFLEN          21u
@@ -68,7 +67,7 @@ static int boot_thread (void * arg)
 	if (module == NULL) {
 		err = read_file(name, &buf, 0, 0, &len, true);
 		if (err_is_fail(err)) {
-			debug_printf("Could not read module from sd card! Will boot it from kernel\n");
+			debug_printf("Could not read module from sd card! Will boot it from bootinfobootinfo modulee\n");
 		}	
 		else 
 			put_module_in_cache(name, buf, len);

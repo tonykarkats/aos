@@ -173,24 +173,19 @@ void clear_process_node(struct process_node *node)
 
 	struct frame_node* head_frame = node->consumed_frame;
 	struct frame_node* temp;
-	err = 1;
 	
-	//debug_printf("Clearing up for client that requested total memory %" PRIu32 "\n", node->memory_consumed);
 	// First free ALL allocated frames and also 
 	// free regions in mm_ram allocator
 	while (head_frame != NULL) {
 
-		//debug_printf("clearing frame! with base %"PRIu32" and size %" PRIu32 "\n", head_frame->base, head_frame->bits);	
 		
 		err = memserv_free(head_frame->frame, head_frame->base, head_frame->bits);
 		if (err_is_fail(err)) {
 			debug_printf("Can not free frame in mm_ram allocator!\n");	
 		}	
 		
-		//debug_printf("cleared frame!\n");	
-
 		cap_revoke(head_frame->frame);
-		// cap_delete(head_frame->frame);	
+		
 		temp = head_frame;
 		head_frame = head_frame->next_frame;		
 		free(temp);
@@ -199,8 +194,14 @@ void clear_process_node(struct process_node *node)
 	// Then free everything else in the node	
 	free(node->name);
 
-	// debug_printf("ram cleared...\n");
+	// Free shared frame with the client 
+	struct frame_identity fid;
+	err = invoke_frame_identify(node->shared_frame, &fid);
+	if (err_is_ok(err)) {	
+		memserv_free(node->shared_frame, fid.base, fid.bits);		
+	}
 
+	// Free all file descriptor nodes!
 	struct file_descriptor_node * head_fd = node->fd_node;
 	struct file_descriptor_node * temp_fd;
 
@@ -221,6 +222,7 @@ void clear_process_node(struct process_node *node)
 	if (err_is_fail(err)) {
 		debug_printf("Can not free memory region of terminated process!\n");
 	}
+
 	return;
 }
 
@@ -335,8 +337,8 @@ errval_t locate_and_map_shared_frame( struct process_node *node, struct capref *
  * \param my_core_id Core in which to spawn the domain.
  * \param dispatcher_frame The saved dispatcher frame.
  * \param did Domain id.
- * \param elf_vaddr The address of the elf to load from.
- * \param elf_size The size of the elf
+ * \param elf_vaddr The address of the elf to load from - if NULL then elf is loaded from multiboot image
+ * \param elf_size The size of the elf - Used only IF elf_vaddr != NULL.
  *
  */
 errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi,
@@ -349,14 +351,12 @@ errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct 
 	
 	char * module_name = strcat(prefix, name);
 
-	//debug_printf("Before spawn! %s\n", module_name);
 	err = spawn_load_with_bootinfo(domain_si, bi, module_name, my_core_id, did, elf_vaddr, elf_size);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_load_with_bootinfo: ERROR in loading module %s! Error %s\n", name, err_getstring(err));
 		return SPAWN_ERR_LOAD;
 	}
 
-	//debug_printf("Before run!\n");
 	err = spawn_run(domain_si);
 	if (err_is_fail(err)) {
 		debug_printf("spawn_load_with_bootinfo: ERROR in running module %s!\n", name);

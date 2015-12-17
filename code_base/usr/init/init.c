@@ -32,8 +32,6 @@
 #include <barrelfish/cross_core.h>
 #include <mm/mm.h>
 
-#define UNUSED(x) (x) = (x)
-
 #define FIRSTEP_BUFLEN          21u
 #define FIRSTEP_OFFSET          (33472u + 56u)
 
@@ -121,6 +119,7 @@ static int boot_thread(void *arg)
 			len = module->len; 
 		}
 
+		debug_printf("Spawning the module!\n");
 		struct spawninfo si;	
 		struct capref disp_frame;
 		domainid_t d_id;
@@ -131,6 +130,7 @@ static int boot_thread(void *arg)
 			d_id = 0;	
 		}
 		else {
+			debug_printf("Spawned inserting to list...\n");
 			thread_mutex_lock(&process_list_lock);
 			global_did++;
 			d_id = global_did;	
@@ -138,14 +138,15 @@ static int boot_thread(void *arg)
 			thread_mutex_unlock(&process_list_lock);
 		}
 		
+		debug_printf("Answering to client..\n");
 		err = lmp_ep_send1(client_ep, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, d_id);
 		if (err_is_fail(err)) {
 			DEBUG_ERR(err,"boot_thread: Can not send domain id back to the client!\n");
 		}
 	}		
 
-	free(args->name);
-	free(args);
+	//free(args->name);
+	//free(args);
 
 	return 0;
 }
@@ -282,11 +283,12 @@ static void recv_handler(void *arg)
 		
 			thread_mutex_lock(&process_list_lock);	
 			process = get_process_node(&pr_head, requested_did, "aa");
+
 			// Map shared frame at child process node
 			debug_printf("Mapping shared frame for client!\n");
 			err = paging_map_frame( get_current_paging_state(), 
 										(void **) &(process->buffer),
-										4096, shared_frame, NULL, NULL);
+										4096, shared_frame, NULL, NULL);			
 
 			// Assert some magic value that the other side expects. Sanity check
 			for (int byte = 0; byte < 4096; byte++)
@@ -333,6 +335,7 @@ static void recv_handler(void *arg)
 			// Check if client has exceeded it's memory limit
 			// and keep track of the frames allocated from this client.
 			thread_mutex_lock(&process_list_lock);	
+
 			process = get_process_node(&pr_head, domain_id, "aa");
 			if ((process->memory_consumed + pow(2, size_requested)) > CLIENT_MEMORY_LIMIT) {
 				// Client has exceeded its memory limit do not give more memory.
@@ -508,10 +511,8 @@ static void recv_handler(void *arg)
 			uint32_t temp_size;
 			err = list( open_file_name, &temp_dirtable, &temp_size);
 
-			//debug_printf("Returned type = %" PRIu32 ". Type = %d Will open file %s\n", temp_size, temp_dirtable[0].type , temp_dirtable[0].name);
 			// file not found, or a directory or not a file :)
 			if (err_is_fail(err) || temp_size != 1 || temp_dirtable[0].type == typeDir) { 
-				//debug_printf("no file!\n");
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) -1);
 				if (err_is_fail(err)) {
 					DEBUG_ERR(err,"recv_handler: Can not send request for open file back to the client!\n");
@@ -525,11 +526,6 @@ static void recv_handler(void *arg)
 				next_fd ++;
 				update_fd_list(process, next_fd, 0, open_file_name);
 
-				//struct file_descriptor_node* n = process->fd_node;
-				//while(n != NULL) {
-				//	debug_printf("fd = %d name = %s\n", n->fd, n->file_name);
-				//	n = n->next_file_descriptor;
-				//}
 				thread_mutex_unlock(&process_list_lock);	
 				
 				err = lmp_chan_send1(lc, LMP_SEND_FLAGS_DEFAULT, NULL_CAP, (uint32_t) next_fd);
@@ -572,7 +568,8 @@ static void recv_handler(void *arg)
 					if (ret_size != 0)
 						memcpy(process->buffer, fbuf, ret_size);	
 				}
-				
+			
+				cap_destroy(cap);	
 				free(fbuf);
 			}
 
@@ -636,11 +633,15 @@ static void recv_handler(void *arg)
 			// by this child. 
 			clear_process_node(terminated_process);
 			free(terminated_process);
-			
+
+			cap_destroy(cap);	
 			break;
 	}
 }
 
+/* 
+ * Sets up init's endpoint 
+ */
 static errval_t setup_channel(struct lmp_chan *channel) {
 
 	errval_t err;
@@ -804,15 +805,7 @@ int main(int argc, char *argv[])
 	
 	void *buf = NULL;
 	uint32_t len = 0;
-	
-	/*	
-	debug_printf("Reading shell binary from SD card.. This might take a while...\n");
-	err = read_file("/armv7/sbin/shell", &buf, 0, 0, &len, true);
-	if (err_is_fail(err)) {
-		debug_printf("Could not read module from sd card!\n");
-	}	
-	*/
-
+		
 	struct spawninfo led_si;	
 	struct capref dispframe1;
 	err = bootstrap_domain("shell", &led_si, bi, my_core_id, &dispframe1, global_did, buf, len);

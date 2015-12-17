@@ -36,8 +36,6 @@ errval_t map_shared_frame(void **buf, bool init_frame)
 	struct frame_identity fid;
 	invoke_frame_identify(ump_frame, &fid);
 
-	// debug_printf("map_shared_frame: Base of frame is 0x%x\n", fid.base);	
-
 	err = paging_map_frame_attr(get_current_paging_state(), buf, 4096, ump_frame, DEVICE_FLAGS, NULL, NULL);
 	if (err_is_fail(err)) {
 		debug_printf("Can not allocate and map for UMP shared frame!\n");

@@ -34,6 +34,8 @@ struct process_node {
 	struct capref dispatcher_frame;       // <- Unused.
 	char * buffer;                        // <- Shared buffer used for communication between init and spawned process.
 	struct capref shared_frame;           // <- Shared frame for the communication.
+	uint32_t shared_frame_base;			  // -< Base of the shared frame with the client, kept for freeing the memory at cleanup
+		
 	uint32_t memory_consumed;             // <- Amount of memory already consumed by the process
 	struct frame_node *consumed_frame;    // <- List of frames used by the process
 	struct file_descriptor_node *fd_node; // <- List of open files for this process.
