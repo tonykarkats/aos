@@ -1,6 +1,16 @@
 #include <barrelfish/proc.h>
 #include <barrelfish/mem_serv.h>
 
+/**
+ * \brief Searches through the process list for a process node with a given name or domain id.
+ *        One of did or name must not be NULL. 
+ *
+ * \param head The head of the process list.
+ * \param did The domain id to search for.
+ * \param name The name to search for.
+ * 
+ * \return The node that was found or NULL if no node was found.
+ */
 struct process_node * get_process_node(struct process_node ** head, domainid_t did, char * name) 
 {
 	struct process_node * active = *head;
@@ -18,7 +28,15 @@ struct process_node * get_process_node(struct process_node ** head, domainid_t d
 }
 
 
-
+/**
+ * \brief Deletes from the process list a process node with a given name or domain id.
+ *        One of did or name must not be NULL. 
+ *
+ * \param head The head of the process list.
+ * \param did The domain id to search for.
+ * \param name The name to search for.
+ * 
+ */
 struct process_node * delete_process_node(struct process_node ** head, domainid_t did, char * name) 
 {
 	struct process_node * active = *head;
@@ -45,6 +63,19 @@ struct process_node * delete_process_node(struct process_node ** head, domainid_
 	return NULL;
 }
 
+
+/**
+ * \brief Inserts a new process node into the process list.
+ *        One of did or name must not be NULL. 
+ *
+ * \param head The head of the process list.
+ * \param did The domain id of the new process.
+ * \param name The name of the new process.
+ * \param background Whether the process is spawned on the background.
+ * \param client_endpoint The endpoint of the client that spawned the process.
+ * \param dispatcher_frame Unused
+ * 
+ */
 struct process_node* insert_process_node(struct process_node * head, domainid_t did, char * name, bool background, struct capref client_endpoint, struct capref dispatcher_frame) {
 
 	struct process_node* new_node = (struct process_node *) malloc(sizeof(struct process_node));
@@ -73,6 +104,15 @@ struct process_node* insert_process_node(struct process_node * head, domainid_t 
 	return new_node;
 }
 
+/**
+ * \brief Retrieves a process with a given name from the process list.
+ *
+ * \param head The head of the process list.
+ * \param name The name to search for.
+ *
+ * \return The domain id of the process found or 0 if it was not found.
+ * 
+ */
 domainid_t get_did_by_name(struct process_node * head, const char * name) 
 {
 	struct process_node * node = head;
@@ -87,6 +127,15 @@ domainid_t get_did_by_name(struct process_node * head, const char * name)
 	
 }
 
+/**
+ * \brief Retrieves a process with a given domain id from the process list.
+ *
+ * \param head The head of the process list.
+ * \param did The domain id to search for.
+ *
+ * \return The name of the process found or NULL if it was not found.
+ * 
+ */
 char * get_name_by_did(struct process_node * head, domainid_t did) 
 {
 	struct process_node * node = head;
@@ -101,6 +150,9 @@ char * get_name_by_did(struct process_node * head, domainid_t did)
 	
 }
 
+/**
+ * \brief Helper function that prints all the nodes of a process list.
+ */
 void print_nodes( struct process_node *head) 
 {
 	struct process_node * node = head;
@@ -112,6 +164,9 @@ void print_nodes( struct process_node *head)
 
 }
 
+/**
+ * \brief Free up all the resources a process node consumes.
+ */
 void clear_process_node(struct process_node *node) 
 {
 	errval_t err;
@@ -169,6 +224,9 @@ void clear_process_node(struct process_node *node)
 	return;
 }
 
+/**
+ * \brief Insert a new file into the open files list.
+ */
 void update_fd_list (struct process_node *node, int fd, int poss, char * name) 
 {
 
@@ -186,6 +244,9 @@ void update_fd_list (struct process_node *node, int fd, int poss, char * name)
 	return;
 }
 
+/**
+ * \brief Checks if a file descriptor exists in an open files list.
+ */
 char * check_if_fd_exists(struct file_descriptor_node *node, int fd) 
 {
 	struct file_descriptor_node * head = node;
@@ -202,6 +263,9 @@ char * check_if_fd_exists(struct file_descriptor_node *node, int fd)
 	return NULL;
 }
 
+/**
+ * \brief Deletes a file descriptor from an open files list.
+ */
 bool delete_fd(struct process_node *node, int fd) 
 {
 	struct file_descriptor_node * head = node->fd_node;
@@ -262,7 +326,22 @@ errval_t locate_and_map_shared_frame( struct process_node *node, struct capref *
 
 }
 
-errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi, coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did, char * elf_vaddr, uint32_t elf_size)
+/**
+ * \brief Spawns a new domain on the given core.
+ *
+ * \param name The name of the domain to spawn. Will be prefixed with armv7/sbin/
+ * \param domain_si The spawinfo struct of the domain.
+ * \param bi The bootinfo struct.
+ * \param my_core_id Core in which to spawn the domain.
+ * \param dispatcher_frame The saved dispatcher frame.
+ * \param did Domain id.
+ * \param elf_vaddr The address of the elf to load from.
+ * \param elf_size The size of the elf
+ *
+ */
+errval_t bootstrap_domain(const char *name, struct spawninfo *domain_si, struct bootinfo* bi,
+			  coreid_t my_core_id, struct capref* dispatcher_frame, domainid_t did,
+			  char * elf_vaddr, uint32_t elf_size)
 {
 
 	errval_t err;
