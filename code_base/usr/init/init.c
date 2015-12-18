@@ -560,7 +560,7 @@ static void recv_handler(void *arg)
 						memcpy(process->buffer, fbuf, ret_size);	
 				}
 			
-				cap_destroy(cap);	
+				//cap_destroy(cap);	
 				free(fbuf);
 			}
 

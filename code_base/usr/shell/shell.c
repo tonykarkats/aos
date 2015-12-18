@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 			else {
 				// debug_printf("entries = %"PRIu32"\n", dir_entries);
 				for (int i = 0; i < dir_entries; i++) {
-					printf("%s %"PRIu32" | ", dirtable[i].name, dirtable[i].size);
+					printf("%s %"PRIu32" %s | ", dirtable[i].name, dirtable[i].size, (dirtable[i].type == 0) ? " F " : "D" );
 				}	
 				printf("\n");
 				

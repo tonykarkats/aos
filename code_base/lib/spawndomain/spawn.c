@@ -742,7 +742,6 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
 	// If no address provided locate and map module from boot info.
 	if (elf_vaddr == NULL) {
 		    /* Get the module from the multiboot */
-    	debug_printf("spawning from multiboot\n");
 		struct mem_region *module = multiboot_find_module(bi, name);
     	if (module == NULL) {
     	    debug_printf("could not find module [%s] in multiboot image\n", name);
@@ -761,7 +760,6 @@ errval_t spawn_load_with_bootinfo(struct spawninfo *si, struct bootinfo *bi,
 		binary = (lvaddr_t) elf_vaddr;	
 	}
 
-	debug_printf("module mapped... moving on!\n");
     /* Determine cpu type */
     err = spawn_determine_cputype(si, binary);
     if (err_is_fail(err)) {

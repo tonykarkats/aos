@@ -132,29 +132,29 @@ errval_t fat32_init(void) {
 	BPB_BytsPerSec = (((uint8_t*) buffer)[12] <<  8) +
 				   			  ((uint8_t*) buffer)[11];
 
-	debug_printf("Bytes Per Sector: %d\n", BPB_BytsPerSec);
+	debug_printf("FAT: Bytes Per Sector: %d\n", BPB_BytsPerSec);
 
 
 	BPB_SecPerClus =  ((uint8_t*) buffer)[13];
-	debug_printf("Number of Sectors per Cluster: %d\n", BPB_SecPerClus);
+	debug_printf("FAT: Number of Sectors per Cluster: %d\n", BPB_SecPerClus);
 
 	BPB_NumFATs =  ((uint8_t*) buffer)[16];
-	debug_printf("Number of FATs: %d\n", BPB_NumFATs);
+	debug_printf("FAT: Number of FATs: %d\n", BPB_NumFATs);
 
 	FATSz = 	(((uint8_t*) buffer)[39] << 24) +
 				   		(((uint8_t*) buffer)[38] << 16) +
 				   		(((uint8_t*) buffer)[37] <<  8) +
 				   		((uint8_t*) buffer)[36];
-	debug_printf("Size of FAT: %d\n", FATSz);
+	//debug_printf("Size of FAT: %d\n", FATSz);
 
 	BPB_RsvdSecCnt = (((uint8_t*) buffer)[15] <<  8) +
 				   			  ((uint8_t*) buffer)[14];
 
-	debug_printf("Number of reserved sectors: %d\n", BPB_RsvdSecCnt);
+	//debug_printf("Number of reserved sectors: %d\n", BPB_RsvdSecCnt);
 
 	// Calculate the start of the data region
 	FirstDataSector = BPB_RsvdSecCnt + (BPB_NumFATs*FATSz);
-	debug_printf("First Data Sector: %d\n", FirstDataSector);
+	//debug_printf("First Data Sector: %d\n", FirstDataSector);
 
 	// Calculate first cluster of root directory
 		
@@ -162,13 +162,13 @@ errval_t fat32_init(void) {
 				   				(((uint8_t*) buffer)[46] << 16) +
 				   				(((uint8_t*) buffer)[45] <<  8) +
 				   				((uint8_t*) buffer)[44];
-	debug_printf("First cluster of Root Directory: %d\n", BPB_RootClus);
+	//debug_printf("First cluster of Root Directory: %d\n", BPB_RootClus);
 
 
 	// Now we have to find the sector number of the root directory
 	
 	FirstSectorofRootDir = ((BPB_RootClus-2)*BPB_SecPerClus + FirstDataSector);
-	debug_printf("First sector of Root Directory : %d\n", FirstSectorofRootDir); 
+	//debug_printf("First sector of Root Directory : %d\n", FirstSectorofRootDir); 
 
 	return SYS_ERR_OK;
 }
