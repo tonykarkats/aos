@@ -19,11 +19,13 @@ int main(int argc, char *argv[])
 	err = aos_rpc_get_dev_cap(get_init_chan(), 0x4A310000, 4096, &dev_cap, &ret_len);
 	if (err_is_fail(err)) {
 		debug_printf("Can not get device frame!\n");
-		abort();
+		return 1;
 	}
 
-	if (capref_is_null(dev_cap))
-		printf("Got null dev?!\n");
+	if (capref_is_null(dev_cap)) {
+		debug_printf("Got null dev?!\n");
+		return 1;
+	}
 
 	void * vbuf;	
 	err = paging_map_frame_attr(get_current_paging_state(), &vbuf, 4096, dev_cap, DEVICE_FLAGS, NULL, NULL);
